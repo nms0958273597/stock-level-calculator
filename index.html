@@ -2,74 +2,434 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>股票關卡計算機</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>股票關卡計算機｜三大法人</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f7fa;color:#222}
-.container{max-width:600px;margin:auto}
-h1{text-align:center;margin:10px 0 20px}
-.card{background:white;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 3px 12px #0001}
-label{display:block;font-weight:600;margin:12px 0 6px}
-input{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;font-size:18px}
-button{width:100%;padding:15px;border:0;border-radius:10px;background:#1677ff;color:white;font-size:18px;font-weight:bold;margin-top:18px}
-.result{font-size:20px;line-height:1.8}
-.green{color:#16803c}.red{color:#d33}
-.small{color:#777;font-size:14px}
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  padding:20px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f3f5f7;
+  color:#222;
+}
+
+.container{
+  max-width:600px;
+  margin:auto;
+}
+
+h1{
+  text-align:center;
+  margin:10px 0 20px;
+  font-size:28px;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+label{
+  display:block;
+  font-weight:700;
+  margin:14px 0 7px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  font-size:18px;
+}
+
+button{
+  width:100%;
+  padding:16px;
+  margin-top:18px;
+  border:0;
+  border-radius:12px;
+  background:#2878f0;
+  color:white;
+  font-size:20px;
+  font-weight:700;
+}
+
+.result{
+  font-size:20px;
+  line-height:1.8;
+}
+
+.green{
+  color:#16803c;
+  font-weight:700;
+}
+
+.red{
+  color:#d33;
+  font-weight:700;
+}
+
+.blue{
+  color:#1670c5;
+  font-weight:700;
+}
+
+.gray{
+  color:#777;
+}
+
+.section-title{
+  font-size:22px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.institution{
+  background:#f8f9fb;
+  padding:12px;
+  border-radius:12px;
+  margin-top:10px;
+}
+
+.total{
+  background:#eef5ff;
+  border-radius:12px;
+  padding:15px;
+  margin-top:15px;
+}
+
+.status{
+  text-align:center;
+  font-size:24px;
+  font-weight:800;
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+}
+
+.status-bull{
+  background:#e8f7ed;
+  color:#16803c;
+}
+
+.status-bear{
+  background:#fff0f0;
+  color:#d33;
+}
+
+.small{
+  font-size:14px;
+  color:#777;
+}
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
 <h1>📈 股票關卡計算機</h1>
 
 <div class="card">
+
+<label>股票名稱</label>
+<input id="stock" type="text" placeholder="例如：台化">
+
 <label>股票現價</label>
-<input id="price" type="number" step="0.01" placeholder="例如 36.30">
+<input id="price" type="number" step="0.01" placeholder="例如：36.30">
 
-<label>成本價</label>
-<input id="cost" type="number" step="0.01" placeholder="例如 36.30">
+<label>我的成本</label>
+<input id="cost" type="number" step="0.01" placeholder="例如：36.30">
 
-<label>上漲／下跌百分比</label>
-<input id="percent" type="number" step="0.1" value="10">
+<label>上漲 / 下跌百分比</label>
+<input id="percent" type="number" step="0.1" value="2">
 
 <button onclick="calculate()">開始計算</button>
-</div>
-
-<div class="card result" id="result">
-請輸入資料後按「開始計算」
-</div>
 
 </div>
+
+
+<div class="card result">
+
+<div class="section-title">📊 價格計算</div>
+
+<div id="priceResult">
+請輸入現價、成本後開始計算
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="section-title">🏦 三大法人</div>
+
+<div class="small">
+請輸入「買超為正數、賣超為負數」
+</div>
+
+
+<div class="institution">
+
+<label>外資</label>
+<input id="foreign" type="number" placeholder="例如：1440000 或 -1440000">
+
+</div>
+
+
+<div class="institution">
+
+<label>投信</label>
+<input id="trust" type="number" placeholder="例如：50000 或 -50000">
+
+</div>
+
+
+<div class="institution">
+
+<label>自營商</label>
+<input id="dealer" type="number" placeholder="例如：20000 或 -20000">
+
+</div>
+
+<button onclick="calculateInstitutions()">計算三大法人</button>
+
+
+<div id="institutionResult"></div>
+
+</div>
+
+
+<div class="card">
+
+<div class="section-title">🎯 關卡價格</div>
+
+<div id="levels">
+請先輸入資料
+</div>
+
+</div>
+
+</div>
+
 
 <script>
-function calculate(){
-  const price=Number(document.getElementById("price").value);
-  const cost=Number(document.getElementById("cost").value);
-  const p=Number(document.getElementById("percent").value);
 
-  if(!price || !cost){
-    document.getElementById("result").innerHTML="⚠️ 請輸入現價與成本價";
+function numberFormat(num){
+
+  return Number(num).toLocaleString('zh-TW',{
+    maximumFractionDigits:0
+  });
+
+}
+
+
+function calculate(){
+
+  const price = Number(document.getElementById("price").value);
+
+  const cost = Number(document.getElementById("cost").value);
+
+  const p = Number(document.getElementById("percent").value);
+
+
+  if(!price || !cost || !p){
+
+    alert("請把現價、成本、漲跌百分比填完整");
+
     return;
+
   }
 
-  const up=price*(1+p/100);
-  const down=price*(1-p/100);
-  const profit=(price-cost)/cost*100;
 
-  document.getElementById("result").innerHTML=`
-    <b>📊 計算結果</b><br><br>
-    現價：<b>${price.toFixed(2)}</b><br>
-    成本：<b>${cost.toFixed(2)}</b><br>
-    <span class="${profit>=0?'green':'red'}">
-    目前報酬率：<b>${profit.toFixed(2)}%</b>
-    </span>
-    <hr>
-    📈 上漲 ${p}%：<b>${up.toFixed(2)}</b><br>
-    📉 下跌 ${p}%：<b>${down.toFixed(2)}</b>
+  const profit = ((price-cost)/cost)*100;
+
+
+  const up = price*(1+p/100);
+
+  const down = price*(1-p/100);
+
+
+  const up2 = price*(1+p*2/100);
+
+  const down2 = price*(1-p*2/100);
+
+
+  let profitClass = profit >= 0 ? "green" : "red";
+
+
+  document.getElementById("priceResult").innerHTML = `
+
+  現價：<b>${price.toFixed(2)}</b><br>
+
+  成本：<b>${cost.toFixed(2)}</b><br>
+
+  目前報酬率：
+  <span class="${profitClass}">
+  ${profit.toFixed(2)}%
+  </span>
+
+  <hr>
+
+  <span class="green">
+  📈 上漲 ${p}%：<b>${up.toFixed(2)}</b>
+  </span>
+
+  <br>
+
+  <span class="red">
+  📉 下跌 ${p}%：<b>${down.toFixed(2)}</b>
+  </span>
+
   `;
+
+
+  document.getElementById("levels").innerHTML = `
+
+  <b>目前現價：</b>${price.toFixed(2)}
+
+  <br><br>
+
+  <span class="green">
+  第一關 ↑ ${p}%：
+  <b>${up.toFixed(2)}</b>
+  </span>
+
+  <br>
+
+  <span class="red">
+  第一關 ↓ ${p}%：
+  <b>${down.toFixed(2)}</b>
+  </span>
+
+  <br><br>
+
+  <span class="green">
+  第二關 ↑ ${p*2}%：
+  <b>${up2.toFixed(2)}</b>
+  </span>
+
+  <br>
+
+  <span class="red">
+  第二關 ↓ ${p*2}%：
+  <b>${down2.toFixed(2)}</b>
+  </span>
+
+  `;
+
 }
+
+
+function calculateInstitutions(){
+
+  const foreign = Number(document.getElementById("foreign").value) || 0;
+
+  const trust = Number(document.getElementById("trust").value) || 0;
+
+  const dealer = Number(document.getElementById("dealer").value) || 0;
+
+
+  const total = foreign + trust + dealer;
+
+
+  let status = "";
+
+  let statusClass = "";
+
+
+  if(total > 0){
+
+    status = "🔥 三大法人偏多";
+
+    statusClass = "status-bull";
+
+  }
+
+  else if(total < 0){
+
+    status = "⚠️ 三大法人偏空";
+
+    statusClass = "status-bear";
+
+  }
+
+  else{
+
+    status = "⚪ 三大法人中性";
+
+    statusClass = "";
+
+  }
+
+
+  document.getElementById("institutionResult").innerHTML = `
+
+  <div class="total">
+
+  <b>外資：</b>
+
+  <span class="${foreign>=0?'green':'red'}">
+
+  ${numberFormat(foreign)}
+
+  </span>
+
+  <br>
+
+
+  <b>投信：</b>
+
+  <span class="${trust>=0?'green':'red'}">
+
+  ${numberFormat(trust)}
+
+  </span>
+
+  <br>
+
+
+  <b>自營商：</b>
+
+  <span class="${dealer>=0?'green':'red'}">
+
+  ${numberFormat(dealer)}
+
+  </span>
+
+  <hr>
+
+
+  <b>三大法人合計：</b>
+
+  <span class="${total>=0?'green':'red'}">
+
+  ${numberFormat(total)}
+
+  </span>
+
+  </div>
+
+
+  <div class="status ${statusClass}">
+
+  ${status}
+
+  </div>
+
+  `;
+
+}
+
 </script>
 
 </body>
