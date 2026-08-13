@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>股票關卡計算機</title>
+
+<style>
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
+  background: #f5f7fa;
+  margin: 0;
+  padding: 20px;
+  color: #222;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 15px;
+  margin-bottom: 7px;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 17px;
+}
+
+button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background: #1677ff;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.result {
+  margin-top: 12px;
+  padding: 13px;
+  border-radius: 10px;
+  background: #f1f3f5;
+  display: flex;
+  justify-content: space-between;
+}
+
+.green {
+  color: #16803c;
+  font-weight: bold;
+}
+
+.red {
+  color: #d93025;
+  font-weight: bold;
+}
+
+.note {
+  font-size: 13px;
+  color: #777;
+  margin-top: 15px;
+  line-height: 1.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📈 股票關卡計算機</h1>
+
+<div class="card">
+
+<label>股票代號</label>
+<input id="code" type="text" placeholder="例如：1326">
+
+<label>股票名稱</label>
+<input id="name" type="text" placeholder="例如：台化">
+
+<label>現價</label>
+<input id="price" type="number" step="0.01" placeholder="例如：36.29">
+
+<label>主力成本</label>
+<input id="mainCost" type="number" step="0.01" placeholder="可以先手動輸入">
+
+<label>融資成本</label>
+<input id="marginCost" type="number" step="0.01" placeholder="可以先手動輸入">
+
+<button onclick="calculate()">開始計算</button>
+
+</div>
+
+<div id="results" class="card" style="display:none;">
+
+<h2>📊 股票關卡</h2>
+
+<div class="result">
+<span>現價</span>
+<strong id="current"></strong>
+</div>
+
+<div class="result">
+<span>主力成本</span>
+<strong id="main"></strong>
+</div>
+
+<div class="result">
+<span>融資成本</span>
+<strong id="margin"></strong>
+</div>
+
+<h3>🔴 下跌關卡</h3>
+
+<div class="result">
+<span>跌 1%</span>
+<strong class="red" id="down1"></strong>
+</div>
+
+<div class="result">
+<span>跌 2%</span>
+<strong class="red" id="down2"></strong>
+</div>
+
+<div class="result">
+<span>跌 3%</span>
+<strong class="red" id="down3"></strong>
+</div>
+
+<div class="result">
+<span>跌 5%</span>
+<strong class="red" id="down5"></strong>
+</div>
+
+<div class="result">
+<span>跌 10%</span>
+<strong class="red" id="down10"></strong>
+</div>
+
+<h3>🟢 上漲關卡</h3>
+
+<div class="result">
+<span>漲 1%</span>
+<strong class="green" id="up1"></strong>
+</div>
+
+<div class="result">
+<span>漲 2%</span>
+<strong class="green" id="up2"></strong>
+</div>
+
+<div class="result">
+<span>漲 3%</span>
+<strong class="green" id="up3"></strong>
+</div>
+
+<div class="result">
+<span>漲 5%</span>
+<strong class="green" id="up5"></strong>
+</div>
+
+<div class="result">
+<span>漲 10%</span>
+<strong class="green" id="up10"></strong>
+</div>
+
+<h3>🎯 交易參考</h3>
+
+<div class="result">
+<span>跌 3% 參考進場</span>
+<strong id="entry"></strong>
+</div>
+
+<div class="result">
+<span>漲 5% 第一止盈</span>
+<strong id="take"></strong>
+</div>
+
+<div class="note">
+※ 關卡是依百分比計算，不代表實際支撐、壓力或主力真實成本。<br>
+※ 「主力成本」目前需要手動輸入，下一階段再加入自動資料來源。
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function money(value) {
+  return Number(value).toFixed(2);
+}
+
+function calculate() {
+
+  const price = parseFloat(document.getElementById("price").value);
+
+  if (!price || price <= 0) {
+    alert("請先輸入正確的股票現價");
+    return;
+  }
+
+  const mainCost = document.getElementById("mainCost").value;
+  const marginCost = document.getElementById("marginCost").value;
+
+  document.getElementById("results").style.display = "block";
+
+  document.getElementById("current").textContent = money(price);
+
+  document.getElementById("main").textContent =
+    mainCost ? money(mainCost) : "尚未輸入";
+
+  document.getElementById("margin").textContent =
+    marginCost ? money(marginCost) : "尚未輸入";
+
+  document.getElementById("down1").textContent = money(price * 0.99);
+  document.getElementById("down2").textContent = money(price * 0.98);
+  document.getElementById("down3").textContent = money(price * 0.97);
+  document.getElementById("down5").textContent = money(price * 0.95);
+  document.getElementById("down10").textContent = money(price * 0.90);
+
+  document.getElementById("up1").textContent = money(price * 1.01);
+  document.getElementById("up2").textContent = money(price * 1.02);
+  document.getElementById("up3").textContent = money(price * 1.03);
+  document.getElementById("up5").textContent = money(price * 1.05);
+  document.getElementById("up10").textContent = money(price * 1.10);
+
+  document.getElementById("entry").textContent =
+    money(price * 0.97);
+
+  document.getElementById("take").textContent =
+    money(price * 1.05);
+}
+
+</script>
+
+</body>
+</html>
