@@ -13,7 +13,7 @@
 
 body{
   margin:0;
-  padding:16px;
+  padding:20px;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:#f3f5f7;
   color:#222;
@@ -26,140 +26,141 @@ body{
 
 h1{
   text-align:center;
-  font-size:27px;
-  margin:10px 0 18px;
+  font-size:30px;
+  margin:15px 0 25px;
 }
 
 .card{
   background:white;
-  border-radius:18px;
-  padding:18px;
-  margin-bottom:15px;
-  box-shadow:0 3px 12px rgba(0,0,0,.08);
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:18px;
+  box-shadow:0 3px 15px rgba(0,0,0,.08);
 }
 
 label{
   display:block;
   font-weight:700;
-  margin:12px 0 7px;
+  font-size:18px;
+  margin:15px 0 8px;
 }
 
 input{
   width:100%;
-  padding:14px;
+  padding:15px;
   border:1px solid #ccc;
-  border-radius:10px;
-  font-size:18px;
+  border-radius:12px;
+  font-size:20px;
 }
 
 button{
   width:100%;
-  padding:15px;
-  margin-top:15px;
+  padding:17px;
+  margin-top:20px;
   border:0;
-  border-radius:12px;
+  border-radius:13px;
   background:#2878f0;
   color:white;
-  font-size:19px;
+  font-size:21px;
   font-weight:700;
 }
 
 .section-title{
-  font-size:22px;
+  font-size:25px;
   font-weight:800;
-  margin-bottom:12px;
+  margin-bottom:15px;
 }
 
-.row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:13px 0;
-  border-bottom:1px solid #eee;
-}
-
-.row:last-child{
-  border-bottom:0;
-}
-
-.name{
-  font-weight:700;
-}
-
-.value{
+.result{
   font-size:19px;
-  font-weight:800;
+  line-height:1.8;
+}
+
+.institution{
+  padding:15px;
+  background:#f8f9fb;
+  border-radius:14px;
+  margin-top:12px;
+}
+
+.total{
+  padding:18px;
+  background:#eef5ff;
+  border-radius:14px;
+  margin-top:15px;
+  font-size:19px;
+  line-height:2;
 }
 
 .green{
   color:#16803c;
+  font-weight:800;
 }
 
 .red{
   color:#d33;
+  font-weight:800;
 }
 
 .blue{
   color:#1670c5;
-}
-
-.purple{
-  color:#7b3fc6;
-}
-
-.orange{
-  color:#d87900;
-}
-
-.total{
-  margin-top:15px;
-  padding:16px;
-  background:#eef5ff;
-  border-radius:13px;
-  font-size:21px;
   font-weight:800;
+}
+
+.gray{
+  color:#777;
 }
 
 .status{
   text-align:center;
-  margin-top:15px;
-  padding:15px;
-  border-radius:13px;
-  font-size:21px;
+  font-size:24px;
   font-weight:800;
+  padding:17px;
+  border-radius:14px;
+  margin-top:15px;
 }
 
-.bull{
+.status-bull{
   background:#e8f7ed;
   color:#16803c;
 }
 
-.bear{
+.status-bear{
   background:#fff0f0;
   color:#d33;
 }
 
-.neutral{
+.status-neutral{
   background:#f1f1f1;
-  color:#666;
-}
-
-.info{
-  background:#f8f9fb;
-  padding:14px;
-  border-radius:12px;
-  line-height:1.8;
+  color:#777;
 }
 
 .small{
-  font-size:14px;
   color:#777;
+  font-size:14px;
 }
 
 .loading{
   text-align:center;
-  padding:15px;
+  padding:20px;
+  font-size:18px;
   color:#777;
+}
+
+.error{
+  background:#fff0f0;
+  color:#d33;
+  padding:15px;
+  border-radius:12px;
+  line-height:1.7;
+}
+
+.good{
+  background:#e8f7ed;
+  color:#16803c;
+  padding:15px;
+  border-radius:12px;
+  line-height:1.7;
 }
 </style>
 </head>
@@ -178,15 +179,14 @@ button{
   id="stock"
   type="text"
   inputmode="numeric"
-  placeholder="例如：2330"
-  maxlength="6"
+  placeholder="例如：1326、2330、2317"
 >
 
-<button onclick="loadData()">
+<button onclick="searchStock()">
 🔍 查詢三大法人
 </button>
 
-<div id="message" class="loading"></div>
+<div id="message"></div>
 
 </div>
 
@@ -210,8 +210,8 @@ button{
 🏦 三大法人
 </div>
 
-<div id="institution">
-請先查詢股票
+<div id="institutionResult">
+尚未查詢
 </div>
 
 </div>
@@ -224,32 +224,7 @@ button{
 </div>
 
 <div id="signal">
-請先查詢股票
-</div>
-
-</div>
-
-
-<div class="card">
-
-<div class="section-title">
-🎯 我的成本
-</div>
-
-<label>成本價</label>
-
-<input
-  id="cost"
-  type="number"
-  step="0.01"
-  placeholder="例如：62.00"
->
-
-<button onclick="calculateProfit()">
-💰 計算損益
-</button>
-
-<div id="profit">
+尚未查詢
 </div>
 
 </div>
@@ -259,6 +234,18 @@ button{
 
 <script>
 
+/* =========================
+   基本設定
+========================= */
+
+const PROXY =
+"https://api.allorigins.win/raw?url=";
+
+
+/* =========================
+   工具
+========================= */
+
 function cleanNumber(value){
 
   if(value === null || value === undefined){
@@ -267,9 +254,8 @@ function cleanNumber(value){
 
   return Number(
     String(value)
-    .replace(/,/g,"")
-    .replace(/--/g,"0")
-    .trim()
+      .replace(/,/g,"")
+      .replace(/\s/g,"")
   ) || 0;
 
 }
@@ -282,32 +268,326 @@ function formatNumber(value){
 }
 
 
-function signed(value){
+function dateString(date){
 
-  if(value > 0){
-    return "+" + formatNumber(value);
+  const y = date.getFullYear();
+
+  const m = String(date.getMonth()+1).padStart(2,"0");
+
+  const d = String(date.getDate()).padStart(2,"0");
+
+  return `${y}${m}${d}`;
+
+}
+
+
+function displayDate(date){
+
+  return date.getFullYear() + "/" +
+    String(date.getMonth()+1).padStart(2,"0") + "/" +
+    String(date.getDate()).padStart(2,"0");
+
+}
+
+
+/* =========================
+   查詢上市 T86
+========================= */
+
+async function getTWSE(stock){
+
+  const today = new Date();
+
+  for(let i=0;i<10;i++){
+
+    const date = new Date(today);
+
+    date.setDate(today.getDate()-i);
+
+    const dateStr = dateString(date);
+
+    const api =
+      "https://www.twse.com.tw/rwd/zh/fund/T86" +
+      "?date=" + dateStr +
+      "&selectType=ALLBUT0999" +
+      "&response=json";
+
+    try{
+
+      const url =
+        PROXY + encodeURIComponent(api);
+
+      const response =
+        await fetch(url);
+
+      if(!response.ok){
+        continue;
+      }
+
+      const json =
+        await response.json();
+
+      if(
+        json.stat !== "OK" ||
+        !json.data ||
+        !json.data.length
+      ){
+        continue;
+      }
+
+      const row =
+        json.data.find(
+          item => String(item[0]).trim() === stock
+        );
+
+      if(!row){
+        continue;
+      }
+
+      return {
+
+        market:"上市",
+
+        date:displayDate(date),
+
+        code:String(row[0]).trim(),
+
+        name:String(row[1]).trim(),
+
+        foreign:cleanNumber(row[4]),
+
+        foreignDealer:cleanNumber(row[7]),
+
+        trust:cleanNumber(row[10]),
+
+        dealer:cleanNumber(row[11]),
+
+        dealerSelf:cleanNumber(row[14]),
+
+        dealerHedge:cleanNumber(row[17]),
+
+        total:cleanNumber(row[18])
+
+      };
+
+    }catch(error){
+
+      console.log(error);
+
+    }
+
   }
 
-  return formatNumber(value);
+  return null;
 
 }
 
 
-function className(value){
+/* =========================
+   查詢上櫃 TPEx
+========================= */
 
-  if(value > 0) return "green";
+async function getTPEx(stock){
 
-  if(value < 0) return "red";
+  try{
 
-  return "";
+    const api =
+      "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading";
+
+    const url =
+      PROXY + encodeURIComponent(api);
+
+    const response =
+      await fetch(url);
+
+    if(!response.ok){
+      return null;
+    }
+
+    const data =
+      await response.json();
+
+    if(!Array.isArray(data)){
+      return null;
+    }
+
+    const rows =
+      data.filter(
+        row =>
+          String(
+            row["證券代號"] ||
+            row["SecuritiesCompanyCode"] ||
+            ""
+          ).trim() === stock
+      );
+
+    if(!rows.length){
+      return null;
+    }
+
+    const row = rows[0];
+
+    function findValue(words){
+
+      const key =
+        Object.keys(row).find(
+          k => words.some(w => k.includes(w))
+        );
+
+      return key ? cleanNumber(row[key]) : 0;
+
+    }
+
+    const foreign =
+      findValue(["外資及陸資買賣超","外陸資買賣超"]);
+
+    const trust =
+      findValue(["投信買賣超"]);
+
+    const dealer =
+      findValue(["自營商買賣超"]);
+
+    const total =
+      findValue(["三大法人買賣超"]);
+
+    return {
+
+      market:"上櫃",
+
+      date:
+        row["日期"] ||
+        row["Date"] ||
+        row["資料日期"] ||
+        "最近交易日",
+
+      code:stock,
+
+      name:
+        row["證券名稱"] ||
+        row["SecuritiesCompanyName"] ||
+        "",
+
+      foreign:foreign,
+
+      foreignDealer:0,
+
+      trust:trust,
+
+      dealer:dealer,
+
+      dealerSelf:0,
+
+      dealerHedge:0,
+
+      total:
+        total || foreign + trust + dealer
+
+    };
+
+  }catch(error){
+
+    console.log(error);
+
+    return null;
+
+  }
 
 }
 
 
-async function loadData(){
+/* =========================
+   連續買超
+========================= */
+
+async function calculateConsecutive(stock){
+
+  let count = 0;
+
+  const today = new Date();
+
+  for(let i=0;i<10;i++){
+
+    const date = new Date(today);
+
+    date.setDate(today.getDate()-i);
+
+    const dateStr = dateString(date);
+
+    const api =
+      "https://www.twse.com.tw/rwd/zh/fund/T86" +
+      "?date=" + dateStr +
+      "&selectType=ALLBUT0999" +
+      "&response=json";
+
+    try{
+
+      const url =
+        PROXY + encodeURIComponent(api);
+
+      const response =
+        await fetch(url);
+
+      if(!response.ok){
+        continue;
+      }
+
+      const json =
+        await response.json();
+
+      if(
+        json.stat !== "OK" ||
+        !json.data
+      ){
+        continue;
+      }
+
+      const row =
+        json.data.find(
+          item =>
+            String(item[0]).trim() === stock
+        );
+
+      if(!row){
+        continue;
+      }
+
+      const total =
+        cleanNumber(row[18]);
+
+      if(total > 0){
+
+        count++;
+
+      }else{
+
+        break;
+
+      }
+
+    }catch(error){
+
+      break;
+
+    }
+
+  }
+
+  return count;
+
+}
+
+
+/* =========================
+   主查詢
+========================= */
+
+async function searchStock(){
 
   const stock =
-    document.getElementById("stock").value.trim();
+    document.getElementById("stock")
+      .value
+      .trim()
+      .toUpperCase();
 
   const message =
     document.getElementById("message");
@@ -315,8 +595,8 @@ async function loadData(){
   const stockInfo =
     document.getElementById("stockInfo");
 
-  const institution =
-    document.getElementById("institution");
+  const result =
+    document.getElementById("institutionResult");
 
   const signal =
     document.getElementById("signal");
@@ -324,396 +604,262 @@ async function loadData(){
 
   if(!stock){
 
-    alert("請輸入股票代號");
+    message.innerHTML =
+      `<div class="error">
+      ❌ 請輸入股票代號
+      </div>`;
 
     return;
 
   }
 
 
-  message.innerHTML = "⏳ 正在取得最新三大法人資料...";
+  message.innerHTML =
+    `<div class="loading">
+    ⏳ 正在查詢最新交易日資料...
+    </div>`;
 
 
-  stockInfo.innerHTML = "";
+  result.innerHTML =
+    `<div class="loading">
+    ⏳ 查詢中...
+    </div>`;
 
-  institution.innerHTML = "";
 
   signal.innerHTML = "";
 
 
-  try{
+  /* 先查上市 */
 
-    /*
-      TWSE 官方 T86
-      三大法人買賣超日報
-    */
+  let data =
+    await getTWSE(stock);
 
-    const today =
-      new Date();
 
-    const date =
-      today.getFullYear() +
-      String(today.getMonth()+1).padStart(2,"0") +
-      String(today.getDate()).padStart(2,"0");
+  /* 上市查不到，再查上櫃 */
 
+  if(!data){
 
-    const url =
-      "https://www.twse.com.tw/rwd/zh/fund/T86" +
-      "?response=json" +
-      "&date=" + date +
-      "&selectType=ALL";
-
-
-    const response =
-      await fetch(url);
-
-
-    const json =
-      await response.json();
-
-
-    if(
-      json.stat !== "OK" ||
-      !Array.isArray(json.data)
-    ){
-
-      throw new Error(
-        "今天可能不是交易日，或資料尚未公布"
-      );
-
-    }
-
-
-    const fields =
-      json.fields;
-
-
-    const codeIndex =
-      fields.indexOf("證券代號");
-
-    const nameIndex =
-      fields.indexOf("證券名稱");
-
-    const foreignIndex =
-      fields.indexOf(
-        "外陸資買賣超股數(不含外資自營商)"
-      );
-
-    const trustIndex =
-      fields.indexOf(
-        "投信買賣超股數"
-      );
-
-    const dealerIndex =
-      fields.indexOf(
-        "自營商買賣超股數"
-      );
-
-    const totalIndex =
-      fields.indexOf(
-        "三大法人買賣超股數"
-      );
-
-
-    const row =
-      json.data.find(
-        item =>
-          String(item[codeIndex]).trim() === stock
-      );
-
-
-    if(!row){
-
-      throw new Error(
-        "找不到這支股票，請確認股票代號"
-      );
-
-    }
-
-
-    const name =
-      row[nameIndex];
-
-
-    const foreign =
-      cleanNumber(row[foreignIndex]);
-
-    const trust =
-      cleanNumber(row[trustIndex]);
-
-    const dealer =
-      cleanNumber(row[dealerIndex]);
-
-    const total =
-      cleanNumber(row[totalIndex]);
-
-
-    message.innerHTML =
-      "✅ 已取得今日三大法人資料";
-
-
-    stockInfo.innerHTML = `
-
-      <div class="info">
-
-        <b>股票代號：</b>
-        ${stock}
-
-        <br>
-
-        <b>股票名稱：</b>
-        ${name}
-
-        <br>
-
-        <span class="small">
-        資料來源：臺灣證券交易所 T86
-        </span>
-
-      </div>
-
-    `;
-
-
-    institution.innerHTML = `
-
-      <div class="row">
-
-        <span class="name blue">
-        🔵 外資
-        </span>
-
-        <span class="value ${className(foreign)}">
-
-        ${signed(foreign)} 股
-
-        </span>
-
-      </div>
-
-
-      <div class="row">
-
-        <span class="name purple">
-        🟣 投信
-        </span>
-
-        <span class="value ${className(trust)}">
-
-        ${signed(trust)} 股
-
-        </span>
-
-      </div>
-
-
-      <div class="row">
-
-        <span class="name orange">
-        🟠 自營商
-        </span>
-
-        <span class="value ${className(dealer)}">
-
-        ${signed(dealer)} 股
-
-        </span>
-
-      </div>
-
-
-      <div class="total">
-
-        📈 三大法人合計
-
-        <br>
-
-        <span class="${className(total)}">
-
-        ${signed(total)} 股
-
-        </span>
-
-      </div>
-
-    `;
-
-
-    let statusText = "";
-    let statusClass = "";
-
-
-    if(
-      foreign > 0 &&
-      trust > 0 &&
-      dealer > 0
-    ){
-
-      statusText =
-        "🔥 三大法人同步買超";
-
-      statusClass =
-        "bull";
-
-    }
-
-    else if(total > 0){
-
-      statusText =
-        "📈 三大法人偏多";
-
-      statusClass =
-        "bull";
-
-    }
-
-    else if(total < 0){
-
-      statusText =
-        "⚠️ 三大法人偏空";
-
-      statusClass =
-        "bear";
-
-    }
-
-    else{
-
-      statusText =
-        "⚪ 三大法人中性";
-
-      statusClass =
-        "neutral";
-
-    }
-
-
-    signal.innerHTML = `
-
-      <div class="status ${statusClass}">
-
-      ${statusText}
-
-      </div>
-
-      <div class="info" style="margin-top:12px">
-
-      外資：
-      ${foreign > 0 ? "🟢 買超" : foreign < 0 ? "🔴 賣超" : "⚪ 中性"}
-
-      <br>
-
-      投信：
-      ${trust > 0 ? "🟢 買超" : trust < 0 ? "🔴 賣超" : "⚪ 中性"}
-
-      <br>
-
-      自營商：
-      ${dealer > 0 ? "🟢 買超" : dealer < 0 ? "🔴 賣超" : "⚪ 中性"}
-
-      </div>
-
-    `;
-
-
-    window.currentPrice = null;
-
+    data =
+      await getTPEx(stock);
 
   }
 
-  catch(error){
 
-    console.error(error);
+  if(!data){
 
     message.innerHTML =
-      "❌ " + error.message;
+      `<div class="error">
+      ❌ 查不到 ${stock} 的資料。<br><br>
+      可能原因：<br>
+      1️⃣ 股票代號錯誤<br>
+      2️⃣ 尚未有最新交易資料<br>
+      3️⃣ 資料來源暫時忙碌<br><br>
+      請稍後再試。
+      </div>`;
 
-    stockInfo.innerHTML = `
-      <div class="info">
-      今天可能尚未公布資料，
-      或這支股票不是上市股票。
-      <br><br>
-      如果是上櫃股票，目前這個版本先不查。
-      </div>
-    `;
-
-    institution.innerHTML = "";
-
-    signal.innerHTML = "";
-
-  }
-
-}
-
-
-function calculateProfit(){
-
-  const cost =
-    Number(
-      document.getElementById("cost").value
-    );
-
-
-  if(!cost){
-
-    alert("請輸入成本價");
+    result.innerHTML =
+      "目前沒有資料";
 
     return;
 
   }
 
 
-  const price =
-    Number(window.currentPrice);
+  message.innerHTML =
+    `<div class="good">
+    ✅ 查詢成功！<br>
+    資料日期：${data.date}<br>
+    市場：${data.market}
+    </div>`;
 
 
-  if(!price){
+  stockInfo.innerHTML = `
 
-    document.getElementById("profit").innerHTML = `
+    <b>股票代號：</b>
+    ${data.code}
 
-      <div class="info">
+    <br>
 
-      ⚠️ 這個版本目前先讓你輸入成本，
-      但尚未自動取得即時股價。
+    <b>股票名稱：</b>
+    ${data.name || "—"}
 
-      </div>
+    <br>
 
-    `;
+    <b>市場：</b>
+    ${data.market}
 
-    return;
+    <br>
 
-  }
+    <b>資料日期：</b>
+    ${data.date}
+
+  `;
 
 
-  const profit =
-    ((price-cost)/cost)*100;
+  const foreignClass =
+    data.foreign >= 0 ? "green" : "red";
+
+  const trustClass =
+    data.trust >= 0 ? "green" : "red";
+
+  const dealerClass =
+    data.dealer >= 0 ? "green" : "red";
+
+  const totalClass =
+    data.total >= 0 ? "green" : "red";
 
 
-  document.getElementById("profit").innerHTML = `
+  result.innerHTML = `
+
+    <div class="institution">
+
+      🔵 <b>外資買賣超：</b>
+
+      <span class="${foreignClass}">
+      ${formatNumber(data.foreign)} 股
+      </span>
+
+    </div>
+
+
+    <div class="institution">
+
+      🟣 <b>投信買賣超：</b>
+
+      <span class="${trustClass}">
+      ${formatNumber(data.trust)} 股
+      </span>
+
+    </div>
+
+
+    <div class="institution">
+
+      🟠 <b>自營商買賣超：</b>
+
+      <span class="${dealerClass}">
+      ${formatNumber(data.dealer)} 股
+      </span>
+
+    </div>
+
 
     <div class="total">
 
-    現價：
-    ${price.toFixed(2)}
+      📈 <b>三大法人合計：</b>
 
-    <br>
-
-    成本：
-    ${cost.toFixed(2)}
-
-    <br>
-
-    報酬率：
-
-    <span class="${profit>=0?'green':'red'}">
-
-    ${profit.toFixed(2)}%
-
-    </span>
+      <span class="${totalClass}">
+      ${formatNumber(data.total)} 股
+      </span>
 
     </div>
 
   `;
+
+
+  /* 三大法人同時買超 */
+
+  const sameBuy =
+    data.foreign > 0 &&
+    data.trust > 0 &&
+    data.dealer > 0;
+
+
+  let consecutive =
+    await calculateConsecutive(stock);
+
+
+  if(sameBuy){
+
+    signal.innerHTML += `
+
+      <div class="status status-bull">
+
+      ⭐ 三大法人同時買超
+
+      </div>
+
+    `;
+
+  }else{
+
+    signal.innerHTML += `
+
+      <div class="status status-neutral">
+
+      ⚪ 三大法人沒有同時買超
+
+      </div>
+
+    `;
+
+  }
+
+
+  if(consecutive > 0){
+
+    signal.innerHTML += `
+
+      <div class="status status-bull">
+
+      🔥 目前連續買超 ${consecutive} 天
+
+      </div>
+
+    `;
+
+  }else{
+
+    signal.innerHTML += `
+
+      <div class="status status-neutral">
+
+      📌 目前沒有連續買超
+
+      </div>
+
+    `;
+
+  }
+
+
+  if(data.total > 0){
+
+    signal.innerHTML += `
+
+      <div class="status status-bull">
+
+      🟢 三大法人整體偏多
+
+      </div>
+
+    `;
+
+  }else if(data.total < 0){
+
+    signal.innerHTML += `
+
+      <div class="status status-bear">
+
+      🔴 三大法人整體偏空
+
+      </div>
+
+    `;
+
+  }else{
+
+    signal.innerHTML += `
+
+      <div class="status status-neutral">
+
+      ⚪ 三大法人中性
+
+      </div>
+
+    `;
+
+  }
 
 }
 
