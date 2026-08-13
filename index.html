@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>股票關卡計算機｜三大法人</title>
+
+<title>台股三大法人分析</title>
 
 <style>
 *{
@@ -12,7 +13,7 @@
 
 body{
   margin:0;
-  padding:20px;
+  padding:16px;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:#f3f5f7;
   color:#222;
@@ -25,22 +26,22 @@ body{
 
 h1{
   text-align:center;
-  margin:10px 0 20px;
-  font-size:28px;
+  font-size:27px;
+  margin:10px 0 18px;
 }
 
 .card{
   background:white;
   border-radius:18px;
-  padding:20px;
-  margin-bottom:16px;
+  padding:18px;
+  margin-bottom:15px;
   box-shadow:0 3px 12px rgba(0,0,0,.08);
 }
 
 label{
   display:block;
   font-weight:700;
-  margin:14px 0 7px;
+  margin:12px 0 7px;
 }
 
 input{
@@ -53,81 +54,111 @@ input{
 
 button{
   width:100%;
-  padding:16px;
-  margin-top:18px;
+  padding:15px;
+  margin-top:15px;
   border:0;
   border-radius:12px;
   background:#2878f0;
   color:white;
-  font-size:20px;
+  font-size:19px;
   font-weight:700;
-}
-
-.result{
-  font-size:20px;
-  line-height:1.8;
-}
-
-.green{
-  color:#16803c;
-  font-weight:700;
-}
-
-.red{
-  color:#d33;
-  font-weight:700;
-}
-
-.blue{
-  color:#1670c5;
-  font-weight:700;
-}
-
-.gray{
-  color:#777;
 }
 
 .section-title{
   font-size:22px;
   font-weight:800;
-  margin-bottom:10px;
+  margin-bottom:12px;
 }
 
-.institution{
-  background:#f8f9fb;
-  padding:12px;
-  border-radius:12px;
-  margin-top:10px;
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:13px 0;
+  border-bottom:1px solid #eee;
+}
+
+.row:last-child{
+  border-bottom:0;
+}
+
+.name{
+  font-weight:700;
+}
+
+.value{
+  font-size:19px;
+  font-weight:800;
+}
+
+.green{
+  color:#16803c;
+}
+
+.red{
+  color:#d33;
+}
+
+.blue{
+  color:#1670c5;
+}
+
+.purple{
+  color:#7b3fc6;
+}
+
+.orange{
+  color:#d87900;
 }
 
 .total{
-  background:#eef5ff;
-  border-radius:12px;
-  padding:15px;
   margin-top:15px;
+  padding:16px;
+  background:#eef5ff;
+  border-radius:13px;
+  font-size:21px;
+  font-weight:800;
 }
 
 .status{
   text-align:center;
-  font-size:24px;
-  font-weight:800;
-  padding:15px;
-  border-radius:12px;
   margin-top:15px;
+  padding:15px;
+  border-radius:13px;
+  font-size:21px;
+  font-weight:800;
 }
 
-.status-bull{
+.bull{
   background:#e8f7ed;
   color:#16803c;
 }
 
-.status-bear{
+.bear{
   background:#fff0f0;
   color:#d33;
 }
 
+.neutral{
+  background:#f1f1f1;
+  color:#666;
+}
+
+.info{
+  background:#f8f9fb;
+  padding:14px;
+  border-radius:12px;
+  line-height:1.8;
+}
+
 .small{
   font-size:14px;
+  color:#777;
+}
+
+.loading{
+  text-align:center;
+  padding:15px;
   color:#777;
 }
 </style>
@@ -137,84 +168,88 @@ button{
 
 <div class="container">
 
-<h1>📈 股票關卡計算機</h1>
+<h1>📊 台股三大法人分析</h1>
 
 <div class="card">
 
-<label>股票名稱</label>
-<input id="stock" type="text" placeholder="例如：台化">
+<label>股票代號</label>
 
-<label>股票現價</label>
-<input id="price" type="number" step="0.01" placeholder="例如：36.30">
+<input
+  id="stock"
+  type="text"
+  inputmode="numeric"
+  placeholder="例如：2330"
+  maxlength="6"
+>
 
-<label>我的成本</label>
-<input id="cost" type="number" step="0.01" placeholder="例如：36.30">
+<button onclick="loadData()">
+🔍 查詢三大法人
+</button>
 
-<label>上漲 / 下跌百分比</label>
-<input id="percent" type="number" step="0.1" value="2">
-
-<button onclick="calculate()">開始計算</button>
-
-</div>
-
-
-<div class="card result">
-
-<div class="section-title">📊 價格計算</div>
-
-<div id="priceResult">
-請輸入現價、成本後開始計算
-</div>
+<div id="message" class="loading"></div>
 
 </div>
 
 
 <div class="card">
 
-<div class="section-title">🏦 三大法人</div>
-
-<div class="small">
-請輸入「買超為正數、賣超為負數」
+<div class="section-title">
+📌 股票資訊
 </div>
 
-
-<div class="institution">
-
-<label>外資</label>
-<input id="foreign" type="number" placeholder="例如：1440000 或 -1440000">
-
+<div id="stockInfo">
+請輸入股票代號後查詢
 </div>
-
-
-<div class="institution">
-
-<label>投信</label>
-<input id="trust" type="number" placeholder="例如：50000 或 -50000">
-
-</div>
-
-
-<div class="institution">
-
-<label>自營商</label>
-<input id="dealer" type="number" placeholder="例如：20000 或 -20000">
-
-</div>
-
-<button onclick="calculateInstitutions()">計算三大法人</button>
-
-
-<div id="institutionResult"></div>
 
 </div>
 
 
 <div class="card">
 
-<div class="section-title">🎯 關卡價格</div>
+<div class="section-title">
+🏦 三大法人
+</div>
 
-<div id="levels">
-請先輸入資料
+<div id="institution">
+請先查詢股票
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="section-title">
+🔥 法人訊號
+</div>
+
+<div id="signal">
+請先查詢股票
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="section-title">
+🎯 我的成本
+</div>
+
+<label>成本價</label>
+
+<input
+  id="cost"
+  type="number"
+  step="0.01"
+  placeholder="例如：62.00"
+>
+
+<button onclick="calculateProfit()">
+💰 計算損益
+</button>
+
+<div id="profit">
 </div>
 
 </div>
@@ -224,207 +259,459 @@ button{
 
 <script>
 
-function numberFormat(num){
+function cleanNumber(value){
 
-  return Number(num).toLocaleString('zh-TW',{
-    maximumFractionDigits:0
-  });
+  if(value === null || value === undefined){
+    return 0;
+  }
+
+  return Number(
+    String(value)
+    .replace(/,/g,"")
+    .replace(/--/g,"0")
+    .trim()
+  ) || 0;
 
 }
 
 
-function calculate(){
+function formatNumber(value){
 
-  const price = Number(document.getElementById("price").value);
+  return Number(value).toLocaleString("zh-TW");
 
-  const cost = Number(document.getElementById("cost").value);
-
-  const p = Number(document.getElementById("percent").value);
+}
 
 
-  if(!price || !cost || !p){
+function signed(value){
 
-    alert("請把現價、成本、漲跌百分比填完整");
+  if(value > 0){
+    return "+" + formatNumber(value);
+  }
+
+  return formatNumber(value);
+
+}
+
+
+function className(value){
+
+  if(value > 0) return "green";
+
+  if(value < 0) return "red";
+
+  return "";
+
+}
+
+
+async function loadData(){
+
+  const stock =
+    document.getElementById("stock").value.trim();
+
+  const message =
+    document.getElementById("message");
+
+  const stockInfo =
+    document.getElementById("stockInfo");
+
+  const institution =
+    document.getElementById("institution");
+
+  const signal =
+    document.getElementById("signal");
+
+
+  if(!stock){
+
+    alert("請輸入股票代號");
 
     return;
 
   }
 
 
-  const profit = ((price-cost)/cost)*100;
+  message.innerHTML = "⏳ 正在取得最新三大法人資料...";
 
 
-  const up = price*(1+p/100);
+  stockInfo.innerHTML = "";
 
-  const down = price*(1-p/100);
+  institution.innerHTML = "";
 
-
-  const up2 = price*(1+p*2/100);
-
-  const down2 = price*(1-p*2/100);
+  signal.innerHTML = "";
 
 
-  let profitClass = profit >= 0 ? "green" : "red";
+  try{
+
+    /*
+      TWSE 官方 T86
+      三大法人買賣超日報
+    */
+
+    const today =
+      new Date();
+
+    const date =
+      today.getFullYear() +
+      String(today.getMonth()+1).padStart(2,"0") +
+      String(today.getDate()).padStart(2,"0");
 
 
-  document.getElementById("priceResult").innerHTML = `
-
-  現價：<b>${price.toFixed(2)}</b><br>
-
-  成本：<b>${cost.toFixed(2)}</b><br>
-
-  目前報酬率：
-  <span class="${profitClass}">
-  ${profit.toFixed(2)}%
-  </span>
-
-  <hr>
-
-  <span class="green">
-  📈 上漲 ${p}%：<b>${up.toFixed(2)}</b>
-  </span>
-
-  <br>
-
-  <span class="red">
-  📉 下跌 ${p}%：<b>${down.toFixed(2)}</b>
-  </span>
-
-  `;
+    const url =
+      "https://www.twse.com.tw/rwd/zh/fund/T86" +
+      "?response=json" +
+      "&date=" + date +
+      "&selectType=ALL";
 
 
-  document.getElementById("levels").innerHTML = `
+    const response =
+      await fetch(url);
 
-  <b>目前現價：</b>${price.toFixed(2)}
 
-  <br><br>
+    const json =
+      await response.json();
 
-  <span class="green">
-  第一關 ↑ ${p}%：
-  <b>${up.toFixed(2)}</b>
-  </span>
 
-  <br>
+    if(
+      json.stat !== "OK" ||
+      !Array.isArray(json.data)
+    ){
 
-  <span class="red">
-  第一關 ↓ ${p}%：
-  <b>${down.toFixed(2)}</b>
-  </span>
+      throw new Error(
+        "今天可能不是交易日，或資料尚未公布"
+      );
 
-  <br><br>
+    }
 
-  <span class="green">
-  第二關 ↑ ${p*2}%：
-  <b>${up2.toFixed(2)}</b>
-  </span>
 
-  <br>
+    const fields =
+      json.fields;
 
-  <span class="red">
-  第二關 ↓ ${p*2}%：
-  <b>${down2.toFixed(2)}</b>
-  </span>
 
-  `;
+    const codeIndex =
+      fields.indexOf("證券代號");
+
+    const nameIndex =
+      fields.indexOf("證券名稱");
+
+    const foreignIndex =
+      fields.indexOf(
+        "外陸資買賣超股數(不含外資自營商)"
+      );
+
+    const trustIndex =
+      fields.indexOf(
+        "投信買賣超股數"
+      );
+
+    const dealerIndex =
+      fields.indexOf(
+        "自營商買賣超股數"
+      );
+
+    const totalIndex =
+      fields.indexOf(
+        "三大法人買賣超股數"
+      );
+
+
+    const row =
+      json.data.find(
+        item =>
+          String(item[codeIndex]).trim() === stock
+      );
+
+
+    if(!row){
+
+      throw new Error(
+        "找不到這支股票，請確認股票代號"
+      );
+
+    }
+
+
+    const name =
+      row[nameIndex];
+
+
+    const foreign =
+      cleanNumber(row[foreignIndex]);
+
+    const trust =
+      cleanNumber(row[trustIndex]);
+
+    const dealer =
+      cleanNumber(row[dealerIndex]);
+
+    const total =
+      cleanNumber(row[totalIndex]);
+
+
+    message.innerHTML =
+      "✅ 已取得今日三大法人資料";
+
+
+    stockInfo.innerHTML = `
+
+      <div class="info">
+
+        <b>股票代號：</b>
+        ${stock}
+
+        <br>
+
+        <b>股票名稱：</b>
+        ${name}
+
+        <br>
+
+        <span class="small">
+        資料來源：臺灣證券交易所 T86
+        </span>
+
+      </div>
+
+    `;
+
+
+    institution.innerHTML = `
+
+      <div class="row">
+
+        <span class="name blue">
+        🔵 外資
+        </span>
+
+        <span class="value ${className(foreign)}">
+
+        ${signed(foreign)} 股
+
+        </span>
+
+      </div>
+
+
+      <div class="row">
+
+        <span class="name purple">
+        🟣 投信
+        </span>
+
+        <span class="value ${className(trust)}">
+
+        ${signed(trust)} 股
+
+        </span>
+
+      </div>
+
+
+      <div class="row">
+
+        <span class="name orange">
+        🟠 自營商
+        </span>
+
+        <span class="value ${className(dealer)}">
+
+        ${signed(dealer)} 股
+
+        </span>
+
+      </div>
+
+
+      <div class="total">
+
+        📈 三大法人合計
+
+        <br>
+
+        <span class="${className(total)}">
+
+        ${signed(total)} 股
+
+        </span>
+
+      </div>
+
+    `;
+
+
+    let statusText = "";
+    let statusClass = "";
+
+
+    if(
+      foreign > 0 &&
+      trust > 0 &&
+      dealer > 0
+    ){
+
+      statusText =
+        "🔥 三大法人同步買超";
+
+      statusClass =
+        "bull";
+
+    }
+
+    else if(total > 0){
+
+      statusText =
+        "📈 三大法人偏多";
+
+      statusClass =
+        "bull";
+
+    }
+
+    else if(total < 0){
+
+      statusText =
+        "⚠️ 三大法人偏空";
+
+      statusClass =
+        "bear";
+
+    }
+
+    else{
+
+      statusText =
+        "⚪ 三大法人中性";
+
+      statusClass =
+        "neutral";
+
+    }
+
+
+    signal.innerHTML = `
+
+      <div class="status ${statusClass}">
+
+      ${statusText}
+
+      </div>
+
+      <div class="info" style="margin-top:12px">
+
+      外資：
+      ${foreign > 0 ? "🟢 買超" : foreign < 0 ? "🔴 賣超" : "⚪ 中性"}
+
+      <br>
+
+      投信：
+      ${trust > 0 ? "🟢 買超" : trust < 0 ? "🔴 賣超" : "⚪ 中性"}
+
+      <br>
+
+      自營商：
+      ${dealer > 0 ? "🟢 買超" : dealer < 0 ? "🔴 賣超" : "⚪ 中性"}
+
+      </div>
+
+    `;
+
+
+    window.currentPrice = null;
+
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    message.innerHTML =
+      "❌ " + error.message;
+
+    stockInfo.innerHTML = `
+      <div class="info">
+      今天可能尚未公布資料，
+      或這支股票不是上市股票。
+      <br><br>
+      如果是上櫃股票，目前這個版本先不查。
+      </div>
+    `;
+
+    institution.innerHTML = "";
+
+    signal.innerHTML = "";
+
+  }
 
 }
 
 
-function calculateInstitutions(){
+function calculateProfit(){
 
-  const foreign = Number(document.getElementById("foreign").value) || 0;
-
-  const trust = Number(document.getElementById("trust").value) || 0;
-
-  const dealer = Number(document.getElementById("dealer").value) || 0;
-
-
-  const total = foreign + trust + dealer;
+  const cost =
+    Number(
+      document.getElementById("cost").value
+    );
 
 
-  let status = "";
+  if(!cost){
 
-  let statusClass = "";
+    alert("請輸入成本價");
 
-
-  if(total > 0){
-
-    status = "🔥 三大法人偏多";
-
-    statusClass = "status-bull";
-
-  }
-
-  else if(total < 0){
-
-    status = "⚠️ 三大法人偏空";
-
-    statusClass = "status-bear";
-
-  }
-
-  else{
-
-    status = "⚪ 三大法人中性";
-
-    statusClass = "";
+    return;
 
   }
 
 
-  document.getElementById("institutionResult").innerHTML = `
-
-  <div class="total">
-
-  <b>外資：</b>
-
-  <span class="${foreign>=0?'green':'red'}">
-
-  ${numberFormat(foreign)}
-
-  </span>
-
-  <br>
+  const price =
+    Number(window.currentPrice);
 
 
-  <b>投信：</b>
+  if(!price){
 
-  <span class="${trust>=0?'green':'red'}">
+    document.getElementById("profit").innerHTML = `
 
-  ${numberFormat(trust)}
+      <div class="info">
 
-  </span>
+      ⚠️ 這個版本目前先讓你輸入成本，
+      但尚未自動取得即時股價。
 
-  <br>
+      </div>
 
+    `;
 
-  <b>自營商：</b>
+    return;
 
-  <span class="${dealer>=0?'green':'red'}">
-
-  ${numberFormat(dealer)}
-
-  </span>
-
-  <hr>
+  }
 
 
-  <b>三大法人合計：</b>
-
-  <span class="${total>=0?'green':'red'}">
-
-  ${numberFormat(total)}
-
-  </span>
-
-  </div>
+  const profit =
+    ((price-cost)/cost)*100;
 
 
-  <div class="status ${statusClass}">
+  document.getElementById("profit").innerHTML = `
 
-  ${status}
+    <div class="total">
 
-  </div>
+    現價：
+    ${price.toFixed(2)}
+
+    <br>
+
+    成本：
+    ${cost.toFixed(2)}
+
+    <br>
+
+    報酬率：
+
+    <span class="${profit>=0?'green':'red'}">
+
+    ${profit.toFixed(2)}%
+
+    </span>
+
+    </div>
 
   `;
 
