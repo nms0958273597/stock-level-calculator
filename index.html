@@ -2,90 +2,39 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>股票關卡計算機</title>
 <style>
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;
-  background:#f5f7fa;
-  margin:0;
-  padding:20px;
-  color:#222;
-}
-.container{
-  max-width:600px;
-  margin:auto;
-}
-h1{
-  text-align:center;
-  margin-bottom:20px;
-}
-.card{
-  background:white;
-  border-radius:16px;
-  padding:20px;
-  margin-bottom:16px;
-  box-shadow:0 3px 12px rgba(0,0,0,.08);
-}
-label{
-  display:block;
-  font-weight:bold;
-  margin-top:14px;
-}
-input{
-  width:100%;
-  box-sizing:border-box;
-  padding:14px;
-  margin-top:6px;
-  border:1px solid #ccc;
-  border-radius:10px;
-  font-size:18px;
-}
-button{
-  width:100%;
-  padding:16px;
-  margin-top:20px;
-  border:0;
-  border-radius:12px;
-  background:#1677ff;
-  color:white;
-  font-size:20px;
-  font-weight:bold;
-}
-.result{
-  font-size:18px;
-  line-height:1.8;
-}
-.green{color:#168a3a;font-weight:bold;}
-.red{color:#d93025;font-weight:bold;}
-.blue{color:#1677ff;font-weight:bold;}
+*{box-sizing:border-box}
+body{margin:0;padding:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f7fa;color:#222}
+.container{max-width:600px;margin:auto}
+h1{text-align:center;margin:10px 0 20px}
+.card{background:white;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 3px 12px #0001}
+label{display:block;font-weight:600;margin:12px 0 6px}
+input{width:100%;padding:14px;border:1px solid #ccc;border-radius:10px;font-size:18px}
+button{width:100%;padding:15px;border:0;border-radius:10px;background:#1677ff;color:white;font-size:18px;font-weight:bold;margin-top:18px}
+.result{font-size:20px;line-height:1.8}
+.green{color:#16803c}.red{color:#d33}
+.small{color:#777;font-size:14px}
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<h1>📊 股票關卡計算機</h1>
+<h1>📈 股票關卡計算機</h1>
 
 <div class="card">
+<label>股票現價</label>
+<input id="price" type="number" step="0.01" placeholder="例如 36.30">
 
-<label>股票名稱</label>
-<input id="name" placeholder="例如：台化">
+<label>成本價</label>
+<input id="cost" type="number" step="0.01" placeholder="例如 36.30">
 
-<label>現價</label>
-<input id="price" type="number" step="0.01" placeholder="例如：36.29">
-
-<label>主力成本</label>
-<input id="mainCost" type="number" step="0.01" placeholder="例如：36.30">
-
-<label>三大法人平均成本</label>
-<input id="institutionCost" type="number" step="0.01" placeholder="例如：36.10">
-
-<label>前低／重要支撐</label>
-<input id="support" type="number" step="0.01" placeholder="例如：35.50">
+<label>上漲／下跌百分比</label>
+<input id="percent" type="number" step="0.1" value="10">
 
 <button onclick="calculate()">開始計算</button>
-
 </div>
 
 <div class="card result" id="result">
@@ -96,80 +45,29 @@ button{
 
 <script>
 function calculate(){
+  const price=Number(document.getElementById("price").value);
+  const cost=Number(document.getElementById("cost").value);
+  const p=Number(document.getElementById("percent").value);
 
-  const name = document.getElementById("name").value || "股票";
-  const price = Number(document.getElementById("price").value);
-  const mainCost = Number(document.getElementById("mainCost").value);
-  const institutionCost = Number(document.getElementById("institutionCost").value);
-  const support = Number(document.getElementById("support").value);
-
-  if(!price){
-    document.getElementById("result").innerHTML =
-    "⚠️ 請先輸入現價";
+  if(!price || !cost){
+    document.getElementById("result").innerHTML="⚠️ 請輸入現價與成本價";
     return;
   }
 
-  const stopLoss = support ? support * 0.98 : price * 0.97;
+  const up=price*(1+p/100);
+  const down=price*(1-p/100);
+  const profit=(price-cost)/cost*100;
 
-  const take1 = price * 1.05;
-  const take2 = price * 1.10;
-  const take3 = price * 1.15;
-
-  const mainDiff = mainCost ?
-    ((price-mainCost)/mainCost*100) : 0;
-
-  const institutionDiff = institutionCost ?
-    ((price-institutionCost)/institutionCost*100) : 0;
-
-  let advice = "";
-
-  if(mainCost && price < mainCost){
-    advice = "🟢 現價低於主力成本，可觀察支撐後分批進場";
-  }else if(mainCost && price >= mainCost){
-    advice = "🟡 現價已在主力成本附近或上方，不宜追高";
-  }
-
-  document.getElementById("result").innerHTML = `
-  <h2>${name}</h2>
-
-  <p>💰 現價：
-  <span class="blue">${price.toFixed(2)}</span></p>
-
-  <p>🎯 主力成本：
-  <span>${mainCost ? mainCost.toFixed(2) : "未輸入"}</span></p>
-
-  <p>🏦 三大法人成本：
-  <span>${institutionCost ? institutionCost.toFixed(2) : "未輸入"}</span></p>
-
-  <hr>
-
-  <p>📊 現價 vs 主力成本：
-  <span class="${mainDiff >= 0 ? 'green':'red'}">
-  ${mainCost ? mainDiff.toFixed(2)+"%" : "—"}
-  </span></p>
-
-  <p>🏦 現價 vs 法人成本：
-  <span class="${institutionDiff >= 0 ? 'green':'red'}">
-  ${institutionCost ? institutionDiff.toFixed(2)+"%" : "—"}
-  </span></p>
-
-  <hr>
-
-  <p>🛑 停損參考：
-  <span class="red">${stopLoss.toFixed(2)}</span></p>
-
-  <p>🎯 第一止盈：
-  <span class="green">${take1.toFixed(2)}</span></p>
-
-  <p>🎯 第二止盈：
-  <span class="green">${take2.toFixed(2)}</span></p>
-
-  <p>🎯 第三止盈：
-  <span class="green">${take3.toFixed(2)}</span></p>
-
-  <hr>
-
-  <p><b>${advice}</b></p>
+  document.getElementById("result").innerHTML=`
+    <b>📊 計算結果</b><br><br>
+    現價：<b>${price.toFixed(2)}</b><br>
+    成本：<b>${cost.toFixed(2)}</b><br>
+    <span class="${profit>=0?'green':'red'}">
+    目前報酬率：<b>${profit.toFixed(2)}%</b>
+    </span>
+    <hr>
+    📈 上漲 ${p}%：<b>${up.toFixed(2)}</b><br>
+    📉 下跌 ${p}%：<b>${down.toFixed(2)}</b>
   `;
 }
 </script>
