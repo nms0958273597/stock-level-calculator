@@ -4,6 +4,650 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>📈 股票關卡計算機｜三大法人</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  padding:16px;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f3f5f7;
+  color:#222;
+}
+
+.container{
+  max-width:650px;
+  margin:auto;
+}
+
+h1{
+  text-align:center;
+  font-size:28px;
+  margin:12px 0 20px;
+}
+
+.card{
+  background:#fff;
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 3px 14px rgba(0,0,0,.08);
+}
+
+.section-title{
+  font-size:23px;
+  font-weight:800;
+  margin-bottom:15px;
+}
+
+label{
+  display:block;
+  font-weight:700;
+  margin:14px 0 7px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border:1px solid #ccc;
+  border-radius:10px;
+  font-size:18px;
+}
+
+button{
+  width:100%;
+  padding:16px;
+  margin-top:18px;
+  border:0;
+  border-radius:12px;
+  background:#2878f0;
+  color:white;
+  font-size:20px;
+  font-weight:700;
+}
+
+.result{
+  font-size:20px;
+  line-height:1.8;
+}
+
+.institution{
+  background:#f7f8fa;
+  padding:14px;
+  border-radius:12px;
+  margin-top:12px;
+}
+
+.total{
+  background:#eef5ff;
+  padding:16px;
+  border-radius:12px;
+  margin-top:16px;
+  font-size:19px;
+  line-height:1.9;
+}
+
+.green{
+  color:#16803c;
+  font-weight:800;
+}
+
+.red{
+  color:#d33;
+  font-weight:800;
+}
+
+.blue{
+  color:#1670c5;
+  font-weight:800;
+}
+
+.orange{
+  color:#d86b00;
+  font-weight:800;
+}
+
+.status{
+  text-align:center;
+  font-size:23px;
+  font-weight:800;
+  padding:16px;
+  border-radius:12px;
+  margin-top:15px;
+}
+
+.status-bull{
+  background:#e8f7ed;
+  color:#16803c;
+}
+
+.status-bear{
+  background:#fff0f0;
+  color:#d33;
+}
+
+.status-neutral{
+  background:#f2f2f2;
+  color:#777;
+}
+
+.same-buy{
+  background:#fff5d9;
+  color:#b86b00;
+  text-align:center;
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+  font-size:20px;
+  font-weight:800;
+}
+
+.level{
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  background:#f7f8fa;
+}
+
+.small{
+  color:#777;
+  font-size:14px;
+}
+
+hr{
+  border:0;
+  border-top:1px solid #ddd;
+  margin:15px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📈 股票關卡計算機</h1>
+
+<!-- 股票基本資料 -->
+
+<div class="card">
+
+<div class="section-title">📊 股票資料</div>
+
+<label>股票名稱</label>
+<input id="stock" type="text" placeholder="例如：台化">
+
+<label>股票代號</label>
+<input id="code" type="text" placeholder="例如：1326">
+
+<label>股票現價</label>
+<input id="price" type="number" step="0.01" placeholder="例如：36.30">
+
+<label>我的成本</label>
+<input id="cost" type="number" step="0.01" placeholder="例如：36.30">
+
+<label>關卡百分比</label>
+<input id="percent" type="number" step="0.1" value="2">
+
+<button onclick="calculate()">📊 開始計算</button>
+
+</div>
+
+
+<!-- 價格結果 -->
+
+<div class="card result">
+
+<div class="section-title">🎯 價格分析</div>
+
+<div id="priceResult">
+請輸入現價與成本後開始計算
+</div>
+
+</div>
+
+
+<!-- 三大法人 -->
+
+<div class="card">
+
+<div class="section-title">🏦 三大法人</div>
+
+<div class="small">
+請輸入張數：買超輸入正數，賣超輸入負數
+</div>
+
+
+<div class="institution">
+
+<label>🔵 外資</label>
+
+<input
+id="foreign"
+type="number"
+placeholder="例如：-1440000"
+>
+
+</div>
+
+
+<div class="institution">
+
+<label>🟣 投信</label>
+
+<input
+id="trust"
+type="number"
+placeholder="例如：50000"
+>
+
+</div>
+
+
+<div class="institution">
+
+<label>🟠 自營商</label>
+
+<input
+id="dealer"
+type="number"
+placeholder="例如：20000"
+>
+
+</div>
+
+
+<label>🔥 連續買超天數</label>
+
+<input
+id="days"
+type="number"
+min="0"
+placeholder="例如：5"
+>
+
+
+<button onclick="calculateInstitutions()">
+🏦 計算三大法人
+</button>
+
+
+<div id="institutionResult"></div>
+
+</div>
+
+
+<!-- 關卡 -->
+
+<div class="card">
+
+<div class="section-title">🎯 股票關卡</div>
+
+<div id="levels">
+請先輸入股票現價
+</div>
+
+</div>
+
+
+<!-- 使用說明 -->
+
+<div class="card">
+
+<div class="section-title">💡 使用方式</div>
+
+<div class="small">
+
+1️⃣ 輸入股票名稱與代號<br><br>
+
+2️⃣ 輸入目前股價<br><br>
+
+3️⃣ 輸入自己的成本<br><br>
+
+4️⃣ 輸入三大法人買賣超<br>
+買超 → 正數<br>
+賣超 → 負數<br><br>
+
+5️⃣ 按「計算三大法人」<br><br>
+
+⭐ 如果外資、投信、自營商三個都是正數，
+會顯示「三大法人同時買超」。
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+function numberFormat(num){
+
+return Number(num).toLocaleString("zh-TW",{
+maximumFractionDigits:0
+});
+
+}
+
+
+/* 股票價格計算 */
+
+function calculate(){
+
+const price =
+Number(document.getElementById("price").value);
+
+const cost =
+Number(document.getElementById("cost").value);
+
+const p =
+Number(document.getElementById("percent").value);
+
+if(!price){
+
+alert("請先輸入股票現價");
+
+return;
+
+}
+
+
+/* 如果沒有成本，只計算關卡 */
+
+let profitHTML="";
+
+if(cost){
+
+const profit =
+((price-cost)/cost)*100;
+
+const cls =
+profit>=0 ? "green" : "red";
+
+profitHTML=`
+
+成本：
+<b>${cost.toFixed(2)}</b><br>
+
+目前損益：
+<span class="${cls}">
+${profit.toFixed(2)}%
+</span>
+
+<hr>
+
+`;
+
+}
+
+
+const up =
+price*(1+p/100);
+
+const down =
+price*(1-p/100);
+
+const up2 =
+price*(1+(p*2)/100);
+
+const down2 =
+price*(1-(p*2)/100);
+
+
+document.getElementById("priceResult").innerHTML=`
+
+股票：
+<b>${document.getElementById("stock").value || "未填寫"}</b><br>
+
+代號：
+<b>${document.getElementById("code").value || "未填寫"}</b><br>
+
+現價：
+<b>${price.toFixed(2)}</b>
+
+<hr>
+
+${profitHTML}
+
+<span class="green">
+⬆️ 上漲 ${p}%：
+<b>${up.toFixed(2)}</b>
+</span>
+
+<br>
+
+<span class="red">
+⬇️ 下跌 ${p}%：
+<b>${down.toFixed(2)}</b>
+</span>
+
+`;
+
+
+document.getElementById("levels").innerHTML=`
+
+<div class="level">
+目前現價：
+<b>${price.toFixed(2)}</b>
+</div>
+
+<div class="level green">
+⬆️ 第一關 +${p}%：
+<b>${up.toFixed(2)}</b>
+</div>
+
+<div class="level red">
+⬇️ 第一關 -${p}%：
+<b>${down.toFixed(2)}</b>
+</div>
+
+<div class="level green">
+⬆️ 第二關 +${p*2}%：
+<b>${up2.toFixed(2)}</b>
+</div>
+
+<div class="level red">
+⬇️ 第二關 -${p*2}%：
+<b>${down2.toFixed(2)}</b>
+</div>
+
+`;
+
+}
+
+
+/* 三大法人 */
+
+function calculateInstitutions(){
+
+const foreign =
+Number(document.getElementById("foreign").value)||0;
+
+const trust =
+Number(document.getElementById("trust").value)||0;
+
+const dealer =
+Number(document.getElementById("dealer").value)||0;
+
+const days =
+Number(document.getElementById("days").value)||0;
+
+
+const total =
+foreign+trust+dealer;
+
+
+/* 判斷多空 */
+
+let status="";
+let statusClass="";
+
+
+if(total>0){
+
+status="🔥 三大法人偏多";
+statusClass="status-bull";
+
+}
+
+else if(total<0){
+
+status="⚠️ 三大法人偏空";
+statusClass="status-bear";
+
+}
+
+else{
+
+status="⚪ 三大法人中性";
+statusClass="status-neutral";
+
+}
+
+
+/* 三大法人同時買超 */
+
+let sameBuy="";
+
+if(
+foreign>0 &&
+trust>0 &&
+dealer>0
+){
+
+sameBuy=`
+
+<div class="same-buy">
+
+⭐ 三大法人同時買超！
+
+<br>
+
+🔥 多方訊號較強
+
+</div>
+
+`;
+
+}
+
+else{
+
+sameBuy=`
+
+<div class="small" style="margin-top:15px;">
+
+目前不是三大法人同時買超
+
+</div>
+
+`;
+
+}
+
+
+/* 連續買超 */
+
+let daysHTML="";
+
+if(days>0){
+
+daysHTML=`
+
+<br>
+
+🔥 連續買超：
+
+<span class="blue">
+<b>${days} 天</b>
+</span>
+
+`;
+
+}
+
+
+document.getElementById("institutionResult").innerHTML=`
+
+<div class="total">
+
+🔵 外資：
+
+<span class="${foreign>=0?'green':'red'}">
+
+${numberFormat(foreign)}
+
+</span>
+
+<br>
+
+
+🟣 投信：
+
+<span class="${trust>=0?'green':'red'}">
+
+${numberFormat(trust)}
+
+</span>
+
+<br>
+
+
+🟠 自營商：
+
+<span class="${dealer>=0?'green':'red'}">
+
+${numberFormat(dealer)}
+
+</span>
+
+<hr>
+
+
+📈 三大法人合計：
+
+<span class="${total>=0?'green':'red'}">
+
+${numberFormat(total)}
+
+</span>
+
+${daysHTML}
+
+</div>
+
+
+<div class="status ${statusClass}">
+
+${status}
+
+</div>
+
+${sameBuy}
+
+`;
+
+}
+
+</script>
+
+</body>
+</html>
+
+
+
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>台股三大法人分析</title>
 
 <style>
