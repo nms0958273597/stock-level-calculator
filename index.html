@@ -2,10 +2,12 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>台股即時股價測試</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>台股自動查詢測試</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
@@ -14,9 +16,9 @@ body{
   margin:0;
   padding:20px;
   background:#f3f5f7;
+  font-family:-apple-system,BlinkMacSystemFont,
+  "Noto Sans TC","PingFang TC",sans-serif;
   color:#222;
-  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",
-  "PingFang TC",sans-serif;
 }
 
 .container{
@@ -64,17 +66,17 @@ button{
   font-weight:700;
 }
 
-#status{
+.result{
   margin-top:18px;
-  padding:16px;
+  padding:18px;
   background:#f7f7f7;
   border-radius:12px;
-  font-size:18px;
   text-align:center;
+  font-size:18px;
 }
 
 .price{
-  font-size:36px;
+  font-size:40px;
   font-weight:800;
   color:#1677d2;
   margin:15px 0;
@@ -93,32 +95,41 @@ button{
 .gray{
   color:#777;
 }
+
 </style>
 </head>
+
 
 <body>
 
 <div class="container">
 
-<h1>📈 台股即時股價測試</h1>
+<h1>📊 台股自動查詢</h1>
+
 
 <div class="card">
 
-<label>🔎 輸入股票代號</label>
+<label>
+🔎 股票代號
+</label>
 
 <input
   id="code"
   value="1326"
-  inputmode="numeric"
   placeholder="例如：1326"
+  inputmode="numeric"
 >
 
-<button onclick="checkStock()">
-🔍 查詢股價
+
+<button onclick="searchStock()">
+🔍 自動查詢股票
 </button>
 
-<div id="status">
-請按「查詢股價」
+
+<div id="result" class="result">
+
+請按「自動查詢股票」
+
 </div>
 
 </div>
@@ -128,48 +139,46 @@ button{
 
 <script>
 
-async function checkStock(){
+async function searchStock(){
 
   const code =
     document.getElementById("code").value.trim();
 
+
   if(!code){
 
-    document.getElementById("status").innerHTML =
+    document.getElementById("result").innerHTML =
       "⚠️ 請輸入股票代號";
 
     return;
+
   }
 
-  document.getElementById("status").innerHTML =
-    "⏳ 正在查詢  " + code + "  ...";
+
+  document.getElementById("result").innerHTML =
+    "⏳ 正在查詢 " + code + " ...";
 
 
   try{
 
+
     /*
-      使用 Yahoo Finance 公開查詢服務
-      避免直接呼叫 TWSE API
+      FinMind 台股即時 Tick Snapshot
     */
 
-    const yahooUrl =
-      "https://query1.finance.yahoo.com/v8/finance/chart/" +
-      code +
-      ".TW?range=1d&interval=1m";
-
-
-    const proxy =
-      "https://api.allorigins.win/raw?url=" +
-      encodeURIComponent(yahooUrl);
+    const url =
+      "https://api.finmindtrade.com/api/v4/taiwan_stock_tick_snapshot";
 
 
     const response =
-      await fetch(proxy);
+      await fetch(url);
 
 
     if(!response.ok){
 
-      throw new Error("API 連線失敗");
+      throw new Error(
+        "API 連線失敗：" + response.status
+      );
 
     }
 
@@ -178,5 +187,151 @@ async function checkStock(){
       await response.json();
 
 
-    const result =
-     
+    console.log("FinMind資料：",data);
+
+
+    if(
+      !data ||
+      !data.data
+    ){
+
+      throw new Error(
+        "沒有取得股票資料"
+      );
+
+    }
+
+
+    /*
+      找指定股票
+    */
+
+    const stock =
+      data.data.find(
+        item =>
+          String(
+            item.stock_id ||
+            item.stock_code ||
+            ""
+          ) === code
+      );
+
+
+    if(!stock){
+
+      throw new Error(
+        "找不到股票 " + code
+      );
+
+    }
+
+
+    console.log(
+      "找到股票：",
+      stock
+    );
+
+
+    /*
+      嘗試取得價格
+    */
+
+    const price =
+      Number(
+        stock.last_price ||
+        stock.latest_trade_price ||
+        stock.price ||
+        stock.close ||
+        0
+      );
+
+
+    if(!price){
+
+      document.getElementById("result").innerHTML = `
+
+        <div>
+          ✅ 找到股票
+        </div>
+
+        <br>
+
+        <div class="gray">
+          但目前 API 沒有回傳價格欄位。
+        </div>
+
+        <br>
+
+        <div class="gray">
+          請看瀏覽器 Console 資料。
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    const name =
+      stock.stock_name ||
+      stock.name ||
+      code;
+
+
+    document.getElementById("result").innerHTML = `
+
+      <div>
+        ✅ 查詢成功
+      </div>
+
+      <div style="margin-top:12px;">
+        📌 ${name}
+      </div>
+
+      <div class="gray">
+        股票代號：${code}
+      </div>
+
+      <div class="price">
+        ${price.toFixed(2)}
+      </div>
+
+      <div class="green">
+        💰 目前價格
+      </div>
+
+    `;
+
+
+  }catch(error){
+
+
+    console.error(
+      "查詢錯誤：",
+      error
+    );
+
+
+    document.getElementById("result").innerHTML = `
+
+      <div class="red">
+        ❌ 查詢失敗
+      </div>
+
+      <br>
+
+      <div class="gray">
+        ${error.message}
+      </div>
+
+    `;
+
+  }
+
+}
+
+</script>
+
+</body>
+</html>
