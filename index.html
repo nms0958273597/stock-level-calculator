@@ -3,102 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-
-<title>台股自動查詢測試</title>
+<title>台股自動查詢</title>
 
 <style>
-
-*{
-  box-sizing:border-box;
-}
-
+*{box-sizing:border-box}
 body{
   margin:0;
   padding:20px;
   background:#f3f5f7;
-  font-family:-apple-system,BlinkMacSystemFont,
-  "Noto Sans TC","PingFang TC",sans-serif;
-  color:#222;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif;
 }
-
-.container{
-  max-width:600px;
-  margin:auto;
-}
-
-h1{
-  text-align:center;
-  font-size:28px;
-  margin:20px 0 25px;
-}
-
+.container{max-width:600px;margin:auto}
+h1{text-align:center}
 .card{
-  background:white;
-  border-radius:18px;
+  background:#fff;
   padding:20px;
-  box-shadow:0 3px 12px rgba(0,0,0,.08);
+  border-radius:18px;
+  margin-bottom:16px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08)
 }
-
-label{
-  display:block;
-  font-size:18px;
-  font-weight:700;
-  margin-bottom:10px;
-}
-
+label{display:block;font-weight:700;margin-bottom:8px}
 input{
   width:100%;
-  padding:16px;
+  padding:15px;
   border:1px solid #ddd;
   border-radius:12px;
-  font-size:20px;
+  font-size:18px
 }
-
 button{
   width:100%;
-  padding:17px;
-  margin-top:16px;
+  padding:16px;
+  margin-top:15px;
   border:0;
   border-radius:12px;
   background:#222;
-  color:white;
-  font-size:19px;
-  font-weight:700;
+  color:#fff;
+  font-size:18px;
+  font-weight:700
 }
-
 .result{
-  margin-top:18px;
+  margin-top:16px;
   padding:18px;
   background:#f7f7f7;
   border-radius:12px;
-  text-align:center;
-  font-size:18px;
+  font-size:18px
 }
-
 .price{
-  font-size:40px;
+  font-size:38px;
   font-weight:800;
   color:#1677d2;
-  margin:15px 0;
+  margin:15px 0
 }
-
-.green{
-  color:#07943a;
-  font-weight:700;
-}
-
-.red{
-  color:#d52626;
-  font-weight:700;
-}
-
-.gray{
-  color:#777;
-}
-
+.green{color:#07943a;font-weight:700}
+.red{color:#d52626;font-weight:700}
+.gray{color:#777}
 </style>
 </head>
-
 
 <body>
 
@@ -106,68 +66,59 @@ button{
 
 <h1>📊 台股自動查詢</h1>
 
-
 <div class="card">
 
-<label>
-🔎 股票代號
-</label>
+<label>🔎 股票代號或股票名稱（二選一）</label>
 
 <input
-  id="code"
-  value="1326"
-  placeholder="例如：1326"
-  inputmode="numeric"
+  id="query"
+  placeholder="例如：1326 或 台化"
 >
 
-
 <button onclick="searchStock()">
-🔍 自動查詢股票
+🔍 查詢股票
 </button>
 
-
 <div id="result" class="result">
-
-請按「自動查詢股票」
-
+請輸入股票代號或名稱
 </div>
 
 </div>
 
 </div>
-
 
 <script>
 
 async function searchStock(){
 
-  const code =
-    document.getElementById("code").value.trim();
+  const query =
+    document.getElementById("query").value.trim();
 
-
-  if(!code){
+  if(!query){
 
     document.getElementById("result").innerHTML =
-      "⚠️ 請輸入股票代號";
+      "⚠️ 請輸入股票代號或股票名稱";
 
     return;
-
   }
 
-
   document.getElementById("result").innerHTML =
-    "⏳ 正在查詢 " + code + " ...";
-
+    "⏳ 正在查詢...";
 
   try{
 
-
     /*
-      FinMind 台股即時 Tick Snapshot
+      ⚠️ 這裡之後要放你的 Cloudflare Worker 網址
     */
 
+    const WORKER_URL =
+      "請把你的Worker網址貼在這裡";
+
+
     const url =
-      "https://api.finmindtrade.com/api/v4/taiwan_stock_tick_snapshot";
+      WORKER_URL +
+      "?q=" +
+      encodeURIComponent(query);
 
 
     const response =
@@ -177,7 +128,7 @@ async function searchStock(){
     if(!response.ok){
 
       throw new Error(
-        "API 連線失敗：" + response.status
+        "查詢服務連線失敗"
       );
 
     }
@@ -187,96 +138,17 @@ async function searchStock(){
       await response.json();
 
 
-    console.log("FinMind資料：",data);
-
-
-    if(
-      !data ||
-      !data.data
-    ){
+    if(!data.success){
 
       throw new Error(
-        "沒有取得股票資料"
+        data.message || "找不到股票"
       );
 
     }
 
-
-    /*
-      找指定股票
-    */
-
-    const stock =
-      data.data.find(
-        item =>
-          String(
-            item.stock_id ||
-            item.stock_code ||
-            ""
-          ) === code
-      );
-
-
-    if(!stock){
-
-      throw new Error(
-        "找不到股票 " + code
-      );
-
-    }
-
-
-    console.log(
-      "找到股票：",
-      stock
-    );
-
-
-    /*
-      嘗試取得價格
-    */
 
     const price =
-      Number(
-        stock.last_price ||
-        stock.latest_trade_price ||
-        stock.price ||
-        stock.close ||
-        0
-      );
-
-
-    if(!price){
-
-      document.getElementById("result").innerHTML = `
-
-        <div>
-          ✅ 找到股票
-        </div>
-
-        <br>
-
-        <div class="gray">
-          但目前 API 沒有回傳價格欄位。
-        </div>
-
-        <br>
-
-        <div class="gray">
-          請看瀏覽器 Console 資料。
-        </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    const name =
-      stock.stock_name ||
-      stock.name ||
-      code;
+      Number(data.price);
 
 
     document.getElementById("result").innerHTML = `
@@ -285,33 +157,32 @@ async function searchStock(){
         ✅ 查詢成功
       </div>
 
-      <div style="margin-top:12px;">
-        📌 ${name}
-      </div>
+      <div style="margin-top:10px">
 
-      <div class="gray">
-        股票代號：${code}
+        ${data.name}
+
+        <span class="gray">
+        ${data.code}
+        </span>
+
       </div>
 
       <div class="price">
+
         ${price.toFixed(2)}
+
       </div>
 
-      <div class="green">
-        💰 目前價格
+      <div>
+
+        💰 目前股價
+
       </div>
 
     `;
 
 
   }catch(error){
-
-
-    console.error(
-      "查詢錯誤：",
-      error
-    );
-
 
     document.getElementById("result").innerHTML = `
 
