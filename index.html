@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>股票關卡＋籌碼分析</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  padding:20px;
+  background:#f3f5f7;
+  color:#222;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",
+  "PingFang TC",sans-serif;
+}
+
+.container{
+  max-width:600px;
+  margin:auto;
+}
+
+h1{
+  text-align:center;
+  margin:10px 0 22px;
+  font-size:28px;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+label{
+  display:block;
+  margin-top:12px;
+  font-weight:700;
+}
+
+input{
+  width:100%;
+  padding:13px;
+  margin-top:7px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:17px;
+}
+
+button{
+  width:100%;
+  padding:15px;
+  margin-top:20px;
+  border:0;
+  border-radius:12px;
+  background:#222;
+  color:white;
+  font-size:18px;
+  font-weight:700;
+}
+
+.result{
+  margin-top:15px;
+  padding:16px;
+  background:#f7f7f7;
+  border-radius:12px;
+  font-size:18px;
+}
+
+.level{
+  padding:12px 0;
+  border-bottom:1px solid #eee;
+}
+
+.level:last-child{
+  border-bottom:0;
+}
+
+.green{
+  color:#0a9f35;
+  font-weight:700;
+}
+
+.red{
+  color:#d92727;
+  font-weight:700;
+}
+
+.orange{
+  color:#d97706;
+  font-weight:700;
+}
+
+.blue{
+  color:#1677d2;
+  font-weight:700;
+}
+
+.small{
+  color:#777;
+  font-size:14px;
+  margin-top:8px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>📊 股票關卡＋籌碼分析</h1>
+
+<div class="card">
+
+<label>股票名稱</label>
+<input id="stock" placeholder="例如：台化">
+
+<label>股票代號</label>
+<input id="code" placeholder="例如：1326">
+
+<label>目前股價</label>
+<input id="price" type="number" step="0.01" placeholder="例如：60.9">
+
+<label>我的成本</label>
+<input id="cost" type="number" step="0.01" placeholder="例如：58.5">
+
+<label>第一進場價</label>
+<input id="entry1" type="number" step="0.01">
+
+<label>第二進場價</label>
+<input id="entry2" type="number" step="0.01">
+
+<label>第一止盈％</label>
+<input id="profit1" type="number" step="0.1" value="5">
+
+<label>第二止盈％</label>
+<input id="profit2" type="number" step="0.1" value="10">
+
+<label>停損％</label>
+<input id="loss" type="number" step="0.1" value="3">
+
+<button onclick="calculate()">開始計算</button>
+
+</div>
+
+
+<div class="card">
+
+<h2>🎯 股票關卡</h2>
+
+<div id="result" class="result">
+請輸入資料後按「開始計算」
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>📈 三大法人籌碼</h2>
+
+<label>外資買賣超（張）</label>
+<input id="foreign" type="number" placeholder="正數＝買超，負數＝賣超">
+
+<label>投信買賣超（張）</label>
+<input id="trust" type="number" placeholder="正數＝買超，負數＝賣超">
+
+<label>自營商買賣超（張）</label>
+<input id="dealer" type="number" placeholder="正數＝買超，負數＝賣超">
+
+<label>外資連買／賣天數</label>
+<input id="foreignDays" type="number" placeholder="例如：5">
+
+<label>投信連買／賣天數</label>
+<input id="trustDays" type="number" placeholder="例如：3">
+
+<button onclick="chip()">分析籌碼</button>
+
+<div id="chipResult" class="result">
+尚未分析籌碼
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>📌 使用方式</h2>
+
+<div class="small">
+① 輸入目前股價<br><br>
+② 輸入自己的成本<br><br>
+③ 設定第一、第二進場價<br><br>
+④ 設定第一、第二止盈％<br><br>
+⑤ 設定停損％<br><br>
+⑥ 按「開始計算」
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+function num(id){
+  return Number(document.getElementById(id).value) || 0;
+}
+
+
+function money(n){
+  return Number(n).toFixed(2);
+}
+
+
+function calculate(){
+
+  const price=num("price");
+  const cost=num("cost");
+
+  const entry1=num("entry1");
+  const entry2=num("entry2");
+
+  const profit1=num("profit1");
+  const profit2=num("profit2");
+  const loss=num("loss");
+
+  if(price<=0 || cost<=0){
+    document.getElementById("result").innerHTML=
+      "⚠️ 請先輸入「目前股價」和「我的成本」";
+    return;
+  }
+
+  const takeProfit1=cost*(1+profit1/100);
+  const takeProfit2=cost*(1+profit2/100);
+
+  const stopLoss=cost*(1-loss/100);
+
+  const profitPercent=((price-cost)/cost)*100;
+
+  let status="";
+
+  if(price>cost){
+    status=`目前獲利 <span class="green">${money(profitPercent)}%</span>`;
+  }else if(price<cost){
+    status=`目前虧損 <span class="red">${money(Math.abs(profitPercent))}%</span>`;
+  }else{
+    status="目前剛好打平";
+  }
+
+  document.getElementById("result").innerHTML=`
+
+    <div class="level">
+      💰 目前股價：
+      <span class="blue">${money(price)}</span>
+    </div>
+
+    <div class="level">
+      🧾 我的成本：
+      <span>${money(cost)}</span>
+    </div>
+
+    <div class="level">
+      ${status}
+    </div>
+
+    <hr>
+
+    <div class="level">
+      🟢 第一進場：
+      <span class="green">
+      ${entry1>0 ? money(entry1) : "尚未設定"}
+      </span>
+    </div>
+
+    <div class="level">
+      🟢 第二進場：
+      <span class="green">
+      ${entry2>0 ? money(entry2) : "尚未設定"}
+      </span>
+    </div>
+
+    <div class="level">
+      💰 第一止盈：
+      <span class="orange">
+      ${money(takeProfit1)}
+      </span>
+      <br>
+      <span class="small">
+      成本＋${profit1}%
+      </span>
+    </div>
+
+    <div class="level">
+      💰 第二止盈：
+      <span class="orange">
+      ${money(takeProfit2)}
+      </span>
+      <br>
+      <span class="small">
+      成本＋${profit2}%
+      </span>
+    </div>
+
+    <div class="level">
+      🛑 防守／停損：
+      <span class="red">
+      ${money(stopLoss)}
+      </span>
+      <br>
+      <span class="small">
+      成本－${loss}%
+      </span>
+    </div>
+  `;
+}
+
+
+function chip(){
+
+  const foreign=num("foreign");
+  const trust=num("trust");
+  const dealer=num("dealer");
+
+  const foreignDays=num("foreignDays");
+  const trustDays=num("trustDays");
+
+  const total=foreign+trust+dealer;
+
+  function text(v){
+
+    if(v>0){
+      return `<span class="green">買超 ${Math.abs(v).toLocaleString()} 張</span>`;
+    }
+
+    if(v<0){
+      return `<span class="red">賣超 ${Math.abs(v).toLocaleString()} 張</span>`;
+    }
+
+    return `<span>0 張</span>`;
+  }
+
+  let score=0;
+
+  if(foreign>0) score++;
+  if(trust>0) score++;
+  if(dealer>0) score++;
+
+  let conclusion="⚪ 籌碼中性";
+
+  if(score>=2){
+    conclusion=
+      `<span class="green">🟢 籌碼偏多</span>`;
+  }
+
+  if(foreign<0 && trust<0){
+    conclusion=
+      `<span class="red">🔴 外資＋投信同步賣超</span>`;
+  }
+
+  if(foreignDays>=3){
+    conclusion+=
+      `<br><br>🔥 外資連續 ${foreignDays} 天有動作`;
+  }
+
+  if(trustDays>=3){
+    conclusion+=
+      `<br>🔥 投信連續 ${trustDays} 天有動作`;
+  }
+
+  document.getElementById("chipResult").innerHTML=`
+
+    <div class="level">
+      🌍 外資：
+      ${text(foreign)}
+    </div>
+
+    <div class="level">
+      🏦 投信：
+      ${text(trust)}
+    </div>
+
+    <div class="level">
+      🏢 自營商：
+      ${text(dealer)}
+    </div>
+
+    <div class="level">
+      📊 三大法人合計：
+      ${text(total)}
+    </div>
+
+    <hr>
+
+    <div class="level">
+      ${conclusion}
+    </div>
+
+  `;
+}
+
+</script>
+
+</body>
+</html>
