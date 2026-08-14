@@ -13,7 +13,7 @@
 
 body{
   margin:0;
-  padding:18px;
+  padding:20px;
   background:#f3f5f7;
   color:#222;
   font-family:-apple-system,BlinkMacSystemFont,
@@ -27,48 +27,44 @@ body{
 
 h1{
   text-align:center;
-  font-size:27px;
+  font-size:28px;
   margin:10px 0 22px;
 }
 
 .card{
   background:#fff;
   border-radius:18px;
-  padding:18px;
-  margin-bottom:16px;
+  padding:20px;
+  margin-bottom:18px;
   box-shadow:0 3px 12px rgba(0,0,0,.08);
 }
 
 label{
   display:block;
-  margin-top:13px;
+  margin-top:14px;
   font-weight:700;
+  font-size:17px;
 }
 
 input{
   width:100%;
-  padding:14px;
-  margin-top:7px;
+  padding:15px;
+  margin-top:8px;
   border:1px solid #ddd;
-  border-radius:11px;
+  border-radius:12px;
   font-size:18px;
-  background:#fff;
 }
 
 button{
   width:100%;
-  padding:15px;
-  margin-top:18px;
+  padding:16px;
+  margin-top:20px;
   border:0;
   border-radius:12px;
   background:#222;
   color:#fff;
-  font-size:18px;
+  font-size:19px;
   font-weight:700;
-}
-
-button:active{
-  opacity:.75;
 }
 
 .result{
@@ -80,7 +76,7 @@ button:active{
 }
 
 .level{
-  padding:13px 0;
+  padding:14px 0;
   border-bottom:1px solid #eee;
 }
 
@@ -118,13 +114,13 @@ button:active{
   line-height:1.7;
 }
 
-.loading{
+.status{
   text-align:center;
-  padding:15px;
+  padding:12px;
+  font-size:17px;
 }
 </style>
 </head>
-
 
 <body>
 
@@ -133,7 +129,9 @@ button:active{
 <h1>📊 股票自動查詢＋關卡分析</h1>
 
 
+<!-- ===================== -->
 <!-- 股票查詢 -->
+<!-- ===================== -->
 
 <div class="card">
 
@@ -141,6 +139,7 @@ button:active{
 
 <input
   id="query"
+  type="text"
   placeholder="例如：1326 或 台化"
   autocomplete="off"
 >
@@ -149,18 +148,20 @@ button:active{
 🔍 自動查詢股票
 </button>
 
-<div id="status" class="loading">
-請輸入股票代號或名稱
+<div id="status" class="status">
+請輸入股票代號或股票名稱
 </div>
 
 </div>
 
 
+<!-- ===================== -->
 <!-- 股票資訊 -->
+<!-- ===================== -->
 
 <div class="card">
 
-<h2>📈 股票即時資訊</h2>
+<h2>📈 股票即時／最新資訊</h2>
 
 <div id="stockResult" class="result">
 尚未查詢股票
@@ -169,7 +170,9 @@ button:active{
 </div>
 
 
-<!-- 我的設定 -->
+<!-- ===================== -->
+<!-- 交易設定 -->
+<!-- ===================== -->
 
 <div class="card">
 
@@ -181,9 +184,8 @@ button:active{
   id="cost"
   type="number"
   step="0.01"
-  placeholder="例如：58.50"
+  placeholder="例如：62"
 >
-
 
 <label>第一止盈％</label>
 
@@ -194,7 +196,6 @@ button:active{
   value="5"
 >
 
-
 <label>第二止盈％</label>
 
 <input
@@ -203,7 +204,6 @@ button:active{
   step="0.1"
   value="10"
 >
-
 
 <label>停損％</label>
 
@@ -214,7 +214,6 @@ button:active{
   value="3"
 >
 
-
 <button onclick="calculateLevels()">
 🎯 計算股票關卡
 </button>
@@ -222,41 +221,46 @@ button:active{
 </div>
 
 
-<!-- 股票關卡 -->
+<!-- ===================== -->
+<!-- 關卡 -->
+<!-- ===================== -->
 
 <div class="card">
 
 <h2>🎯 股票關卡</h2>
 
 <div id="levels" class="result">
-先輸入股票代號或名稱查詢。
-</div>
+
+請先查詢股票，再輸入成本。
 
 </div>
 
+</div>
 
-<!-- 說明 -->
+
+<!-- ===================== -->
+<!-- 使用說明 -->
+<!-- ===================== -->
 
 <div class="card">
 
-<h2>📌 使用方法</h2>
+<h2>📌 使用方式</h2>
 
 <div class="small">
 
-① 輸入「股票代號」或「股票名稱」其中一個<br><br>
+① 輸入股票代號，例如：<b>1326</b><br><br>
 
-例如：<b>1326</b><br>
-或：<b>台化</b><br><br>
+或輸入股票名稱，例如：<b>台化</b><br><br>
 
-② 按「🔍 自動查詢股票」<br><br>
+② 按「自動查詢股票」<br><br>
 
-③ 網站會自動取得目前股價<br><br>
+③ 自動取得最新可用股價<br><br>
 
-④ 只輸入你的「我的成本」<br><br>
+④ 輸入你的成本<br><br>
 
-⑤ 按「🎯 計算股票關卡」<br><br>
+⑤ 按「計算股票關卡」<br><br>
 
-⑥ 自動得到進場、止盈、停損位置
+⑥ 自動算出第一止盈、第二止盈、停損
 
 </div>
 
@@ -267,121 +271,121 @@ button:active{
 
 <script>
 
-/* =========================
-   全域股票資料
-========================= */
+/* ===================================
+   全域目前股票
+=================================== */
 
-let stockList = [];
-
-window.currentStock = null;
+let currentStock = null;
 
 
-/* =========================
-   取得股票清單
-========================= */
+/* ===================================
+   證交所 OpenAPI
+=================================== */
 
-async function loadStockList(){
+const STOCK_API =
+"https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL";
 
-  try{
-
-    const response = await fetch(
-      "https://openapi.twse.com.tw/v1/opendata/t187ap03_L"
-    );
-
-    if(!response.ok){
-      throw new Error("股票清單取得失敗");
-    }
-
-    stockList = await response.json();
-
-  }catch(error){
-
-    console.log("股票清單載入失敗",error);
-
-  }
-
-}
+const LIST_API =
+"https://openapi.twse.com.tw/v1/opendata/t187ap03_L";
 
 
-/* =========================
-   股票查詢
-========================= */
+/* ===================================
+   查詢股票
+=================================== */
 
 async function searchStock(){
 
   const q =
-    document.getElementById("query").value.trim();
+    document.getElementById("query")
+    .value
+    .trim();
 
   if(!q){
 
-    showStatus("⚠️ 請輸入股票代號或股票名稱");
+    setStatus("⚠️ 請輸入股票代號或股票名稱");
 
     return;
   }
 
-
-  showStatus("⏳ 正在查詢股票...");
-
+  setStatus("⏳ 正在查詢股票...");
 
   try{
 
-    let code = "";
+    const response =
+      await fetch(STOCK_API + "?_=" + Date.now());
 
+    if(!response.ok){
 
-    /* 如果輸入股票代號 */
+      throw new Error("股票資料取得失敗");
 
-    if(/^\d{4,6}$/.test(q)){
+    }
 
-      code = q;
+    const data =
+      await response.json();
+
+    if(!Array.isArray(data)){
+
+      throw new Error("資料格式錯誤");
 
     }
 
 
-    /* 如果輸入股票名稱 */
+    /* =============================
+       先找股票代號
+    ============================= */
 
-    else{
-
-      if(stockList.length === 0){
-
-        await loadStockList();
-
-      }
+    let found = null;
 
 
-      const found =
-        stockList.find(item => {
+    if(/^\d{4,6}$/.test(q)){
 
-          const text =
-            item["有價證券代號及名稱"] || "";
+      found =
+        data.find(item =>
+          String(item["證券代號"]).trim() === q
+        );
 
-          return text.includes(q);
+    }else{
+
+      /* =============================
+         股票名稱搜尋
+      ============================= */
+
+      found =
+        data.find(item => {
+
+          const name =
+            String(item["證券名稱"] || "")
+            .trim();
+
+          return name === q;
 
         });
 
 
-      if(found){
+      /* 找不到完全相同，再找包含 */
 
-        const text =
-          found["有價證券代號及名稱"];
+      if(!found){
 
-        const match =
-          text.match(/^(\d{4,6})/);
+        found =
+          data.find(item => {
 
-        if(match){
+            const name =
+              String(item["證券名稱"] || "")
+              .trim();
 
-          code = match[1];
+            return name.includes(q);
 
-        }
+          });
 
       }
 
     }
 
 
-    if(!code){
+    if(!found){
 
-      showStatus(
-        "❌ 找不到股票，請確認代號或名稱"
+      setStatus(
+        "❌ 找不到股票，請輸入正確的股票代號或名稱"
       );
 
       return;
@@ -389,14 +393,86 @@ async function searchStock(){
     }
 
 
-    await getStockPrice(code);
+    /* =============================
+       取得資料
+    ============================= */
+
+    const code =
+      String(found["證券代號"]).trim();
+
+    const name =
+      String(found["證券名稱"]).trim();
+
+
+    const close =
+      parseFloat(
+        String(found["收盤價"])
+        .replace(/,/g,"")
+      );
+
+
+    const change =
+      parseFloat(
+        String(found["漲跌價差"])
+        .replace(/,/g,"")
+      );
+
+
+    if(!isFinite(close)){
+
+      throw new Error("目前沒有可用股價");
+
+    }
+
+
+    const yesterday =
+      close - (isFinite(change) ? change : 0);
+
+
+    let changePercent = 0;
+
+    if(yesterday !== 0){
+
+      changePercent =
+        (change / yesterday) * 100;
+
+    }
+
+
+    currentStock = {
+
+      code:code,
+
+      name:name,
+
+      price:close,
+
+      change:change || 0,
+
+      changePercent:changePercent
+
+    };
+
+
+    showStock();
+
+
+    setStatus(
+      `✅ 已找到 ${name}（${code}）`
+    );
+
+
+    /* 自動顯示關卡 */
+
+    showAutoLevels();
+
 
   }catch(error){
 
     console.error(error);
 
-    showStatus(
-      "❌ 查詢失敗，請稍後再試"
+    setStatus(
+      "❌ 查詢失敗。請稍後再試一次。"
     );
 
   }
@@ -404,106 +480,27 @@ async function searchStock(){
 }
 
 
-/* =========================
-   取得股票價格
-========================= */
+/* ===================================
+   顯示股票資訊
+=================================== */
 
-async function getStockPrice(code){
+function showStock(){
 
-  const url =
-    "https://mis.twse.com.tw/stock/api/getStockInfo.jsp" +
-    "?ex_ch=tse_" +
-    code +
-    ".tw&json=1&delay=0";
+  if(!currentStock) return;
 
 
-  const response =
-    await fetch(url);
+  let changeClass =
+    "gray";
 
+  if(currentStock.change > 0){
 
-  if(!response.ok){
+    changeClass =
+      "green";
 
-    throw new Error("股價取得失敗");
+  }else if(currentStock.change < 0){
 
-  }
-
-
-  const data =
-    await response.json();
-
-
-  if(
-    !data.msgArray ||
-    data.msgArray.length === 0
-  ){
-
-    throw new Error("找不到股票");
-
-  }
-
-
-  const s =
-    data.msgArray[0];
-
-
-  const name =
-    s.n || code;
-
-
-  const yesterday =
-    Number(s.y) || 0;
-
-
-  let price =
-    Number(s.z);
-
-
-  /* 沒有最新成交價就使用昨收 */
-
-  if(!price || price <= 0){
-
-    price = yesterday;
-
-  }
-
-
-  const change =
-    price - yesterday;
-
-
-  const changePercent =
-    yesterday > 0
-      ? change / yesterday * 100
-      : 0;
-
-
-  window.currentStock = {
-
-    code:code,
-
-    name:name,
-
-    price:price,
-
-    yesterday:yesterday,
-
-    change:change,
-
-    changePercent:changePercent
-
-  };
-
-
-  let changeClass = "gray";
-
-
-  if(change > 0){
-
-    changeClass = "green";
-
-  }else if(change < 0){
-
-    changeClass = "red";
+    changeClass =
+      "red";
 
   }
 
@@ -516,10 +513,12 @@ async function getStockPrice(code){
 
       📌 股票：
 
-      <b>${name}</b>
+      <b>
+      ${currentStock.name}
+      </b>
 
       <span class="gray">
-      ${code}
+      ${currentStock.code}
       </span>
 
     </div>
@@ -527,10 +526,10 @@ async function getStockPrice(code){
 
     <div class="level">
 
-      💰 目前股價：
+      💰 最新可用股價：
 
       <span class="blue">
-      ${price.toFixed(2)}
+      ${currentStock.price.toFixed(2)}
       </span>
 
     </div>
@@ -542,8 +541,8 @@ async function getStockPrice(code){
 
       <span class="${changeClass}">
 
-      ${change >= 0 ? "+" : ""}
-      ${change.toFixed(2)}
+      ${currentStock.change >= 0 ? "+" : ""}
+      ${currentStock.change.toFixed(2)}
 
       </span>
 
@@ -556,41 +555,30 @@ async function getStockPrice(code){
 
       <span class="${changeClass}">
 
-      ${change >= 0 ? "+" : ""}
-      ${changePercent.toFixed(2)}%
+      ${currentStock.changePercent >= 0 ? "+" : ""}
+      ${currentStock.changePercent.toFixed(2)}%
 
       </span>
 
     </div>
 
-
-    <div class="small">
-
-      昨日收盤：
-      ${yesterday.toFixed(2)}
-
-    </div>
-
   `;
-
-
-  showStatus(
-    `✅ ${name}（${code}）查詢成功`
-  );
-
-
-  /* 自動顯示進場 */
-
-  showAutoEntry(price);
 
 }
 
 
-/* =========================
-   自動進場
-========================= */
+/* ===================================
+   自動進場關卡
+=================================== */
 
-function showAutoEntry(price){
+function showAutoLevels(){
+
+  if(!currentStock) return;
+
+
+  const price =
+    currentStock.price;
+
 
   const entry1 =
     price * 0.98;
@@ -606,7 +594,7 @@ function showAutoEntry(price){
 
     <div class="level">
 
-      💰 目前股價：
+      💰 自動帶入股價：
 
       <span class="blue">
 
@@ -630,7 +618,9 @@ function showAutoEntry(price){
       <br>
 
       <span class="small">
+
       現價下方 2%
+
       </span>
 
     </div>
@@ -649,7 +639,9 @@ function showAutoEntry(price){
       <br>
 
       <span class="small">
+
       現價下方 5%
+
       </span>
 
     </div>
@@ -657,8 +649,8 @@ function showAutoEntry(price){
 
     <div class="small">
 
-      💡 以上進場位置是預設計算，
-      實際操作仍要搭配支撐、K線及籌碼判斷。
+      ⬆️ 上方輸入你的成本後，
+      還可以計算止盈與停損。
 
     </div>
 
@@ -667,23 +659,19 @@ function showAutoEntry(price){
 }
 
 
-/* =========================
-   計算完整關卡
-========================= */
+/* ===================================
+   完整關卡計算
+=================================== */
 
 function calculateLevels(){
 
-  if(!window.currentStock){
+  if(!currentStock){
 
-    alert("請先輸入股票代號或名稱並查詢");
+    alert("請先查詢股票");
 
     return;
 
   }
-
-
-  const price =
-    window.currentStock.price;
 
 
   const cost =
@@ -719,6 +707,10 @@ function calculateLevels(){
     ) || 3;
 
 
+  const price =
+    currentStock.price;
+
+
   const entry1 =
     price * 0.98;
 
@@ -740,37 +732,227 @@ function calculateLevels(){
 
 
   const profitPercent =
-    (price - cost) / cost * 100;
+    ((price - cost) / cost) * 100;
 
 
-  let status;
+  let status = "";
 
 
   if(profitPercent > 0){
 
-    status =
-      `目前獲利
+    status = `
+
+      目前獲利
+
       <span class="green">
+
       +${profitPercent.toFixed(2)}%
-      </span>`;
 
-  }
+      </span>
 
-  else if(profitPercent < 0){
+    `;
+
+  }else if(profitPercent < 0){
+
+    status = `
+
+      目前虧損
+
+      <span class="red">
+
+      ${profitPercent.toFixed(2)}%
+
+      </span>
+
+    `;
+
+  }else{
 
     status =
-      `目前虧損
+      "目前剛好打平";
+
+  }
+
+
+  document.getElementById(
+    "levels"
+  ).innerHTML = `
+
+    <div class="level">
+
+      💰 目前股價：
+
+      <span class="blue">
+
+      ${price.toFixed(2)}
+
+      </span>
+
+    </div>
+
+
+    <div class="level">
+
+      🧾 我的成本：
+
+      <b>
+
+      ${cost.toFixed(2)}
+
+      </b>
+
+      <br><br>
+
+      ${status}
+
+    </div>
+
+
+    <hr>
+
+
+    <div class="level">
+
+      🟢 第一進場：
+
+      <span class="green">
+
+      ${entry1.toFixed(2)}
+
+      </span>
+
+      <br>
+
+      <span class="small">
+
+      現價下方 2%
+
+      </span>
+
+    </div>
+
+
+    <div class="level">
+
+      🟢 第二進場：
+
+      <span class="green">
+
+      ${entry2.toFixed(2)}
+
+      </span>
+
+      <br>
+
+      <span class="small">
+
+      現價下方 5%
+
+      </span>
+
+    </div>
+
+
+    <div class="level">
+
+      💰 第一止盈：
+
+      <span class="orange">
+
+      ${takeProfit1.toFixed(2)}
+
+      </span>
+
+      <br>
+
+      <span class="small">
+
+      成本＋${profit1}%
+
+      </span>
+
+    </div>
+
+
+    <div class="level">
+
+      💰 第二止盈：
+
+      <span class="orange">
+
+      ${takeProfit2.toFixed(2)}
+
+      </span>
+
+      <br>
+
+      <span class="small">
+
+      成本＋${profit2}%
+
+      </span>
+
+    </div>
+
+
+    <div class="level">
+
+      🛑 防守／停損：
+
       <span class="red">
-      ${profitPercent.toFixed(2)}%
-      </span>`;
+
+      ${stopLoss.toFixed(2)}
+
+      </span>
+
+      <br>
+
+      <span class="small">
+
+      成本－${loss}%
+
+      </span>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ===================================
+   顯示狀態
+=================================== */
+
+function setStatus(text){
+
+  document.getElementById(
+    "status"
+  ).innerHTML = text;
+
+}
+
+
+/* ===================================
+   Enter 也可以查詢
+=================================== */
+
+document.getElementById(
+  "query"
+).addEventListener(
+  "keydown",
+  function(event){
+
+    if(event.key === "Enter"){
+
+      searchStock();
+
+    }
 
   }
+);
 
-  else{
+</script>
 
-    status = "目前剛好打平";
-
-  }
-
-
-  document.getElement
+</body>
+</html>
