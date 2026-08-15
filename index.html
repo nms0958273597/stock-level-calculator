@@ -1,16 +1,20 @@
-const ALLOWED_ORIGINS = [
-  "https://nms0958273597.github.io",
-  "https://nms0958273597.github.io/"
-];
+const STOCK_NAMES = {
+  "台化": "1326",
+  "台積電": "2330",
+  "鴻海": "2317",
+  "聯電": "2303",
+  "台達電": "2308",
+  "台塑": "1301",
+  "南亞": "1303",
+  "中鋼": "2002",
+  "華通": "2313",
+  "群創": "3481",
+  "日月光投控": "3711"
+};
 
-function corsHeaders(origin) {
-  const allowed =
-    ALLOWED_ORIGINS.includes(origin)
-      ? origin
-      : "*";
-
+function corsHeaders(origin = "*") {
   return {
-    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Origin": origin === "null" ? "*" : origin,
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Cache-Control": "no-store"
@@ -18,142 +22,1047 @@ function corsHeaders(origin) {
 }
 
 function json(data, status = 200, origin = "*") {
-  return new Response(
-    JSON.stringify(data),
-    {
-      status,
-      headers: {
-        "Content-Type": "application/json; charset=UTF-8",
-        ...corsHeaders(origin)
-      }
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=UTF-8",
+      ...corsHeaders(origin)
     }
+  });
+}
+
+function number(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === "-"
+  ) {
+    return null;
+  }
+
+  const n = Number(
+    String(value).replace(/,/g, "")
+  );
+
+  return Number.isFinite(n) ? n : null;
+}
+
+function price(value) {
+  const n = number(value);
+  return n === null ? "--" : n.toFixed(2);
+}
+
+function findValue(arr, index) {
+  if (!Array.isArray(arr)) return null;
+  return arr[index] ?? null;
+}
+
+async function getTWSE(code, exchange) {
+
+  const url =
+    "https://mis.twse.com.tw/stock/api/getStockInfo.jsp" +
+    "?ex_ch=" +
+    exchange +
+    "_" +
+    code +
+    ".tw" +
+    "&json=1" +
+    "&delay=0" +
+    "&_=" +
+    Date.now();
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json",
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      "TWSE HTTP " + response.status
+    );
+  }
+
+  const data = await response.json();
+
+  if (
+    data &&
+    Array.isArray(data.msgArray) &&
+    data.msgArray.length > 0
+  ) {
+    return data.msgArray[0];
+  }
+
+  return null;
+}
+
+async function getStock(code) {
+
+  const exchanges = ["tse", "otc"];
+
+  for (const exchange of exchanges) {
+
+    try {
+
+      const data =
+        await getTWSE(code, exchange);
+
+      if (
+        data &&
+        data.c
+      ) {
+        return {
+          ...data,
+          exchange
+        };
+      }
+
+    } catch (error) {
+
+      console.log(
+        exchange,
+        error.message
+      );
+
+    }
+  }
+
+  return null;
+}
+
+function calculateLevels(data) {
+
+  const current =
+    number(data.z) ??
+    number(data.y);
+
+  const yesterday =
+    number(data.y);
+
+  const high =
+    number(data.h);
+
+  const low =
+    number(data.l);
+
+  if (current === null) {
+    return {
+      entry: null,
+      support: null,
+      resistance: null,
+      tp1: null,
+      tp2: null,
+      stop: null
+    };
+  }
+
+  const support =
+    low !== null
+      ? low
+      : current * 0.98;
+
+  const resistance =
+    high !== null
+      ? high
+      : current * 1.02;
+
+  const entry =
+    support +
+    (current - support) * 0.35;
+
+  const tp1 =
+    entry * 1.03;
+
+  const tp2 =
+    entry * 1.06;
+
+  const stop =
+    entry * 0.98;
+
+  return {
+    entry: price(entry),
+    support: price(support),
+    resistance: price(resistance),
+    tp1: price(tp1),
+    tp2: price(tp2),
+    stop: price(stop)
+  };
+}
+
+function normalizeStock(data) {
+
+  const current =
+    number(data.z) ??
+    number(data.y);
+
+  const yesterday =
+    number(data.y);
+
+  let change = null;
+  let percent = null;
+
+  if (
+    current !== null &&
+    yesterday !== null &&
+    yesterday !== 0
+  ) {
+
+    change =
+      current - yesterday;
+
+    percent =
+      change / yesterday * 100;
+  }
+
+  const asks =
+    String(data.a || "")
+      .split("_")
+      .filter(x => x && x !== "-");
+
+  const bids =
+    String(data.b || "")
+      .split("_")
+      .filter(x => x && x !== "-");
+
+  const askVolumes =
+    String(data.f || "")
+      .split("_")
+      .filter(x => x && x !== "-");
+
+  const bidVolumes =
+    String(data.g || "")
+      .split("_")
+      .filter(x => x && x !== "-");
+
+  return {
+    code: data.c || "",
+    name: data.n || "",
+    exchange: data.exchange || "",
+    time: data.t || "",
+
+    price: price(current),
+    yesterday: price(data.y),
+    open: price(data.o),
+    high: price(data.h),
+    low: price(data.l),
+
+    change:
+      change === null
+        ? "--"
+        : price(change),
+
+    percent:
+      percent === null
+        ? "--"
+        : percent.toFixed(2),
+
+    volume: data.v || "--",
+
+    ask1:
+      asks.length
+        ? price(asks[0])
+        : "--",
+
+    bid1:
+      bids.length
+        ? price(bids[0])
+        : "--",
+
+    askVolume:
+      askVolumes.length
+        ? askVolumes[0]
+        : "--",
+
+    bidVolume:
+      bidVolumes.length
+        ? bidVolumes[0]
+        : "--",
+
+    levels:
+      calculateLevels(data)
+  };
+}
+
+function html() {
+
+return `<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<title>📊 台股高階行情分析</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:
+    linear-gradient(
+      180deg,
+      #f5f7fa,
+      #eef1f5
+    );
+  color:#1f2937;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Noto Sans TC",
+    "Microsoft JhengHei",
+    sans-serif;
+}
+
+header{
+  padding:34px 18px 24px;
+  text-align:center;
+}
+
+h1{
+  margin:0;
+  font-size:32px;
+  font-weight:900;
+}
+
+.subtitle{
+  margin-top:8px;
+  color:#6b7280;
+  font-size:14px;
+}
+
+.container{
+  width:94%;
+  max-width:760px;
+  margin:auto;
+}
+
+.card{
+  background:white;
+  border-radius:24px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:
+    0 10px 30px
+    rgba(0,0,0,.07);
+}
+
+label{
+  display:block;
+  font-size:17px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.searchRow{
+  display:flex;
+  gap:10px;
+}
+
+input{
+  flex:1;
+  min-width:0;
+  padding:16px;
+  border:
+    2px solid #e5e7eb;
+  border-radius:15px;
+  font-size:19px;
+  outline:none;
+}
+
+input:focus{
+  border-color:#111827;
+}
+
+button{
+  border:0;
+  border-radius:15px;
+  padding:0 20px;
+  background:#111827;
+  color:white;
+  font-size:17px;
+  font-weight:800;
+}
+
+button:active{
+  transform:scale(.97);
+}
+
+.status{
+  margin-top:16px;
+  padding:14px;
+  border-radius:14px;
+  line-height:1.6;
+  font-size:14px;
+}
+
+.wait{
+  background:#fff7df;
+  color:#795900;
+}
+
+.ok{
+  background:#eaf8ef;
+  color:#176b38;
+}
+
+.error{
+  background:#fff0f0;
+  color:#b42318;
+}
+
+.hidden{
+  display:none;
+}
+
+.stockTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.name{
+  font-size:27px;
+  font-weight:900;
+}
+
+.code{
+  margin-top:3px;
+  color:#6b7280;
+}
+
+.price{
+  margin-top:15px;
+  font-size:52px;
+  font-weight:900;
+}
+
+.change{
+  font-size:19px;
+  font-weight:800;
+  margin-top:3px;
+}
+
+.up{
+  color:#dc2626;
+}
+
+.down{
+  color:#15803d;
+}
+
+.section{
+  margin:
+    25px 0
+    12px;
+  font-size:20px;
+  font-weight:900;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:
+    repeat(2,1fr);
+  gap:10px;
+}
+
+.box{
+  padding:15px;
+  border-radius:15px;
+  background:#f7f8fa;
+}
+
+.boxTitle{
+  color:#6b7280;
+  font-size:13px;
+  margin-bottom:5px;
+}
+
+.boxValue{
+  font-size:19px;
+  font-weight:800;
+}
+
+.entry{
+  background:#edf8f0;
+}
+
+.target{
+  background:#fff3f3;
+}
+
+.stop{
+  background:#eef7f0;
+}
+
+.refresh{
+  width:100%;
+  height:50px;
+  margin-top:15px;
+}
+
+.note{
+  color:#6b7280;
+  font-size:12px;
+  line-height:1.7;
+  margin-top:20px;
+}
+
+@media(max-width:520px){
+
+  .searchRow{
+    flex-direction:column;
+  }
+
+  button{
+    height:52px;
+  }
+
+  .price{
+    font-size:43px;
+  }
+
+  .name{
+    font-size:25px;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>📊 台股高階行情分析</h1>
+
+<div class="subtitle">
+即時行情・五檔・交易關卡
+</div>
+
+</header>
+
+<main class="container">
+
+<section class="card">
+
+<label>
+🔎 股票代號／名稱
+</label>
+
+<div class="searchRow">
+
+<input
+  id="code"
+  value="1326"
+  placeholder="例如：1326、2330、台化"
+  autocomplete="off"
+>
+
+<button
+  onclick="searchStock()"
+>
+查詢
+</button>
+
+</div>
+
+<div
+  id="status"
+  class="status hidden"
+></div>
+
+</section>
+
+
+<section
+  id="result"
+  class="card hidden"
+>
+
+<div class="stockTop">
+
+<div>
+
+<div
+  id="name"
+  class="name"
+>
+--
+</div>
+
+<div
+  id="stockCode"
+  class="code"
+>
+--
+</div>
+
+</div>
+
+<div
+  id="exchange"
+  class="code"
+>
+--
+</div>
+
+</div>
+
+
+<div
+  id="price"
+  class="price"
+>
+--
+</div>
+
+<div
+  id="change"
+  class="change"
+>
+--
+</div>
+
+
+<div class="section">
+📈 今日行情
+</div>
+
+<div class="grid">
+
+<div class="box">
+<div class="boxTitle">昨收</div>
+<div id="yesterday" class="boxValue">--</div>
+</div>
+
+<div class="box">
+<div class="boxTitle">開盤</div>
+<div id="open" class="boxValue">--</div>
+</div>
+
+<div class="box">
+<div class="boxTitle">最高</div>
+<div id="high" class="boxValue">--</div>
+</div>
+
+<div class="box">
+<div class="boxTitle">最低</div>
+<div id="low" class="boxValue">--</div>
+</div>
+
+<div class="box">
+<div class="boxTitle">成交量</div>
+<div id="volume" class="boxValue">--</div>
+</div>
+
+<div class="box">
+<div class="boxTitle">更新時間</div>
+<div id="time" class="boxValue">--</div>
+</div>
+
+</div>
+
+
+<div class="section">
+💰 五檔報價
+</div>
+
+<div class="grid">
+
+<div class="box target">
+<div class="boxTitle">賣一</div>
+<div id="ask1" class="boxValue up">--</div>
+</div>
+
+<div class="box entry">
+<div class="boxTitle">買一</div>
+<div id="bid1" class="boxValue down">--</div>
+</div>
+
+<div class="box">
+<div class="boxTitle">賣一量</div>
+<div id="askVolume" class="boxValue">--</div>
+</div>
+
+<div class="box">
+<div class="boxTitle">買一量</div>
+<div id="bidVolume" class="boxValue">--</div>
+</div>
+
+</div>
+
+
+<div class="section">
+🎯 交易關卡
+</div>
+
+<div class="grid">
+
+<div class="box entry">
+<div class="boxTitle">參考進場</div>
+<div id="entry" class="boxValue">--</div>
+</div>
+
+<div class="box">
+<div class="boxTitle">支撐</div>
+<div id="support" class="boxValue">--</div>
+</div>
+
+<div class="box target">
+<div class="boxTitle">第一止盈</div>
+<div id="tp1" class="boxValue up">--</div>
+</div>
+
+<div class="box target">
+<div class="boxTitle">第二止盈</div>
+<div id="tp2" class="boxValue up">--</div>
+</div>
+
+<div class="box stop">
+<div class="boxTitle">停損</div>
+<div id="stop" class="boxValue down">--</div>
+</div>
+
+<div class="box">
+<div class="boxTitle">壓力</div>
+<div id="resistance" class="boxValue">--</div>
+</div>
+
+</div>
+
+
+<button
+  class="refresh"
+  onclick="searchStock()"
+>
+🔄 重新查詢
+</button>
+
+
+<div class="note">
+資料由 Cloudflare Worker 代理取得。
+<br>
+交易關卡為程式計算的技術參考，
+不代表投資建議。
+</div>
+
+</section>
+
+</main>
+
+
+<script>
+
+const WORKER =
+  location.origin;
+
+const names = ${JSON.stringify(STOCK_NAMES)};
+
+function setStatus(text,type){
+
+  const el =
+    document.getElementById("status");
+
+  el.className =
+    "status " + type;
+
+  el.innerHTML =
+    text;
+
+  el.classList.remove(
+    "hidden"
   );
 }
 
+function value(id,text){
+
+  document.getElementById(id)
+    .textContent =
+    text ?? "--";
+}
+
+async function searchStock(){
+
+  let code =
+    document
+      .getElementById("code")
+      .value
+      .trim();
+
+  if(names[code]){
+    code = names[code];
+  }
+
+  if(!/^[0-9]{4,6}$/.test(code)){
+
+    setStatus(
+      "⚠️ 請輸入正確股票代號，例如 1326",
+      "error"
+    );
+
+    return;
+  }
+
+  setStatus(
+    "⏳ 正在取得 " +
+    code +
+    " 的行情資料……",
+    "wait"
+  );
+
+  document
+    .getElementById("result")
+    .classList.add("hidden");
+
+  try{
+
+    const response =
+      await fetch(
+        "/api/stock?code=" +
+        encodeURIComponent(code),
+        {
+          cache:"no-store"
+        }
+      );
+
+    const result =
+      await response.json();
+
+    if(
+      !response.ok ||
+      !result.ok
+    ){
+
+      throw new Error(
+        result.error ||
+        "目前沒有取得行情資料"
+      );
+    }
+
+    show(result.data);
+
+    setStatus(
+      "✅ 查詢成功",
+      "ok"
+    );
+
+  }catch(error){
+
+    console.error(error);
+
+    setStatus(
+      "❌ 查詢失敗<br><br>" +
+      error.message,
+      "error"
+    );
+  }
+}
+
+function show(d){
+
+  document
+    .getElementById("result")
+    .classList
+    .remove("hidden");
+
+  value("name",d.name);
+  value("stockCode",d.code);
+  value(
+    "exchange",
+    d.exchange === "tse"
+      ? "上市"
+      : "上櫃"
+  );
+
+  value("price",d.price);
+
+  const change =
+    document
+      .getElementById("change");
+
+  const ch =
+    Number(d.change);
+
+  const pct =
+    Number(d.percent);
+
+  change.className =
+    "change";
+
+  if(ch > 0){
+
+    change.classList.add("up");
+
+    change.textContent =
+      "▲ +" +
+      d.change +
+      "  (+" +
+      d.percent +
+      "%)";
+
+  }else if(ch < 0){
+
+    change.classList.add("down");
+
+    change.textContent =
+      "▼ " +
+      d.change +
+      "  (" +
+      d.percent +
+      "%)";
+
+  }else{
+
+    change.textContent =
+      "— 0.00 (0.00%)";
+  }
+
+  value("yesterday",d.yesterday);
+  value("open",d.open);
+  value("high",d.high);
+  value("low",d.low);
+  value("volume",d.volume);
+  value("time",d.time);
+
+  value("ask1",d.ask1);
+  value("bid1",d.bid1);
+  value("askVolume",d.askVolume);
+  value("bidVolume",d.bidVolume);
+
+  value("entry",d.levels.entry);
+  value("support",d.levels.support);
+  value("tp1",d.levels.tp1);
+  value("tp2",d.levels.tp2);
+  value("stop",d.levels.stop);
+  value("resistance",d.levels.resistance);
+}
+
+document
+  .getElementById("code")
+  .addEventListener(
+    "keydown",
+    event => {
+
+      if(event.key === "Enter"){
+        searchStock();
+      }
+
+    }
+  );
+
+</script>
+
+</body>
+
+</html>`;
+}
+
 export default {
+
   async fetch(request) {
+
+    const url =
+      new URL(request.url);
 
     const origin =
       request.headers.get("Origin") || "*";
 
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: {
+    if(request.method === "OPTIONS"){
+
+      return new Response(null,{
+        status:204,
+        headers:{
           ...corsHeaders(origin),
-          "Access-Control-Max-Age": "86400"
+          "Access-Control-Max-Age":"86400"
         }
       });
     }
 
-    const url = new URL(request.url);
+    if(
+      url.pathname === "/api/stock"
+    ){
 
-    /*
-      只允許：
-      /api/stock?code=1326
-      /api/stock?code=2330
-    */
+      const raw =
+        (
+          url.searchParams
+            .get("code") ||
+          ""
+        ).trim();
 
-    if (url.pathname !== "/api/stock") {
-      return json(
-        {
-          ok: true,
-          service: "Taiwan Stock API Proxy",
-          message: "請使用 /api/stock?code=股票代號"
-        },
-        200,
-        origin
-      );
-    }
+      const code =
+        STOCK_NAMES[raw] ||
+        raw;
 
-    const code =
-      (url.searchParams.get("code") || "")
-        .trim();
+      if(
+        !/^[0-9]{4,6}$/.test(code)
+      ){
 
-    if (!/^[0-9]{4,6}$/.test(code)) {
-      return json(
-        {
-          ok: false,
-          error: "股票代號格式錯誤"
-        },
-        400,
-        origin
-      );
-    }
+        return json({
+          ok:false,
+          error:
+            "股票代號格式錯誤"
+        },400,origin);
+      }
 
-    const exchanges = ["tse", "otc"];
-
-    for (const exchange of exchanges) {
-
-      const twseUrl =
-        "https://mis.twse.com.tw/stock/api/getStockInfo.jsp" +
-        "?ex_ch=" +
-        exchange +
-        "_" +
-        code +
-        ".tw" +
-        "&json=1" +
-        "&delay=0" +
-        "&_=" +
-        Date.now();
-
-      try {
-
-        const response =
-          await fetch(twseUrl, {
-            method: "GET",
-            headers: {
-              "Accept": "application/json",
-              "User-Agent":
-                "Mozilla/5.0"
-            }
-          });
-
-        if (!response.ok) {
-          continue;
-        }
+      try{
 
         const data =
-          await response.json();
+          await getStock(code);
 
-        if (
-          data &&
-          Array.isArray(data.msgArray) &&
-          data.msgArray.length > 0 &&
-          data.msgArray[0].c
-        ) {
+        if(!data){
 
-          return json(
-            {
-              ok: true,
-              exchange,
-              data: data.msgArray[0],
-              fetchedAt:
-                new Date().toISOString()
-            },
-            200,
-            origin
-          );
+          return json({
+            ok:false,
+            error:
+              "目前找不到這支股票的行情資料"
+          },404,origin);
         }
 
-      } catch (error) {
+        return json({
+          ok:true,
+          data:
+            normalizeStock(data)
+        },200,origin);
 
-        console.log(
-          "TWSE request error:",
-          error
-        );
+      }catch(error){
 
+        console.log(error);
+
+        return json({
+          ok:false,
+          error:
+            "行情服務暫時無法取得資料"
+        },502,origin);
       }
     }
 
-    return json(
+    return new Response(
+      html(),
       {
-        ok: false,
-        error:
-          "找不到股票資料，可能是代號錯誤或目前沒有即時行情。"
-      },
-      404,
-      origin
+        status:200,
+        headers:{
+          "Content-Type":
+            "text/html; charset=UTF-8",
+          "Cache-Control":
+            "no-store"
+        }
+      }
     );
   }
 };
