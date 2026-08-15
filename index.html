@@ -1,845 +1,159 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>📊 台股自動查詢</title>
+const ALLOWED_ORIGINS = [
+  "https://nms0958273597.github.io",
+  "https://nms0958273597.github.io/"
+];
 
-<style>
-*{box-sizing:border-box}
+function corsHeaders(origin) {
+  const allowed =
+    ALLOWED_ORIGINS.includes(origin)
+      ? origin
+      : "*";
 
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;
-background:#f3f5f7;
-color:#222;
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Cache-Control": "no-store"
+  };
 }
 
-header{
-text-align:center;
-padding:32px 15px 20px;
+function json(data, status = 200, origin = "*") {
+  return new Response(
+    JSON.stringify(data),
+    {
+      status,
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+        ...corsHeaders(origin)
+      }
+    }
+  );
 }
 
-h1{
-margin:0;
-font-size:38px;
-font-weight:800;
-}
-
-.subtitle{
-margin-top:8px;
-font-size:15px;
-color:#777;
-}
-
-.container{
-width:94%;
-max-width:760px;
-margin:auto;
-}
-
-.card{
-background:#fff;
-border-radius:24px;
-padding:24px;
-margin-bottom:20px;
-box-shadow:0 8px 28px rgba(0,0,0,.08);
-}
-
-label{
-display:block;
-font-size:19px;
-font-weight:700;
-margin-bottom:10px;
-}
-
-input{
-width:100%;
-padding:18px;
-font-size:23px;
-border:2px solid #ddd;
-border-radius:16px;
-outline:none;
-}
-
-input:focus{
-border-color:#333;
-}
-
-button{
-width:100%;
-padding:18px;
-margin-top:15px;
-border:0;
-border-radius:16px;
-background:#222;
-color:#fff;
-font-size:21px;
-font-weight:700;
-}
-
-button:active{
-transform:scale(.98);
-}
-
-.status{
-margin-top:18px;
-padding:17px;
-border-radius:16px;
-font-size:17px;
-line-height:1.7;
-}
-
-.hidden{
-display:none;
-}
-
-.wait{
-background:#fff6dc;
-color:#805c00;
-}
-
-.ok{
-background:#e8f7ed;
-color:#13763a;
-}
-
-.error{
-background:#fff0f0;
-color:#c62828;
-}
-
-.stock-name{
-font-size:30px;
-font-weight:800;
-}
-
-.stock-code{
-margin-top:3px;
-color:#777;
-}
-
-.price{
-margin-top:12px;
-font-size:50px;
-font-weight:800;
-}
-
-.change{
-margin-top:4px;
-font-size:21px;
-font-weight:700;
-}
-
-.up{
-color:#e53935;
-}
-
-.down{
-color:#16803c;
-}
-
-.section{
-margin:27px 0 13px;
-font-size:22px;
-font-weight:800;
-}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-}
-
-.box{
-padding:16px;
-border-radius:15px;
-background:#f7f7f7;
-}
-
-.box-title{
-margin-bottom:6px;
-font-size:14px;
-color:#777;
-}
-
-.box-value{
-font-size:21px;
-font-weight:700;
-}
-
-.buy{
-background:#eaf8ef;
-}
-
-.sell{
-background:#fff0f0;
-}
-
-.note{
-margin-top:20px;
-font-size:13px;
-line-height:1.7;
-color:#777;
-}
-
-@media(max-width:500px){
-
-h1{
-font-size:32px;
-}
-
-.price{
-font-size:42px;
-}
-
-}
-</style>
-</head>
-
-<body>
-
-<header>
-<h1>📊 台股自動查詢</h1>
-<div class="subtitle">即時行情＋股票關卡分析</div>
-</header>
-
-<div class="container">
-
-<div class="card">
-
-<label>🔎 股票代號或股票名稱</label>
-
-<input
-id="stockInput"
-type="text"
-inputmode="numeric"
-placeholder="例如：1326 或 台化"
->
-
-<button onclick="searchStock()">
-🔍 查詢股票
-</button>
-
-<div id="status" class="status hidden"></div>
-
-</div>
-
-
-<div id="result" class="card hidden">
-
-<div id="stockName" class="stock-name">--</div>
-
-<div id="stockCode" class="stock-code">--</div>
-
-<div id="price" class="price">--</div>
-
-<div id="change" class="change">--</div>
-
-
-<div class="section">
-📌 今日行情
-</div>
-
-<div class="grid">
-
-<div class="box">
-<div class="box-title">昨收</div>
-<div id="yesterday" class="box-value">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">開盤</div>
-<div id="open" class="box-value">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">最高</div>
-<div id="high" class="box-value">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">最低</div>
-<div id="low" class="box-value">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">成交量</div>
-<div id="volume" class="box-value">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">資料時間</div>
-<div id="time" class="box-value">--</div>
-</div>
-
-</div>
-
-
-<div class="section">
-💰 五檔報價
-</div>
-
-<div class="grid">
-
-<div class="box">
-<div class="box-title">賣一</div>
-<div id="ask1" class="box-value up">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">買一</div>
-<div id="bid1" class="box-value down">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">賣一量</div>
-<div id="askVol" class="box-value">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">買一量</div>
-<div id="bidVol" class="box-value">--</div>
-</div>
-
-</div>
-
-
-<div class="section">
-🎯 股票關卡
-</div>
-
-<div class="grid">
-
-<div class="box buy">
-<div class="box-title">參考進場</div>
-<div id="entry" class="box-value">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">支撐</div>
-<div id="support" class="box-value">--</div>
-</div>
-
-<div class="box sell">
-<div class="box-title">第一止盈</div>
-<div id="tp1" class="box-value up">--</div>
-</div>
-
-<div class="box sell">
-<div class="box-title">第二止盈</div>
-<div id="tp2" class="box-value up">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">停損</div>
-<div id="stop" class="box-value down">--</div>
-</div>
-
-<div class="box">
-<div class="box-title">壓力</div>
-<div id="resistance" class="box-value">--</div>
-</div>
-
-</div>
-
-
-<div class="note">
-※ 關卡為程式依行情計算的技術參考，不代表投資建議。
-</div>
-
-</div>
-
-</div>
-
-
-<script>
-
-const stockNames={
-
-"台化":"1326",
-"台積電":"2330",
-"聯電":"2303",
-"鴻海":"2317",
-"台達電":"2308",
-"南亞":"1303",
-"台塑":"1301",
-"中鋼":"2002",
-"華通":"2313",
-"燿華":"2367",
-"群創":"3481",
-"日月光投控":"3711"
-
+export default {
+  async fetch(request) {
+
+    const origin =
+      request.headers.get("Origin") || "*";
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          ...corsHeaders(origin),
+          "Access-Control-Max-Age": "86400"
+        }
+      });
+    }
+
+    const url = new URL(request.url);
+
+    /*
+      只允許：
+      /api/stock?code=1326
+      /api/stock?code=2330
+    */
+
+    if (url.pathname !== "/api/stock") {
+      return json(
+        {
+          ok: true,
+          service: "Taiwan Stock API Proxy",
+          message: "請使用 /api/stock?code=股票代號"
+        },
+        200,
+        origin
+      );
+    }
+
+    const code =
+      (url.searchParams.get("code") || "")
+        .trim();
+
+    if (!/^[0-9]{4,6}$/.test(code)) {
+      return json(
+        {
+          ok: false,
+          error: "股票代號格式錯誤"
+        },
+        400,
+        origin
+      );
+    }
+
+    const exchanges = ["tse", "otc"];
+
+    for (const exchange of exchanges) {
+
+      const twseUrl =
+        "https://mis.twse.com.tw/stock/api/getStockInfo.jsp" +
+        "?ex_ch=" +
+        exchange +
+        "_" +
+        code +
+        ".tw" +
+        "&json=1" +
+        "&delay=0" +
+        "&_=" +
+        Date.now();
+
+      try {
+
+        const response =
+          await fetch(twseUrl, {
+            method: "GET",
+            headers: {
+              "Accept": "application/json",
+              "User-Agent":
+                "Mozilla/5.0"
+            }
+          });
+
+        if (!response.ok) {
+          continue;
+        }
+
+        const data =
+          await response.json();
+
+        if (
+          data &&
+          Array.isArray(data.msgArray) &&
+          data.msgArray.length > 0 &&
+          data.msgArray[0].c
+        ) {
+
+          return json(
+            {
+              ok: true,
+              exchange,
+              data: data.msgArray[0],
+              fetchedAt:
+                new Date().toISOString()
+            },
+            200,
+            origin
+          );
+        }
+
+      } catch (error) {
+
+        console.log(
+          "TWSE request error:",
+          error
+        );
+
+      }
+    }
+
+    return json(
+      {
+        ok: false,
+        error:
+          "找不到股票資料，可能是代號錯誤或目前沒有即時行情。"
+      },
+      404,
+      origin
+    );
+  }
 };
-
-
-function num(value){
-
-if(
-value===null||
-value===undefined||
-value===""||
-value==="-"
-){
-return null;
-}
-
-const n=parseFloat(
-String(value).replace(/,/g,"")
-);
-
-return Number.isFinite(n)?n:null;
-
-}
-
-
-function money(value){
-
-const n=num(value);
-
-return n===null?"--":n.toFixed(2);
-
-}
-
-
-function setStatus(text,type){
-
-const box=document.getElementById("status");
-
-box.className="status "+type;
-
-box.innerHTML=text;
-
-box.classList.remove("hidden");
-
-}
-
-
-async function getStock(exchange,code){
-
-const url=
-"https://mis.twse.com.tw/stock/api/getStockInfo.jsp"+
-"?ex_ch="+exchange+"_"+code+".tw"+
-"&json=1"+
-"&delay=0"+
-"&_="+Date.now();
-
-const response=await fetch(url,{
-method:"GET",
-cache:"no-store"
-});
-
-if(!response.ok){
-
-throw new Error(
-"HTTP "+response.status
-);
-
-}
-
-const data=await response.json();
-
-if(
-data &&
-Array.isArray(data.msgArray) &&
-data.msgArray.length>0
-){
-
-return data.msgArray[0];
-
-}
-
-return null;
-
-}
-
-
-async function searchStock(){
-
-let code=
-document
-.getElementById("stockInput")
-.value
-.trim();
-
-
-if(stockNames[code]){
-code=stockNames[code];
-}
-
-
-if(!/^[0-9]{4,6}$/.test(code)){
-
-setStatus(
-"⚠️ 請輸入股票代號，例如：1326",
-"error"
-);
-
-return;
-
-}
-
-
-document
-.getElementById("result")
-.classList.add("hidden");
-
-
-setStatus(
-"⏳ 正在查詢 "+code+"，請稍候……",
-"wait"
-);
-
-
-try{
-
-let data=
-await getStock("tse",code);
-
-
-if(!data){
-
-data=
-await getStock("otc",code);
-
-}
-
-
-if(!data){
-
-setStatus(
-"❌ 找不到這支股票<br><br>"+
-"請確認股票代號是否正確。",
-"error"
-);
-
-return;
-
-}
-
-
-showStock(data);
-
-
-setStatus(
-"✅ 查詢成功<br>"+
-"資料時間："+(data.t||"--"),
-"ok"
-);
-
-
-}catch(error){
-
-console.error(error);
-
-setStatus(
-"❌ 查詢服務連線失敗<br><br>"+
-"股票代號沒有問題，"+
-"目前是即時行情服務連線問題。",
-"error"
-);
-
-}
-
-}
-
-
-function showStock(d){
-
-const price=
-num(d.z) ??
-num(d.y);
-
-const yesterday=num(d.y);
-
-let change=null;
-let percent=null;
-
-
-if(
-price!==null &&
-yesterday!==null &&
-yesterday!==0
-){
-
-change=price-yesterday;
-
-percent=
-change/yesterday*100;
-
-}
-
-
-document
-.getElementById("result")
-.classList.remove("hidden");
-
-
-document
-.getElementById("stockName")
-.textContent=
-d.n||"股票";
-
-
-document
-.getElementById("stockCode")
-.textContent=
-d.c||"--";
-
-
-document
-.getElementById("price")
-.textContent=
-money(price);
-
-
-const priceBox=
-document.getElementById("price");
-
-const changeBox=
-document.getElementById("change");
-
-
-priceBox.className="price";
-
-changeBox.className="change";
-
-
-if(change>0){
-
-priceBox.classList.add("up");
-
-changeBox.classList.add("up");
-
-changeBox.textContent=
-"▲ +"+
-money(change)+
-" (+"+
-percent.toFixed(2)+
-"%)";
-
-}
-else if(change<0){
-
-priceBox.classList.add("down");
-
-changeBox.classList.add("down");
-
-changeBox.textContent=
-"▼ "+
-money(change)+
-" ("+
-percent.toFixed(2)+
-"%)";
-
-}
-else{
-
-changeBox.textContent=
-"— 0.00 (0.00%)";
-
-}
-
-
-document
-.getElementById("yesterday")
-.textContent=
-money(d.y);
-
-
-document
-.getElementById("open")
-.textContent=
-money(d.o);
-
-
-document
-.getElementById("high")
-.textContent=
-money(d.h);
-
-
-document
-.getElementById("low")
-.textContent=
-money(d.l);
-
-
-document
-.getElementById("volume")
-.textContent=
-d.v||"--";
-
-
-document
-.getElementById("time")
-.textContent=
-d.t||"--";
-
-
-const asks=
-String(d.a||"")
-.split("_")
-.filter(x=>x&&x!=="-");
-
-
-const bids=
-String(d.b||"")
-.split("_")
-.filter(x=>x&&x!=="-");
-
-
-const askVolumes=
-String(d.f||"")
-.split("_")
-.filter(x=>x&&x!=="-");
-
-
-const bidVolumes=
-String(d.g||"")
-.split("_")
-.filter(x=>x&&x!=="-");
-
-
-document
-.getElementById("ask1")
-.textContent=
-asks.length
-?money(asks[0])
-:"--";
-
-
-document
-.getElementById("bid1")
-.textContent=
-bids.length
-?money(bids[0])
-:"--";
-
-
-document
-.getElementById("askVol")
-.textContent=
-askVolumes.length
-?askVolumes[0]
-:"--";
-
-
-document
-.getElementById("bidVol")
-.textContent=
-bidVolumes.length
-?bidVolumes[0]
-:"--";
-
-
-calculateLevels(d);
-
-}
-
-
-function calculateLevels(d){
-
-const price=
-num(d.z) ??
-num(d.y);
-
-if(price===null){
-return;
-}
-
-
-const high=num(d.h);
-
-const low=num(d.l);
-
-
-const support=
-low!==null
-?low
-:price*0.98;
-
-
-const resistance=
-high!==null
-?high
-:price*1.02;
-
-
-const entry=
-support+
-(price-support)*0.35;
-
-
-const tp1=
-entry*1.03;
-
-
-const tp2=
-entry*1.06;
-
-
-const stop=
-entry*0.98;
-
-
-document
-.getElementById("entry")
-.textContent=
-money(entry);
-
-
-document
-.getElementById("support")
-.textContent=
-money(support);
-
-
-document
-.getElementById("tp1")
-.textContent=
-money(tp1);
-
-
-document
-.getElementById("tp2")
-.textContent=
-money(tp2);
-
-
-document
-.getElementById("stop")
-.textContent=
-money(stop);
-
-
-document
-.getElementById("resistance")
-.textContent=
-money(resistance);
-
-}
-
-
-document
-.getElementById("stockInput")
-.addEventListener(
-"keydown",
-function(event){
-
-if(event.key==="Enter"){
-searchStock();
-}
-
-}
-);
-
-
-document
-.getElementById("stockInput")
-.value="1326";
-
-</script>
-
-</body>
-</html>
