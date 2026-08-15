@@ -12,41 +12,18 @@ const STOCK_NAMES = {
   "日月光投控": "3711"
 };
 
-const ALLOWED_ORIGINS = [
-  "https://nms0958273597.github.io",
-  "https://dawn-lab-4833.nms0958273597.workers.dev"
-];
-
-function getCorsOrigin(request) {
-  const origin = request.headers.get("Origin");
-
-  if (!origin) {
-    return "*";
-  }
-
-  if (ALLOWED_ORIGINS.includes(origin)) {
-    return origin;
-  }
-
-  return "*";
-}
-
 function corsHeaders(request) {
+  const origin =
+    request.headers.get("Origin") || "*";
+
   return {
-    "Access-Control-Allow-Origin":
-      getCorsOrigin(request),
-
+    "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods":
-      "GET, HEAD, OPTIONS",
-
+      "GET, OPTIONS",
     "Access-Control-Allow-Headers":
       "Content-Type",
-
-    "Access-Control-Max-Age":
-      "86400",
-
-    "Vary":
-      "Origin"
+    "Access-Control-Max-Age": "86400",
+    "Vary": "Origin"
   };
 }
 
@@ -62,10 +39,8 @@ function jsonResponse(
       headers: {
         "Content-Type":
           "application/json; charset=UTF-8",
-
         "Cache-Control":
           "no-store, no-cache, must-revalidate",
-
         ...corsHeaders(request)
       }
     }
@@ -88,53 +63,39 @@ function number(value) {
       .trim()
   );
 
-  return Number.isFinite(n)
-    ? n
-    : null;
+  return Number.isFinite(n) ? n : null;
 }
 
-function formatPrice(value) {
+function price(value) {
   const n = number(value);
-
-  if (n === null) {
-    return "--";
-  }
-
-  return n.toFixed(2);
+  return n === null ? "--" : n.toFixed(2);
 }
 
-function safeText(value) {
-  if (
-    value === null ||
+function text(value) {
+  return value === null ||
     value === undefined ||
     value === ""
-  ) {
-    return "--";
-  }
-
-  return String(value);
+    ? "--"
+    : String(value);
 }
 
-function splitLevels(value) {
+function levels(value) {
   return String(value || "")
     .split("_")
     .filter(
-      item =>
-        item !== "" &&
-        item !== "-"
+      x => x !== "" && x !== "-"
     );
 }
 
+/* =========================
+   取得台股行情
+========================= */
 
-/* =========================================
-   TWSE / OTC
-========================================= */
-
-async function requestMarketData(
+async function getMarketData(
   code,
   exchange
 ) {
-  const target =
+  const url =
     "https://mis.twse.com.tw/stock/api/getStockInfo.jsp" +
     "?ex_ch=" +
     exchange +
@@ -147,24 +108,17 @@ async function requestMarketData(
     Date.now();
 
   const response = await fetch(
-    target,
+    url,
     {
       method: "GET",
-
       headers: {
         "Accept":
           "application/json,text/plain,*/*",
-
         "User-Agent":
-          "Mozilla/5.0 " +
-          "(Windows NT 10.0; Win64; x64) " +
-          "AppleWebKit/537.36 " +
-          "Chrome/120 Safari/537.36",
-
+          "Mozilla/5.0",
         "Referer":
           "https://mis.twse.com.tw/"
       },
-
       cf: {
         cacheTtl: 0,
         cacheEverything: false
@@ -179,17 +133,17 @@ async function requestMarketData(
     );
   }
 
-  const text =
+  const raw =
     await response.text();
 
-  if (!text) {
+  if (!raw) {
     return null;
   }
 
   let data;
 
   try {
-    data = JSON.parse(text);
+    data = JSON.parse(raw);
   } catch {
     throw new Error(
       "市場資料格式錯誤"
@@ -199,7 +153,7 @@ async function requestMarketData(
   if (
     data &&
     Array.isArray(data.msgArray) &&
-    data.msgArray.length > 0
+    data.msgArray.length
   ) {
     return data.msgArray[0];
   }
@@ -207,37 +161,26 @@ async function requestMarketData(
   return null;
 }
 
-
 async function findStock(code) {
-  const exchanges = [
-    "tse",
-    "otc"
-  ];
-
   for (
-    const exchange of exchanges
+    const exchange of ["tse", "otc"]
   ) {
     try {
       const data =
-        await requestMarketData(
+        await getMarketData(
           code,
           exchange
         );
 
-      if (
-        data &&
-        data.c
-      ) {
+      if (data && data.c) {
         return {
           ...data,
           exchange
         };
       }
-
     } catch (error) {
       console.log(
-        exchange +
-        " error:",
+        exchange,
         error.message
       );
     }
@@ -246,10 +189,9 @@ async function findStock(code) {
   return null;
 }
 
-
-/* =========================================
-   交易關卡計算
-========================================= */
+/* =========================
+   交易關卡
+========================= */
 
 function calculateLevels(data) {
   const current =
@@ -290,45 +232,23 @@ function calculateLevels(data) {
     );
 
   const entry =
-    support +
-    range * 0.35;
-
-  const tp1 =
-    entry * 1.03;
-
-  const tp2 =
-    entry * 1.06;
-
-  const stop =
-    entry * 0.98;
+    support + range * 0.35;
 
   return {
-    entry:
-      formatPrice(entry),
-
-    support:
-      formatPrice(support),
-
-    resistance:
-      formatPrice(resistance),
-
-    tp1:
-      formatPrice(tp1),
-
-    tp2:
-      formatPrice(tp2),
-
-    stop:
-      formatPrice(stop)
+    entry: price(entry),
+    support: price(support),
+    resistance: price(resistance),
+    tp1: price(entry * 1.03),
+    tp2: price(entry * 1.06),
+    stop: price(entry * 0.98)
   };
 }
 
+/* =========================
+   整理資料
+========================= */
 
-/* =========================================
-   整理股票資料
-========================================= */
-
-function normalizeStock(data) {
+function normalize(data) {
   const current =
     number(data.z) ??
     number(data.y);
@@ -348,84 +268,68 @@ function normalizeStock(data) {
       current - yesterday;
 
     percent =
-      change /
-      yesterday *
-      100;
+      change / yesterday * 100;
   }
 
   const asks =
-    splitLevels(data.a);
+    levels(data.a);
 
   const bids =
-    splitLevels(data.b);
+    levels(data.b);
 
   const askVolumes =
-    splitLevels(data.f);
+    levels(data.f);
 
   const bidVolumes =
-    splitLevels(data.g);
+    levels(data.g);
 
   return {
-    code:
-      safeText(data.c),
-
-    name:
-      safeText(data.n),
+    code: text(data.c),
+    name: text(data.n),
 
     exchange:
       data.exchange === "tse"
         ? "上市"
         : "上櫃",
 
-    updateTime:
-      safeText(data.t),
+    time: text(data.t),
 
-    price:
-      formatPrice(current),
-
-    yesterday:
-      formatPrice(data.y),
-
-    open:
-      formatPrice(data.o),
-
-    high:
-      formatPrice(data.h),
-
-    low:
-      formatPrice(data.l),
+    price: price(current),
+    yesterday: price(data.y),
+    open: price(data.o),
+    high: price(data.h),
+    low: price(data.l),
 
     change:
       change === null
         ? "--"
-        : formatPrice(change),
+        : price(change),
 
     percent:
       percent === null
         ? "--"
         : percent.toFixed(2),
 
-    volume:
-      safeText(data.v),
+    volume: text(data.v),
 
     ask1:
       asks.length
-        ? formatPrice(asks[0])
+        ? price(asks[0])
         : "--",
 
     ask2:
       asks.length > 1
-        ? formatPrice(asks[1])
+        ? price(asks[1])
         : "--",
 
     bid1:
       bids.length
-        ? formatPrice(bids[0])
+        ? price(bids[0])
         : "--",
 
     bid2:
       bids.length > 1
-        ? formatPrice(bids[1])
+        ? price(bids[1])
         : "--",
 
     askVolume:
@@ -443,14 +347,12 @@ function normalizeStock(data) {
   };
 }
 
-
-/* =========================================
+/* =========================
    網頁
-========================================= */
+========================= */
 
-function renderHTML() {
+function page() {
   return `<!DOCTYPE html>
-
 <html lang="zh-TW">
 
 <head>
@@ -459,7 +361,7 @@ function renderHTML() {
 
 <meta
   name="viewport"
-  content="width=device-width,initial-scale=1,viewport-fit=cover"
+  content="width=device-width,initial-scale=1"
 >
 
 <meta
@@ -478,16 +380,13 @@ function renderHTML() {
 body {
   margin: 0;
   min-height: 100vh;
-
   background:
     linear-gradient(
       180deg,
-      #f8fafc 0%,
-      #eef2f7 100%
+      #f8fafc,
+      #eef2f7
     );
-
   color: #111827;
-
   font-family:
     -apple-system,
     BlinkMacSystemFont,
@@ -497,31 +396,26 @@ body {
 }
 
 header {
-  padding:
-    34px
-    18px
-    24px;
-
   text-align: center;
+  padding: 34px 18px 24px;
 }
 
 .logo {
-  font-size: 14px;
+  color: #64748b;
+  font-size: 13px;
   font-weight: 800;
-  color: #6b7280;
   letter-spacing: 2px;
-  margin-bottom: 7px;
 }
 
 h1 {
-  margin: 0;
+  margin: 7px 0 0;
   font-size: 32px;
   font-weight: 900;
 }
 
 .subtitle {
   margin-top: 8px;
-  color: #6b7280;
+  color: #64748b;
   font-size: 14px;
 }
 
@@ -533,20 +427,18 @@ h1 {
 }
 
 .card {
-  background: #ffffff;
+  background: white;
   border-radius: 24px;
   padding: 22px;
   margin-bottom: 18px;
-
   box-shadow:
     0 12px 35px
-    rgba(15, 23, 42, .07);
+    rgba(15,23,42,.07);
 }
 
 label {
   display: block;
   margin-bottom: 10px;
-
   font-size: 17px;
   font-weight: 900;
 }
@@ -559,19 +451,11 @@ label {
 input {
   flex: 1;
   min-width: 0;
-
   padding: 16px;
-
-  border:
-    2px solid #e5e7eb;
-
+  border: 2px solid #e5e7eb;
   border-radius: 16px;
-
   outline: none;
-
   font-size: 19px;
-
-  background: #fff;
 }
 
 input:focus {
@@ -581,32 +465,19 @@ input:focus {
 button {
   border: 0;
   border-radius: 16px;
-
+  padding: 0 22px;
   background: #111827;
-  color: #ffffff;
-
+  color: white;
   font-size: 17px;
   font-weight: 900;
-
-  padding:
-    0 22px;
-
-  cursor: pointer;
-}
-
-button:active {
-  transform: scale(.97);
 }
 
 .status {
   margin-top: 15px;
-
   padding: 14px;
-
   border-radius: 15px;
-
   font-size: 14px;
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 .wait {
@@ -631,8 +502,6 @@ button:active {
 .stockHeader {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-
   gap: 12px;
 }
 
@@ -643,36 +512,25 @@ button:active {
 
 .stockCode {
   margin-top: 4px;
-  color: #6b7280;
-  font-size: 14px;
+  color: #64748b;
 }
 
-.marketBadge {
-  padding:
-    7px 11px;
-
-  border-radius: 999px;
-
+.market {
   background: #f1f5f9;
-
-  color: #475569;
-
+  padding: 7px 11px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 800;
 }
 
 .bigPrice {
   margin-top: 18px;
-
   font-size: 54px;
-  line-height: 1;
-
   font-weight: 950;
 }
 
 .change {
   margin-top: 8px;
-
   font-size: 19px;
   font-weight: 900;
 }
@@ -685,38 +543,28 @@ button:active {
   color: #15803d;
 }
 
-.sectionTitle {
-  margin:
-    28px
-    0
-    13px;
-
+.section {
+  margin: 28px 0 13px;
   font-size: 21px;
   font-weight: 950;
 }
 
 .grid {
   display: grid;
-
   grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
+    repeat(2,minmax(0,1fr));
   gap: 10px;
 }
 
 .box {
   padding: 16px;
-
   border-radius: 16px;
-
   background: #f8fafc;
 }
 
 .boxTitle {
   color: #64748b;
-
   font-size: 13px;
-
   margin-bottom: 6px;
 }
 
@@ -725,19 +573,19 @@ button:active {
   font-weight: 900;
 }
 
-.greenBox {
+.green {
   background: #edf8f0;
 }
 
-.redBox {
+.red {
   background: #fff1f2;
 }
 
-.yellowBox {
+.yellow {
   background: #fff8e7;
 }
 
-.blueBox {
+.blue {
   background: #eef6ff;
 }
 
@@ -749,17 +597,13 @@ button:active {
 
 .footer {
   margin-top: 20px;
-
   color: #64748b;
-
   font-size: 12px;
-
   line-height: 1.7;
-
   text-align: center;
 }
 
-@media (max-width: 520px) {
+@media (max-width:520px) {
 
   .search {
     flex-direction: column;
@@ -812,15 +656,12 @@ TAIWAN STOCK ANALYTICS
 <div class="search">
 
 <input
-  id="stockInput"
+  id="code"
   value="1326"
   placeholder="例如：1326、2330、台化"
-  autocomplete="off"
 >
 
-<button
-  onclick="searchStock()"
->
+<button onclick="searchStock()">
 查詢
 </button>
 
@@ -843,7 +684,7 @@ TAIWAN STOCK ANALYTICS
 <div>
 
 <div
-  id="stockName"
+  id="name"
   class="stockName"
 >
 --
@@ -860,7 +701,7 @@ TAIWAN STOCK ANALYTICS
 
 <div
   id="market"
-  class="marketBadge"
+  class="market"
 >
 --
 </div>
@@ -881,7 +722,7 @@ TAIWAN STOCK ANALYTICS
 --
 </div>
 
-<div class="sectionTitle">
+<div class="section">
 📈 今日行情
 </div>
 
@@ -914,33 +755,33 @@ TAIWAN STOCK ANALYTICS
 
 <div class="box">
 <div class="boxTitle">更新時間</div>
-<div id="updateTime" class="boxValue">--</div>
+<div id="time" class="boxValue">--</div>
 </div>
 
 </div>
 
-<div class="sectionTitle">
+<div class="section">
 💰 五檔報價
 </div>
 
 <div class="grid">
 
-<div class="box redBox">
+<div class="box red">
 <div class="boxTitle">賣一</div>
 <div id="ask1" class="boxValue up">--</div>
 </div>
 
-<div class="box greenBox">
+<div class="box green">
 <div class="boxTitle">買一</div>
 <div id="bid1" class="boxValue down">--</div>
 </div>
 
-<div class="box redBox">
+<div class="box red">
 <div class="boxTitle">賣一量</div>
 <div id="askVolume" class="boxValue">--</div>
 </div>
 
-<div class="box greenBox">
+<div class="box green">
 <div class="boxTitle">買一量</div>
 <div id="bidVolume" class="boxValue">--</div>
 </div>
@@ -957,38 +798,38 @@ TAIWAN STOCK ANALYTICS
 
 </div>
 
-<div class="sectionTitle">
+<div class="section">
 🎯 交易關卡
 </div>
 
 <div class="grid">
 
-<div class="box greenBox">
+<div class="box green">
 <div class="boxTitle">參考進場</div>
 <div id="entry" class="boxValue">--</div>
 </div>
 
-<div class="box blueBox">
+<div class="box blue">
 <div class="boxTitle">支撐</div>
 <div id="support" class="boxValue">--</div>
 </div>
 
-<div class="box redBox">
+<div class="box red">
 <div class="boxTitle">第一止盈</div>
 <div id="tp1" class="boxValue up">--</div>
 </div>
 
-<div class="box redBox">
+<div class="box red">
 <div class="boxTitle">第二止盈</div>
 <div id="tp2" class="boxValue up">--</div>
 </div>
 
-<div class="box greenBox">
+<div class="box green">
 <div class="boxTitle">停損</div>
 <div id="stop" class="boxValue down">--</div>
 </div>
 
-<div class="box yellowBox">
+<div class="box yellow">
 <div class="boxTitle">壓力</div>
 <div id="resistance" class="boxValue">--</div>
 </div>
@@ -1004,7 +845,7 @@ TAIWAN STOCK ANALYTICS
 
 <div class="footer">
 資料由 Cloudflare Worker 代理取得。<br>
-交易關卡為程式計算的技術參考，不代表投資建議。
+交易關卡僅供技術分析參考，不代表投資建議。
 </div>
 
 </section>
@@ -1013,17 +854,13 @@ TAIWAN STOCK ANALYTICS
 
 <script>
 
-const STOCK_NAMES =
+const names =
   ${JSON.stringify(STOCK_NAMES)};
 
-function setStatus(
-  message,
-  type
-) {
+function status(message,type) {
+
   const box =
-    document.getElementById(
-      "status"
-    );
+    document.getElementById("status");
 
   box.className =
     "status " + type;
@@ -1031,20 +868,16 @@ function setStatus(
   box.innerHTML =
     message;
 
-  box.classList.remove(
-    "hidden"
-  );
+  box.classList.remove("hidden");
 }
 
-function setValue(
-  id,
-  value
-) {
-  const element =
+function setValue(id,value) {
+
+  const el =
     document.getElementById(id);
 
-  if (element) {
-    element.textContent =
+  if (el) {
+    el.textContent =
       value ?? "--";
   }
 }
@@ -1053,41 +886,33 @@ async function searchStock() {
 
   let code =
     document
-      .getElementById(
-        "stockInput"
-      )
+      .getElementById("code")
       .value
       .trim();
 
-  if (
-    STOCK_NAMES[code]
-  ) {
-    code =
-      STOCK_NAMES[code];
+  if (names[code]) {
+    code = names[code];
   }
 
-  if (
-    !/^[0-9]{4,6}$/.test(code)
-  ) {
-    setStatus(
-      "⚠️ 請輸入正確股票代號，例如：1326",
+  if (!/^[0-9]{4,6}$/.test(code)) {
+
+    status(
+      "⚠️ 請輸入正確股票代號，例如 1326",
       "error"
     );
 
     return;
   }
 
-  setStatus(
+  status(
     "⏳ 正在查詢 " +
     code +
-    " 的最新行情……",
+    " ……",
     "wait"
   );
 
   document
-    .getElementById(
-      "result"
-    )
+    .getElementById("result")
     .classList
     .add("hidden");
 
@@ -1098,7 +923,6 @@ async function searchStock() {
         "/api/stock?code=" +
         encodeURIComponent(code),
         {
-          method: "GET",
           cache: "no-store"
         }
       );
@@ -1116,20 +940,16 @@ async function searchStock() {
       );
     }
 
-    showStock(
-      result.data
-    );
+    show(result.data);
 
-    setStatus(
+    status(
       "✅ 查詢成功",
       "ok"
     );
 
   } catch (error) {
 
-    console.error(error);
-
-    setStatus(
+    status(
       "❌ 查詢失敗<br><br>" +
       error.message,
       "error"
@@ -1137,162 +957,72 @@ async function searchStock() {
   }
 }
 
-function showStock(data) {
+function show(d) {
 
   document
-    .getElementById(
-      "result"
-    )
+    .getElementById("result")
     .classList
     .remove("hidden");
 
-  setValue(
-    "stockName",
-    data.name
-  );
+  setValue("name",d.name);
+  setValue("stockCode",d.code);
+  setValue("market",d.exchange);
+  setValue("price",d.price);
+  setValue("yesterday",d.yesterday);
+  setValue("open",d.open);
+  setValue("high",d.high);
+  setValue("low",d.low);
+  setValue("volume",d.volume);
+  setValue("time",d.time);
 
-  setValue(
-    "stockCode",
-    data.code
-  );
+  setValue("ask1",d.ask1);
+  setValue("ask2",d.ask2);
+  setValue("bid1",d.bid1);
+  setValue("bid2",d.bid2);
+  setValue("askVolume",d.askVolume);
+  setValue("bidVolume",d.bidVolume);
 
-  setValue(
-    "market",
-    data.exchange
-  );
-
-  setValue(
-    "price",
-    data.price
-  );
-
-  setValue(
-    "yesterday",
-    data.yesterday
-  );
-
-  setValue(
-    "open",
-    data.open
-  );
-
-  setValue(
-    "high",
-    data.high
-  );
-
-  setValue(
-    "low",
-    data.low
-  );
-
-  setValue(
-    "volume",
-    data.volume
-  );
-
-  setValue(
-    "updateTime",
-    data.updateTime
-  );
-
-  setValue(
-    "ask1",
-    data.ask1
-  );
-
-  setValue(
-    "ask2",
-    data.ask2
-  );
-
-  setValue(
-    "bid1",
-    data.bid1
-  );
-
-  setValue(
-    "bid2",
-    data.bid2
-  );
-
-  setValue(
-    "askVolume",
-    data.askVolume
-  );
-
-  setValue(
-    "bidVolume",
-    data.bidVolume
-  );
-
-  setValue(
-    "entry",
-    data.levels.entry
-  );
-
-  setValue(
-    "support",
-    data.levels.support
-  );
-
-  setValue(
-    "tp1",
-    data.levels.tp1
-  );
-
-  setValue(
-    "tp2",
-    data.levels.tp2
-  );
-
-  setValue(
-    "stop",
-    data.levels.stop
-  );
-
-  setValue(
-    "resistance",
-    data.levels.resistance
-  );
+  setValue("entry",d.levels.entry);
+  setValue("support",d.levels.support);
+  setValue("tp1",d.levels.tp1);
+  setValue("tp2",d.levels.tp2);
+  setValue("stop",d.levels.stop);
+  setValue("resistance",d.levels.resistance);
 
   const change =
-    document.getElementById(
-      "change"
-    );
+    document.getElementById("change");
 
-  const changeNumber =
-    Number(data.change);
+  const n =
+    Number(d.change);
 
-  change.className =
-    "change";
+  change.className = "change";
 
   if (
-    Number.isFinite(changeNumber) &&
-    changeNumber > 0
+    Number.isFinite(n) &&
+    n > 0
   ) {
 
     change.classList.add("up");
 
     change.textContent =
       "▲ +" +
-      data.change +
-      "  (+" +
-      data.percent +
+      d.change +
+      " (+" +
+      d.percent +
       "%)";
 
   } else if (
-    Number.isFinite(changeNumber) &&
-    changeNumber < 0
+    Number.isFinite(n) &&
+    n < 0
   ) {
 
     change.classList.add("down");
 
     change.textContent =
       "▼ " +
-      data.change +
-      "  (" +
-      data.percent +
+      d.change +
+      " (" +
+      d.percent +
       "%)";
 
   } else {
@@ -1303,16 +1033,12 @@ function showStock(data) {
 }
 
 document
-  .getElementById(
-    "stockInput"
-  )
+  .getElementById("code")
   .addEventListener(
     "keydown",
     function(event) {
 
-      if (
-        event.key === "Enter"
-      ) {
+      if (event.key === "Enter") {
         searchStock();
       }
 
@@ -1327,9 +1053,9 @@ document
 }
 
 
-/* =========================================
-   CLOUDFLARE WORKER
-========================================= */
+/* =========================
+   WORKER
+========================= */
 
 export default {
 
@@ -1337,8 +1063,6 @@ export default {
 
     const url =
       new URL(request.url);
-
-    /* OPTIONS / CORS */
 
     if (
       request.method ===
@@ -1349,15 +1073,11 @@ export default {
         null,
         {
           status: 204,
-
           headers:
             corsHeaders(request)
         }
       );
     }
-
-
-    /* 股票 API */
 
     if (
       url.pathname ===
@@ -1370,6 +1090,10 @@ export default {
             .get("code") ||
           ""
         ).trim();
+
+      if (names[code]) {
+        code = names[code];
+      }
 
       if (
         STOCK_NAMES[code]
@@ -1414,9 +1138,8 @@ export default {
         return jsonResponse(
           {
             ok: true,
-
             data:
-              normalizeStock(stock)
+              normalize(stock)
           },
           request,
           200
@@ -1425,7 +1148,6 @@ export default {
       } catch (error) {
 
         console.log(
-          "API error:",
           error.message
         );
 
@@ -1441,74 +1163,52 @@ export default {
       }
     }
 
-
-    /* 首頁 */
-
     if (
       url.pathname === "/" ||
       url.pathname === ""
     ) {
 
       return new Response(
-        renderHTML(),
+        page(),
         {
           status: 200,
-
           headers: {
             "Content-Type":
               "text/html; charset=UTF-8",
-
             "Cache-Control":
               "no-store",
-
             "X-Content-Type-Options":
-              "nosniff",
-
-            "Referrer-Policy":
-              "strict-origin-when-cross-origin"
+              "nosniff"
           }
         }
       );
     }
 
-
-    /* 健康檢查 */
-
     if (
-      url.pathname ===
-      "/health"
+      url.pathname === "/health"
     ) {
 
       return jsonResponse(
         {
           ok: true,
-
           service:
             "Taiwan Stock Analytics",
-
           time:
             new Date().toISOString()
         },
-        request,
-        200
+        request
       );
     }
-
-
-    /* 404 */
 
     return new Response(
       "404 Not Found",
       {
         status: 404,
-
         headers: {
           "Content-Type":
             "text/plain; charset=UTF-8"
         }
       }
     );
-
   }
-
 };
