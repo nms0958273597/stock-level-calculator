@@ -55,21 +55,19 @@ function jsonResponse(
   request,
   status = 200
 ) {
-  const headers = {
-    "Content-Type":
-      "application/json; charset=UTF-8",
-
-    "Cache-Control":
-      "no-store, no-cache, must-revalidate",
-
-    ...corsHeaders(request)
-  };
-
   return new Response(
     JSON.stringify(data),
     {
       status,
-      headers
+      headers: {
+        "Content-Type":
+          "application/json; charset=UTF-8",
+
+        "Cache-Control":
+          "no-store, no-cache, must-revalidate",
+
+        ...corsHeaders(request)
+      }
     }
   );
 }
@@ -127,9 +125,10 @@ function splitLevels(value) {
     );
 }
 
-/* =========================
-   TWSE / OTC DATA
-========================= */
+
+/* =========================================
+   TWSE / OTC
+========================================= */
 
 async function requestMarketData(
   code,
@@ -147,32 +146,31 @@ async function requestMarketData(
     "&_=" +
     Date.now();
 
-  const response =
-    await fetch(
-      target,
-      {
-        method: "GET",
+  const response = await fetch(
+    target,
+    {
+      method: "GET",
 
-        headers: {
-          "Accept":
-            "application/json,text/plain,*/*",
+      headers: {
+        "Accept":
+          "application/json,text/plain,*/*",
 
-          "User-Agent":
-            "Mozilla/5.0 " +
-            "(Windows NT 10.0; Win64; x64) " +
-            "AppleWebKit/537.36 " +
-            "Chrome/120 Safari/537.36",
+        "User-Agent":
+          "Mozilla/5.0 " +
+          "(Windows NT 10.0; Win64; x64) " +
+          "AppleWebKit/537.36 " +
+          "Chrome/120 Safari/537.36",
 
-          "Referer":
-            "https://mis.twse.com.tw/"
-        },
+        "Referer":
+          "https://mis.twse.com.tw/"
+      },
 
-        cf: {
-          cacheTtl: 0,
-          cacheEverything: false
-        }
+      cf: {
+        cacheTtl: 0,
+        cacheEverything: false
       }
-    );
+    }
+  );
 
   if (!response.ok) {
     throw new Error(
@@ -191,11 +189,10 @@ async function requestMarketData(
   let data;
 
   try {
-    data =
-      JSON.parse(text);
+    data = JSON.parse(text);
   } catch {
     throw new Error(
-      "市場資料不是有效 JSON"
+      "市場資料格式錯誤"
     );
   }
 
@@ -209,6 +206,7 @@ async function requestMarketData(
 
   return null;
 }
+
 
 async function findStock(code) {
   const exchanges = [
@@ -235,6 +233,7 @@ async function findStock(code) {
           exchange
         };
       }
+
     } catch (error) {
       console.log(
         exchange +
@@ -247,16 +246,14 @@ async function findStock(code) {
   return null;
 }
 
-/* =========================
-   TECHNICAL LEVELS
-========================= */
+
+/* =========================================
+   交易關卡計算
+========================================= */
 
 function calculateLevels(data) {
   const current =
     number(data.z) ??
-    number(data.y);
-
-  const yesterday =
     number(data.y);
 
   const high =
@@ -326,9 +323,10 @@ function calculateLevels(data) {
   };
 }
 
-/* =========================
-   NORMALIZE STOCK DATA
-========================= */
+
+/* =========================================
+   整理股票資料
+========================================= */
 
 function normalizeStock(data) {
   const current =
@@ -366,9 +364,6 @@ function normalizeStock(data) {
 
   const bidVolumes =
     splitLevels(data.g);
-
-  const levels =
-    calculateLevels(data);
 
   return {
     code:
@@ -443,13 +438,15 @@ function normalizeStock(data) {
         ? bidVolumes[0]
         : "--",
 
-    levels
+    levels:
+      calculateLevels(data)
   };
 }
 
-/* =========================
-   HTML
-========================= */
+
+/* =========================================
+   網頁
+========================================= */
 
 function renderHTML() {
   return `<!DOCTYPE html>
@@ -884,7 +881,6 @@ TAIWAN STOCK ANALYTICS
 --
 </div>
 
-
 <div class="sectionTitle">
 📈 今日行情
 </div>
@@ -922,7 +918,6 @@ TAIWAN STOCK ANALYTICS
 </div>
 
 </div>
-
 
 <div class="sectionTitle">
 💰 五檔報價
@@ -962,7 +957,6 @@ TAIWAN STOCK ANALYTICS
 
 </div>
 
-
 <div class="sectionTitle">
 🎯 交易關卡
 </div>
@@ -1001,7 +995,6 @@ TAIWAN STOCK ANALYTICS
 
 </div>
 
-
 <button
   class="refresh"
   onclick="searchStock()"
@@ -1027,7 +1020,6 @@ function setStatus(
   message,
   type
 ) {
-
   const box =
     document.getElementById(
       "status"
@@ -1048,7 +1040,6 @@ function setValue(
   id,
   value
 ) {
-
   const element =
     document.getElementById(id);
 
@@ -1078,7 +1069,6 @@ async function searchStock() {
   if (
     !/^[0-9]{4,6}$/.test(code)
   ) {
-
     setStatus(
       "⚠️ 請輸入正確股票代號，例如：1326",
       "error"
@@ -1120,7 +1110,6 @@ async function searchStock() {
       !response.ok ||
       !result.ok
     ) {
-
       throw new Error(
         result.error ||
         "目前無法取得行情"
@@ -1138,9 +1127,7 @@ async function searchStock() {
 
   } catch (error) {
 
-    console.error(
-      error
-    );
+    console.error(error);
 
     setStatus(
       "❌ 查詢失敗<br><br>" +
@@ -1285,8 +1272,7 @@ function showStock(data) {
     changeNumber > 0
   ) {
 
-    change.classList
-      .add("up");
+    change.classList.add("up");
 
     change.textContent =
       "▲ +" +
@@ -1300,8 +1286,7 @@ function showStock(data) {
     changeNumber < 0
   ) {
 
-    change.classList
-      .add("down");
+    change.classList.add("down");
 
     change.textContent =
       "▼ " +
@@ -1341,20 +1326,19 @@ document
 </html>`;
 }
 
-/* =========================
-   WORKER ENTRY
-========================= */
+
+/* =========================================
+   CLOUDFLARE WORKER
+========================================= */
 
 export default {
 
-  async fetch(
-    request
-  ) {
+  async fetch(request) {
 
     const url =
       new URL(request.url);
 
-    /* CORS OPTIONS */
+    /* OPTIONS / CORS */
 
     if (
       request.method ===
@@ -1365,14 +1349,15 @@ export default {
         null,
         {
           status: 204,
-          headers: {
-            ...corsHeaders(request)
-          }
+
+          headers:
+            corsHeaders(request)
         }
       );
     }
 
-    /* API */
+
+    /* 股票 API */
 
     if (
       url.pathname ===
@@ -1411,9 +1396,7 @@ export default {
       try {
 
         const stock =
-          await findStock(
-            code
-          );
+          await findStock(code);
 
         if (!stock) {
 
@@ -1428,15 +1411,12 @@ export default {
           );
         }
 
-        const normalized =
-          normalizeStock(
-            stock
-          );
-
         return jsonResponse(
           {
             ok: true,
-            data: normalized
+
+            data:
+              normalizeStock(stock)
           },
           request,
           200
@@ -1461,7 +1441,8 @@ export default {
       }
     }
 
-    /* HOME PAGE */
+
+    /* 首頁 */
 
     if (
       url.pathname === "/" ||
@@ -1490,7 +1471,8 @@ export default {
       );
     }
 
-    /* HEALTH CHECK */
+
+    /* 健康檢查 */
 
     if (
       url.pathname ===
@@ -1500,8 +1482,10 @@ export default {
       return jsonResponse(
         {
           ok: true,
+
           service:
             "Taiwan Stock Analytics",
+
           time:
             new Date().toISOString()
         },
@@ -1510,15 +1494,21 @@ export default {
       );
     }
 
+
+    /* 404 */
+
     return new Response(
       "404 Not Found",
       {
         status: 404,
+
         headers: {
           "Content-Type":
             "text/plain; charset=UTF-8"
         }
       }
     );
+
   }
+
 };
