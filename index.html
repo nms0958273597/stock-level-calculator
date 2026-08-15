@@ -3,12 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>📊 台股關卡計算器</title>
+<title>📊 台股自動查詢</title>
 
 <style>
-*{
-box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
 margin:0;
@@ -19,17 +17,18 @@ color:#222;
 
 header{
 text-align:center;
-padding:30px 15px 15px;
+padding:32px 15px 20px;
 }
 
 h1{
 margin:0;
-font-size:34px;
+font-size:38px;
 font-weight:800;
 }
 
 .subtitle{
 margin-top:8px;
+font-size:15px;
 color:#777;
 }
 
@@ -42,24 +41,24 @@ margin:auto;
 .card{
 background:#fff;
 border-radius:24px;
-padding:22px;
-margin-bottom:18px;
-box-shadow:0 7px 25px rgba(0,0,0,.08);
+padding:24px;
+margin-bottom:20px;
+box-shadow:0 8px 28px rgba(0,0,0,.08);
 }
 
 label{
 display:block;
-font-size:18px;
-font-weight:bold;
-margin-bottom:9px;
+font-size:19px;
+font-weight:700;
+margin-bottom:10px;
 }
 
 input{
 width:100%;
-padding:16px;
+padding:18px;
+font-size:23px;
 border:2px solid #ddd;
-border-radius:14px;
-font-size:20px;
+border-radius:16px;
 outline:none;
 }
 
@@ -69,14 +68,14 @@ border-color:#333;
 
 button{
 width:100%;
-padding:17px;
-margin-top:14px;
+padding:18px;
+margin-top:15px;
 border:0;
-border-radius:14px;
+border-radius:16px;
 background:#222;
 color:#fff;
-font-size:19px;
-font-weight:bold;
+font-size:21px;
+font-weight:700;
 }
 
 button:active{
@@ -84,9 +83,10 @@ transform:scale(.98);
 }
 
 .status{
-margin-top:15px;
-padding:15px;
-border-radius:13px;
+margin-top:18px;
+padding:17px;
+border-radius:16px;
+font-size:17px;
 line-height:1.7;
 }
 
@@ -110,25 +110,25 @@ color:#c62828;
 }
 
 .stock-name{
-font-size:28px;
+font-size:30px;
 font-weight:800;
 }
 
 .stock-code{
-color:#777;
 margin-top:3px;
+color:#777;
 }
 
 .price{
-font-size:48px;
-font-weight:800;
 margin-top:12px;
+font-size:50px;
+font-weight:800;
 }
 
 .change{
-font-size:20px;
-font-weight:bold;
 margin-top:4px;
+font-size:21px;
+font-weight:700;
 }
 
 .up{
@@ -140,32 +140,32 @@ color:#16803c;
 }
 
 .section{
-font-size:21px;
+margin:27px 0 13px;
+font-size:22px;
 font-weight:800;
-margin:24px 0 12px;
 }
 
 .grid{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:11px;
+gap:12px;
 }
 
 .box{
+padding:16px;
+border-radius:15px;
 background:#f7f7f7;
-padding:15px;
-border-radius:14px;
 }
 
 .box-title{
+margin-bottom:6px;
 font-size:14px;
 color:#777;
-margin-bottom:5px;
 }
 
 .box-value{
-font-size:20px;
-font-weight:bold;
+font-size:21px;
+font-weight:700;
 }
 
 .buy{
@@ -177,56 +177,44 @@ background:#fff0f0;
 }
 
 .note{
-margin-top:18px;
+margin-top:20px;
 font-size:13px;
-color:#777;
 line-height:1.7;
+color:#777;
 }
 
 @media(max-width:500px){
 
 h1{
-font-size:30px;
+font-size:32px;
 }
 
 .price{
-font-size:40px;
-}
-
-.grid{
-grid-template-columns:1fr 1fr;
+font-size:42px;
 }
 
 }
 </style>
 </head>
 
-
 <body>
 
 <header>
-
-<h1>📊 台股關卡計算器</h1>
-
-<div class="subtitle">
-輸入股票代號，查詢行情與交易關卡
-</div>
-
+<h1>📊 台股自動查詢</h1>
+<div class="subtitle">即時行情＋股票關卡分析</div>
 </header>
-
 
 <div class="container">
 
-
 <div class="card">
 
-<label>🔎 股票代號</label>
+<label>🔎 股票代號或股票名稱</label>
 
 <input
 id="stockInput"
 type="text"
 inputmode="numeric"
-placeholder="例如：1326"
+placeholder="例如：1326 或 台化"
 >
 
 <button onclick="searchStock()">
@@ -238,33 +226,20 @@ placeholder="例如：1326"
 </div>
 
 
-
 <div id="result" class="card hidden">
 
+<div id="stockName" class="stock-name">--</div>
 
-<div id="stockName" class="stock-name">
---
-</div>
+<div id="stockCode" class="stock-code">--</div>
 
-<div id="stockCode" class="stock-code">
---
-</div>
+<div id="price" class="price">--</div>
 
-
-<div id="price" class="price">
---
-</div>
-
-<div id="change" class="change">
---
-</div>
-
+<div id="change" class="change">--</div>
 
 
 <div class="section">
 📌 今日行情
 </div>
-
 
 <div class="grid">
 
@@ -301,11 +276,9 @@ placeholder="例如：1326"
 </div>
 
 
-
 <div class="section">
 💰 五檔報價
 </div>
-
 
 <div class="grid">
 
@@ -332,11 +305,9 @@ placeholder="例如：1326"
 </div>
 
 
-
 <div class="section">
-🎯 交易關卡
+🎯 股票關卡
 </div>
-
 
 <div class="grid">
 
@@ -374,18 +345,15 @@ placeholder="例如：1326"
 
 
 <div class="note">
-※ 以上價格為程式計算的技術參考值，不代表投資建議。
-</div>
-
-
+※ 關卡為程式依行情計算的技術參考，不代表投資建議。
 </div>
 
 </div>
 
+</div>
 
 
 <script>
-
 
 const stockNames={
 
@@ -405,13 +373,12 @@ const stockNames={
 };
 
 
-
 function num(value){
 
 if(
-value===null ||
-value===undefined ||
-value==="" ||
+value===null||
+value===undefined||
+value===""||
 value==="-"
 ){
 return null;
@@ -426,17 +393,13 @@ return Number.isFinite(n)?n:null;
 }
 
 
-
 function money(value){
 
 const n=num(value);
 
-return n===null
-?"--"
-:n.toFixed(2);
+return n===null?"--":n.toFixed(2);
 
 }
-
 
 
 function setStatus(text,type){
@@ -452,7 +415,6 @@ box.classList.remove("hidden");
 }
 
 
-
 async function getStock(exchange,code){
 
 const url=
@@ -462,11 +424,10 @@ const url=
 "&delay=0"+
 "&_="+Date.now();
 
-
 const response=await fetch(url,{
+method:"GET",
 cache:"no-store"
 });
-
 
 if(!response.ok){
 
@@ -476,9 +437,7 @@ throw new Error(
 
 }
 
-
 const data=await response.json();
-
 
 if(
 data &&
@@ -490,11 +449,9 @@ return data.msgArray[0];
 
 }
 
-
 return null;
 
 }
-
 
 
 async function searchStock(){
@@ -529,13 +486,12 @@ document
 
 
 setStatus(
-"⏳ 正在查詢 "+code+" ……",
+"⏳ 正在查詢 "+code+"，請稍候……",
 "wait"
 );
 
 
 try{
-
 
 let data=
 await getStock("tse",code);
@@ -572,22 +528,20 @@ setStatus(
 );
 
 
-}
-catch(error){
+}catch(error){
 
-console.log(error);
-
+console.error(error);
 
 setStatus(
-"❌ 無法連接即時行情服務<br><br>"+
-"如果目前是非交易時間，也可能沒有即時資料。",
+"❌ 查詢服務連線失敗<br><br>"+
+"股票代號沒有問題，"+
+"目前是即時行情服務連線問題。",
 "error"
 );
 
 }
 
 }
-
 
 
 function showStock(d){
@@ -608,8 +562,7 @@ yesterday!==null &&
 yesterday!==0
 ){
 
-change=
-price-yesterday;
+change=price-yesterday;
 
 percent=
 change/yesterday*100;
@@ -625,13 +578,13 @@ document
 document
 .getElementById("stockName")
 .textContent=
-d.n || "股票";
+d.n||"股票";
 
 
 document
 .getElementById("stockCode")
 .textContent=
-d.c || "--";
+d.c||"--";
 
 
 document
@@ -640,25 +593,25 @@ document
 money(price);
 
 
-const priceElement=
+const priceBox=
 document.getElementById("price");
 
-const changeElement=
+const changeBox=
 document.getElementById("change");
 
 
-priceElement.className="price";
+priceBox.className="price";
 
-changeElement.className="change";
+changeBox.className="change";
 
 
 if(change>0){
 
-priceElement.classList.add("up");
+priceBox.classList.add("up");
 
-changeElement.classList.add("up");
+changeBox.classList.add("up");
 
-changeElement.textContent=
+changeBox.textContent=
 "▲ +"+
 money(change)+
 " (+"+
@@ -668,11 +621,11 @@ percent.toFixed(2)+
 }
 else if(change<0){
 
-priceElement.classList.add("down");
+priceBox.classList.add("down");
 
-changeElement.classList.add("down");
+changeBox.classList.add("down");
 
-changeElement.textContent=
+changeBox.textContent=
 "▼ "+
 money(change)+
 " ("+
@@ -682,11 +635,10 @@ percent.toFixed(2)+
 }
 else{
 
-changeElement.textContent=
+changeBox.textContent=
 "— 0.00 (0.00%)";
 
 }
-
 
 
 document
@@ -716,38 +668,37 @@ money(d.l);
 document
 .getElementById("volume")
 .textContent=
-d.v || "--";
+d.v||"--";
 
 
 document
 .getElementById("time")
 .textContent=
-d.t || "--";
-
+d.t||"--";
 
 
 const asks=
 String(d.a||"")
 .split("_")
-.filter(x=>x && x!=="-");
+.filter(x=>x&&x!=="-");
 
 
 const bids=
 String(d.b||"")
 .split("_")
-.filter(x=>x && x!=="-");
+.filter(x=>x&&x!=="-");
 
 
 const askVolumes=
 String(d.f||"")
 .split("_")
-.filter(x=>x && x!=="-");
+.filter(x=>x&&x!=="-");
 
 
 const bidVolumes=
 String(d.g||"")
 .split("_")
-.filter(x=>x && x!=="-");
+.filter(x=>x&&x!=="-");
 
 
 document
@@ -782,11 +733,9 @@ bidVolumes.length
 :"--";
 
 
-
 calculateLevels(d);
 
 }
-
 
 
 function calculateLevels(d){
@@ -801,8 +750,8 @@ return;
 
 
 const high=num(d.h);
+
 const low=num(d.l);
-const yesterday=num(d.y);
 
 
 const support=
@@ -872,7 +821,6 @@ money(resistance);
 }
 
 
-
 document
 .getElementById("stockInput")
 .addEventListener(
@@ -890,7 +838,6 @@ searchStock();
 document
 .getElementById("stockInput")
 .value="1326";
-
 
 </script>
 
