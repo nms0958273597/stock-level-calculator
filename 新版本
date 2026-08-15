@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📊 台股自動查詢 V3</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
+  "Noto Sans TC",sans-serif;
+  background:#f3f5f7;
+  color:#222;
+}
+
+.header{
+  text-align:center;
+  padding:35px 15px 20px;
+}
+
+.header h1{
+  margin:0;
+  font-size:42px;
+  font-weight:800;
+}
+
+.header p{
+  margin:10px 0 0;
+  color:#777;
+  font-size:15px;
+}
+
+.container{
+  width:min(94%,760px);
+  margin:auto;
+}
+
+.card{
+  background:white;
+  border-radius:25px;
+  padding:25px;
+  margin-bottom:20px;
+  box-shadow:0 8px 30px rgba(0,0,0,.08);
+}
+
+label{
+  display:block;
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+input{
+  width:100%;
+  padding:18px;
+  border:2px solid #ddd;
+  border-radius:16px;
+  font-size:22px;
+  outline:none;
+}
+
+input:focus{
+  border-color:#333;
+}
+
+button{
+  width:100%;
+  margin-top:15px;
+  padding:18px;
+  border:0;
+  border-radius:16px;
+  background:#222;
+  color:white;
+  font-size:20px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button:active{
+  transform:scale(.98);
+}
+
+.status{
+  margin-top:20px;
+  padding:18px;
+  border-radius:16px;
+  background:#f5f5f5;
+  font-size:17px;
+  line-height:1.7;
+}
+
+.success{
+  background:#eaf8ef;
+  color:#16733a;
+}
+
+.error{
+  background:#fff0f0;
+  color:#c62828;
+}
+
+.loading{
+  background:#fff8e5;
+  color:#8a6200;
+}
+
+.hidden{
+  display:none;
+}
+
+.stock-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.stock-name{
+  font-size:28px;
+  font-weight:800;
+}
+
+.stock-code{
+  color:#777;
+}
+
+.price{
+  font-size:48px;
+  font-weight:800;
+  margin:5px 0;
+}
+
+.up{
+  color:#e53935;
+}
+
+.down{
+  color:#16803c;
+}
+
+.flat{
+  color:#777;
+}
+
+.change{
+  font-size:21px;
+  font-weight:700;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.item{
+  background:#f7f7f7;
+  border-radius:15px;
+  padding:15px;
+}
+
+.item-title{
+  color:#777;
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+.item-value{
+  font-size:20px;
+  font-weight:700;
+}
+
+.section-title{
+  font-size:22px;
+  font-weight:800;
+  margin:25px 0 15px;
+}
+
+.level{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.level-box{
+  padding:18px;
+  border-radius:15px;
+  background:#f7f7f7;
+}
+
+.level-box strong{
+  display:block;
+  font-size:14px;
+  color:#777;
+  margin-bottom:6px;
+}
+
+.level-box span{
+  font-size:23px;
+  font-weight:800;
+}
+
+.buy{
+  background:#eaf8ef;
+}
+
+.sell{
+  background:#fff0f0;
+}
+
+.note{
+  color:#777;
+  font-size:13px;
+  line-height:1.7;
+  margin-top:20px;
+}
+
+@media(max-width:500px){
+  .header h1{
+    font-size:32px;
+  }
+
+  .price{
+    font-size:40px;
+  }
+
+  .grid,
+  .level{
+    grid-template-columns:1fr 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>📊 台股自動查詢</h1>
+  <p>即時行情查詢 V3</p>
+</div>
+
+<div class="container">
+
+  <div class="card">
+
+    <label>🔎 股票代號或股票名稱</label>
+
+    <input
+      id="stockInput"
+      type="text"
+      placeholder="例如：1326 或 台化"
+      autocomplete="off"
+    >
+
+    <button onclick="searchStock()">
+      🔍 查詢股票
+    </button>
+
+    <div id="status" class="status hidden"></div>
+
+  </div>
+
+
+  <div id="result" class="card hidden">
+
+    <div class="stock-title">
+
+      <div>
+        <div id="stockName" class="stock-name">台化</div>
+        <div id="stockCode" class="stock-code">1326</div>
+      </div>
+
+      <div id="market">上市</div>
+
+    </div>
+
+
+    <div id="price" class="price">--</div>
+
+    <div id="change" class="change">--</div>
+
+
+    <div class="section-title">
+      📌 今日行情
+    </div>
+
+    <div class="grid">
+
+      <div class="item">
+        <div class="item-title">昨收</div>
+        <div id="yesterday" class="item-value">--</div>
+      </div>
+
+      <div class="item">
+        <div class="item-title">開盤</div>
+        <div id="open" class="item-value">--</div>
+      </div>
+
+      <div class="item">
+        <div class="item-title">最高</div>
+        <div id="high" class="item-value">--</div>
+      </div>
+
+      <div class="item">
+        <div class="item-title">最低</div>
+        <div id="low" class="item-value">--</div>
+      </div>
+
+      <div class="item">
+        <div class="item-title">成交量</div>
+        <div id="volume" class="item-value">--</div>
+      </div>
+
+      <div class="item">
+        <div class="item-title">資料時間</div>
+        <div id="time" class="item-value">--</div>
+      </div>
+
+    </div>
+
+
+    <div class="section-title">
+      📈 漲跌停
+    </div>
+
+    <div class="grid">
+
+      <div class="item">
+        <div class="item-title">漲停</div>
+        <div id="limitUp" class="item-value up">--</div>
+      </div>
+
+      <div class="item">
+        <div class="item-title">跌停</div>
+        <div id="limitDown" class="item-value down">--</div>
+      </div>
+
+    </div>
+
+
+    <div class="section-title">
+      💰 五檔報價
+    </div>
+
+    <div class="grid">
+
+      <div class="item">
+        <div class="item-title">最佳賣價</div>
+        <div id="ask1" class="item-value up">--</div>
+      </div>
+
+      <div class="item">
+        <div class="item-title">最佳買價</div>
+        <div id="bid1" class="item-value down">--</div>
+      </div>
+
+      <div class="item">
+        <div class="item-title">賣一量</div>
+        <div id="askVol" class="item-value">--</div>
+      </div>
+
+      <div class="item">
+        <div class="item-title">買一量</div>
+        <div id="bidVol" class="item-value">--</div>
+      </div>
+
+    </div>
+
+
+    <div class="section-title">
+      🎯 自動價格參考
+    </div>
+
+    <div class="level">
+
+      <div class="level-box buy">
+        <strong>參考進場</strong>
+        <span id="entry">--</span>
+      </div>
+
+      <div class="level-box">
+        <strong>支撐</strong>
+        <span id="support">--</span>
+      </div>
+
+      <div class="level-box sell">
+        <strong>第一止盈</strong>
+        <span id="tp1">--</span>
+      </div>
+
+      <div class="level-box sell">
+        <strong>第二止盈</strong>
+        <span id="tp2">--</span>
+      </div>
+
+      <div class="level-box">
+        <strong>停損參考</strong>
+        <span id="stop">--</span>
+      </div>
+
+      <div class="level-box">
+        <strong>壓力</strong>
+        <span id="resistance">--</span>
+      </div>
+
+    </div>
+
+
+    <div class="note">
+      ※ 即時行情來自公開市場資料。
+      「參考進場、支撐、壓力、止盈、停損」為程式依當日價格計算的技術參考，
+      不代表投資建議。
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const stockMap = {
+
+  "台化":"1326",
+  "台積電":"2330",
+  "聯電":"2303",
+  "鴻海":"2317",
+  "台達電":"2308",
+  "南亞":"1303",
+  "台塑":"1301",
+  "中鋼":"2002",
+  "華通":"2313",
+  "燿華":"2367",
+  "群創":"3481",
+  "彩晶":"6116",
+  "日月光投控":"3711"
+
+};
+
+
+function showStatus(message,type){
+
+  const box=document.getElementById("status");
+
+  box.className="status "+type;
+
+  box.innerHTML=message;
+
+  box.classList.remove("hidden");
+
+}
+
+
+function number(v){
+
+  if(v===undefined || v===null || v==="" || v==="-"){
+    return null;
+  }
+
+  const n=parseFloat(String(v).replace(/,/g,""));
+
+  return Number.isFinite(n) ? n : null;
+}
+
+
+function money(v){
+
+  const n=number(v);
+
+  if(n===null) return "--";
+
+  return n.toFixed(2);
+}
+
+
+function volume(v){
+
+  const n=number(v);
+
+  if(n===null) return "--";
+
+  return n.toLocaleString();
+}
+
+
+function getInput(){
+
+  let value=document
+    .getElementById("stockInput")
+    .value
+    .trim();
+
+  if(stockMap[value]){
+    value=stockMap[value];
+  }
+
+  return value;
+}
+
+
+async function requestStock(type,code){
+
+  const url =
+    "https://mis.twse.com.tw/stock/api/getStockInfo.jsp"+
+    "?ex_ch="+type+"_"+code+".tw"+
+    "&json=1"+
+    "&delay=0"+
+    "&_="+Date.now();
+
+  const response=await fetch(url,{
+    method:"GET",
+    cache:"no-store"
+  });
+
+  if(!response.ok){
+    throw new Error("HTTP "+response.status);
+  }
+
+  const data=await response.json();
+
+  if(data &&
+     Array.isArray(data.msgArray) &&
+     data.msgArray.length>0){
+
+    return data.msgArray[0];
+
+  }
+
+  return null;
+}
+
+
+async function findStock(code){
+
+  // 先查上市
+  let data=await requestStock("tse",code);
+
+  if(data && data.c){
+    return data;
+  }
+
+  // 再查上櫃
+  data=await requestStock("otc",code);
+
+  if(data && data.c){
+    return data;
+  }
+
+  return null;
+}
+
+
+function calculateLevels(d){
+
+  const price=number(d.z) ?? number(d.y);
+
+  const high=number(d.h);
+  const low=number(d.l);
+  const open=number(d.o);
+  const yesterday=number(d.y);
+
+  if(price===null){
+    return;
+  }
+
+  /*
+    以下為簡易技術參考算法：
+
+    支撐：
+    今日低點與昨收取較低者附近
+
+    壓力：
+    今日高點與昨收取較高者附近
+
+    進場：
+    價格回到支撐上方約1%
+
+    第一止盈：
+    進場 + 約3%
+
+    第二止盈：
+    進場 + 約6%
+
+    停損：
+    進場 - 約2%
+  */
+
+  const supportBase =
+    low !== null ? low : price*0.98;
+
+  const resistanceBase =
+    high !== null ? high : price*1.02;
+
+  const support =
+    Math.min(
+      supportBase,
+      yesterday ?? supportBase
+    );
+
+  const resistance =
+    Math.max(
+      resistanceBase,
+      yesterday ?? resistanceBase
+    );
+
+  const entry =
+    support + (price-support)*0.35;
+
+  const tp1=entry*1.03;
+
+  const tp2=entry*1.06;
+
+  const stop=entry*0.98;
+
+  document.getElementById("entry").textContent=
+    money(entry);
+
+  document.getElementById("support").textContent=
+    money(support);
+
+  document.getElementById("tp1").textContent=
+    money(tp1);
+
+  document.getElementById("tp2").textContent=
+    money(tp2);
+
+  document.getElementById("stop").textContent=
+    money(stop);
+
+  document.getElementById("resistance").textContent=
+    money(resistance);
+
+}
+
+
+function renderStock(d){
+
+  const price=
+    number(d.z) ??
+    number(d.y);
+
+  const yesterday=number(d.y);
+
+  const change=
+    price!==null &&
+    yesterday!==null
+      ? price-yesterday
+      : null;
+
+  const changePercent=
+    change!==null &&
+    yesterday!==null &&
+    yesterday!==0
+      ? change/yesterday*100
+      : null;
+
+
+  document.getElementById("result")
+    .classList.remove("hidden");
+
+
+  document.getElementById("stockName")
+    .textContent=d.n || d.nf || "股票";
+
+
+  document.getElementById("stockCode")
+    .textContent=d.c || "";
+
+
+  document.getElementById("market")
+    .textContent=d.ex==="tse"
+      ? "上市"
+      : d.ex==="otc"
+        ? "上櫃"
+        : d.ex || "--";
+
+
+  document.getElementById("price")
+    .textContent=money(price);
+
+
+  const priceBox=
+    document.getElementById("price");
+
+  const changeBox=
+    document.getElementById("change");
+
+
+  priceBox.className="price";
+
+  changeBox.className="change";
+
+
+  if(change>0){
+
+    priceBox.classList.add("up");
+    changeBox.classList.add("up");
+
+    changeBox.textContent=
+      "▲ +"+money(change)+
+      "（+"+changePercent.toFixed(2)+"%）";
+
+  }
+  else if(change<0){
+
+    priceBox.classList.add("down");
+    changeBox.classList.add("down");
+
+    changeBox.textContent=
+      "▼ "+money(change)+
+      "（"+changePercent.toFixed(2)+"%）";
+
+  }
+  else{
+
+    priceBox.classList.add("flat");
+    changeBox.classList.add("flat");
+
+    changeBox.textContent="— 0.00（0.00%）";
+
+  }
+
+
+  document.getElementById("yesterday")
+    .textContent=money(d.y);
+
+  document.getElementById("open")
+    .textContent=money(d.o);
+
+  document.getElementById("high")
+    .textContent=money(d.h);
+
+  document.getElementById("low")
+    .textContent=money(d.l);
+
+  document.getElementById("volume")
+    .textContent=volume(d.v);
+
+  document.getElementById("time")
+    .textContent=d.t || "--";
+
+
+  document.getElementById("limitUp")
+    .textContent=money(d.u);
+
+  document.getElementById("limitDown")
+    .textContent=money(d.w);
+
+
+  const asks=
+    String(d.a || "")
+      .split("_")
+      .filter(x=>x && x!=="-");
+
+  const bids=
+    String(d.b || "")
+      .split("_")
+      .filter(x=>x && x!=="-");
+
+  const askVolumes=
+    String(d.f || "")
+      .split("_")
+      .filter(x=>x && x!=="-");
+
+  const bidVolumes=
+    String(d.g || "")
+      .split("_")
+      .filter(x=>x && x!=="-");
+
+
+  document.getElementById("ask1")
+    .textContent=
+      asks.length ? money(asks[0]) : "--";
+
+
+  document.getElementById("bid1")
+    .textContent=
+      bids.length ? money(bids[0]) : "--";
+
+
+  document.getElementById("askVol")
+    .textContent=
+      askVolumes.length
+        ? volume(askVolumes[0])
+        : "--";
+
+
+  document.getElementById("bidVol")
+    .textContent=
+      bidVolumes.length
+        ? volume(bidVolumes[0])
+        : "--";
+
+
+  calculateLevels(d);
+
+}
+
+
+async function searchStock(){
+
+  const input=getInput();
+
+  document.getElementById("result")
+    .classList.add("hidden");
+
+
+  if(!input){
+
+    showStatus(
+      "⚠️ 請輸入股票代號，例如：1326",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if(!/^[0-9]{4,6}$/.test(input)){
+
+    showStatus(
+      "⚠️ 目前請輸入股票代號，例如：1326、2330、2303",
+      "error"
+    );
+
+    return;
+  }
+
+
+  showStatus(
+    "⏳ 正在查詢 "+input+"，請稍候……",
+    "loading"
+  );
+
+
+  try{
+
+    const data=await findStock(input);
+
+    if(!data){
+
+      showStatus(
+        "❌ 找不到這支股票<br><br>"+
+        "請確認股票代號是否正確。",
+        "error"
+      );
+
+      return;
+    }
+
+
+    renderStock(data);
+
+
+    showStatus(
+      "✅ 查詢成功！"+
+      "<br>資料時間："+(data.t || "--"),
+      "success"
+    );
+
+  }
+  catch(error){
+
+    console.error(error);
+
+    showStatus(
+      "❌ 無法連接即時行情服務<br><br>"+
+      "如果你是在 GitHub Pages 開啟，"+
+      "可能是證交所 API 的瀏覽器 CORS 限制。"+
+      "<br><br>"+
+      "這不是你輸入股票代號錯誤。",
+      "error"
+    );
+
+  }
+
+}
+
+
+document
+  .getElementById("stockInput")
+  .addEventListener("keydown",function(e){
+
+    if(e.key==="Enter"){
+      searchStock();
+    }
+
+  });
+
+
+document
+  .getElementById("stockInput")
+  .value="1326";
+
+</script>
+
+</body>
+</html>
