@@ -1,76 +1,423 @@
 export default {
   async fetch(request) {
-    const cors = {
+    const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type"
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Content-Type": "application/json; charset=UTF-8"
     };
 
     if (request.method === "OPTIONS") {
-      return new Response(null, { headers: cors });
+      return new Response(null, {
+        status: 204,
+        headers: corsHeaders
+      });
     }
 
     try {
       const url = new URL(request.url);
-      const stock = url.searchParams.get("stock");
+      const stock = (url.searchParams.get("stock") || "").trim();
 
-      if (!stock) {
+      if (!/^\d{4,6}$/.test(stock)) {
         return new Response(
-          JSON.stringify({ error: "請提供股票代號" }),
+          JSON.stringify({
+            success: false,
+            error: "股票代號格式錯誤"
+          }),
           {
             status: 400,
-            headers: {
-              ...cors,
-              "Content-Type": "application/json"
-            }
+            headers: corsHeaders
           }
         );
       }
 
-      const twseHost = "mis.twse.com.tw";
+      /*
+       * ============================
+       * 1. 即時行情
+       * ============================
+       */
 
-      const apiUrl =
-        "https://" +
-        twseHost +
-        "/stock/api/getStockInfo.jsp" +
+      let market = "tse";
+      let realStock = stock;
+
+      // 先嘗試上市
+      let quoteUrl =
+        "https://mis.twse.com.tw/stock/api/getStockInfo.jsp" +
         "?ex_ch=tse_" +
-        encodeURIComponent(stock) +
+        stock +
         ".tw" +
         "&json=1" +
-        "&delay=0";
+        "&delay=0" +
+        "&_=" +
+        Date.now();
 
-      const response = await fetch(apiUrl, {
+      let quoteResponse = await fetch(quoteUrl, {
         headers: {
           "User-Agent": "Mozilla/5.0",
           "Accept": "application/json"
         }
       });
 
-      const data = await response.json();
+      let quoteData = await quoteResponse.json();
+
+      /*
+       * 如果上市查不到，再嘗試上櫃
+       */
+      if (
+        !quoteData ||
+        !quoteData.msgArray ||
+        quoteData.msgArray.length === 0
+      ) {
+        market = "otc";
+
+        quoteUrl =
+          "https://mis.twse.com.tw/stock/api/getStockInfo.jsp" +
+          "?ex_ch=otc_" +
+          stock +
+          ".tw" +
+          "&json=1" +
+          "&delay=0" +
+          "&_=" +
+          Date.now();
+
+        quoteResponse = await fetch(quoteUrl, {
+          headers: {
+            "User-Agent": "Mozilla/5.0",
+            "Accept": "application/json"
+          }
+        });
+
+        quoteData = await quoteResponse.json();
+      }
+
+      if (
+        !quoteData ||
+        !quoteData.msgArray ||
+        quoteData.msgArray.length === 0
+      ) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "找不到股票行情：" + stock
+          }),
+          {
+            status: 404,
+            headers: corsHeaders
+          }
+        );
+      }
+
+      const q = quoteData.msgArray[0];
+
+      /*
+       * ============================
+       * 基本資料
+       * ============================
+       */
+
+      const name = q.n || stock;
+
+      // 最新成交價
+      const price = toNumber(q.z);
+
+      // 昨收
+      const previousClose = toNumber(q.y);
+
+      // 今日開盤
+      const open = toNumber(q.o);
+
+      // 今日最高
+      const high = toNumber(q.h);
+
+      // 今日最低
+      const low = toNumber(q.l);
+
+      // 成交量
+      const volume = toNumber(q.v);
+
+      // 買一
+      const bid1 = toNumber(
+        q.b ? String(q.b).split("_")[0] : ""
+      );
+
+      // 賣一
+      const ask1 = toNumber(
+        q.a ? String(q.a).split("_")[0] : ""
+      );
+
+      /*
+       * 收盤價：
+       *
+       * 盤後 z 通常就是當日最後成交價。
+       * 如果還在盤中，則以最新價做 latestPrice，
+       * closePrice 留給前端判斷。
+       */
+
+      const latestPrice = price || previousClose;
+
+      /*
+       * ============================
+       * 2. 抓歷史資料計算月線
+       * ============================
+       */
+
+      const closes = [];
+
+      const now = new Date();
+
+      /*
+       * 抓最近 3 個月，
+       * 足夠取得 20 個交易日。
+       */
+      for (let i = 0; i < 3; i++) {
+        const d = new Date(
+          now.getFullYear(),
+          now.getMonth() - i,
+          1
+        );
+
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+
+        const dateParam = `${yyyy}${mm}01`;
+
+        const historyUrl =
+          "https://www.twse.com.tw/exchangeReport/STOCK_DAY" +
+          "?response=json" +
+          "&date=" +
+          dateParam +
+          "&stockNo=" +
+          stock;
+
+        try {
+          const historyResponse = await fetch(historyUrl, {
+            headers: {
+              "User-Agent": "Mozilla/5.0",
+              "Accept": "application/json"
+            }
+          });
+
+          const historyData = await historyResponse.json();
+
+          if (
+            historyData &&
+            Array.isArray(historyData.data)
+          ) {
+            for (const row of historyData.data) {
+              if (row.length >= 7) {
+                const closeValue = parseNumber(row[6]);
+
+                if (
+                  closeValue !== null &&
+                  closeValue > 0
+                ) {
+                  closes.push({
+                    date: row[0],
+                    close: closeValue
+                  });
+                }
+              }
+            }
+          }
+        } catch (e) {
+          // 某個月份抓不到就繼續
+        }
+      }
+
+      /*
+       * 去除重複日期
+       */
+      const unique = {};
+
+      for (const item of closes) {
+        unique[item.date] = item.close;
+      }
+
+      const historicalCloses = Object.keys(unique)
+        .map(date => ({
+          date,
+          close: unique[date]
+        }))
+        .sort((a, b) =>
+          a.date.localeCompare(b.date)
+        );
+
+      /*
+       * 取最近 20 個交易日
+       */
+      const last20 =
+        historicalCloses.slice(-20);
+
+      /*
+       * 如果今天已經有收盤價，
+       * 而歷史資料尚未包含今天，
+       * 可以把最新價格加入計算。
+       */
+      if (
+        latestPrice &&
+        last20.length > 0
+      ) {
+        const latestHistorical =
+          last20[last20.length - 1];
+
+        /*
+         * 簡單避免重複加入
+         */
+        if (
+          String(latestHistorical.close) !==
+          String(latestPrice)
+        ) {
+          last20.push({
+            date: "NOW",
+            close: latestPrice
+          });
+        }
+      }
+
+      /*
+       * 取最後20筆
+       */
+      const month20 =
+        last20.slice(-20);
+
+      let monthlyMA = null;
+
+      if (month20.length >= 20) {
+        const sum = month20.reduce(
+          (total, item) =>
+            total + item.close,
+          0
+        );
+
+        monthlyMA =
+          Math.round(
+            (sum / month20.length) * 100
+          ) / 100;
+      }
+
+      /*
+       * ============================
+       * 3. 漲跌
+       * ============================
+       */
+
+      let change = null;
+      let changePercent = null;
+
+      if (
+        latestPrice !== null &&
+        previousClose !== null &&
+        previousClose !== 0
+      ) {
+        change =
+          Math.round(
+            (latestPrice - previousClose) * 100
+          ) / 100;
+
+        changePercent =
+          Math.round(
+            ((latestPrice - previousClose) /
+              previousClose) *
+              10000
+          ) / 100;
+      }
+
+      /*
+       * ============================
+       * 4. 回傳
+       * ============================
+       */
 
       return new Response(
-        JSON.stringify(data),
+        JSON.stringify({
+          success: true,
+
+          stock: realStock,
+          market,
+
+          name,
+
+          price: latestPrice,
+
+          previousClose,
+
+          open,
+
+          high,
+
+          low,
+
+          volume,
+
+          bid1,
+
+          ask1,
+
+          change,
+
+          changePercent,
+
+          monthlyMA,
+
+          monthMAName: "月線20MA",
+
+          updateTime:
+            new Date().toISOString()
+        }),
         {
-          headers: {
-            ...cors,
-            "Content-Type": "application/json; charset=utf-8"
-          }
+          status: 200,
+          headers: corsHeaders
         }
       );
 
     } catch (error) {
       return new Response(
         JSON.stringify({
+          success: false,
           error: error.message
         }),
         {
           status: 500,
-          headers: {
-            ...cors,
-            "Content-Type": "application/json"
-          }
+          headers: corsHeaders
         }
       );
     }
   }
 };
+
+
+/*
+ * ============================
+ * 數字處理
+ * ============================
+ */
+
+function parseNumber(value) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  const cleaned =
+    String(value)
+      .replace(/,/g, "")
+      .replace(/,/g, "")
+      .trim();
+
+  if (
+    cleaned === "" ||
+    cleaned === "--" ||
+    cleaned === "-"
+  ) {
+    return null;
+  }
+
+  const n = Number(cleaned);
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+function toNumber(value) {
+  return parseNumber(value);
+}
