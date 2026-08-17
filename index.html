@@ -2,45 +2,163 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>股票關卡計算機</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<title>📈 股票關卡計算機</title>
 
 <style>
+
 *{
   box-sizing:border-box;
 }
 
 body{
   margin:0;
-  background:#f4f7fb;
-  color:#202735;
-  font-family:-apple-system,BlinkMacSystemFont,
-  "Noto Sans TC","PingFang TC",sans-serif;
+  background:#f3f5f8;
+  color:#111;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Noto Sans TC",
+    "PingFang TC",
+    sans-serif;
 }
 
-.container{
-  max-width:640px;
+.wrap{
+  max-width:720px;
   margin:auto;
-  padding:16px 14px 50px;
+  padding:16px;
 }
 
-h1{
+.title{
   text-align:center;
-  font-size:29px;
-  margin:8px 0 22px;
+  font-size:30px;
+  font-weight:900;
+  margin:14px 0 5px;
+}
+
+.sub{
+  text-align:center;
+  color:#666;
+  font-size:18px;
+  margin-bottom:20px;
 }
 
 .card{
   background:#fff;
-  border-radius:22px;
+  border-radius:24px;
   padding:20px;
-  margin-bottom:16px;
-  box-shadow:0 5px 18px rgba(30,50,80,.08);
+  margin:15px 0;
+  box-shadow:0 5px 20px rgba(0,0,0,.06);
 }
 
 h2{
-  font-size:23px;
-  margin:0 0 17px;
+  margin:0 0 18px;
+  font-size:25px;
+}
+
+label{
+  display:block;
+  font-size:17px;
+  font-weight:800;
+  margin:10px 0 7px;
+}
+
+input{
+  width:100%;
+  height:58px;
+  padding:12px 16px;
+  border:2px solid #d8dce1;
+  border-radius:15px;
+  background:#fff;
+  color:#111;
+  font-size:20px;
+  outline:none;
+  -webkit-appearance:none;
+  appearance:none;
+  -webkit-user-select:text;
+  user-select:text;
+}
+
+input:focus{
+  border-color:#222;
+  box-shadow:0 0 0 3px rgba(0,0,0,.07);
+}
+
+.search{
+  display:grid;
+  grid-template-columns:1fr 115px;
+  gap:10px;
+}
+
+button{
+  border:0;
+  border-radius:15px;
+  min-height:56px;
+  padding:12px 16px;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.black{
+  background:#222;
+  color:#fff;
+}
+
+.gray{
+  background:#eef1f5;
+  color:#111;
+}
+
+.red{
+  background:#ffe6e6;
+  color:#c00;
+}
+
+.purple{
+  background:linear-gradient(
+    90deg,
+    #5d61ed,
+    #ad4bea
+  );
+  color:#fff;
+}
+
+.status{
+  margin-top:12px;
+  padding:15px;
+  border-radius:15px;
+  background:#f5f5f5;
+  font-size:17px;
+  font-weight:800;
+  line-height:1.5;
+}
+
+.info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.infoBox{
+  background:#f5f7fa;
+  border-radius:16px;
+  padding:16px;
+  min-height:100px;
+}
+
+.infoBox span{
+  display:block;
+  color:#777;
+  font-size:15px;
+}
+
+.infoBox strong{
+  display:block;
+  margin-top:8px;
+  font-size:24px;
 }
 
 .grid{
@@ -49,309 +167,402 @@ h2{
   gap:12px;
 }
 
-label{
-  display:block;
-  font-size:16px;
-  font-weight:800;
-  margin:12px 0 7px;
-}
-
-input{
-  width:100%;
-  height:50px;
-  padding:0 14px;
-  border:1px solid #dce2e9;
-  border-radius:12px;
-  background:#fff;
-  font-size:17px;
-  color:#222;
-}
-
-button{
-  width:100%;
-  height:54px;
-  border:0;
-  border-radius:13px;
-  background:#222;
-  color:#fff;
-  font-size:18px;
-  font-weight:800;
-  margin-top:12px;
-}
-
-button.blue{
-  background:#2878e8;
-}
-
-button.gray{
-  background:#eef1f5;
-  color:#222;
-}
-
-button.red{
-  background:#df3945;
-}
-
-.status{
-  text-align:center;
-  color:#687386;
-  margin-top:12px;
-  min-height:24px;
+.resultGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:15px;
 }
 
 .result{
-  background:#f7f9fb;
-  border-radius:15px;
-  padding:8px 16px;
+  padding:17px;
+  border-radius:17px;
+  min-height:105px;
 }
 
-.row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:14px;
-  padding:13px 0;
-  border-bottom:1px solid #e7ebf0;
-  font-size:18px;
+.result span{
+  display:block;
+  font-size:16px;
 }
 
-.row:last-child{
-  border-bottom:0;
+.result strong{
+  display:block;
+  margin-top:8px;
+  font-size:27px;
 }
 
 .green{
-  color:#24a148;
+  background:#e9f8ef;
+}
+
+.redbox{
+  background:#fff0f0;
+}
+
+.blue{
+  background:#edf5ff;
+}
+
+.gold{
+  background:#fff7dc;
+}
+
+.savedItem{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:13px 0;
+  border-bottom:1px solid #eee;
+}
+
+.savedItem:last-child{
+  border-bottom:0;
+}
+
+.savedName{
+  font-size:18px;
   font-weight:800;
 }
 
-.redtxt{
-  color:#d92d3a;
-  font-weight:800;
-}
-
-.orange{
-  color:#d97904;
-  font-weight:800;
-}
-
-.bluetxt{
-  color:#2878e8;
-  font-weight:800;
-}
-
-.saved{
-  border:1px solid #e0e6ee;
-  border-radius:15px;
-  padding:14px;
-  margin-top:12px;
-  background:#fbfcfd;
-}
-
-.badge{
-  display:inline-block;
-  padding:5px 9px;
-  border-radius:99px;
-  background:#eaf2ff;
-  color:#2878e8;
-  font-size:13px;
-  font-weight:800;
-  margin-right:7px;
-}
-
-.empty{
-  text-align:center;
-  color:#788394;
-  padding:15px;
+.savedCode{
+  color:#777;
+  font-size:14px;
+  margin-top:3px;
 }
 
 .small{
-  font-size:13px;
-  color:#788394;
-  line-height:1.7;
+  color:#777;
+  font-size:14px;
+  line-height:1.6;
 }
 
 @media(max-width:520px){
 
+  .title{
+    font-size:27px;
+  }
+
+  .sub{
+    font-size:16px;
+  }
+
+  .info{
+    grid-template-columns:1fr 1fr;
+  }
+
   .grid{
-    grid-template-columns:1fr;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .resultGrid{
+    grid-template-columns:1fr 1fr;
   }
 
 }
+
 </style>
 </head>
 
 
 <body>
 
-<div class="container">
-
-<h1>📈 股票關卡計算機</h1>
+<div class="wrap">
 
 
-<!-- 我的股票 -->
+<!-- 標題 -->
 
-<div class="card">
+<div class="title">
+📈 股票關卡計算機
+</div>
 
-<h2>📁 我的股票</h2>
-
-<button
-  id="saveBtn"
-  class="blue"
-  type="button">
-＋ 儲存目前股票
-</button>
-
-<button
-  id="clearBtn"
-  class="gray"
-  type="button">
-🗑 清除全部
-</button>
-
-<div id="saved"></div>
-
+<div class="sub">
+即時行情・🐰仙兔關卡・成本計算
 </div>
 
 
-<!-- 基本資訊 -->
+<!-- =========================
+     基本資訊
+========================= -->
 
 <div class="card">
 
 <h2>📊 基本資訊</h2>
 
-<div class="grid">
-
-<div>
-
 <label>股票代號</label>
 
 <input
-  id="code"
-  placeholder="例如：1326">
+id="code"
+type="text"
+inputmode="text"
+autocomplete="off"
+placeholder="例如 2330"
+>
 
-</div>
-
-
-<div>
 
 <label>股票名稱</label>
 
 <input
-  id="name"
-  placeholder="例如：台化">
+id="nameInput"
+type="text"
+autocomplete="off"
+placeholder="例如 台積電"
+>
 
-</div>
 
-</div>
-
-
-<div class="grid">
-
-<div>
-
-<label>填寫日期</label>
+<label>日期</label>
 
 <input
-  id="date"
-  type="date">
+id="date"
+type="text"
+readonly
+>
 
-</div>
-
-
-<div>
 
 <label>現價</label>
 
 <input
-  id="price"
-  type="number"
-  step="0.01"
-  placeholder="例如：60.50">
+id="price"
+type="text"
+inputmode="decimal"
+placeholder="請輸入現價"
+>
+
+
+<div
+id="status"
+class="status"
+>
+尚未查詢
+</div>
+
+</div>
+
+
+<!-- =========================
+     股票行情
+========================= -->
+
+<div class="card">
+
+<h2>📡 股票資訊</h2>
+
+<div class="info">
+
+<div class="infoBox">
+<span>股票名稱</span>
+<strong id="showName">--</strong>
+</div>
+
+<div class="infoBox">
+<span>股票代號</span>
+<strong id="showCode">--</strong>
+</div>
+
+<div class="infoBox">
+<span>現價</span>
+<strong id="showPrice">--</strong>
+</div>
+
+<div class="infoBox">
+<span>日期</span>
+<strong id="showDate">--</strong>
+</div>
+
+</div>
+
+<div
+style="margin-top:12px"
+>
+
+<button
+class="black"
+type="button"
+onclick="searchStock()"
+>
+🔎 查詢股票
+</button>
 
 </div>
 
 </div>
 
-</div>
 
-
-<!-- 仙兔關卡 -->
+<!-- =========================
+     仙兔關卡
+========================= -->
 
 <div class="card">
 
 <h2>🐰 仙兔關卡</h2>
 
+<div class="small">
+👇 白色欄位都可以直接輸入數字
+</div>
 
-<label>
-外資／融資成本
-</label>
+
+<div class="grid">
+
+
+<div>
+
+<label>成本價</label>
 
 <input
-  id="cost"
-  type="number"
-  step="0.01"
-  placeholder="例如：61.20">
+id="cost"
+type="text"
+inputmode="decimal"
+autocomplete="off"
+placeholder="例如 36.30"
+>
+
+</div>
+
+
+<div>
+
+<label>止盈 %</label>
+
+<input
+id="take"
+type="text"
+inputmode="decimal"
+value="6"
+>
+
+</div>
+
+
+<div>
+
+<label>止損 %</label>
+
+<input
+id="stop"
+type="text"
+inputmode="decimal"
+value="3"
+>
+
+</div>
+
+
+<div>
+
+<label>突破 %</label>
+
+<input
+id="breakout"
+type="text"
+inputmode="decimal"
+value="2"
+>
+
+</div>
+
+
+<div>
+
+<label>跌破注意 %</label>
+
+<input
+id="breakdown"
+type="text"
+inputmode="decimal"
+value="2"
+>
+
+</div>
+
+
+<div>
+
+<label>目標本益比</label>
+
+<input
+id="pe"
+type="text"
+inputmode="decimal"
+value="15"
+>
+
+</div>
+
+
+</div>
+
+
+<div
+style="margin-top:14px"
+>
+
+<button
+class="gray"
+type="button"
+onclick="clearCost()"
+>
+清除成本
+</button>
+
+</div>
+
+
+<div
+id="levels"
+class="resultGrid"
+>
+</div>
+
+</div>
+
+
+<!-- =========================
+     外資融資成本
+========================= -->
+
+<div class="card">
+
+<h2>🌍 籌碼</h2>
 
 
 <div class="grid">
 
 <div>
 
-<label>止盈</label>
+<label>外資成本</label>
 
 <input
-  id="take"
-  type="number"
-  step="0.01"
-  placeholder="例如：65">
+id="foreignCost"
+type="text"
+inputmode="decimal"
+placeholder="例如 36.50"
+>
 
 </div>
 
 
 <div>
 
-<label>止損</label>
+<label>融資成本</label>
 
 <input
-  id="stop"
-  type="number"
-  step="0.01"
-  placeholder="例如：58">
+id="marginCost"
+type="text"
+inputmode="decimal"
+placeholder="例如 37.20"
+>
 
 </div>
 
-
-<div>
-
-<label>突破</label>
-
-<input
-  id="breakout"
-  type="number"
-  step="0.01"
-  placeholder="例如：63">
-
-</div>
-
-
-<div>
-
-<label>跌破注意</label>
-
-<input
-  id="breakdown"
-  type="number"
-  step="0.01"
-  placeholder="例如：59">
-
-</div>
 
 </div>
 
 </div>
 
 
-<!-- 營收 -->
+<!-- =========================
+     營收飆漲
+========================= -->
 
 <div class="card">
 
@@ -362,102 +573,117 @@ button.red{
 
 <div>
 
-<label>營收目標價</label>
+<label>目標價</label>
 
 <input
-  id="revenue"
-  type="number"
-  step="0.01"
-  placeholder="例如：70">
+id="targetPrice"
+type="text"
+inputmode="decimal"
+placeholder="例如 48"
+>
 
 </div>
 
 
 <div>
 
-<label>本益比倍數</label>
+<label>倍數</label>
 
 <input
-  id="pe"
-  type="number"
-  step="0.1"
-  placeholder="例如：15">
+id="multiple"
+type="text"
+inputmode="decimal"
+placeholder="例如 1.2"
+>
 
 </div>
 
 </div>
 
-
-<label>
-外資（張）
-</label>
-
-<input
-  id="foreign"
-  type="number"
-  placeholder="買超＋／賣超－">
+</div>
 
 
-<label>
-融資（張）
-</label>
+<!-- =========================
+     開始計算
+========================= -->
 
-<input
-  id="margin"
-  type="number"
-  placeholder="增加＋／減少－">
-
+<div class="card">
 
 <button
-  id="calcBtn"
-  type="button">
-
+class="purple"
+type="button"
+onclick="calculate()"
+>
 🎯 開始計算
-
 </button>
 
 
 <div
-  id="status"
-  class="status">
-
-請填好資料後按「開始計算」
-
-</div>
-
-</div>
-
-
-<!-- 結果 -->
-
-<div class="card">
-
-<h2>📌 計算結果</h2>
-
-<div
-  id="result"
-  class="result">
-
-<div class="empty">
+id="result"
+class="status"
+>
 尚未計算
 </div>
 
 </div>
 
-</div>
 
+<!-- =========================
+     我的股票
+========================= -->
 
 <div class="card">
 
-<div class="small">
+<h2>💾 我的股票</h2>
 
-📌 這個版本先以你輸入的數字計算。<br><br>
 
-💾 儲存資料會留在這台手機的瀏覽器。<br><br>
+<div
+class="grid"
+>
 
-🚀 突破、跌破注意、止盈、止損都是你自己設定的價格。
+<button
+class="black"
+type="button"
+onclick="saveStock()"
+>
+＋ 儲存目前股票
+</button>
+
+
+<button
+class="red"
+type="button"
+onclick="clearStocks()"
+>
+🗑 清除股票
+</button>
 
 </div>
+
+
+<div
+id="savedStocks"
+style="margin-top:15px"
+>
+尚未儲存股票
+</div>
+
+</div>
+
+
+<!-- =========================
+     說明
+========================= -->
+
+<div class="card small">
+
+📌 成本價由你自己輸入。<br>
+
+📌 儲存股票會保存在目前手機瀏覽器。<br>
+
+📌 清除股票只會清除已儲存的股票，不會清除成本設定。<br>
+
+📌 關卡為程式計算參考，不代表投資建議。
 
 </div>
 
@@ -467,68 +693,47 @@ button.red{
 
 <script>
 
-(function(){
+
+/* =========================
+   股票名稱
+========================= */
+
+const stockNames = {
+
+  "2330":"台積電",
+  "1326":"台化",
+  "2303":"聯電",
+  "2618":"長榮航",
+  "2367":"燿華",
+  "2313":"華通",
+  "3491":"昇達科",
+  "3481":"群創",
+  "8046":"南電",
+  "2308":"台達電",
+  "3711":"日月光"
+
+};
 
 
 /* =========================
-   工具
+   中文名稱轉代號
 ========================= */
 
-function $(id){
+const stockCodes = {
 
-  return document.getElementById(id);
+  "台積電":"2330",
+  "台化":"1326",
+  "聯電":"2303",
+  "長榮航":"2618",
+  "燿華":"2367",
+  "華通":"2313",
+  "昇達科":"3491",
+  "群創":"3481",
+  "南電":"8046",
+  "台達電":"2308",
+  "日月光":"3711"
 
-}
-
-
-function number(id){
-
-  var value =
-    parseFloat($(id).value);
-
-  if(isNaN(value)){
-
-    return null;
-
-  }
-
-  return value;
-
-}
-
-
-function money(value){
-
-  if(
-    value === null ||
-    value === undefined
-  ){
-
-    return "—";
-
-  }
-
-  return value.toLocaleString(
-    "zh-TW",
-    {
-      minimumFractionDigits:2,
-      maximumFractionDigits:2
-    }
-  );
-
-}
-
-
-function escapeHTML(value){
-
-  return String(value || "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#39;");
-
-}
+};
 
 
 /* =========================
@@ -537,320 +742,428 @@ function escapeHTML(value){
 
 function today(){
 
-  var d =
+  const d =
     new Date();
 
-  return (
-    d.getFullYear() +
-    "-" +
+  const y =
+    d.getFullYear();
+
+  const m =
     String(
       d.getMonth()+1
-    ).padStart(2,"0") +
-    "-" +
+    ).padStart(2,"0");
+
+  const day =
     String(
       d.getDate()
-    ).padStart(2,"0")
-  );
+    ).padStart(2,"0");
+
+  return y+"年"+m+"月"+day+"日";
 
 }
 
+document
+  .getElementById("date")
+  .value =
+  today();
 
-$("date").value =
+
+document
+  .getElementById("showDate")
+  .innerText =
   today();
 
 
 /* =========================
-   計算
+   數字
+========================= */
+
+function num(id){
+
+  const el =
+    document.getElementById(id);
+
+  if(!el){
+    return null;
+  }
+
+  const value =
+    el.value
+      .trim()
+      .replace(/,/g,"");
+
+  if(value === ""){
+    return null;
+  }
+
+  const n =
+    Number(value);
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+
+}
+
+
+/* =========================
+   金額
+========================= */
+
+function money(v){
+
+  if(
+    v === null ||
+    v === undefined ||
+    !Number.isFinite(Number(v))
+  ){
+
+    return "--";
+
+  }
+
+  return Number(v).toFixed(2);
+
+}
+
+
+/* =========================
+   查詢股票
+========================= */
+
+function searchStock(){
+
+  let code =
+    document
+      .getElementById("code")
+      .value
+      .trim();
+
+
+  const nameInput =
+    document
+      .getElementById("nameInput");
+
+
+  /*
+    輸入中文名稱
+  */
+
+  if(stockCodes[code]){
+
+    code =
+      stockCodes[code];
+
+    document
+      .getElementById("code")
+      .value =
+      code;
+
+  }
+
+
+  /*
+    沒輸入代號，
+    嘗試從股票名稱找
+  */
+
+  if(!code){
+
+    const name =
+      nameInput
+        .value
+        .trim();
+
+    if(stockCodes[name]){
+
+      code =
+        stockCodes[name];
+
+      document
+        .getElementById("code")
+        .value =
+        code;
+
+    }
+
+  }
+
+
+  if(!code){
+
+    document
+      .getElementById("status")
+      .innerText =
+      "⚠️ 請輸入股票代號或名稱";
+
+    return;
+
+  }
+
+
+  /*
+    已知股票
+  */
+
+  if(stockNames[code]){
+
+    const name =
+      stockNames[code];
+
+    nameInput.value =
+      name;
+
+    document
+      .getElementById("showName")
+      .innerText =
+      name;
+
+    document
+      .getElementById("showCode")
+      .innerText =
+      code;
+
+    document
+      .getElementById("showDate")
+      .innerText =
+      today();
+
+    document
+      .getElementById("status")
+      .innerText =
+      "✅ 已找到 "+
+      name+
+      "（"+
+      code+
+      "）";
+
+    return;
+
+  }
+
+
+  /*
+    不在清單
+  */
+
+  document
+    .getElementById("showName")
+    .innerText =
+    "--";
+
+  document
+    .getElementById("showCode")
+    .innerText =
+    code;
+
+  document
+    .getElementById("status")
+    .innerText =
+    "⚠️ 目前只有股票名稱顯示，請自行輸入現價";
+
+}
+
+
+/* =========================
+   成本計算
 ========================= */
 
 function calculate(){
 
-  var price =
-    number("price");
-
-  var cost =
-    number("cost");
-
-  var take =
-    number("take");
-
-  var stop =
-    number("stop");
-
-  var breakout =
-    number("breakout");
-
-  var breakdown =
-    number("breakdown");
-
-  var revenue =
-    number("revenue");
-
-  var pe =
-    number("pe");
-
-  var foreign =
-    number("foreign");
-
-  var margin =
-    number("margin");
+  const cost =
+    num("cost");
 
 
-  var html = "";
+  if(cost === null){
 
+    document
+      .getElementById("levels")
+      .innerHTML =
+      `
+      <div class="result">
+        <span>⚠️ 提示</span>
+        <strong>請先輸入成本價</strong>
+      </div>
+      `;
 
-  html += row(
-    "📌 股票",
-    escapeHTML(
-      $("name").value ||
-      "未填"
-    ) +
-    " " +
-    escapeHTML(
-      $("code").value
-    )
-  );
+    document
+      .getElementById("result")
+      .innerText =
+      "請先輸入成本價";
 
-
-  html += row(
-    "📅 填寫日期",
-    escapeHTML(
-      $("date").value
-    )
-  );
-
-
-  html += row(
-    "💰 現價",
-    '<span class="bluetxt">' +
-    money(price) +
-    "</span>"
-  );
-
-
-  html += row(
-    "🏦 外資／融資成本",
-    money(cost)
-  );
-
-
-  html += row(
-    "💰 止盈",
-    '<span class="orange">' +
-    money(take) +
-    "</span>"
-  );
-
-
-  html += row(
-    "🛑 止損",
-    '<span class="redtxt">' +
-    money(stop) +
-    "</span>"
-  );
-
-
-  html += row(
-    "🚀 突破",
-    '<span class="green">' +
-    money(breakout) +
-    "</span>"
-  );
-
-
-  html += row(
-    "⚠️ 跌破注意",
-    '<span class="redtxt">' +
-    money(breakdown) +
-    "</span>"
-  );
-
-
-  html += row(
-    "🌍 外資",
-    money(foreign) +
-    " 張"
-  );
-
-
-  html += row(
-    "💳 融資",
-    money(margin) +
-    " 張"
-  );
-
-
-  html += row(
-    "🎯 營收目標價",
-    '<span class="orange">' +
-    money(revenue) +
-    "</span>"
-  );
-
-
-  html += row(
-    "📊 本益比倍數",
-    money(pe) +
-    " 倍"
-  );
-
-
-  /* 突破判斷 */
-
-  if(
-    price !== null &&
-    breakout !== null
-  ){
-
-    if(price >= breakout){
-
-      html += row(
-        "🔎 突破狀態",
-        '<span class="green">🚀 已突破</span>'
-      );
-
-    }else{
-
-      html += row(
-        "🔎 突破狀態",
-        "尚未突破"
-      );
-
-    }
+    return;
 
   }
 
 
-  /* 跌破判斷 */
+  const take =
+    num("take") ?? 6;
 
-  if(
-    price !== null &&
-    breakdown !== null
-  ){
+  const stop =
+    num("stop") ?? 3;
 
-    if(price <= breakdown){
+  const breakout =
+    num("breakout") ?? 2;
 
-      html += row(
-        "⚠️ 跌破狀態",
-        '<span class="redtxt">🔴 已跌破注意</span>'
-      );
-
-    }else{
-
-      html += row(
-        "⚠️ 跌破狀態",
-        "尚未跌破"
-      );
-
-    }
-
-  }
+  const breakdown =
+    num("breakdown") ?? 2;
 
 
-  $("result").innerHTML =
-    html;
+  /*
+    第一止盈
+  */
+
+  const takePrice =
+    cost *
+    (1 + take/100);
 
 
-  $("status").innerHTML =
-    "✅ 計算完成";
+  /*
+    止損
+  */
 
-}
+  const stopPrice =
+    cost *
+    (1 - stop/100);
 
 
-/* =========================
-   結果列
-========================= */
+  /*
+    突破
+  */
 
-function row(
-  title,
-  value
-){
+  const breakoutPrice =
+    cost *
+    (1 + breakout/100);
 
-  return `
-    <div class="row">
-      <span>${title}</span>
-      <span>${value}</span>
+
+  /*
+    跌破
+  */
+
+  const breakdownPrice =
+    cost *
+    (1 - breakdown/100);
+
+
+  document
+    .getElementById("levels")
+    .innerHTML =
+
+    `
+    <div class="result green">
+      <span>🥕 第一止盈</span>
+      <strong>
+        ${money(takePrice)}
+      </strong>
     </div>
-  `;
+
+    <div class="result redbox">
+      <span>🛑 止損</span>
+      <strong>
+        ${money(stopPrice)}
+      </strong>
+    </div>
+
+    <div class="result blue">
+      <span>🚀 突破確認</span>
+      <strong>
+        ${money(breakoutPrice)}
+      </strong>
+    </div>
+
+    <div class="result gold">
+      <span>⚠️ 跌破注意</span>
+      <strong>
+        ${money(breakdownPrice)}
+      </strong>
+    </div>
+    `;
+
+
+  /* =========================
+     其他估值
+  ========================= */
+
+  const foreign =
+    num("foreignCost");
+
+  const margin =
+    num("marginCost");
+
+  const target =
+    num("targetPrice");
+
+  const multiple =
+    num("multiple");
+
+  let text =
+    "計算完成";
+
+
+  if(foreign !== null){
+
+    text +=
+      "｜外資成本："+
+      money(foreign);
+
+  }
+
+
+  if(margin !== null){
+
+    text +=
+      "｜融資成本："+
+      money(margin);
+
+  }
+
+
+  if(target !== null){
+
+    text +=
+      "｜營收目標價："+
+      money(target);
+
+  }
+
+
+  if(multiple !== null){
+
+    text +=
+      "｜倍數："+
+      multiple+"倍";
+
+  }
+
+
+  document
+    .getElementById("result")
+    .innerText =
+    text;
 
 }
 
 
 /* =========================
-   儲存
+   清除成本
 ========================= */
 
-var saved = [];
+function clearCost(){
 
-try{
+  document
+    .getElementById("cost")
+    .value =
+    "";
 
-  saved =
-    JSON.parse(
-      localStorage.getItem(
-        "myStockCards"
-      ) || "[]"
-    );
+  document
+    .getElementById("levels")
+    .innerHTML =
+    "";
 
-}catch(error){
-
-  saved = [];
-
-}
-
-
-var fields = [
-
-  "code",
-  "name",
-  "date",
-  "price",
-  "cost",
-  "take",
-  "stop",
-  "breakout",
-  "breakdown",
-  "revenue",
-  "pe",
-  "foreign",
-  "margin"
-
-];
-
-
-function getData(){
-
-  var data = {
-
-    id:
-      Date.now()
-
-  };
-
-
-  fields.forEach(
-    function(id){
-
-      if(
-        id === "code" ||
-        id === "name" ||
-        id === "date"
-      ){
-
-        data[id] =
-          $(id).value;
-
-      }else{
-
-        data[id] =
-          number(id);
-
-      }
-
-    }
-  );
-
-
-  return data;
+  document
+    .getElementById("result")
+    .innerText =
+    "成本已清除";
 
 }
 
@@ -861,310 +1174,366 @@ function getData(){
 
 function saveStock(){
 
-  if(
-    !$("code").value.trim() &&
-    !$("name").value.trim()
-  ){
+  const code =
+    document
+      .getElementById("code")
+      .value
+      .trim();
 
-    $("status").innerHTML =
-      "⚠️ 請先輸入股票代號或名稱";
-
-    return;
-
-  }
-
-
-  saved.unshift(
-    getData()
-  );
+  const name =
+    document
+      .getElementById("nameInput")
+      .value
+      .trim();
 
 
-  localStorage.setItem(
-    "myStockCards",
-    JSON.stringify(saved)
-  );
+  if(!code && !name){
 
-
-  renderSaved();
-
-
-  calculate();
-
-
-  $("status").innerHTML =
-    "✅ 已儲存目前股票";
-
-}
-
-
-/* =========================
-   載入
-========================= */
-
-function loadStock(id){
-
-  var stock =
-    saved.find(
-      function(item){
-
-        return item.id === id;
-
-      }
+    alert(
+      "請先輸入股票代號或名稱"
     );
 
-
-  if(!stock){
-
     return;
 
   }
 
 
-  fields.forEach(
-    function(id){
-
-      $(id).value =
-        stock[id] ??
-        "";
-
-    }
-  );
-
-
-  calculate();
-
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-
-}
-
-
-/* =========================
-   刪除
-========================= */
-
-function deleteStock(id){
-
-  saved =
-    saved.filter(
-      function(item){
-
-        return item.id !== id;
-
-      }
-    );
-
-
-  localStorage.setItem(
-    "myStockCards",
-    JSON.stringify(saved)
-  );
-
-
-  renderSaved();
-
-}
-
-
-/* =========================
-   顯示儲存股票
-========================= */
-
-function renderSaved(){
-
-  var box =
-    $("saved");
-
-
-  if(
-    saved.length === 0
-  ){
-
-    box.innerHTML =
-      '<div class="empty">目前沒有儲存股票</div>';
-
-    return;
-
-  }
-
-
-  var html = "";
-
-
-  saved.forEach(
-    function(stock){
-
-      html += `
-
-        <div class="saved">
-
-          <div>
-
-            <span class="badge">
-
-              ${
-                escapeHTML(
-                  stock.code ||
-                  "無代號"
-                )
-              }
-
-            </span>
-
-            <b>
-
-              ${
-                escapeHTML(
-                  stock.name ||
-                  "未命名"
-                )
-              }
-
-            </b>
-
-          </div>
-
-
-          <div class="row">
-
-            <span>現價</span>
-
-            <span class="bluetxt">
-
-              ${money(stock.price)}
-
-            </span>
-
-          </div>
-
-
-          <div class="row">
-
-            <span>
-              止盈／止損
-            </span>
-
-            <span>
-
-              ${money(stock.take)}
-              ／
-              ${money(stock.stop)}
-
-            </span>
-
-          </div>
-
-
-          <div class="row">
-
-            <span>
-              突破／跌破注意
-            </span>
-
-            <span>
-
-              ${money(stock.breakout)}
-              ／
-              ${money(stock.breakdown)}
-
-            </span>
-
-          </div>
-
-
-          <button
-            class="gray"
-            type="button"
-            onclick="
-              loadStock(${stock.id})
-            ">
-
-            ✏️ 載入修改
-
-          </button>
-
-
-          <button
-            class="red"
-            type="button"
-            onclick="
-              deleteStock(${stock.id})
-            ">
-
-            🗑 刪除
-
-          </button>
-
-        </div>
-
-      `;
-
-    }
-  );
-
-
-  box.innerHTML =
-    html;
-
-}
-
-
-/* =========================
-   按鈕
-========================= */
-
-$("calcBtn").onclick =
-  calculate;
-
-
-$("saveBtn").onclick =
-  saveStock;
-
-
-$("clearBtn").onclick =
-  function(){
-
-    if(
-      saved.length === 0
-    ){
-
-      return;
-
-    }
-
-
-    if(
-      confirm(
-        "確定要清除全部股票嗎？"
-      )
-    ){
-
-      saved = [];
-
-
-      localStorage.removeItem(
-        "myStockCards"
-      );
-
-
-      renderSaved();
-
-    }
+  const stock = {
+
+    code:
+      code || "",
+
+    name:
+      name ||
+      stockNames[code] ||
+      "",
+
+    cost:
+      document
+        .getElementById("cost")
+        .value,
+
+    price:
+      document
+        .getElementById("price")
+        .value
 
   };
 
 
+  let stocks =
+    JSON.parse(
+      localStorage.getItem(
+        "myStocks"
+      ) || "[]"
+    );
+
+
+  /*
+    避免重複
+  */
+
+  stocks =
+    stocks.filter(
+      item =>
+        item.code !== stock.code
+    );
+
+
+  stocks.push(stock);
+
+
+  localStorage.setItem(
+    "myStocks",
+    JSON.stringify(stocks)
+  );
+
+
+  showSavedStocks();
+
+}
+
+
 /* =========================
-   初始化
+   顯示股票
 ========================= */
 
-renderSaved();
+function showSavedStocks(){
+
+  const box =
+    document
+      .getElementById("savedStocks");
 
 
-})();
+  const stocks =
+    JSON.parse(
+      localStorage.getItem(
+        "myStocks"
+      ) || "[]"
+    );
+
+
+  if(stocks.length === 0){
+
+    box.innerHTML =
+      "尚未儲存股票";
+
+    return;
+
+  }
+
+
+  box.innerHTML =
+    stocks
+      .map(
+        function(stock,index){
+
+          return `
+
+          <div class="savedItem">
+
+            <div>
+
+              <div class="savedName">
+                📌 ${stock.name || "股票"}
+              </div>
+
+              <div class="savedCode">
+                ${stock.code}
+                ${
+                  stock.cost
+                  ? "｜成本 "+stock.cost
+                  : ""
+                }
+              </div>
+
+            </div>
+
+            <button
+              class="gray"
+              style="width:auto;min-width:80px"
+              onclick="loadStock(${index})"
+            >
+              載入
+            </button>
+
+          </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+
+/* =========================
+   載入股票
+========================= */
+
+function loadStock(index){
+
+  const stocks =
+    JSON.parse(
+      localStorage.getItem(
+        "myStocks"
+      ) || "[]"
+    );
+
+
+  const stock =
+    stocks[index];
+
+
+  if(!stock){
+    return;
+  }
+
+
+  document
+    .getElementById("code")
+    .value =
+    stock.code || "";
+
+
+  document
+    .getElementById("nameInput")
+    .value =
+    stock.name || "";
+
+
+  document
+    .getElementById("cost")
+    .value =
+    stock.cost || "";
+
+
+  document
+    .getElementById("price")
+    .value =
+    stock.price || "";
+
+
+  searchStock();
+
+
+  const p =
+    num("price");
+
+
+  if(p !== null){
+
+    document
+      .getElementById("showPrice")
+      .innerText =
+      money(p);
+
+  }
+
+
+  calculate();
+
+}
+
+
+/* =========================
+   清除全部股票
+========================= */
+
+function clearStocks(){
+
+  const stocks =
+    JSON.parse(
+      localStorage.getItem(
+        "myStocks"
+      ) || "[]"
+    );
+
+
+  if(stocks.length === 0){
+
+    return;
+
+  }
+
+
+  if(
+    !confirm(
+      "確定要清除所有已儲存股票嗎？"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  localStorage.removeItem(
+    "myStocks"
+  );
+
+
+  showSavedStocks();
+
+}
+
+
+/* =========================
+   現價輸入後同步
+========================= */
+
+document
+  .getElementById("price")
+  .addEventListener(
+    "input",
+    function(){
+
+      const value =
+        this.value.trim();
+
+      document
+        .getElementById("showPrice")
+        .innerText =
+        value
+        ? value
+        : "--";
+
+    }
+  );
+
+
+/* =========================
+   自動計算
+========================= */
+
+[
+  "cost",
+  "take",
+  "stop",
+  "breakout",
+  "breakdown",
+  "pe",
+  "foreignCost",
+  "marginCost",
+  "targetPrice",
+  "multiple"
+]
+.forEach(
+  function(id){
+
+    const el =
+      document.getElementById(id);
+
+    if(!el){
+      return;
+    }
+
+    el.addEventListener(
+      "input",
+      calculate
+    );
+
+  }
+);
+
+
+/* =========================
+   Enter 查詢
+========================= */
+
+document
+  .getElementById("code")
+  .addEventListener(
+    "keydown",
+    function(e){
+
+      if(e.key === "Enter"){
+
+        searchStock();
+
+      }
+
+    }
+  );
+
+
+/* =========================
+   一開始顯示日期
+========================= */
+
+document
+  .getElementById("date")
+  .value =
+  today();
+
+
+/* =========================
+   顯示已儲存股票
+========================= */
+
+showSavedStocks();
+
 </script>
 
 </body>
