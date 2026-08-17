@@ -1,34 +1,64 @@
-const HTML = `<!doctype html>
+from pathlib import Path
+
+# Build a corrected Cloudflare Worker from the user's pasted code.
+# Key fixes:
+# 1) Inputs are explicitly editable on iPhone/iPad.
+# 2) Number fields use inputmode="decimal" + text, avoiding iOS number-input quirks.
+# 3) All calculation fields have clear/editable styling.
+# 4) Search endpoint remains /api/quote for Worker deployment.
+# 5) Adds a "清除成本" button so auto-filled cost can be replaced easily.
+# 6) Prevents calculate() from overwriting a manually entered cost.
+
+worker = r'''const HTML = `<!doctype html>
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>📈 股票關卡計算機 V4</title>
+<title>📈 股票關卡計算機 V5</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f3f5f8;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;color:#111}
-.wrap{max-width:720px;margin:auto;padding:18px}.title{text-align:center;font-size:30px;font-weight:900;margin:12px 0 4px}.sub{text-align:center;color:#666;margin-bottom:18px}
+*{box-sizing:border-box}
+body{margin:0;background:#f3f5f8;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif;color:#111}
+.wrap{max-width:720px;margin:auto;padding:18px}
+.title{text-align:center;font-size:30px;font-weight:900;margin:12px 0 4px}
+.sub{text-align:center;color:#666;margin-bottom:18px}
 .card{background:#fff;border-radius:22px;padding:18px;margin:14px 0;box-shadow:0 5px 20px #0000000d}
-label{display:block;font-weight:800;margin:10px 0 6px}input{width:100%;padding:14px;border:1px solid #d7dbe0;border-radius:12px;font-size:18px;background:#fff}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:0;border-radius:14px;padding:15px;font-size:18px;font-weight:900;cursor:pointer}.primary{background:#222;color:#fff}.secondary{background:#eef1f5}.danger{background:#ffe8e8;color:#c00}
-.status{padding:14px;border-radius:14px;background:#f5f5f5;margin-top:12px;font-weight:800}.ok{color:#087a35}.err{color:#c22}
-.quote{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.q{background:#f6f7f9;padding:12px;border-radius:12px}.q b{display:block;font-size:19px;margin-top:4px}
-.levels{display:grid;grid-template-columns:1fr 1fr;gap:10px}.level{padding:14px;border-radius:14px;background:#f7f7f7}.level strong{display:block;font-size:23px;margin-top:5px}
+label{display:block;font-weight:800;margin:10px 0 6px}
+input{
+ width:100%;padding:14px;border:2px solid #d7dbe0;border-radius:12px;
+ font-size:18px;background:#fff;color:#111;outline:none;
+ -webkit-user-select:text;user-select:text;-webkit-appearance:none;
+ touch-action:manipulation;pointer-events:auto;
+}
+input:focus{border-color:#222;background:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{border:0;border-radius:14px;padding:15px;font-size:18px;font-weight:900;cursor:pointer;touch-action:manipulation}
+.primary{background:#222;color:#fff}.secondary{background:#eef1f5}.danger{background:#ffe8e8;color:#c00}
+.status{padding:14px;border-radius:14px;background:#f5f5f5;margin-top:12px;font-weight:800}
+.ok{color:#087a35}.err{color:#c22}
+.quote{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.q{background:#f6f7f9;padding:12px;border-radius:12px}.q b{display:block;font-size:19px;margin-top:4px}
+.levels{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.level{padding:14px;border-radius:14px;background:#f7f7f7}.level strong{display:block;font-size:23px;margin-top:5px}
 .green{background:#e9f8ef}.red{background:#fff0f0}.gold{background:#fff7dc}.blue{background:#edf5ff}
 .small{font-size:13px;color:#777;line-height:1.5}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}
 .stock{display:flex;gap:8px}.stock input{flex:1}.stock button{width:110px}
-ul{padding-left:20px}.saved{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}.saved:last-child{border-bottom:0}
+.editbox{background:#fafafa;border:2px dashed #ddd;border-radius:18px;padding:12px}
+.editbox h3{margin:4px 0 8px}
+.hint{font-size:13px;color:#666;margin:6px 0 12px}
+.saved{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
+.saved:last-child{border-bottom:0}
 @media(max-width:520px){.quote{grid-template-columns:1fr 1fr}.levels{grid-template-columns:1fr}.title{font-size:26px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<div class="title">📈 股票關卡計算機 V4</div>
+<div class="title">📈 股票關卡計算機 V5</div>
 <div class="sub">即時行情・5秒更新・仙兔關卡・成本計算</div>
 
 <div class="card">
 <label>🔎 股票代號／名稱</label>
 <div class="stock">
-<input id="code" value="2330" placeholder="例如 2330、台化、聯電">
+<input id="code" value="2330" placeholder="例如 2330、台化、聯電" autocomplete="off">
 <button class="btn primary" onclick="query()">查詢</button>
 </div>
 <div id="status" class="status">尚未查詢</div>
@@ -50,27 +80,33 @@ ul{padding-left:20px}.saved{display:flex;justify-content:space-between;align-ite
 
 <div class="card">
 <h2>🐰 仙兔關卡</h2>
+<div class="hint">👇 以下白色框框都可以直接點擊輸入數字</div>
+<div class="editbox">
 <div class="grid">
-<div><label>成本價</label><input id="cost" type="number" step="0.01" placeholder="例如 36.30"></div>
-<div><label>止盈 %</label><input id="tp" type="number" step="0.1" value="6"></div>
-<div><label>止損 %</label><input id="sl" type="number" step="0.1" value="3"></div>
-<div><label>突破 %</label><input id="br" type="number" step="0.1" value="2"></div>
-<div><label>跌破注意 %</label><input id="bd" type="number" step="0.1" value="2"></div>
-<div><label>目標本益比</label><input id="pe" type="number" step="0.1" value="15"></div>
+<div><label>成本價</label><input id="cost" type="text" inputmode="decimal" placeholder="例如 36.30" autocomplete="off"></div>
+<div><label>止盈 %</label><input id="tp" type="text" inputmode="decimal" value="6" autocomplete="off"></div>
+<div><label>止損 %</label><input id="sl" type="text" inputmode="decimal" value="3" autocomplete="off"></div>
+<div><label>突破 %</label><input id="br" type="text" inputmode="decimal" value="2" autocomplete="off"></div>
+<div><label>跌破注意 %</label><input id="bd" type="text" inputmode="decimal" value="2" autocomplete="off"></div>
+<div><label>目標本益比</label><input id="pe" type="text" inputmode="decimal" value="15" autocomplete="off"></div>
 </div>
-<button class="btn primary" style="width:100%;margin-top:12px" onclick="calculate()">🎯 開始計算</button>
+<div class="row" style="margin-top:10px">
+<button class="btn secondary" onclick="clearCost()">清除成本</button>
+<button class="btn primary" onclick="calculate()">🎯 開始計算</button>
+</div>
+</div>
 <div id="levels" class="levels" style="margin-top:12px"></div>
 </div>
 
 <div class="card">
 <h2>🌍 籌碼／估值</h2>
 <div class="grid">
-<div><label>外資（張）</label><input id="foreign" type="number" placeholder="可手動輸入"></div>
-<div><label>融資（張）</label><input id="margin" type="number" placeholder="可手動輸入"></div>
-<div><label>預估EPS</label><input id="eps" type="number" step="0.01" placeholder="例如 12"></div>
-<div><label>營收目標價（手動）</label><input id="revTarget" type="number" step="0.01" placeholder="例如 48"></div>
+<div><label>外資（張）</label><input id="foreign" type="text" inputmode="numeric" placeholder="可手動輸入"></div>
+<div><label>融資（張）</label><input id="margin" type="text" inputmode="numeric" placeholder="可手動輸入"></div>
+<div><label>預估 EPS</label><input id="eps" type="text" inputmode="decimal" placeholder="例如 12"></div>
+<div><label>營收目標價</label><input id="revTarget" type="text" inputmode="decimal" placeholder="例如 48"></div>
 </div>
-<div id="valuation" class="status" style="margin-top:12px">尚未計算</div>
+<div id="valuation" class="status">尚未計算</div>
 </div>
 
 <div class="card">
@@ -85,61 +121,103 @@ ul{padding-left:20px}.saved{display:flex;justify-content:space-between;align-ite
 <div class="card small">
 📡 資料來源：台灣證券交易所 MIS 即時行情。<br>
 🔄 查詢後每 5 秒自動更新。<br>
-⚠️ 本版本把前端與 Worker 放在一起，不需要 GitHub Pages 再另外設定 CORS。<br>
-📌 關卡為計算參考，不代表投資建議。
+📌 關卡為程式計算參考，不代表投資建議。
 </div>
 </div>
 
 <script>
-let current=null, timer=null;
+let current=null,timer=null;
 const $=id=>document.getElementById(id);
-function n(v){const x=Number(v);return Number.isFinite(x)?x:null}
-function fmt(v){return v==null||v===''||v==='-'?'--':Number(v).toFixed(2)}
-function setStatus(t,ok=false){$('status').textContent=t;$('status').className='status '+(ok?'ok':'err')}
+
+function num(id){
+ const raw=$(id).value.trim().replace(/,/g,'');
+ if(raw==='')return null;
+ const x=Number(raw);
+ return Number.isFinite(x)?x:null;
+}
+function textNum(v){
+ if(v===null||v===undefined||v===''||v==='-')return '--';
+ const x=Number(v);return Number.isFinite(x)?x.toFixed(2):'--';
+}
+function setStatus(t,ok=false){
+ $('status').textContent=t;
+ $('status').className='status '+(ok?'ok':'err');
+}
+function clearCost(){
+ $('cost').value='';
+ $('cost').focus();
+}
 async function query(){
-  let q=$('code').value.trim();
-  if(!q){setStatus('請輸入股票代號或名稱');return}
-  setStatus('查詢中…',true);
-  try{
-    const r=await fetch('/api/quote?q='+encodeURIComponent(q),{cache:'no-store'});
-    const d=await r.json();
-    if(!r.ok||!d.ok) throw new Error(d.error||'找不到股票');
-    current=d.data; render(current); calculate();
-    setStatus('✅ 已連線：'+current.name+'（'+current.code+'）',true);
-    if(timer)clearInterval(timer); timer=setInterval(()=>refresh(),5000);
-  }catch(e){setStatus('❌ '+e.message)}
+ const q=$('code').value.trim();
+ if(!q){setStatus('請輸入股票代號或名稱');return}
+ setStatus('查詢中…',true);
+ try{
+  const r=await fetch('/api/quote?q='+encodeURIComponent(q),{cache:'no-store'});
+  const d=await r.json();
+  if(!r.ok||!d.ok)throw new Error(d.error||'找不到股票');
+  current=d.data;render(current);calculate();
+  setStatus('✅ 已連線：'+current.name+'（'+current.code+'）',true);
+  if(timer)clearInterval(timer);
+  timer=setInterval(refresh,5000);
+ }catch(e){setStatus('❌ '+e.message)}
 }
 async function refresh(){
  if(!current)return;
  try{
   const r=await fetch('/api/quote?q='+encodeURIComponent(current.code),{cache:'no-store'});
-  const d=await r.json(); if(d.ok){current=d.data;render(current);calculate()}
+  const d=await r.json();
+  if(d.ok){current=d.data;render(current);calculate()}
  }catch(e){}
 }
 function render(d){
- $('name').textContent=d.name||'--';$('symbol').textContent=d.code||'--';$('price').textContent=fmt(d.price);
- $('prev').textContent=fmt(d.prev);$('open').textContent=fmt(d.open);
- $('hl').textContent=fmt(d.high)+' / '+fmt(d.low);$('vol').textContent=d.volume?Number(d.volume).toLocaleString():'--';
- $('ba').textContent=fmt(d.bid1)+' / '+fmt(d.ask1);$('time').textContent=d.time||'--';
- if(!$('cost').value && d.price)$('cost').value=fmt(d.price);
+ $('name').textContent=d.name||'--';
+ $('symbol').textContent=d.code||'--';
+ $('price').textContent=textNum(d.price);
+ $('prev').textContent=textNum(d.prev);
+ $('open').textContent=textNum(d.open);
+ $('hl').textContent=textNum(d.high)+' / '+textNum(d.low);
+ $('vol').textContent=d.volume?Number(d.volume).toLocaleString():'--';
+ $('ba').textContent=textNum(d.bid1)+' / '+textNum(d.ask1);
+ $('time').textContent=d.time||'--';
+ // 只有成本欄目前為空時才自動帶入現價，絕不覆蓋使用者手動輸入
+ if(!$('cost').value && d.price)$('cost').value=Number(d.price).toFixed(2);
 }
 function calculate(){
- const p=n($('price').textContent), c=n($('cost').value);
- if(!p)return;
- const base=c||p,tp=n($('tp').value)||6,sl=n($('sl').value)||3,br=n($('br').value)||2,bd=n($('bd').value)||2;
- const take=base*(1+tp/100), stop=base*(1-sl/100), breakout=p*(1+br/100), breakdown=p*(1-bd/100);
+ const p=textToNumber($('price').textContent);
+ if(p===null){
+  $('levels').innerHTML='<div class="level">請先查詢股票</div>';
+  return;
+ }
+ const c=num('cost');
+ const base=c===null?p:c;
+ const tp=num('tp')??6,sl=num('sl')??3,br=num('br')??2,bd=num('bd')??2;
+ const take=base*(1+tp/100);
+ const stop=base*(1-sl/100);
+ const breakout=p*(1+br/100);
+ const breakdown=p*(1-bd/100);
  $('levels').innerHTML=
-  box('green','第一止盈',take)+box('red','止損',stop)+box('blue','突破確認',breakout)+box('gold','跌破注意',breakdown);
- const eps=n($('eps').value), pe=n($('pe').value), rt=n($('revTarget').value);
- let s='目前股價：'+fmt(p);
- if(c)s+='｜成本：'+fmt(c)+'｜損益：'+((p-c)/c*100).toFixed(2)+'%';
- if(eps&&pe)s+='｜PE估值：'+fmt(eps*pe);
- if(rt)s+='｜營收目標價：'+fmt(rt);
+  box('green','第一止盈',take)+
+  box('red','止損',stop)+
+  box('blue','突破確認',breakout)+
+  box('gold','跌破注意',breakdown);
+
+ const eps=num('eps'),pe=num('pe'),rt=num('revTarget');
+ let s='目前股價：'+textNum(p);
+ if(c!==null)s+='｜成本：'+textNum(c)+'｜損益：'+((p-c)/c*100).toFixed(2)+'%';
+ if(eps!==null&&pe!==null)s+='｜PE估值：'+textNum(eps*pe);
+ if(rt!==null)s+='｜營收目標價：'+textNum(rt);
  $('valuation').textContent=s;
 }
-function box(cls,t,v){return '<div class="level '+cls+'"><span>'+t+'</span><strong>'+fmt(v)+'</strong></div>'}
+function textToNumber(v){
+ if(v===null||v===undefined||v==='--'||v==='')return null;
+ const x=Number(String(v).replace(/,/g,''));
+ return Number.isFinite(x)?x:null;
+}
+function box(cls,t,v){
+ return '<div class="level '+cls+'"><span>'+t+'</span><strong>'+textNum(v)+'</strong></div>';
+}
 function saveStock(){
- const code=$('symbol').textContent, name=$('name').textContent;
+ const code=$('symbol').textContent,name=$('name').textContent;
  if(code==='--')return;
  const arr=JSON.parse(localStorage.getItem('stocks')||'[]');
  if(!arr.some(x=>x.code===code))arr.push({code,name});
@@ -147,60 +225,86 @@ function saveStock(){
 }
 function showSaved(){
  const arr=JSON.parse(localStorage.getItem('stocks')||'[]');
- $('saved').innerHTML=arr.length?arr.map(x=>'<div class="saved"><span>📌 '+x.code+' '+x.name+'</span><button class="btn secondary" onclick="loadStock(\\''+x.code+'\\')">查詢</button></div>').join(''):'尚未儲存股票';
+ $('saved').innerHTML=arr.length?arr.map(x=>
+  '<div class="saved"><span>📌 '+x.code+' '+x.name+
+  '</span><button class="btn secondary" onclick="loadStock(\\''+x.code+'\\')">查詢</button></div>'
+ ).join(''):'尚未儲存股票';
 }
 function loadStock(c){$('code').value=c;query()}
 function clearStocks(){localStorage.removeItem('stocks');showSaved()}
+
 showSaved();
 $('code').addEventListener('keydown',e=>{if(e.key==='Enter')query()});
+
+// 點擊欄位時強制取得焦點，方便 iPhone 操作
+document.querySelectorAll('input').forEach(el=>{
+ el.addEventListener('click',()=>el.focus());
+});
 </script>
-</body></html>`;
+</body>
+</html>`;
 
 async function fetchQuote(code, env) {
-  const clean = code.trim();
-  const nameMap = {
-    "台積電":"2330","台化":"1326","聯電":"2303","長榮航":"2618","燿華":"2367",
-    "華通":"2313","昇達科":"3491","群創":"3481","南電":"8046","台達電":"2308",
-    "日月光":"3711"
-  };
-  const symbol = nameMap[clean] || clean;
-  if (!/^[0-9A-Za-z.]{2,12}$/.test(symbol)) throw new Error("請輸入正確股票代號或支援的股票名稱");
-  const markets = ["tse","otc"];
-  for (const ex of markets) {
-    const url = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${ex}_${encodeURIComponent(symbol)}.tw&json=1&delay=0&_=${Date.now()}`;
-    try {
-      const res = await fetch(url, {headers: {"User-Agent":"Mozilla/5.0","Accept":"application/json"}});
-      if (!res.ok) continue;
-      const j = await res.json();
-      const x = j.msgArray && j.msgArray[0];
-      if (!x || x.c !== symbol) continue;
-      const first = s => { if (!s || s === "-") return null; const a=s.split("_").filter(v=>v && v!=="-"); return a.length?Number(a[0]):null };
-      const num = s => (s && s!=="-") ? Number(s) : null;
-      return {
-        code:x.c,name:x.n,price:num(x.z),prev:num(x.y),open:num(x.o),high:num(x.h),low:num(x.l),
-        volume:num(x.v),bid1:first(x.b),ask1:first(x.a),time:x.t||"--",exchange:x.ex
-      };
-    } catch(e) {}
-  }
-  throw new Error("查不到此股票，請確認代號；若是特殊商品可能不在即時行情範圍");
+ const clean=code.trim();
+ const nameMap={
+  "台積電":"2330","台化":"1326","聯電":"2303","長榮航":"2618","燿華":"2367",
+  "華通":"2313","昇達科":"3491","群創":"3481","南電":"8046","台達電":"2308","日月光":"3711"
+ };
+ const symbol=nameMap[clean]||clean;
+ if(!/^[0-9A-Za-z.]{2,12}$/.test(symbol))
+  throw new Error("請輸入正確股票代號或支援的股票名稱");
+
+ for(const ex of ["tse","otc"]){
+  const url=`https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${ex}_${encodeURIComponent(symbol)}.tw&json=1&delay=0&_=${Date.now()}`;
+  try{
+   const res=await fetch(url,{headers:{"User-Agent":"Mozilla/5.0","Accept":"application/json"}});
+   if(!res.ok)continue;
+   const j=await res.json(),x=j.msgArray&&j.msgArray[0];
+   if(!x||x.c!==symbol)continue;
+   const first=s=>{
+    if(!s||s==="-" )return null;
+    const a=s.split("_").filter(v=>v&&v!=="-");
+    return a.length?Number(a[0]):null;
+   };
+   const n=s=>(s&&s!=="-")?Number(s):null;
+   return {
+    code:x.c,name:x.n,price:n(x.z),prev:n(x.y),open:n(x.o),high:n(x.h),low:n(x.l),
+    volume:n(x.v),bid1:first(x.b),ask1:first(x.a),time:x.t||"--",exchange:x.ex
+   };
+  }catch(e){}
+ }
+ throw new Error("查不到此股票，請確認代號");
 }
 
 export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    if (url.pathname === "/api/quote") {
-      const q = url.searchParams.get("q") || "";
-      try {
-        const data = await fetchQuote(q, env);
-        return new Response(JSON.stringify({ok:true,data}), {
-          headers: {"content-type":"application/json;charset=UTF-8","cache-control":"no-store","access-control-allow-origin":"*"}
-        });
-      } catch(e) {
-        return new Response(JSON.stringify({ok:false,error:e.message}), {
-          status:400, headers: {"content-type":"application/json;charset=UTF-8","access-control-allow-origin":"*"}
-        });
-      }
-    }
-    return new Response(HTML, {headers: {"content-type":"text/html;charset=UTF-8","cache-control":"no-store"}});
+ async fetch(request,env){
+  const url=new URL(request.url);
+  if(url.pathname==="/api/quote"){
+   const q=url.searchParams.get("q")||"";
+   try{
+    const data=await fetchQuote(q,env);
+    return new Response(JSON.stringify({ok:true,data}),{
+     headers:{
+      "content-type":"application/json;charset=UTF-8",
+      "cache-control":"no-store",
+      "access-control-allow-origin":"*"
+     }
+    });
+   }catch(e){
+    return new Response(JSON.stringify({ok:false,error:e.message}),{
+     status:400,
+     headers:{
+      "content-type":"application/json;charset=UTF-8",
+      "access-control-allow-origin":"*"
+     }
+    });
+   }
   }
+  return new Response(HTML,{headers:{"content-type":"text/html;charset=UTF-8","cache-control":"no-store"}});
+ }
 };
+'''
+
+out = Path("/mnt/data/stock-level-calculator-V5-fixed-worker.js")
+out.write_text(worker, encoding="utf-8")
+print(out)
