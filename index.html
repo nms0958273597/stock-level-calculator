@@ -207,7 +207,792 @@ button{
 </head>
 
 <body>
+<script>
 
+const names = {
+  "2330":"台積電",
+  "1326":"台化",
+  "2303":"聯電",
+  "2618":"長榮航",
+  "2367":"燿華",
+  "2313":"華通",
+  "3491":"昇達科",
+  "3481":"群創",
+  "8046":"南電",
+  "2308":"台達電",
+  "3711":"日月光"
+};
+
+const aliases = {
+  "台積電":"2330",
+  "台化":"1326",
+  "聯電":"2303",
+  "長榮航":"2618",
+  "燿華":"2367",
+  "華通":"2313",
+  "昇達科":"3491",
+  "群創":"3481",
+  "南電":"8046",
+  "台達電":"2308",
+  "日月光":"3711"
+};
+
+let currentStock = null;
+let refreshTimer = null;
+
+
+/* =========================
+   數字處理
+========================= */
+
+function number(id){
+
+  const el = document.getElementById(id);
+
+  if(!el) return null;
+
+  const value =
+    el.value
+      .trim()
+      .replace(/,/g,"");
+
+  if(value === ""){
+    return null;
+  }
+
+  const n = Number(value);
+
+  return Number.isFinite(n) ? n : null;
+}
+
+
+function money(value){
+
+  if(
+    value === null ||
+    value === undefined ||
+    value === "" ||
+    value === "-"
+  ){
+    return "--";
+  }
+
+  const n = Number(value);
+
+  if(!Number.isFinite(n)){
+    return "--";
+  }
+
+  return n.toFixed(2);
+}
+
+
+/* =========================
+   證交所資料解析
+========================= */
+
+function firstValue(text){
+
+  if(
+    text === null ||
+    text === undefined ||
+    text === "" ||
+    text === "-"
+  ){
+    return null;
+  }
+
+  const arr =
+    String(text)
+      .split("_")
+      .filter(x => x !== "" && x !== "-");
+
+  if(arr.length === 0){
+    return null;
+  }
+
+  const n = Number(arr[0]);
+
+  return Number.isFinite(n) ? n : null;
+}
+
+
+function value(text){
+
+  if(
+    text === null ||
+    text === undefined ||
+    text === "" ||
+    text === "-"
+  ){
+    return null;
+  }
+
+  const n = Number(text);
+
+  return Number.isFinite(n) ? n : null;
+}
+
+
+/* =========================
+   查詢單一市場
+========================= */
+
+async function fetchMarket(exchange, code){
+
+  const url =
+    "https://mis.twse.com.tw/stock/api/getStockInfo.jsp" +
+    "?ex_ch=" +
+    exchange +
+    "_" +
+    encodeURIComponent(code) +
+    ".tw" +
+    "&json=1&delay=0&_=" +
+    Date.now();
+
+  const response =
+    await fetch(
+      url,
+      {
+        cache:"no-store"
+      }
+    );
+
+  if(!response.ok){
+    throw new Error("行情連線失敗");
+  }
+
+  const data =
+    await response.json();
+
+  if(
+    !data ||
+    !Array.isArray(data.msgArray) ||
+    data.msgArray.length === 0
+  ){
+    return null;
+  }
+
+  const x =
+    data.msgArray.find(
+      item => item.c === code
+    );
+
+  if(!x){
+    return null;
+  }
+
+  return {
+
+    code: x.c || code,
+
+    name: x.n || names[code] || "--",
+
+    price: value(x.z),
+
+    prev: value(x.y),
+
+    open: value(x.o),
+
+    high: value(x.h),
+
+    low: value(x.l),
+
+    volume: value(x.v),
+
+    bid1: firstValue(x.b),
+
+    ask1: firstValue(x.a),
+
+    time: x.t || "--",
+
+    exchange: exchange
+
+  };
+
+}
+
+
+/* =========================
+   查詢台股
+========================= */
+
+async function getStock(code){
+
+  const markets = [
+    "tse",
+    "otc"
+  ];
+
+  for(const market of markets){
+
+    try{
+
+      const result =
+        await fetchMarket(
+          market,
+          code
+        );
+
+      if(result){
+
+        return result;
+
+      }
+
+    }catch(error){
+
+      console.log(
+        market,
+        error
+      );
+
+    }
+
+  }
+
+  return null;
+
+}
+
+
+/* =========================
+   顯示行情
+========================= */
+
+function renderStock(data){
+
+  document
+    .getElementById("name")
+    .innerText =
+    data.name || "--";
+
+  document
+    .getElementById("symbol")
+    .innerText =
+    data.code || "--";
+
+  document
+    .getElementById("price")
+    .innerText =
+    money(data.price);
+
+  document
+    .getElementById("prev")
+    .innerText =
+    money(data.prev);
+
+  document
+    .getElementById("open")
+    .innerText =
+    money(data.open);
+
+  document
+    .getElementById("highlow")
+    .innerText =
+    money(data.high)
+    +
+    " / "
+    +
+    money(data.low);
+
+  document
+    .getElementById("volume")
+    .innerText =
+    data.volume === null
+      ? "--"
+      : Number(data.volume).toLocaleString();
+
+  document
+    .getElementById("bidask")
+    .innerText =
+    money(data.bid1)
+    +
+    " / "
+    +
+    money(data.ask1);
+
+  document
+    .getElementById("time")
+    .innerText =
+    data.time || "--";
+
+}
+
+
+/* =========================
+   查詢按鈕
+========================= */
+
+async function queryStock(){
+
+  let code =
+    document
+      .getElementById("code")
+      .value
+      .trim();
+
+
+  /* 如果輸入中文名稱 */
+
+  if(aliases[code]){
+
+    code =
+      aliases[code];
+
+    document
+      .getElementById("code")
+      .value =
+      code;
+
+  }
+
+
+  if(!code){
+
+    document
+      .getElementById("status")
+      .innerText =
+      "⚠️ 請輸入股票代號或名稱";
+
+    return;
+
+  }
+
+
+  if(!/^[0-9A-Za-z.]{2,12}$/.test(code)){
+
+    document
+      .getElementById("status")
+      .innerText =
+      "⚠️ 股票代號格式不正確";
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("status")
+    .innerText =
+    "🔄 查詢即時行情中…";
+
+
+  try{
+
+    const data =
+      await getStock(code);
+
+
+    if(!data){
+
+      document
+        .getElementById("status")
+        .innerText =
+        "❌ 找不到這支股票的即時行情";
+
+      return;
+
+    }
+
+
+    currentStock = data;
+
+
+    renderStock(data);
+
+
+    document
+      .getElementById("status")
+      .innerText =
+      "✅ 已連線："
+      +
+      data.name
+      +
+      "（"
+      +
+      data.code
+      +
+      "）";
+
+
+    /*
+      查詢後每 5 秒更新
+    */
+
+    if(refreshTimer){
+
+      clearInterval(
+        refreshTimer
+      );
+
+    }
+
+
+    refreshTimer =
+      setInterval(
+        refreshStock,
+        5000
+      );
+
+
+    /*
+      如果成本價已經有輸入，
+      查詢行情後自動重新計算
+    */
+
+    calculate();
+
+
+  }catch(error){
+
+    console.error(error);
+
+    document
+      .getElementById("status")
+      .innerText =
+      "❌ 即時行情連線失敗，請稍後再試";
+
+  }
+
+}
+
+
+/* =========================
+   每 5 秒更新
+========================= */
+
+async function refreshStock(){
+
+  if(!currentStock){
+    return;
+  }
+
+
+  try{
+
+    const data =
+      await getStock(
+        currentStock.code
+      );
+
+
+    if(!data){
+      return;
+    }
+
+
+    currentStock = data;
+
+    renderStock(data);
+
+    calculate();
+
+
+  }catch(error){
+
+    console.log(
+      "自動更新失敗",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================
+   仙兔關卡
+========================= */
+
+function calculate(){
+
+  /*
+    成本價：
+    使用者自己輸入
+  */
+
+  const cost =
+    number("cost");
+
+
+  /*
+    如果沒有成本價，
+    不自動亂填
+  */
+
+  if(cost === null){
+
+    document
+      .getElementById("levels")
+      .innerHTML =
+      `
+      <div class="level">
+        <span>⚠️ 提示</span>
+        <strong>請先輸入成本價</strong>
+      </div>
+      `;
+
+  }else{
+
+    const take =
+      number("take") ?? 6;
+
+    const stop =
+      number("stop") ?? 3;
+
+    const breakout =
+      number("breakout") ?? 2;
+
+    const breakdown =
+      number("breakdown") ?? 2;
+
+
+    /*
+      第一止盈、止損：
+      以成本價計算
+    */
+
+    const takePrice =
+      cost *
+      (1 + take / 100);
+
+    const stopPrice =
+      cost *
+      (1 - stop / 100);
+
+
+    /*
+      突破、跌破：
+      優先使用目前即時股價
+      沒行情時才使用成本價
+    */
+
+    let basePrice =
+      null;
+
+
+    if(
+      currentStock &&
+      currentStock.price !== null
+    ){
+
+      basePrice =
+        currentStock.price;
+
+    }else{
+
+      basePrice =
+        cost;
+
+    }
+
+
+    const breakoutPrice =
+      basePrice *
+      (1 + breakout / 100);
+
+    const breakdownPrice =
+      basePrice *
+      (1 - breakdown / 100);
+
+
+    document
+      .getElementById("levels")
+      .innerHTML =
+
+      `
+      <div class="level green">
+        <span>🥕 第一止盈</span>
+        <strong>
+          ${money(takePrice)}
+        </strong>
+      </div>
+
+      <div class="level redbox">
+        <span>🛑 止損</span>
+        <strong>
+          ${money(stopPrice)}
+        </strong>
+      </div>
+
+      <div class="level blue">
+        <span>🚀 突破確認</span>
+        <strong>
+          ${money(breakoutPrice)}
+        </strong>
+      </div>
+
+      <div class="level gold">
+        <span>⚠️ 跌破注意</span>
+        <strong>
+          ${money(breakdownPrice)}
+        </strong>
+      </div>
+      `;
+
+  }
+
+
+  /* =========================
+     PE / 估值
+  ========================= */
+
+  const eps =
+    number("eps");
+
+  const pe =
+    number("pe");
+
+  const target =
+    number("target");
+
+
+  let result =
+    "尚未計算";
+
+
+  if(
+    eps !== null &&
+    pe !== null
+  ){
+
+    result =
+      "PE估值："
+      +
+      money(
+        eps * pe
+      );
+
+  }
+
+
+  if(target !== null){
+
+    if(result === "尚未計算"){
+
+      result = "";
+
+    }
+
+    if(result !== ""){
+
+      result +=
+        "｜";
+
+    }
+
+    result +=
+      "營收目標價："
+      +
+      money(target);
+
+  }
+
+
+  if(
+    eps === null &&
+    target === null
+  ){
+
+    result =
+      "尚未計算";
+
+  }
+
+
+  document
+    .getElementById("valuation")
+    .innerText =
+    result;
+
+}
+
+
+/* =========================
+   清除成本
+========================= */
+
+function clearCost(){
+
+  document
+    .getElementById("cost")
+    .value =
+    "";
+
+  document
+    .getElementById("cost")
+    .focus();
+
+
+  document
+    .getElementById("levels")
+    .innerHTML =
+    "";
+
+}
+
+
+/* =========================
+   Enter 查詢
+========================= */
+
+document
+  .getElementById("code")
+  .addEventListener(
+    "keydown",
+    function(e){
+
+      if(e.key === "Enter"){
+
+        queryStock();
+
+      }
+
+    }
+  );
+
+
+/* =========================
+   一開始股票代號保持空白
+========================= */
+
+document
+  .getElementById("code")
+  .value = "";
+
+
+/* =========================
+   其他輸入欄位改變時，
+   自動重新計算
+========================= */
+
+[
+  "cost",
+  "take",
+  "stop",
+  "breakout",
+  "breakdown",
+  "pe",
+  "eps",
+  "target"
+].forEach(
+  function(id){
+
+    const el =
+      document.getElementById(id);
+
+    if(!el) return;
+
+    el.addEventListener(
+      "input",
+      calculate
+    );
+
+  }
+);
+
+</script>
 <div class="wrap">
 
 <div class="title">
