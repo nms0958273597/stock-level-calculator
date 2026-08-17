@@ -3,10 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>📈 股票關卡計算機 V7</title>
+
+<title>📈 股票關卡計算機</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -25,21 +28,27 @@ body{
   text-align:center;
   font-size:30px;
   font-weight:900;
-  margin:12px 0 5px;
+  margin:15px 0 5px;
 }
 
 .sub{
   text-align:center;
   color:#666;
-  margin-bottom:18px;
+  font-size:17px;
+  margin-bottom:20px;
 }
 
 .card{
   background:#fff;
-  border-radius:22px;
-  padding:18px;
-  margin:14px 0;
+  border-radius:24px;
+  padding:20px;
+  margin:15px 0;
   box-shadow:0 5px 20px rgba(0,0,0,.07);
+}
+
+h2{
+  margin:0 0 16px;
+  font-size:25px;
 }
 
 label{
@@ -51,10 +60,10 @@ label{
 
 input{
   width:100%;
-  height:56px;
+  height:58px;
   padding:12px 15px;
   border:2px solid #d8dce1;
-  border-radius:14px;
+  border-radius:15px;
   background:#fff;
   color:#111;
   font-size:20px;
@@ -63,7 +72,6 @@ input{
   appearance:none;
   -webkit-user-select:text;
   user-select:text;
-  touch-action:manipulation;
 }
 
 input:focus{
@@ -79,13 +87,13 @@ input:focus{
 
 button{
   width:100%;
-  height:56px;
+  min-height:56px;
   border:0;
-  border-radius:14px;
+  border-radius:15px;
+  padding:12px;
   font-size:18px;
   font-weight:900;
   cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
 }
 
 .black{
@@ -98,39 +106,24 @@ button{
   color:#111;
 }
 
+.red{
+  background:#ffe6e6;
+  color:#c00;
+}
+
+.purple{
+  background:linear-gradient(90deg,#5d61ed,#ad4bea);
+  color:#fff;
+}
+
 .status{
-  margin-top:12px;
-  padding:14px;
+  margin-top:13px;
+  padding:15px;
+  border-radius:15px;
   background:#f5f5f5;
-  border-radius:14px;
+  font-size:17px;
   font-weight:800;
   line-height:1.5;
-}
-
-.quote{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.q{
-  background:#f6f7f9;
-  border-radius:14px;
-  padding:13px;
-  min-height:88px;
-}
-
-.q span{
-  display:block;
-  color:#666;
-  font-size:14px;
-}
-
-.q b{
-  display:block;
-  font-size:21px;
-  margin-top:7px;
-  word-break:break-word;
 }
 
 .grid{
@@ -139,51 +132,113 @@ button{
   gap:12px;
 }
 
+.quote{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.box{
+  background:#f5f7fa;
+  border-radius:16px;
+  padding:16px;
+  min-height:95px;
+}
+
+.box span{
+  display:block;
+  color:#666;
+  font-size:15px;
+}
+
+.box strong{
+  display:block;
+  font-size:23px;
+  margin-top:8px;
+}
+
 .levels{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:12px;
+  gap:12px;
+  margin-top:15px;
 }
 
 .level{
-  padding:15px;
-  border-radius:15px;
-  min-height:95px;
+  padding:17px;
+  border-radius:17px;
+  min-height:110px;
 }
 
 .level span{
   display:block;
+  font-size:16px;
 }
 
 .level strong{
   display:block;
-  font-size:25px;
-  margin-top:7px;
+  font-size:28px;
+  margin-top:8px;
 }
 
-.green{background:#e9f8ef}
-.redbox{background:#fff0f0}
-.blue{background:#edf5ff}
-.gold{background:#fff7dc}
+.green{
+  background:#e9f8ef;
+}
 
-.row{
+.redbox{
+  background:#fff0f0;
+}
+
+.blue{
+  background:#edf5ff;
+}
+
+.gold{
+  background:#fff7dc;
+}
+
+.saved{
   display:flex;
+  align-items:center;
+  justify-content:space-between;
   gap:10px;
+  padding:13px 0;
+  border-bottom:1px solid #eee;
 }
 
-.row>*{
-  flex:1;
+.saved:last-child{
+  border-bottom:0;
+}
+
+.savedName{
+  font-weight:900;
+  font-size:18px;
+}
+
+.savedInfo{
+  color:#777;
+  font-size:14px;
+  margin-top:4px;
 }
 
 .small{
   color:#777;
-  font-size:13px;
+  font-size:14px;
   line-height:1.6;
 }
 
 @media(max-width:520px){
-  .title{font-size:26px}
+
+  .title{
+    font-size:27px;
+  }
+
+  .grid,
+  .quote,
+  .levels{
+    grid-template-columns:1fr 1fr;
+  }
+
 }
 </style>
 </head>
@@ -192,18 +247,22 @@ button{
 
 <div class="wrap">
 
-<div class="title">📈 股票關卡計算機 V7</div>
+<div class="title">
+📈 股票關卡計算機
+</div>
 
 <div class="sub">
-即時行情・5秒更新・🐰仙兔關卡・成本計算
+🐰 仙兔關卡・成本計算・股票收藏
 </div>
 
 
-<!-- 股票查詢 -->
+<!-- 股票 -->
 
 <div class="card">
 
-<label>🔎 股票代號／名稱</label>
+<h2>🔎 股票查詢</h2>
+
+<label>股票代號／名稱</label>
 
 <div class="search">
 
@@ -212,75 +271,80 @@ id="code"
 type="text"
 inputmode="text"
 autocomplete="off"
-placeholder="例如 2330、1326、台化"
+placeholder="例如 2330、台化"
 >
 
 <button
-type="button"
 class="black"
-onclick="queryStock()"
+type="button"
+onclick="searchStock()"
 >
 查詢
 </button>
 
 </div>
 
-<div id="status" class="status">
+<div
+id="status"
+class="status"
+>
 尚未查詢
 </div>
 
 </div>
 
 
-<!-- 行情 -->
+<!-- 股票資訊 -->
 
 <div class="card">
 
+<h2>📡 股票資訊</h2>
+
 <div class="quote">
 
-<div class="q">
+<div class="box">
 <span>股票名稱</span>
-<b id="name">--</b>
+<strong id="name">--</strong>
 </div>
 
-<div class="q">
+<div class="box">
 <span>代號</span>
-<b id="symbol">--</b>
+<strong id="symbol">--</strong>
 </div>
 
-<div class="q">
+<div class="box">
 <span>現價</span>
-<b id="price">--</b>
+<strong id="price">--</strong>
 </div>
 
-<div class="q">
+<div class="box">
 <span>昨收</span>
-<b id="prev">--</b>
+<strong id="prev">--</strong>
 </div>
 
-<div class="q">
+<div class="box">
 <span>開盤</span>
-<b id="open">--</b>
+<strong id="open">--</strong>
 </div>
 
-<div class="q">
+<div class="box">
 <span>最高／最低</span>
-<b id="highlow">--</b>
+<strong id="highlow">--</strong>
 </div>
 
-<div class="q">
+<div class="box">
 <span>成交量</span>
-<b id="volume">--</b>
+<strong id="volume">--</strong>
 </div>
 
-<div class="q">
+<div class="box">
 <span>買一／賣一</span>
-<b id="bidask">--</b>
+<strong id="bidask">--</strong>
 </div>
 
-<div class="q">
+<div class="box">
 <span>更新時間</span>
-<b id="time">--</b>
+<strong id="time">--</strong>
 </div>
 
 </div>
@@ -295,13 +359,15 @@ onclick="queryStock()"
 <h2>🐰 仙兔關卡</h2>
 
 <div class="small">
-👇 以下白色欄位全部可以直接輸入數字
+👇 白色欄位都可以直接輸入數字
 </div>
 
 <div class="grid">
 
 <div>
+
 <label>成本價</label>
+
 <input
 id="cost"
 type="text"
@@ -309,73 +375,92 @@ inputmode="decimal"
 autocomplete="off"
 placeholder="例如 36.30"
 >
+
 </div>
 
 <div>
+
 <label>止盈 %</label>
+
 <input
 id="take"
 type="text"
 inputmode="decimal"
 value="6"
 >
+
 </div>
 
 <div>
+
 <label>止損 %</label>
+
 <input
 id="stop"
 type="text"
 inputmode="decimal"
 value="3"
 >
+
 </div>
 
 <div>
+
 <label>突破 %</label>
+
 <input
 id="breakout"
 type="text"
 inputmode="decimal"
 value="2"
 >
+
 </div>
 
 <div>
+
 <label>跌破注意 %</label>
+
 <input
 id="breakdown"
 type="text"
 inputmode="decimal"
 value="2"
 >
+
 </div>
 
 <div>
+
 <label>目標本益比</label>
+
 <input
 id="pe"
 type="text"
 inputmode="decimal"
 value="15"
 >
-</div>
 
 </div>
 
-<div class="row" style="margin-top:12px">
+</div>
+
+
+<div
+style="display:flex;gap:10px;margin-top:14px"
+>
 
 <button
-type="button"
 class="gray"
+type="button"
 onclick="clearCost()"
 >
 清除成本
 </button>
 
 <button
+class="purple"
 type="button"
-class="black"
 onclick="calculate()"
 >
 🎯 開始計算
@@ -383,7 +468,12 @@ onclick="calculate()"
 
 </div>
 
-<div id="levels" class="levels"></div>
+
+<div
+id="levels"
+class="levels"
+>
+</div>
 
 </div>
 
@@ -392,58 +482,127 @@ onclick="calculate()"
 
 <div class="card">
 
-<h2>🌍 籌碼／估值</h2>
+<h2>🌍 籌碼</h2>
 
 <div class="grid">
 
 <div>
-<label>外資（張）</label>
+
+<label>外資成本</label>
+
 <input
 id="foreign"
 type="text"
-inputmode="numeric"
-autocomplete="off"
-placeholder="可輸入"
+inputmode="decimal"
+placeholder="例如 36.50"
 >
+
 </div>
 
 <div>
-<label>融資（張）</label>
+
+<label>融資成本</label>
+
 <input
 id="margin"
 type="text"
-inputmode="numeric"
-autocomplete="off"
-placeholder="可輸入"
->
-</div>
-
-<div>
-<label>預估 EPS</label>
-<input
-id="eps"
-type="text"
 inputmode="decimal"
-autocomplete="off"
-placeholder="例如 12"
+placeholder="例如 37.20"
 >
+
 </div>
 
+</div>
+
+</div>
+
+
+<!-- 營收 -->
+
+<div class="card">
+
+<h2>🚀 營收飆漲</h2>
+
+<div class="grid">
+
 <div>
+
 <label>營收目標價</label>
+
 <input
 id="target"
 type="text"
 inputmode="decimal"
-autocomplete="off"
 placeholder="例如 48"
 >
+
+</div>
+
+<div>
+
+<label>倍數</label>
+
+<input
+id="multiple"
+type="text"
+inputmode="decimal"
+placeholder="例如 1.2"
+>
+
+</div>
+
 </div>
 
 </div>
 
-<div id="valuation" class="status">
+
+<!-- 結果 -->
+
+<div class="card">
+
+<h2>📊 計算結果</h2>
+
+<div
+id="result"
+class="status"
+>
 尚未計算
+</div>
+
+</div>
+
+
+<!-- 我的股票 -->
+
+<div class="card">
+
+<h2>💾 我的股票</h2>
+
+<div class="grid">
+
+<button
+class="black"
+type="button"
+onclick="saveStock()"
+>
+＋ 儲存目前股票
+</button>
+
+<button
+class="red"
+type="button"
+onclick="clearStocks()"
+>
+🗑 清除股票
+</button>
+
+</div>
+
+<div
+id="saved"
+style="margin-top:15px"
+>
+尚未儲存股票
 </div>
 
 </div>
@@ -451,578 +610,5 @@ placeholder="例如 48"
 
 <div class="card small">
 
-📡 資料來源：Cloudflare Worker → 台股行情<br>
-🔄 查詢成功後每 5 秒更新<br>
-💡 現價、昨收、開盤等由行情服務自動帶入<br>
-💡 成本價、止盈、止損等由你自己輸入<br>
-📌 關卡為計算參考，不代表投資建議
-
-</div>
-
-</div>
-
-
-<script>
-
-/* ==================================================
-   股票名稱
-================================================== */
-
-const names = {
-  "2330":"台積電",
-  "1326":"台化",
-  "2303":"聯電",
-  "2618":"長榮航",
-  "2367":"燿華",
-  "2313":"華通",
-  "3491":"昇達科",
-  "3481":"群創",
-  "8046":"南電",
-  "2308":"台達電",
-  "3711":"日月光"
-};
-
-const aliases = {
-  "台積電":"2330",
-  "台化":"1326",
-  "聯電":"2303",
-  "長榮航":"2618",
-  "燿華":"2367",
-  "華通":"2313",
-  "昇達科":"3491",
-  "群創":"3481",
-  "南電":"8046",
-  "台達電":"2308",
-  "日月光":"3711"
-};
-
-
-/* ==================================================
-   Worker 網址
-================================================== */
-
-const WORKER_URL = "";
-
-
-let currentStock = null;
-let refreshTimer = null;
-
-
-/* ==================================================
-   數字
-================================================== */
-
-function getNumber(id){
-
-  const el =
-    document.getElementById(id);
-
-  if(!el){
-    return null;
-  }
-
-  const text =
-    el.value
-      .trim()
-      .replace(/,/g,"");
-
-  if(text === ""){
-    return null;
-  }
-
-  const n = Number(text);
-
-  return Number.isFinite(n)
-    ? n
-    : null;
-}
-
-
-/* ==================================================
-   金額
-================================================== */
-
-function money(value){
-
-  if(
-    value === null ||
-    value === undefined ||
-    value === "" ||
-    value === "-"
-  ){
-    return "--";
-  }
-
-  const n = Number(value);
-
-  if(!Number.isFinite(n)){
-    return "--";
-  }
-
-  return n.toFixed(2);
-}
-
-
-/* ==================================================
-   顯示行情
-================================================== */
-
-function renderStock(data){
-
-  document.getElementById("name").innerText =
-    data.name || "--";
-
-  document.getElementById("symbol").innerText =
-    data.code || "--";
-
-  document.getElementById("price").innerText =
-    money(data.price);
-
-  document.getElementById("prev").innerText =
-    money(data.prev);
-
-  document.getElementById("open").innerText =
-    money(data.open);
-
-  document.getElementById("highlow").innerText =
-    money(data.high) +
-    " / " +
-    money(data.low);
-
-  document.getElementById("volume").innerText =
-    data.volume === null ||
-    data.volume === undefined
-      ? "--"
-      : Number(data.volume).toLocaleString();
-
-  document.getElementById("bidask").innerText =
-    money(data.bid1) +
-    " / " +
-    money(data.ask1);
-
-  document.getElementById("time").innerText =
-    data.time || "--";
-}
-
-
-/* ==================================================
-   Worker 查詢
-================================================== */
-
-async function getQuote(code){
-
-  if(!WORKER_URL){
-
-    throw new Error(
-      "尚未設定行情服務"
-    );
-
-  }
-
-  const base =
-    WORKER_URL.replace(/\/$/,"");
-
-  const url =
-    base +
-    "/api/quote?q=" +
-    encodeURIComponent(code) +
-    "&_=" +
-    Date.now();
-
-  const response =
-    await fetch(
-      url,
-      {
-        method:"GET",
-        cache:"no-store"
-      }
-    );
-
-  if(!response.ok){
-
-    throw new Error(
-      "行情服務連線失敗"
-    );
-
-  }
-
-  const data =
-    await response.json();
-
-  if(
-    !data ||
-    !data.ok ||
-    !data.data
-  ){
-
-    throw new Error(
-      data.error ||
-      "查不到股票行情"
-    );
-
-  }
-
-  return data.data;
-}
-
-
-/* ==================================================
-   查詢股票
-================================================== */
-
-async function queryStock(){
-
-  let code =
-    document
-      .getElementById("code")
-      .value
-      .trim();
-
-  if(aliases[code]){
-
-    code =
-      aliases[code];
-
-    document
-      .getElementById("code")
-      .value =
-      code;
-  }
-
-  if(!code){
-
-    document
-      .getElementById("status")
-      .innerText =
-      "⚠️ 請輸入股票代號或名稱";
-
-    return;
-  }
-
-  document
-    .getElementById("status")
-    .innerText =
-    "🔄 查詢即時行情中…";
-
-  try{
-
-    const data =
-      await getQuote(code);
-
-    currentStock =
-      data;
-
-    renderStock(data);
-
-    document
-      .getElementById("status")
-      .innerText =
-      "✅ 已找到 " +
-      data.name +
-      "（" +
-      data.code +
-      "）";
-
-    if(refreshTimer){
-      clearInterval(refreshTimer);
-    }
-
-    refreshTimer =
-      setInterval(
-        refreshStock,
-        5000
-      );
-
-    calculate();
-
-  }catch(error){
-
-    console.error(error);
-
-    document
-      .getElementById("status")
-      .innerText =
-      "❌ " +
-      error.message;
-  }
-}
-
-
-/* ==================================================
-   每 5 秒更新
-================================================== */
-
-async function refreshStock(){
-
-  if(!currentStock){
-    return;
-  }
-
-  try{
-
-    const data =
-      await getQuote(
-        currentStock.code
-      );
-
-    currentStock =
-      data;
-
-    renderStock(data);
-
-    calculate();
-
-  }catch(error){
-
-    console.log(
-      "更新行情失敗",
-      error
-    );
-  }
-}
-
-
-/* ==================================================
-   仙兔計算
-================================================== */
-
-function calculate(){
-
-  const cost =
-    getNumber("cost");
-
-  if(cost === null){
-
-    document
-      .getElementById("levels")
-      .innerHTML =
-      `
-      <div class="level">
-        <span>⚠️ 提示</span>
-        <strong>請先輸入成本價</strong>
-      </div>
-      `;
-
-  }else{
-
-    const take =
-      getNumber("take") ?? 6;
-
-    const stop =
-      getNumber("stop") ?? 3;
-
-    const breakout =
-      getNumber("breakout") ?? 2;
-
-    const breakdown =
-      getNumber("breakdown") ?? 2;
-
-
-    const takePrice =
-      cost *
-      (1 + take / 100);
-
-    const stopPrice =
-      cost *
-      (1 - stop / 100);
-
-
-    let basePrice =
-      cost;
-
-    if(
-      currentStock &&
-      currentStock.price !== null &&
-      Number.isFinite(
-        Number(currentStock.price)
-      )
-    ){
-
-      basePrice =
-        Number(currentStock.price);
-
-    }
-
-
-    const breakoutPrice =
-      basePrice *
-      (1 + breakout / 100);
-
-    const breakdownPrice =
-      basePrice *
-      (1 - breakdown / 100);
-
-
-    document
-      .getElementById("levels")
-      .innerHTML =
-
-      `
-      <div class="level green">
-        <span>🥕 第一止盈</span>
-        <strong>
-          ${money(takePrice)}
-        </strong>
-      </div>
-
-      <div class="level redbox">
-        <span>🛑 止損</span>
-        <strong>
-          ${money(stopPrice)}
-        </strong>
-      </div>
-
-      <div class="level blue">
-        <span>🚀 突破確認</span>
-        <strong>
-          ${money(breakoutPrice)}
-        </strong>
-      </div>
-
-      <div class="level gold">
-        <span>⚠️ 跌破注意</span>
-        <strong>
-          ${money(breakdownPrice)}
-        </strong>
-      </div>
-      `;
-
-  }
-
-
-  /* =========================
-     PE / 估值
-  ========================= */
-
-  const eps =
-    getNumber("eps");
-
-  const pe =
-    getNumber("pe");
-
-  const target =
-    getNumber("target");
-
-
-  let result =
-    "尚未計算";
-
-
-  if(
-    eps !== null &&
-    pe !== null
-  ){
-
-    result =
-      "PE估值：" +
-      money(
-        eps * pe
-      );
-
-  }
-
-
-  if(target !== null){
-
-    if(
-      result !== "尚未計算"
-    ){
-
-      result +=
-        "｜";
-
-    }else{
-
-      result = "";
-
-    }
-
-    result +=
-      "營收目標價：" +
-      money(target);
-
-  }
-
-
-  document
-    .getElementById("valuation")
-    .innerText =
-    result;
-
-}
-
-
-/* ==================================================
-   清除成本
-================================================== */
-
-function clearCost(){
-
-  const el =
-    document.getElementById("cost");
-
-  el.value = "";
-
-  document
-    .getElementById("levels")
-    .innerHTML = "";
-
-  el.focus();
-}
-
-
-/* ==================================================
-   Enter
-================================================== */
-
-document
-  .getElementById("code")
-  .addEventListener(
-    "keydown",
-    function(e){
-
-      if(e.key === "Enter"){
-
-        queryStock();
-
-      }
-
-    }
-  );
-
-
-/* ==================================================
-   自動計算
-================================================== */
-
-[
-  "cost",
-  "take",
-  "stop",
-  "breakout",
-  "breakdown",
-  "pe",
-  "eps",
-  "target"
-].forEach(
-  function(id){
-
-    const el =
-      document.getElementById(id);
-
-    if(!el){
-      return;
-    }
-
-    el.addEventListener(
-      "input",
-      calculate
-    );
-
-  }
-);
-
-</script>
-
-</body>
-</html>
+📌 成本價由你自己輸入。<br>
+📌 第一
