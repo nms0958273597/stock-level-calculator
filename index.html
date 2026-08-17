@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>📈 股票關卡計算機 V22</title>
+<title>📈 股票關卡計算機 V23</title>
 
 <style>
 *{box-sizing:border-box}
@@ -12,7 +12,8 @@ body{
 margin:0;
 background:#f3f5f8;
 color:#111;
-font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif
+font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",
+"Noto Sans TC",sans-serif
 }
 
 .wrap{
@@ -45,7 +46,7 @@ box-shadow:0 5px 20px rgba(0,0,0,.07)
 
 h2{
 margin:0 0 14px;
-font-size:22px
+font-size:23px
 }
 
 label{
@@ -163,16 +164,16 @@ color:#a00000
 .level{
 padding:15px;
 border-radius:16px;
-min-height:110px
+min-height:125px
 }
 
 .level span{
-font-size:15px
+font-size:16px
 }
 
 .level strong{
 display:block;
-font-size:27px;
+font-size:29px;
 margin-top:7px
 }
 
@@ -203,12 +204,12 @@ background:#fff7dc
 background:#f1ecff
 }
 
-.manual{
-display:none
-}
-
-.manual.show{
-display:block
+.note{
+background:#f6f7f9;
+border-radius:15px;
+padding:13px;
+line-height:1.7;
+color:#555
 }
 
 .saved{
@@ -219,15 +220,12 @@ border-bottom:1px solid #eee
 .small{
 font-size:13px;
 color:#777;
-line-height:1.6
+line-height:1.7
 }
 
-.note{
-background:#f6f7f9;
-border-radius:15px;
-padding:13px;
-line-height:1.7;
-color:#555
+.bigResult{
+font-size:32px!important;
+font-weight:900
 }
 
 @media(max-width:520px){
@@ -248,6 +246,10 @@ grid-template-columns:1fr 1fr
 grid-template-columns:1fr 100px
 }
 
+.box b{
+font-size:20px
+}
+
 }
 </style>
 </head>
@@ -257,11 +259,16 @@ grid-template-columns:1fr 100px
 <div class="wrap">
 
 <div class="title">
-📈 股票關卡計算機 V22
+📈 股票關卡計算機 V23
 </div>
 
 <div class="sub">
-上市・上櫃・ETF搜尋｜週均線・月均線｜基本面｜三大法人｜融資｜🐰仙兔關卡
+上市・上櫃・ETF搜尋｜
+週均線・月均線｜
+基本面｜
+三大法人｜
+融資｜
+🐰仙兔關卡
 </div>
 
 
@@ -278,7 +285,7 @@ grid-template-columns:1fr 100px
 <input
 id="search"
 autocomplete="off"
-placeholder="2330、台積電、雙鴻、00631L、元大台灣50正2">
+placeholder="2330、台積電、雙鴻、00631L、0050">
 
 <button
 class="black"
@@ -288,9 +295,7 @@ onclick="searchStock()">
 
 </div>
 
-<div
-id="status"
-class="status">
+<div id="status" class="status">
 尚未查詢
 </div>
 
@@ -380,46 +385,7 @@ class="status">
 </div>
 
 
-<!-- 手動行情 -->
-
-<div
-id="manual"
-class="card manual">
-
-<h2>✏️ 手動行情備援</h2>
-
-<div class="grid">
-
-<div>
-<label>現價</label>
-<input id="mPrice" type="number">
-</div>
-
-<div>
-<label>週均線</label>
-<input id="mWeek" type="number">
-</div>
-
-<div>
-<label>月均線</label>
-<input id="mMonth" type="number">
-</div>
-
-</div>
-
-<button
-class="gray"
-style="width:100%;margin-top:12px"
-onclick="manualApply()">
-
-套用手動資料
-
-</button>
-
-</div>
-
-
-<!-- 基本資料 -->
+<!-- 基本面 -->
 
 <div class="card">
 
@@ -428,7 +394,7 @@ onclick="manualApply()">
 <div class="basic">
 
 <div class="box">
-<span>🎯 目標價（估算）</span>
+<span>🎯 目標價</span>
 <b id="targetPrice">--</b>
 </div>
 
@@ -465,9 +431,7 @@ onclick="manualApply()">
 
 <label>目標 PE 倍數</label>
 
-<select
-id="targetMultiple"
-onchange="recalcTarget()">
+<select id="targetMultiple">
 
 <option value="1.05">
 現有 PE × 1.05
@@ -491,23 +455,22 @@ onchange="recalcTarget()">
 
 <div>
 
-<label>目標價計算方式</label>
+<label>目標價方式</label>
 
 <input
-value="EPS × PE（估算）"
+value="EPS × 目標PE"
 disabled>
 
 </div>
 
 </div>
 
-<div
-class="note"
-style="margin-top:12px">
+<div class="note" style="margin-top:12px">
 
-⚠️ 目標價為模型估算，不代表券商目標價。
-若官方 PE／EPS 資料無法取得，會顯示「資料暫缺」，
-不會自行亂填數字。
+📌 本益比 PE 是證交所提供的估值資料。<br>
+📌 EPS 由「收盤價 ÷ 本益比」反推，僅作估算。<br>
+📌 目標價＝EPS × PE × 目標倍率。<br>
+📌 如果官方資料沒有提供，就顯示「資料暫缺」，不自行亂填。
 
 </div>
 
@@ -524,48 +487,43 @@ style="margin-top:12px">
 
 <div>
 
-<label>
-🌍 外資成本（模型估算）
-</label>
+<label>🌍 外資成本</label>
 
 <input
 id="foreignCost"
 type="number"
+step="0.01"
 placeholder="搜尋後自動估算">
 
 </div>
 
 <div>
 
-<label>
-💳 融資成本（模型估算）
-</label>
+<label>💳 融資成本</label>
 
 <input
 id="marginCost"
 type="number"
+step="0.01"
 placeholder="搜尋後自動估算">
 
 </div>
 
 <div>
 
-<label>
-🐰 關卡基準成本
-</label>
+<label>🐰 關卡基準成本</label>
 
 <input
 id="cost"
 type="number"
-placeholder="自動帶入，可手動修改">
+step="0.01"
+placeholder="自動帶入">
 
 </div>
 
 <div>
 
-<label>
-📌 成本模式
-</label>
+<label>📌 成本模式</label>
 
 <select id="costMode">
 
@@ -591,15 +549,14 @@ placeholder="自動帶入，可手動修改">
 
 </div>
 
-<div
-class="note"
-style="margin-top:12px">
+<div class="note" style="margin-top:12px">
 
-📌 外資平均成本與融資平均成本並沒有官方公開的單一即時數字，
-因此這裡顯示的是「模型估算成本」，不是官方實際持倉成本。
+⚠️ 證交所沒有公開「外資單一即時持股成本」及「融資平均持股成本」這兩個官方即時數字。<br><br>
 
-搜尋股票後會依現價、週均線、月均線自動估算。
-你也可以自行修改。
+因此本區的外資／融資成本是模型估算值，
+會參考現價、週均線、月均線。<br><br>
+
+❗不會把模型估算冒充成官方實際持倉成本。
 
 </div>
 
@@ -616,35 +573,31 @@ style="margin-top:12px">
 
 <div>
 
-<label>
-🥜 起飛幅度 %
-</label>
+<label>🥜 起飛幅度 %</label>
 
 <input
 id="launchPct"
 type="number"
-value="2">
+value="2"
+step="0.1">
 
 </div>
 
 <div>
 
-<label>
-📈 關卡間距 %
-</label>
+<label>📈 關卡間距 %</label>
 
 <input
 id="gapPct"
 type="number"
-value="15">
+value="15"
+step="0.1">
 
 </div>
 
 <div>
 
-<label>
-🚀 關卡四幅度
-</label>
+<label>🚀 關卡四幅度</label>
 
 <select id="level4Mode">
 
@@ -662,9 +615,7 @@ value="15">
 
 <div>
 
-<label>
-📊 機率模型
-</label>
+<label>📊 機率模型</label>
 
 <select id="probMode">
 
@@ -686,13 +637,11 @@ value="15">
 
 </div>
 
-
 <div
 id="levels"
 class="levels"
 style="margin-top:12px">
 </div>
-
 
 <div
 id="levelStatus"
@@ -702,14 +651,11 @@ class="status">
 
 </div>
 
+<div class="note" style="margin-top:12px">
 
-<div
-class="note"
-style="margin-top:12px">
-
-📌 到達機率是本工具的模型估算分數，
-會參考目前價格、週均線、月均線及距離關卡的幅度。
-它不是保證獲利，也不是實際統計勝率。
+📌 到達機率是模型估算分數，不是真實歷史勝率。<br>
+📌 90% 並不代表真的有 90% 機率上漲。<br>
+📌 越遠的價格關卡，模型會自然降低分數。
 
 </div>
 
@@ -746,12 +692,8 @@ style="margin-top:12px">
 
 </div>
 
-<div
-id="fundStatus"
-class="status">
-
+<div id="fundStatus" class="status">
 尚未取得法人資料
-
 </div>
 
 </div>
@@ -787,18 +729,14 @@ class="status">
 
 </div>
 
-<div
-id="marginStatus"
-class="status">
-
+<div id="marginStatus" class="status">
 尚未取得融資資料
-
 </div>
 
 </div>
 
 
-<!-- 儲存股票 -->
+<!-- 我的股票 -->
 
 <div class="card">
 
@@ -824,9 +762,7 @@ onclick="clearSaved()">
 
 </div>
 
-<div
-id="saved"
-style="margin-top:10px">
+<div id="saved" style="margin-top:10px">
 </div>
 
 </div>
@@ -836,11 +772,13 @@ style="margin-top:10px">
 
 <div class="small">
 
-🟢 V22 自動估算版<br>
+🟢 V23 自動估算版<br><br>
 
 📈 週均線＝最近5個交易日收盤平均<br>
 
 📈 月均線＝最近20個交易日收盤平均<br>
+
+📊 基本面＝TWSE PE／殖利率／PB<br>
 
 🌍 外資成本＝模型估算<br>
 
@@ -848,9 +786,13 @@ style="margin-top:10px">
 
 🐰 起飛價＋關卡一～四＋到達機率<br>
 
-🔄 行情每10秒自動更新<br>
+🌍 三大法人＝外資／投信／自營商／合計<br>
 
-📌 本工具僅供交易計算參考，不代表投資建議
+💳 融資＝買進／賣出／餘額<br>
+
+🔄 行情每10秒更新<br><br>
+
+📌 本工具僅供交易計算參考，不代表投資建議。
 
 </div>
 
@@ -861,47 +803,40 @@ style="margin-top:10px">
 
 <script>
 
-const MIS=
+/* =========================
+   API
+========================= */
+
+const MIS =
 "https://mis.twse.com.tw/stock/api/getStockInfo.jsp";
 
-const TWSE_LIST=
-"https://openapi.twse.com.tw/v1/opendata/t187ap03_L";
-
-const TWSE_ALL=
-"https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL";
-
-const TWSE_PE=
+const TWSE_PE =
 "https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL";
 
-const TWSE_MARGIN=
+const TWSE_MARGIN =
 "https://openapi.twse.com.tw/v1/exchangeReport/MI_MARGN";
 
-const TPEX_ALL=
-"https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes";
+const TWSE_STOCK =
+"https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL";
 
-const TPEX_PE=
-"https://www.tpex.org.tw/openapi/v1/tpex_mainboard_peratio_analysis";
-
-const T86=
+const T86 =
 "https://www.twse.com.tw/rwd/zh/fund/T86";
 
-const PROXY=
-u=>"https://corsproxy.io/?url="+
+const PROXY =
+u =>
+"https://corsproxy.io/?url="+
 encodeURIComponent(u);
 
-
-let current=null;
-
-let timer=null;
-
-let stockList=null;
-
-let fundamental=null;
+let current = null;
+let timer = null;
+let fundamental = null;
 
 
-/* 常用股票 */
+/* =========================
+   常用股票
+========================= */
 
-const aliases={
+const aliases = {
 
 "台積電":{
 code:"2330",
@@ -1002,49 +937,43 @@ market:"上市ETF"
 };
 
 
+/* =========================
+   工具
+========================= */
+
 function $(id){
-
 return document.getElementById(id);
-
 }
-
 
 function num(v){
 
 if(
-v===null||
-v===undefined||
+v===null ||
+v===undefined ||
 v===""
 )
 return null;
 
-let x=
+let x =
 Number(
 String(v)
 .replace(/,/g,"")
+.replace(/%/g,"")
 );
 
 return Number.isFinite(x)
-?
-x
-:
-null;
-
+?x
+:null;
 }
-
 
 function money(v){
 
 let x=num(v);
 
 return x===null
-?
-"--"
-:
-x.toFixed(2);
-
+?"--"
+:x.toFixed(2);
 }
-
 
 function clean(s){
 
@@ -1057,17 +986,12 @@ return String(s||"")
 
 }
 
-
 function codeClean(s){
 
 return clean(s)
-.replace(
-/[^A-Z0-9]/g,
-""
-);
+.replace(/[^A-Z0-9]/g,"");
 
 }
-
 
 function today(){
 
@@ -1078,7 +1002,6 @@ String(d.getMonth()+1).padStart(2,"0")+
 String(d.getDate()).padStart(2,"0");
 
 }
-
 
 function dateMinus(n){
 
@@ -1094,29 +1017,28 @@ String(d.getDate()).padStart(2,"0");
 
 }
 
-
-function showStatus(
-text,
-type=""
-){
+function showStatus(text,type=""){
 
 $("status").className=
 "status "+type;
 
-$("status").innerText=
-text;
+$("status").innerText=text;
 
 }
 
 
+/* =========================
+   JSON 讀取
+========================= */
+
 async function getJSON(url){
 
-for(
-const u of [
+const urls=[
 url,
 PROXY(url)
-]
-){
+];
+
+for(const u of urls){
 
 try{
 
@@ -1128,8 +1050,24 @@ cache:"no-store"
 }
 );
 
-if(r.ok)
-return await r.json();
+if(!r.ok)
+continue;
+
+const text=
+await r.text();
+
+if(!text)
+continue;
+
+try{
+
+return JSON.parse(text);
+
+}catch(e){
+
+continue;
+
+}
 
 }catch(e){}
 
@@ -1140,7 +1078,60 @@ return null;
 }
 
 
-/* 股票清單 */
+/* =========================
+   找欄位
+========================= */
+
+function valueFromObject(obj,names){
+
+if(!obj)
+return null;
+
+for(const n of names){
+
+if(
+Object.prototype.hasOwnProperty.call(
+obj,n
+)
+){
+
+return obj[n];
+
+}
+
+}
+
+let keys=
+Object.keys(obj);
+
+for(const n of names){
+
+let key=
+keys.find(
+k =>
+String(k)
+.replace(/\s/g,"")
+.includes(
+String(n)
+.replace(/\s/g,"")
+)
+);
+
+if(key)
+return obj[key];
+
+}
+
+return null;
+
+}
+
+
+/* =========================
+   股票清單
+========================= */
+
+let stockList=null;
 
 async function buildList(){
 
@@ -1149,14 +1140,10 @@ return stockList;
 
 let result=[];
 
+let arr=
+await getJSON(TWSE_STOCK);
 
-function addList(
-arr,
-market
-){
-
-if(!Array.isArray(arr))
-return;
+if(Array.isArray(arr)){
 
 arr.forEach(x=>{
 
@@ -1164,7 +1151,6 @@ let code=
 String(
 x.Code||
 x["證券代號"]||
-x.SecuritiesCompanyCode||
 ""
 ).trim();
 
@@ -1172,7 +1158,6 @@ let name=
 String(
 x.Name||
 x["證券名稱"]||
-x.CompanyName||
 ""
 ).trim();
 
@@ -1181,7 +1166,7 @@ if(code){
 result.push({
 code,
 name,
-market
+market:"上市"
 });
 
 }
@@ -1190,67 +1175,28 @@ market
 
 }
 
+stockList=result;
 
-addList(
-await getJSON(TWSE_LIST),
-"上市"
-);
-
-
-addList(
-await getJSON(TWSE_ALL),
-"上市"
-);
-
-
-addList(
-await getJSON(TPEX_ALL),
-"上櫃"
-);
-
-
-let seen=new Set();
-
-
-stockList=
-result.filter(x=>{
-
-let key=
-codeClean(x.code);
-
-if(seen.has(key))
-return false;
-
-seen.add(key);
-
-return true;
-
-});
-
-
-return stockList;
+return result;
 
 }
 
 
-/* 搜尋 */
+/* =========================
+   搜尋
+========================= */
 
 async function resolve(q){
 
-let s=
-clean(q);
+let s=clean(q);
 
-let c=
-codeClean(q);
-
+let c=codeClean(q);
 
 if(aliases[s])
 return aliases[s];
 
-
 let list=
 await buildList();
-
 
 let found=
 list.find(
@@ -1258,10 +1204,8 @@ x=>
 codeClean(x.code)===c
 );
 
-
 if(found)
 return found;
-
 
 found=
 list.find(
@@ -1269,10 +1213,8 @@ x=>
 clean(x.name)===s
 );
 
-
 if(found)
 return found;
-
 
 found=
 list.find(
@@ -1280,10 +1222,8 @@ x=>
 clean(x.name).includes(s)
 );
 
-
 if(found)
 return found;
-
 
 if(
 /^[A-Z0-9]{4,8}$/.test(c)
@@ -1292,29 +1232,27 @@ if(
 return {
 code:c,
 name:c,
-market:"待判斷"
+market:"上市"
 };
 
 }
-
 
 return null;
 
 }
 
 
-/* 即時行情 */
+/* =========================
+   即時行情
+========================= */
 
 async function realtime(x){
 
 for(
-const ex of [
-"tse_",
-"otc_"
-]
+const ex of ["tse_","otc_"]
 ){
 
-const j=
+let j=
 await getJSON(
 MIS+
 "?ex_ch="+
@@ -1324,19 +1262,16 @@ encodeURIComponent(x.code)+
 Date.now()
 );
 
-
-const z=
-j&&
+let z=
+j &&
 Array.isArray(j.msgArray)
 ?
 j.msgArray.find(
-a=>
+a =>
 String(a.c)===
 String(x.code)
 )
-:
-null;
-
+:null;
 
 if(z){
 
@@ -1390,7 +1325,9 @@ return null;
 }
 
 
-/* 顯示行情 */
+/* =========================
+   顯示行情
+========================= */
 
 function render(d){
 
@@ -1423,9 +1360,8 @@ d.volume===null
 ?
 "--"
 :
-Math.round(
-d.volume
-).toLocaleString();
+Math.round(d.volume)
+.toLocaleString();
 
 $("bidask").innerText=
 money(d.bid)+
@@ -1441,18 +1377,15 @@ d.time||"--";
 }
 
 
-/* 歷史資料 */
+/* =========================
+   歷史行情
+========================= */
 
 async function history(code){
 
-let result=[];
+let rows=[];
 
-
-for(
-let i=0;
-i<4;
-i++
-){
+for(let i=0;i<5;i++){
 
 let d=new Date();
 
@@ -1460,16 +1393,12 @@ d.setMonth(
 d.getMonth()-i
 );
 
-
 let ym=
 d.getFullYear()+
-String(
-d.getMonth()+1
-).padStart(2,"0");
+String(d.getMonth()+1)
+.padStart(2,"0");
 
-
-let j=
-await getJSON(
+let url=
 "https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY"+
 "?date="+
 ym+
@@ -1477,25 +1406,24 @@ ym+
 "&stockNo="+
 encodeURIComponent(code)+
 "&response=json&_="+
-Date.now()
-);
+Date.now();
 
+let j=
+await getJSON(url);
 
 if(
-j&&
+j &&
 Array.isArray(j.data)
 ){
 
-j.data.forEach(
-row=>{
+j.data.forEach(r=>{
 
-let close=
-num(row[6]);
+let close=num(r[6]);
 
 if(close!==null){
 
-result.push({
-date:String(row[0]),
+rows.push({
+date:String(r[0]),
 close
 });
 
@@ -1507,22 +1435,14 @@ close
 
 }
 
-
 let map=new Map();
 
+rows.forEach(x=>{
+map.set(x.date,x);
+});
 
-result.forEach(
-x=>
-map.set(
-x.date,
-x
-)
-);
-
-
-return [
-...map.values()
-].sort(
+return [...map.values()]
+.sort(
 (a,b)=>
 b.date.localeCompare(a.date)
 );
@@ -1530,43 +1450,42 @@ b.date.localeCompare(a.date)
 }
 
 
-/* 均線 */
+/* =========================
+   均線
+========================= */
 
-async function calculateMA(
-code,
-market
-){
+async function calculateMA(code,market){
 
-$("week").innerText=
-"讀取中…";
-
-$("month").innerText=
-"讀取中…";
-
+$("week").innerText="讀取中…";
+$("month").innerText="讀取中…";
 
 if(
-market==="上市"||
-market==="上市ETF"
+market!=="上市" &&
+market!=="上市ETF"
 ){
 
-try{
+$("week").innerText="暫無自動資料";
+$("month").innerText="暫無自動資料";
+
+return;
+
+}
 
 let rows=
 await history(code);
 
-
 if(rows.length>=5){
 
-$("week").innerText=
-money(
+let w=
 rows
 .slice(0,5)
 .reduce(
-(a,b)=>
-a+b.close,
+(a,b)=>a+b.close,
 0
-)/5
-);
+)/5;
+
+$("week").innerText=
+money(w);
 
 }else{
 
@@ -1574,20 +1493,19 @@ $("week").innerText=
 "資料不足";
 
 }
-
 
 if(rows.length>=20){
 
-$("month").innerText=
-money(
+let m=
 rows
 .slice(0,20)
 .reduce(
-(a,b)=>
-a+b.close,
+(a,b)=>a+b.close,
 0
-)/20
-);
+)/20;
+
+$("month").innerText=
+money(m);
 
 }else{
 
@@ -1596,129 +1514,117 @@ $("month").innerText=
 
 }
 
-
-return;
-
-}catch(e){}
-
 }
 
 
-$("week").innerText=
-"暫無自動資料";
+/* =========================
+   基本面
+========================= */
 
-$("month").innerText=
-"暫無自動資料";
-
-}
-
-
-/* 基本面 */
-
-async function fundamentals(
-code,
-market
-){
-
-let arr=null;
-
+async function fundamentals(code,market){
 
 if(
-market==="上市"||
-market==="上市ETF"
+market!=="上市" &&
+market!=="上市ETF"
 ){
 
-arr=
-await getJSON(
-TWSE_PE
-);
-
-}else if(
-market==="上櫃"
-){
-
-arr=
-await getJSON(
-TPEX_PE
-);
+return null;
 
 }
 
+let arr=
+await getJSON(
+TWSE_PE+
+"?_="+
+Date.now()
+);
 
 if(!Array.isArray(arr))
 return null;
 
-
 let x=
-arr.find(a=>{
-
-let c=
+arr.find(
+a=>
 String(
 a.Code||
 a["證券代號"]||
-a.SecuritiesCompanyCode||
 ""
-).trim();
-
-return c===
-String(code);
-
-});
-
+).trim()===
+String(code)
+);
 
 if(!x)
 return null;
 
-
 let close=
 num(
-x.ClosePrice||
-x.Close||
-x["收盤價"]||
-x["收盤"]
+valueFromObject(
+x,
+[
+"ClosePrice",
+"收盤價",
+"收盤"
+]
+)
 );
-
 
 let pe=
 num(
-x.PEratio||
-x.PERatio||
-x["本益比"]
+valueFromObject(
+x,
+[
+"PEratio",
+"本益比"
+]
+)
 );
-
 
 let yieldValue=
 num(
-x.DividendYield||
-x["殖利率"]
+valueFromObject(
+x,
+[
+"DividendYield",
+"殖利率(%)",
+"殖利率"
+]
+)
 );
-
 
 let pb=
 num(
-x.PBratio||
-x.PBRatio||
-x["股價淨值比"]
+valueFromObject(
+x,
+[
+"PBratio",
+"股價淨值比"
+]
+)
 );
 
+let eps=null;
 
-let eps=
-(
-close!==null&&
-pe!==null&&
+if(
+close!==null &&
+pe!==null &&
 pe>0
-)
-?
-close/pe
-:
-null;
+){
 
+eps=
+close/pe;
+
+}
 
 return {
 
 date:
-x.Date||
-x["資料日期"]||
+valueFromObject(
+x,
+[
+"Date",
+"資料日期"
+]
+)||
 today(),
 
 pe,
@@ -1734,104 +1640,88 @@ eps
 }
 
 
-/* 顯示基本面 */
+/* =========================
+   顯示基本面
+========================= */
 
 function setBasic(f){
 
 fundamental=f||null;
 
-
 $("pe").innerText=
-f&&
-f.pe!==null
+f && f.pe!==null
 ?
 money(f.pe)
 :
 "資料暫缺";
 
-
-$("yield").innerText=
-f&&
-f.yield!==null
-?
-money(f.yield)+"%"
-:
-"資料暫缺";
-
-
-$("pb").innerText=
-f&&
-f.pb!==null
-?
-money(f.pb)
-:
-"資料暫缺";
-
-
-$("fundDate").innerText=
-f&&
-f.date
-?
-f.date
-:
-"資料暫缺";
-
-
 $("eps").innerText=
-f&&
-f.eps!==null
+f && f.eps!==null
 ?
 money(f.eps)
 :
 "資料暫缺";
 
+$("yield").innerText=
+f && f.yield!==null
+?
+money(f.yield)+"%"
+:
+"資料暫缺";
+
+$("pb").innerText=
+f && f.pb!==null
+?
+money(f.pb)
+:
+"資料暫缺";
+
+$("fundDate").innerText=
+f && f.date
+?
+f.date
+:
+"資料暫缺";
 
 recalcTarget();
 
 }
 
 
-/* 目標價 */
+/* =========================
+   目標價
+========================= */
 
 function recalcTarget(){
 
-let eps=
-fundamental&&
-fundamental.eps!==null
-?
-fundamental.eps
-:
-null;
+if(!fundamental){
 
+$("targetPrice").innerText=
+"資料暫缺";
+
+return;
+
+}
+
+let eps=
+num(fundamental.eps);
 
 let pe=
-fundamental&&
-fundamental.pe!==null
-?
-fundamental.pe
-:
-null;
-
+num(fundamental.pe);
 
 let multiple=
-num(
-$("targetMultiple").value
-)||
-1.10;
-
+num($("targetMultiple").value)||1.10;
 
 if(
-eps!==null&&
-pe!==null&&
-eps>0&&
+eps!==null &&
+pe!==null &&
+eps>0 &&
 pe>0
 ){
 
 $("targetPrice").innerText=
 money(
-eps*
-pe*
-multiple
+eps*pe*multiple
 );
 
 }else{
@@ -1844,7 +1734,9 @@ $("targetPrice").innerText=
 }
 
 
-/* 三大法人 */
+/* =========================
+   三大法人
+========================= */
 
 function resetFund(){
 
@@ -1854,13 +1746,11 @@ function resetFund(){
 "dealer",
 "total"
 ].forEach(
-id=>
+id =>
 $(id).innerText="--"
 );
 
-
-$("fundStatus").className=
-"status";
+$("fundStatus").className="status";
 
 $("fundStatus").innerText=
 "尚未取得法人資料";
@@ -1868,38 +1758,29 @@ $("fundStatus").innerText=
 }
 
 
-function findIndex(
-fields,
-names
-){
+function formatLots(v){
 
-for(
-const name of names
-){
+let n=num(v);
 
-let i=
-fields.indexOf(name);
+if(n===null)
+return "--";
 
-if(i>=0)
-return i;
-
-}
-
-return -1;
+return (
+n>0?"+":""
+)+
+Math.round(n/1000)
+.toLocaleString()+
+" 張";
 
 }
 
 
-async function funds(
-code,
-market
-){
+async function funds(code,market){
 
 resetFund();
 
-
 if(
-market!=="上市"&&
+market!=="上市" &&
 market!=="上市ETF"
 ){
 
@@ -1907,22 +1788,15 @@ $("fundStatus").className=
 "status warn";
 
 $("fundStatus").innerText=
-"🟠 此市場目前無法自動取得法人資料";
+"🟠 此市場目前未提供自動法人資料";
 
 return;
 
 }
 
+for(let d=0;d<7;d++){
 
-for(
-let d=0;
-d<7;
-d++
-){
-
-let ds=
-dateMinus(d);
-
+let ds=dateMinus(d);
 
 let j=
 await getJSON(
@@ -1934,126 +1808,138 @@ ds+
 Date.now()
 );
 
-
-if(
-!j||
-!Array.isArray(j.data)
-)
+if(!j)
 continue;
 
+let row=null;
 
-let fields=
-j.fields||[];
+/* 新格式：data 是陣列 */
 
+if(Array.isArray(j.data)){
 
-let row=
+row=
 j.data.find(
 r=>
-String(r[0]).trim()===
+String(
+r[0]
+).trim()===
 String(code)
 );
 
+}
+
+/* 舊／物件格式 */
+
+if(!row){
+
+let arr=
+Array.isArray(j)
+?
+j
+:null;
+
+if(arr){
+
+row=
+arr.find(
+r=>
+String(
+r.Code||
+r["證券代號"]||
+""
+).trim()===
+String(code)
+);
+
+}
+
+}
 
 if(!row)
 continue;
 
 
-let foreignIndex=
-findIndex(
-fields,
-[
-"外陸資買賣超股數(不含外資自營商)",
-"外陸資買賣超股數"
-]
-);
+/* =====================
+   表格格式
+===================== */
 
+if(Array.isArray(row)){
 
-let trustIndex=
-findIndex(
-fields,
-[
-"投信買賣超股數"
-]
-);
+let fields=j.fields||[];
 
+function idx(names){
 
-let dealerIndex=
-findIndex(
-fields,
-[
-"自營商買賣超股數"
-]
-);
+for(const n of names){
 
+let i=
+fields.indexOf(n);
 
-let totalIndex=
-findIndex(
-fields,
-[
-"三大法人買賣超股數"
-]
-);
-
-
-let foreign=
-foreignIndex>=0
-?
-num(row[foreignIndex])
-:
-null;
-
-
-let trust=
-trustIndex>=0
-?
-num(row[trustIndex])
-:
-null;
-
-
-let dealer=
-dealerIndex>=0
-?
-num(row[dealerIndex])
-:
-null;
-
-
-let total=
-totalIndex>=0
-?
-num(row[totalIndex])
-:
-(
-foreign!==null&&
-trust!==null&&
-dealer!==null
-?
-foreign+trust+dealer
-:
-null
-);
-
-
-function formatLots(v){
-
-if(v===null)
-return "--";
-
-return (
-v>0
-?
-"+"
-:
-""
-)+
-Math.round(
-v/1000
-).toLocaleString()+
-" 張";
+if(i>=0)
+return i;
 
 }
 
+return -1;
+
+}
+
+let fi=
+idx([
+"外陸資買賣超股數(不含外資自營商)",
+"外陸資買賣超股數"
+]);
+
+let ti=
+idx([
+"投信買賣超股數"
+]);
+
+let di=
+idx([
+"自營商買賣超股數"
+]);
+
+let totalI=
+idx([
+"三大法人買賣超股數"
+]);
+
+let foreign=
+fi>=0?
+num(row[fi]):
+null;
+
+let trust=
+ti>=0?
+num(row[ti]):
+null;
+
+let dealer=
+di>=0?
+num(row[di]):
+null;
+
+let total=
+totalI>=0?
+num(row[totalI]):
+null;
+
+if(total===null){
+
+if(
+foreign!==null &&
+trust!==null &&
+dealer!==null
+){
+
+total=
+foreign+
+trust+
+dealer;
+
+}
+
+}
 
 $("foreign").innerText=
 formatLots(foreign);
@@ -2067,6 +1953,83 @@ formatLots(dealer);
 $("total").innerText=
 formatLots(total);
 
+}else{
+
+/* =====================
+   物件格式
+===================== */
+
+let foreign=
+num(
+valueFromObject(
+row,
+[
+"外陸資買賣超股數",
+"外資買賣超股數",
+"ForeignInvestment"
+]
+)
+);
+
+let trust=
+num(
+valueFromObject(
+row,
+[
+"投信買賣超股數",
+"InvestmentTrust"
+]
+)
+);
+
+let dealer=
+num(
+valueFromObject(
+row,
+[
+"自營商買賣超股數",
+"Dealer"
+]
+)
+);
+
+let total=
+num(
+valueFromObject(
+row,
+[
+"三大法人買賣超股數"
+]
+)
+);
+
+if(
+total===null &&
+foreign!==null &&
+trust!==null &&
+dealer!==null
+){
+
+total=
+foreign+
+trust+
+dealer;
+
+}
+
+$("foreign").innerText=
+formatLots(foreign);
+
+$("trust").innerText=
+formatLots(trust);
+
+$("dealer").innerText=
+formatLots(dealer);
+
+$("total").innerText=
+formatLots(total);
+
+}
 
 $("fundStatus").className=
 "status ok";
@@ -2080,7 +2043,6 @@ return;
 
 }
 
-
 $("fundStatus").className=
 "status warn";
 
@@ -2090,7 +2052,9 @@ $("fundStatus").innerText=
 }
 
 
-/* 融資 */
+/* =========================
+   融資
+========================= */
 
 function resetMargin(){
 
@@ -2100,10 +2064,9 @@ function resetMargin(){
 "marginSell",
 "marginDate"
 ].forEach(
-id=>
+id =>
 $(id).innerText="--"
 );
-
 
 $("marginStatus").className=
 "status";
@@ -2114,103 +2077,7 @@ $("marginStatus").innerText=
 }
 
 
-async function marginData(
-code,
-market
-){
-
-resetMargin();
-
-
-if(
-market!=="上市"&&
-market!=="上市ETF"
-){
-
-$("marginStatus").className=
-"status warn";
-
-$("marginStatus").innerText=
-"🟠 此市場目前無法自動取得融資資料";
-
-return;
-
-}
-
-
-for(
-let d=0;
-d<7;
-d++
-){
-
-let ds=
-dateMinus(d);
-
-
-let j=
-await getJSON(
-TWSE_MARGIN+
-"?date="+
-ds+
-"&selectType=STOCK"+
-"&response=json&_="+
-Date.now()
-);
-
-
-if(
-!j||
-!Array.isArray(j.data)
-)
-continue;
-
-
-let fields=
-j.fields||[];
-
-
-let row=
-j.data.find(
-r=>
-String(r[0]).trim()===
-String(code)
-);
-
-
-if(!row)
-continue;
-
-
-let buy=
-findIndex(
-fields,
-[
-"融資買進"
-]
-);
-
-
-let sell=
-findIndex(
-fields,
-[
-"融資賣出"
-]
-);
-
-
-let balance=
-findIndex(
-fields,
-[
-"融資今日餘額",
-"融資餘額"
-]
-);
-
-
-function fmt(v){
+function fmtLots(v){
 
 let n=num(v);
 
@@ -2225,33 +2092,181 @@ Math.round(n)
 }
 
 
+async function marginData(code,market){
+
+resetMargin();
+
+if(
+market!=="上市" &&
+market!=="上市ETF"
+){
+
+$("marginStatus").className=
+"status warn";
+
+$("marginStatus").innerText=
+"🟠 此市場目前未提供自動融資資料";
+
+return;
+
+}
+
+for(let d=0;d<7;d++){
+
+let ds=dateMinus(d);
+
+let j=
+await getJSON(
+TWSE_MARGIN+
+"?date="+
+ds+
+"&selectType=ALL"+
+"&response=json&_="+
+Date.now()
+);
+
+if(!j)
+continue;
+
+let row=null;
+
+/* 陣列格式 */
+
+if(Array.isArray(j.data)){
+
+row=
+j.data.find(
+r=>
+String(r[0]).trim()===
+String(code)
+);
+
+}
+
+/* 物件格式 */
+
+if(!row && Array.isArray(j)){
+
+row=
+j.find(
+r=>
+String(
+r.Code||
+r["證券代號"]||
+""
+).trim()===
+String(code)
+);
+
+}
+
+if(!row)
+continue;
+
+
+/* 表格格式 */
+
+if(Array.isArray(row)){
+
+let fields=j.fields||[];
+
+function idx(names){
+
+for(const n of names){
+
+let i=
+fields.indexOf(n);
+
+if(i>=0)
+return i;
+
+}
+
+return -1;
+
+}
+
+let bi=
+idx(["融資買進"]);
+
+let si=
+idx(["融資賣出"]);
+
+let balI=
+idx([
+"融資今日餘額",
+"融資餘額"
+]);
+
 $("marginBuy").innerText=
-buy>=0
+bi>=0
 ?
-fmt(row[buy])
+fmtLots(row[bi])
 :
 "--";
-
 
 $("marginSell").innerText=
-sell>=0
+si>=0
 ?
-fmt(row[sell])
+fmtLots(row[si])
 :
 "--";
-
 
 $("marginBalance").innerText=
-balance>=0
+balI>=0
 ?
-fmt(row[balance])
+fmtLots(row[balI])
 :
 "--";
 
+}else{
+
+/* 物件格式 */
+
+let buy=
+num(
+valueFromObject(
+row,
+[
+"融資買進"
+]
+)
+);
+
+let sell=
+num(
+valueFromObject(
+row,
+[
+"融資賣出"
+]
+)
+);
+
+let balance=
+num(
+valueFromObject(
+row,
+[
+"融資今日餘額",
+"融資餘額"
+]
+)
+);
+
+$("marginBuy").innerText=
+fmtLots(buy);
+
+$("marginSell").innerText=
+fmtLots(sell);
+
+$("marginBalance").innerText=
+fmtLots(balance);
+
+}
 
 $("marginDate").innerText=
 ds;
-
 
 $("marginStatus").className=
 "status ok";
@@ -2263,7 +2278,6 @@ return;
 
 }
 
-
 $("marginStatus").className=
 "status warn";
 
@@ -2273,43 +2287,35 @@ $("marginStatus").innerText=
 }
 
 
-/* 自動估算外資／融資成本 */
+/* =========================
+   外資／融資模型成本
+========================= */
 
 function estimateParticipantCosts(){
 
 if(
-!current||
+!current ||
 current.price===null
 )
 return;
 
-
 let price=
 num(current.price);
-
 
 let week=
 num($("week").innerText);
 
-
 let month=
 num($("month").innerText);
 
-
 if(week===null)
 week=price;
-
 
 if(month===null)
 month=price;
 
 
-/*
-外資模型：
-現價 50%
-週均線 30%
-月均線 20%
-*/
+/* 外資模型 */
 
 let foreign=
 price*0.50+
@@ -2317,18 +2323,12 @@ week*0.30+
 month*0.20;
 
 
-/*
-融資模型：
-現價 40%
-週均線 35%
-月均線 25%
-*/
+/* 融資模型 */
 
 let margin=
 price*0.40+
 week*0.35+
 month*0.25;
-
 
 if(
 !$("foreignCost").dataset.manual
@@ -2339,7 +2339,6 @@ foreign.toFixed(2);
 
 }
 
-
 if(
 !$("marginCost").dataset.manual
 ){
@@ -2349,41 +2348,30 @@ margin.toFixed(2);
 
 }
 
-
 updateBaseCost();
 
 }
 
 
-/* 關卡基準成本 */
+/* =========================
+   成本
+========================= */
 
 function updateBaseCost(){
 
 let foreign=
-num(
-$("foreignCost").value
-);
-
+num($("foreignCost").value);
 
 let margin=
-num(
-$("marginCost").value
-);
-
+num($("marginCost").value);
 
 let price=
-num(
-current&&
-current.price
-);
-
+num(current&&current.price);
 
 let mode=
 $("costMode").value;
 
-
 let base=null;
-
 
 if(mode==="foreign"){
 
@@ -2400,15 +2388,12 @@ base=price;
 }else{
 
 if(
-foreign!==null&&
+foreign!==null &&
 margin!==null
 ){
 
 base=
-(
-foreign+
-margin
-)/2;
+(foreign+margin)/2;
 
 }else{
 
@@ -2421,9 +2406,8 @@ price;
 
 }
 
-
 if(
-base!==null&&
+base!==null &&
 !$("cost").dataset.manual
 ){
 
@@ -2432,76 +2416,59 @@ base.toFixed(2);
 
 }
 
-
 calculateLevels();
 
 }
 
 
-/* 到達機率 */
+/* =========================
+   到達機率
+========================= */
 
-function probability(
-target
-){
+function probability(target){
 
 let price=
-num(
-current&&
-current.price
-);
-
+num(current&&current.price);
 
 if(price===null)
 return null;
 
-
 let week=
 num($("week").innerText);
 
-
 let month=
 num($("month").innerText);
-
 
 let distance=
 Math.max(
 0,
 (target-price)/
-Math.max(
-price,
-0.01
-)
+Math.max(price,0.01)
 );
 
 
+/*
+基礎分數
+*/
+
 let p=
 82-
-distance*
-220;
+distance*220;
 
+
+/*
+站在週均線以上
+*/
 
 if(
-week!==null&&
+week!==null &&
 price>=week
 ){
 
 p+=7;
 
-}
-
-
-if(
-month!==null&&
-price>=month
-){
-
-p+=7;
-
-}
-
-
-if(
-week!==null&&
+}else if(
+week!==null &&
 price<week
 ){
 
@@ -2510,8 +2477,19 @@ p-=4;
 }
 
 
+/*
+站在月均線以上
+*/
+
 if(
-month!==null&&
+month!==null &&
+price>=month
+){
+
+p+=7;
+
+}else if(
+month!==null &&
 price<month
 ){
 
@@ -2520,23 +2498,23 @@ p-=4;
 }
 
 
+/*
+模型
+*/
+
 let mode=
 $("probMode").value;
 
-
-if(mode==="conservative"){
-
+if(mode==="conservative")
 p-=8;
 
-}
-
-
-if(mode==="aggressive"){
-
+if(mode==="aggressive")
 p+=8;
 
-}
 
+/*
+限制
+*/
 
 return Math.max(
 5,
@@ -2549,22 +2527,20 @@ Math.round(p)
 }
 
 
-/* 關卡計算 */
+/* =========================
+   關卡
+========================= */
 
 function calculateLevels(){
 
 let cost=
-num(
-$("cost").value
-);
-
+num($("cost").value);
 
 if(cost===null){
 
 $("levels").innerHTML="";
 
-$("levelStatus").className=
-"status";
+$("levelStatus").className="status";
 
 $("levelStatus").innerText=
 "等待成本／行情資料";
@@ -2573,72 +2549,48 @@ return;
 
 }
 
-
 let launchPct=
-num(
-$("launchPct").value
-)||
-2;
+num($("launchPct").value);
 
+if(launchPct===null)
+launchPct=2;
 
 let gap=
-num(
-$("gapPct").value
-)||
-15;
+num($("gapPct").value);
 
+if(gap===null)
+gap=15;
 
 let launch=
 cost*
-(
-1+
-launchPct/100
-);
-
+(1+launchPct/100);
 
 let level1=
 launch*
-(
-1+
-gap/100
-);
-
+(1+gap/100);
 
 let level2=
 level1*
-(
-1+
-gap/100
-);
-
+(1+gap/100);
 
 let level3=
 level2*
-(
-1+
-gap/100
-);
-
+(1+gap/100);
 
 let level4;
-
 
 if(
 $("level4Mode").value==="20"
 ){
 
 level4=
-level3*
-1.20;
+level3*1.20;
 
 }else{
 
 level4=
 level3*
-(
-1+
-gap/100
-);
+(1+gap/100);
 
 }
 
@@ -2652,7 +2604,6 @@ value
 
 let p=
 probability(value);
-
 
 return `
 
@@ -2682,7 +2633,6 @@ p+"%"
 `;
 
 }
-
 
 $("levels").innerHTML=
 
@@ -2716,15 +2666,10 @@ level4
 
 
 let now=
-num(
-current&&
-current.price
-);
-
+num(current&&current.price);
 
 $("levelStatus").className=
 "status ok";
-
 
 if(now===null){
 
@@ -2734,7 +2679,6 @@ $("levelStatus").innerText=
 return;
 
 }
-
 
 if(now>=level4){
 
@@ -2771,7 +2715,9 @@ $("levelStatus").innerText=
 }
 
 
-/* 清除 */
+/* =========================
+   清除目前資料
+========================= */
 
 function clearAll(){
 
@@ -2791,10 +2737,9 @@ function clearAll(){
 "date",
 "time"
 ].forEach(
-id=>
+id =>
 $(id).innerText="--"
 );
-
 
 [
 "foreignCost",
@@ -2804,27 +2749,17 @@ $(id).innerText="--"
 id=>{
 
 $(id).value="";
-
 $(id).dataset.manual="";
 
 }
 );
 
-
-$("manual").classList.remove(
-"show"
-);
-
-
 $("levels").innerHTML="";
 
-
-$("levelStatus").className=
-"status";
+$("levelStatus").className="status";
 
 $("levelStatus").innerText=
 "等待行情資料";
-
 
 setBasic(null);
 
@@ -2832,9 +2767,7 @@ resetFund();
 
 resetMargin();
 
-
 current=null;
-
 
 if(timer){
 
@@ -2847,16 +2780,16 @@ timer=null;
 }
 
 
-/* 查詢 */
+/* =========================
+   查詢
+========================= */
 
 async function searchStock(){
 
 let q=
 $("search").value.trim();
 
-
 clearAll();
-
 
 if(!q){
 
@@ -2869,15 +2802,12 @@ return;
 
 }
 
-
 showStatus(
 "🔎 正在搜尋股票／ETF…"
 );
 
-
 let x=
 await resolve(q);
-
 
 if(!x){
 
@@ -2892,10 +2822,8 @@ return;
 
 }
 
-
 $("search").value=
 x.code;
-
 
 showStatus(
 "🔄 找到 "+
@@ -2905,10 +2833,8 @@ x.code+
 "），正在取得資料…"
 );
 
-
 let d=
 await realtime(x);
-
 
 if(!d){
 
@@ -2921,13 +2847,8 @@ x.code;
 $("market").innerText=
 x.market;
 
-
-$("manual")
-.classList.add("show");
-
-
 showStatus(
-"🟠 找到標的，但即時行情暫時無法取得，可手動輸入",
+"🟠 找到標的，但即時行情暫時無法取得",
 "warn"
 );
 
@@ -2935,18 +2856,9 @@ return;
 
 }
 
-
 current=d;
 
-
 render(d);
-
-
-$("manual")
-.classList.remove(
-"show"
-);
-
 
 await calculateMA(
 d.code,
@@ -2954,8 +2866,16 @@ d.market
 );
 
 
+/*
+先估成本
+*/
+
 estimateParticipantCosts();
 
+
+/*
+基本面
+*/
 
 let f=
 await fundamentals(
@@ -2963,9 +2883,12 @@ d.code,
 d.market
 );
 
-
 setBasic(f);
 
+
+/*
+法人
+*/
 
 await funds(
 d.code,
@@ -2973,14 +2896,21 @@ d.market
 );
 
 
+/*
+融資
+*/
+
 await marginData(
 d.code,
 d.market
 );
 
 
-calculateLevels();
+/*
+最後再計算
+*/
 
+calculateLevels();
 
 showStatus(
 "🟢 連線成功｜"+
@@ -2992,6 +2922,10 @@ d.code+
 );
 
 
+/*
+10秒更新行情
+*/
+
 timer=
 setInterval(
 async()=>{
@@ -2999,27 +2933,21 @@ async()=>{
 if(!current)
 return;
 
-
 let q2=
 await realtime(current);
-
 
 if(q2){
 
 current=q2;
 
-
 render(q2);
-
 
 await calculateMA(
 q2.code,
 q2.market
 );
 
-
 estimateParticipantCosts();
-
 
 calculateLevels();
 
@@ -3032,100 +2960,148 @@ calculateLevels();
 }
 
 
-/* 手動行情 */
+/* =========================
+   Enter
+========================= */
 
-function manualApply(){
+$("search")
+.addEventListener(
+"keydown",
+e=>{
 
-let price=
-num(
-$("mPrice").value
+if(e.key==="Enter")
+searchStock();
+
+});
+
+
+/* =========================
+   目標 PE
+========================= */
+
+$("targetMultiple")
+.addEventListener(
+"change",
+recalcTarget
 );
 
 
-let week=
-num(
-$("mWeek").value
+/* =========================
+   成本修改
+========================= */
+
+$("foreignCost")
+.addEventListener(
+"input",
+()=>{
+
+$("foreignCost")
+.dataset.manual="1";
+
+updateBaseCost();
+
+}
 );
 
+$("marginCost")
+.addEventListener(
+"input",
+()=>{
 
-let month=
-num(
-$("mMonth").value
+$("marginCost")
+.dataset.manual="1";
+
+updateBaseCost();
+
+}
 );
 
+$("cost")
+.addEventListener(
+"input",
+()=>{
 
-if(price!==null){
-
-$("price").innerText=
-money(price);
-
-if(current)
-current.price=price;
-
-}
-
-
-if(week!==null){
-
-$("week").innerText=
-money(week);
-
-}
-
-
-if(month!==null){
-
-$("month").innerText=
-money(month);
-
-}
-
-
-estimateParticipantCosts();
-
+$("cost")
+.dataset.manual="1";
 
 calculateLevels();
 
 }
+);
+
+$("costMode")
+.addEventListener(
+"change",
+()=>{
+
+$("cost").dataset.manual="";
+
+updateBaseCost();
+
+}
+);
 
 
-/* 儲存 */
+/* =========================
+   關卡
+========================= */
+
+[
+"launchPct",
+"gapPct"
+].forEach(
+id=>
+
+$(id).addEventListener(
+"input",
+calculateLevels
+)
+
+);
+
+$("level4Mode")
+.addEventListener(
+"change",
+calculateLevels
+);
+
+$("probMode")
+.addEventListener(
+"change",
+calculateLevels
+);
+
+
+/* =========================
+   儲存
+========================= */
 
 function saveStock(){
 
 let code=
 $("symbol").innerText;
 
-
 if(
-!code||
+!code ||
 code==="--"
 ){
 
-alert(
-"請先查詢股票"
-);
+alert("請先查詢股票");
 
 return;
 
 }
 
-
 let list=
 JSON.parse(
-localStorage.getItem(
-"stocksV22"
-)||
+localStorage.getItem("stocksV23")||
 "[]"
 );
 
-
 list=
 list.filter(
-x=>
-x.code!==code
+x=>x.code!==code
 );
-
 
 list.push({
 
@@ -3145,30 +3121,27 @@ $("marginCost").value
 
 });
 
-
 localStorage.setItem(
-"stocksV22",
+"stocksV23",
 JSON.stringify(list)
 );
-
 
 showSaved();
 
 }
 
 
-/* 顯示儲存 */
+/* =========================
+   顯示儲存
+========================= */
 
 function showSaved(){
 
 let list=
 JSON.parse(
-localStorage.getItem(
-"stocksV22"
-)||
+localStorage.getItem("stocksV23")||
 "[]"
 );
-
 
 if(!list.length){
 
@@ -3178,7 +3151,6 @@ $("saved").innerHTML=
 return;
 
 }
-
 
 $("saved").innerHTML=
 list.map(
@@ -3224,35 +3196,32 @@ onclick="loadSaved(${i})">
 }
 
 
-/* 載入 */
+/* =========================
+   載入
+========================= */
 
 function loadSaved(i){
 
 let list=
 JSON.parse(
-localStorage.getItem(
-"stocksV22"
-)||
+localStorage.getItem("stocksV23")||
 "[]"
 );
 
-
-let x=
-list[i];
-
+let x=list[i];
 
 if(!x)
 return;
 
+$("search").value=x.code;
 
-$("search").value=
-x.code;
+if(x.cost){
 
+$("cost").value=x.cost;
 
-$("cost").value=
-x.cost||
-"";
+$("cost").dataset.manual="1";
 
+}
 
 if(x.foreignCost){
 
@@ -3263,7 +3232,6 @@ $("foreignCost").dataset.manual="1";
 
 }
 
-
 if(x.marginCost){
 
 $("marginCost").value=
@@ -3273,21 +3241,14 @@ $("marginCost").dataset.manual="1";
 
 }
 
-
-$("cost").dataset.manual=
-x.cost
-?
-"1"
-:
-"";
-
-
 searchStock();
 
 }
 
 
-/* 清除儲存 */
+/* =========================
+   清除
+========================= */
 
 function clearSaved(){
 
@@ -3298,7 +3259,7 @@ confirm(
 ){
 
 localStorage.removeItem(
-"stocksV22"
+"stocksV23"
 );
 
 showSaved();
@@ -3308,108 +3269,9 @@ showSaved();
 }
 
 
-/* Enter */
-
-$("search")
-.addEventListener(
-"keydown",
-e=>{
-
-if(e.key==="Enter"){
-
-searchStock();
-
-}
-
-});
-
-
-/* 成本修改 */
-
-$("foreignCost")
-.addEventListener(
-"input",
-()=>{
-
-$("foreignCost")
-.dataset.manual="1";
-
-updateBaseCost();
-
-}
-);
-
-
-$("marginCost")
-.addEventListener(
-"input",
-()=>{
-
-$("marginCost")
-.dataset.manual="1";
-
-updateBaseCost();
-
-}
-);
-
-
-$("cost")
-.addEventListener(
-"input",
-()=>{
-
-$("cost")
-.dataset.manual="1";
-
-calculateLevels();
-
-}
-);
-
-
-$("costMode")
-.addEventListener(
-"change",
-()=>{
-
-$("cost").dataset.manual="";
-
-updateBaseCost();
-
-}
-);
-
-
-/* 關卡 */
-
-[
-"launchPct",
-"gapPct"
-].forEach(
-id=>
-
-$(id).addEventListener(
-"input",
-calculateLevels
-)
-
-);
-
-
-$("level4Mode")
-.addEventListener(
-"change",
-calculateLevels
-);
-
-
-$("probMode")
-.addEventListener(
-"change",
-calculateLevels
-);
-
+/* =========================
+   啟動
+========================= */
 
 showSaved();
 
