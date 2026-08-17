@@ -1,423 +1,1273 @@
-export default {
-  async fetch(request) {
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Content-Type": "application/json; charset=UTF-8"
-    };
-
-    if (request.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders
-      });
-    }
-
-    try {
-      const url = new URL(request.url);
-      const stock = (url.searchParams.get("stock") || "").trim();
-
-      if (!/^\d{4,6}$/.test(stock)) {
-        return new Response(
-          JSON.stringify({
-            success: false,
-            error: "股票代號格式錯誤"
-          }),
-          {
-            status: 400,
-            headers: corsHeaders
-          }
-        );
-      }
-
-      /*
-       * ============================
-       * 1. 即時行情
-       * ============================
-       */
-
-      let market = "tse";
-      let realStock = stock;
-
-      // 先嘗試上市
-      let quoteUrl =
-        "https://mis.twse.com.tw/stock/api/getStockInfo.jsp" +
-        "?ex_ch=tse_" +
-        stock +
-        ".tw" +
-        "&json=1" +
-        "&delay=0" +
-        "&_=" +
-        Date.now();
-
-      let quoteResponse = await fetch(quoteUrl, {
-        headers: {
-          "User-Agent": "Mozilla/5.0",
-          "Accept": "application/json"
-        }
-      });
-
-      let quoteData = await quoteResponse.json();
-
-      /*
-       * 如果上市查不到，再嘗試上櫃
-       */
-      if (
-        !quoteData ||
-        !quoteData.msgArray ||
-        quoteData.msgArray.length === 0
-      ) {
-        market = "otc";
-
-        quoteUrl =
-          "https://mis.twse.com.tw/stock/api/getStockInfo.jsp" +
-          "?ex_ch=otc_" +
-          stock +
-          ".tw" +
-          "&json=1" +
-          "&delay=0" +
-          "&_=" +
-          Date.now();
-
-        quoteResponse = await fetch(quoteUrl, {
-          headers: {
-            "User-Agent": "Mozilla/5.0",
-            "Accept": "application/json"
-          }
-        });
-
-        quoteData = await quoteResponse.json();
-      }
-
-      if (
-        !quoteData ||
-        !quoteData.msgArray ||
-        quoteData.msgArray.length === 0
-      ) {
-        return new Response(
-          JSON.stringify({
-            success: false,
-            error: "找不到股票行情：" + stock
-          }),
-          {
-            status: 404,
-            headers: corsHeaders
-          }
-        );
-      }
-
-      const q = quoteData.msgArray[0];
-
-      /*
-       * ============================
-       * 基本資料
-       * ============================
-       */
-
-      const name = q.n || stock;
-
-      // 最新成交價
-      const price = toNumber(q.z);
-
-      // 昨收
-      const previousClose = toNumber(q.y);
-
-      // 今日開盤
-      const open = toNumber(q.o);
-
-      // 今日最高
-      const high = toNumber(q.h);
-
-      // 今日最低
-      const low = toNumber(q.l);
-
-      // 成交量
-      const volume = toNumber(q.v);
-
-      // 買一
-      const bid1 = toNumber(
-        q.b ? String(q.b).split("_")[0] : ""
-      );
-
-      // 賣一
-      const ask1 = toNumber(
-        q.a ? String(q.a).split("_")[0] : ""
-      );
-
-      /*
-       * 收盤價：
-       *
-       * 盤後 z 通常就是當日最後成交價。
-       * 如果還在盤中，則以最新價做 latestPrice，
-       * closePrice 留給前端判斷。
-       */
-
-      const latestPrice = price || previousClose;
-
-      /*
-       * ============================
-       * 2. 抓歷史資料計算月線
-       * ============================
-       */
-
-      const closes = [];
-
-      const now = new Date();
-
-      /*
-       * 抓最近 3 個月，
-       * 足夠取得 20 個交易日。
-       */
-      for (let i = 0; i < 3; i++) {
-        const d = new Date(
-          now.getFullYear(),
-          now.getMonth() - i,
-          1
-        );
-
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, "0");
-
-        const dateParam = `${yyyy}${mm}01`;
-
-        const historyUrl =
-          "https://www.twse.com.tw/exchangeReport/STOCK_DAY" +
-          "?response=json" +
-          "&date=" +
-          dateParam +
-          "&stockNo=" +
-          stock;
-
-        try {
-          const historyResponse = await fetch(historyUrl, {
-            headers: {
-              "User-Agent": "Mozilla/5.0",
-              "Accept": "application/json"
-            }
-          });
-
-          const historyData = await historyResponse.json();
-
-          if (
-            historyData &&
-            Array.isArray(historyData.data)
-          ) {
-            for (const row of historyData.data) {
-              if (row.length >= 7) {
-                const closeValue = parseNumber(row[6]);
-
-                if (
-                  closeValue !== null &&
-                  closeValue > 0
-                ) {
-                  closes.push({
-                    date: row[0],
-                    close: closeValue
-                  });
-                }
-              }
-            }
-          }
-        } catch (e) {
-          // 某個月份抓不到就繼續
-        }
-      }
-
-      /*
-       * 去除重複日期
-       */
-      const unique = {};
-
-      for (const item of closes) {
-        unique[item.date] = item.close;
-      }
-
-      const historicalCloses = Object.keys(unique)
-        .map(date => ({
-          date,
-          close: unique[date]
-        }))
-        .sort((a, b) =>
-          a.date.localeCompare(b.date)
-        );
-
-      /*
-       * 取最近 20 個交易日
-       */
-      const last20 =
-        historicalCloses.slice(-20);
-
-      /*
-       * 如果今天已經有收盤價，
-       * 而歷史資料尚未包含今天，
-       * 可以把最新價格加入計算。
-       */
-      if (
-        latestPrice &&
-        last20.length > 0
-      ) {
-        const latestHistorical =
-          last20[last20.length - 1];
-
-        /*
-         * 簡單避免重複加入
-         */
-        if (
-          String(latestHistorical.close) !==
-          String(latestPrice)
-        ) {
-          last20.push({
-            date: "NOW",
-            close: latestPrice
-          });
-        }
-      }
-
-      /*
-       * 取最後20筆
-       */
-      const month20 =
-        last20.slice(-20);
-
-      let monthlyMA = null;
-
-      if (month20.length >= 20) {
-        const sum = month20.reduce(
-          (total, item) =>
-            total + item.close,
-          0
-        );
-
-        monthlyMA =
-          Math.round(
-            (sum / month20.length) * 100
-          ) / 100;
-      }
-
-      /*
-       * ============================
-       * 3. 漲跌
-       * ============================
-       */
-
-      let change = null;
-      let changePercent = null;
-
-      if (
-        latestPrice !== null &&
-        previousClose !== null &&
-        previousClose !== 0
-      ) {
-        change =
-          Math.round(
-            (latestPrice - previousClose) * 100
-          ) / 100;
-
-        changePercent =
-          Math.round(
-            ((latestPrice - previousClose) /
-              previousClose) *
-              10000
-          ) / 100;
-      }
-
-      /*
-       * ============================
-       * 4. 回傳
-       * ============================
-       */
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-
-          stock: realStock,
-          market,
-
-          name,
-
-          price: latestPrice,
-
-          previousClose,
-
-          open,
-
-          high,
-
-          low,
-
-          volume,
-
-          bid1,
-
-          ask1,
-
-          change,
-
-          changePercent,
-
-          monthlyMA,
-
-          monthMAName: "月線20MA",
-
-          updateTime:
-            new Date().toISOString()
-        }),
-        {
-          status: 200,
-          headers: corsHeaders
-        }
-      );
-
-    } catch (error) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: error.message
-        }),
-        {
-          status: 500,
-          headers: corsHeaders
-        }
-      );
-    }
-  }
-};
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>股票關卡計算機 V7</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#f3f4f6;
+font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",Arial,sans-serif;
+color:#222;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+padding:22px 14px 70px;
+}
+
+.header{
+text-align:center;
+margin-bottom:20px;
+}
+
+.header h1{
+font-size:32px;
+margin:0;
+font-weight:900;
+}
+
+.header p{
+font-size:17px;
+color:#777;
+margin:8px 0 0;
+}
+
+.card{
+background:white;
+border-radius:28px;
+padding:22px;
+margin-bottom:18px;
+box-shadow:0 5px 18px rgba(0,0,0,.05);
+}
+
+.label{
+font-size:20px;
+font-weight:900;
+margin-bottom:12px;
+}
+
+.search{
+display:flex;
+gap:12px;
+}
+
+input{
+width:100%;
+border:2px solid #d9dde3;
+border-radius:20px;
+padding:17px;
+font-size:23px;
+outline:none;
+}
+
+input:focus{
+border-color:#222;
+}
+
+button{
+border:0;
+border-radius:18px;
+background:#222;
+color:#fff;
+font-size:19px;
+font-weight:900;
+padding:0 28px;
+min-height:56px;
+}
+
+button:active{
+transform:scale(.97);
+}
+
+.status{
+margin-top:14px;
+padding:15px;
+border-radius:18px;
+background:#f1f2f4;
+font-size:17px;
+font-weight:800;
+}
+
+.status.ok{
+background:#e7f8ec;
+color:#15803d;
+}
+
+.status.error{
+background:#fff0f0;
+color:#d02020;
+}
+
+.title{
+font-size:25px;
+font-weight:900;
+margin-bottom:16px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:13px;
+}
+
+.box{
+background:#f5f6f8;
+border-radius:21px;
+padding:18px;
+min-height:108px;
+}
+
+.box small{
+display:block;
+font-size:17px;
+color:#777;
+}
+
+.value{
+margin-top:9px;
+font-size:25px;
+font-weight:900;
+}
+
+.big{
+font-size:34px;
+}
+
+.red{
+color:#df2727;
+}
+
+.green{
+color:#07843c;
+}
+
+.cost-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:13px;
+}
+
+.cost{
+background:#f5f6f8;
+border-radius:20px;
+padding:17px;
+}
+
+.cost input{
+margin-top:8px;
+font-size:21px;
+}
+
+.levels{
+display:grid;
+gap:11px;
+}
+
+.level{
+display:flex;
+justify-content:space-between;
+align-items:center;
+background:#f5f6f8;
+border-radius:20px;
+padding:18px;
+}
+
+.level-name{
+font-size:19px;
+font-weight:900;
+}
+
+.level-value{
+font-size:24px;
+font-weight:900;
+}
+
+.lucky{
+background:#fff7d5;
+border-radius:20px;
+padding:20px;
+text-align:center;
+font-size:20px;
+font-weight:900;
+}
+
+.actions{
+display:flex;
+gap:10px;
+margin-top:14px;
+}
+
+.lucky-btn{
+background:#e5a300;
+}
+
+.clear-btn{
+background:#e5e7eb;
+color:#222;
+}
+
+.footer{
+text-align:center;
+color:#999;
+font-size:14px;
+margin-top:25px;
+}
+
+@media(max-width:600px){
+
+.header h1{
+font-size:28px;
+}
+
+.header p{
+font-size:15px;
+}
+
+.card{
+padding:18px;
+}
+
+.search{
+flex-direction:column;
+}
+
+.search button{
+width:100%;
+}
+
+.box{
+padding:15px;
+}
+
+.box small{
+font-size:15px;
+}
+
+.value{
+font-size:21px;
+}
+
+.big{
+font-size:29px;
+}
+
+.level-value{
+font-size:21px;
+}
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>📈 股票關卡計算機 V7</h1>
+<p>即時行情・5秒更新・🐰仙兔關卡・成本計算</p>
+</div>
+
+
+<!-- 查詢 -->
+
+<div class="card">
+
+<div class="label">
+🔎 股票代號／名稱
+</div>
+
+<div class="search">
+
+<input
+id="stockInput"
+value="1326"
+placeholder="例如：2330"
+/>
+
+<button onclick="searchStock()">
+查詢
+</button>
+
+</div>
+
+<div id="status" class="status">
+📡 尚未連線行情
+</div>
+
+</div>
+
+
+<!-- 行情 -->
+
+<div class="card">
+
+<div class="title">
+📡 即時行情
+</div>
+
+<div class="grid">
+
+<div class="box">
+<small>股票名稱</small>
+<div id="name" class="value">--</div>
+</div>
+
+<div class="box">
+<small>代號</small>
+<div id="code" class="value">--</div>
+</div>
+
+<div class="box">
+<small>現價</small>
+<div id="price" class="value big">--</div>
+</div>
+
+<div class="box">
+<small>昨收</small>
+<div id="yesterday" class="value">--</div>
+</div>
+
+<div class="box">
+<small>今日開盤</small>
+<div id="open" class="value">--</div>
+</div>
+
+<div class="box">
+<small>今日收盤</small>
+<div id="close" class="value">--</div>
+</div>
+
+<div class="box">
+<small>最高／最低</small>
+<div id="highlow" class="value">--</div>
+</div>
+
+<div class="box">
+<small>成交量</small>
+<div id="volume" class="value">--</div>
+</div>
+
+<div class="box">
+<small>買一</small>
+<div id="bid" class="value">--</div>
+</div>
+
+<div class="box">
+<small>賣一</small>
+<div id="ask" class="value">--</div>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- 成本 -->
+
+<div class="card">
+
+<div class="title">
+💰 成本／月線
+</div>
+
+<div class="cost-grid">
+
+<div class="cost">
+
+<small>我的成本價</small>
+
+<input
+id="cost"
+type="number"
+step="0.01"
+placeholder="例如 36.30"
+oninput="calculate()"
+/>
+
+</div>
+
+
+<div class="cost">
+
+<small>📈 月線（20MA）</small>
+
+<div id="ma20" class="value">
+--
+</div>
+
+</div>
+
+
+<div class="cost">
+
+<small>目前損益</small>
+
+<div id="profit" class="value">
+--
+</div>
+
+</div>
+
+
+<div class="cost">
+
+<small>損益幅度</small>
+
+<div id="profitPercent" class="value">
+--
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- 仙兔 -->
+
+<div class="card">
+
+<div class="title">
+🐰 仙兔關卡
+</div>
+
+<div class="levels">
+
+<div class="level">
+<div class="level-name">🥕 第一關</div>
+<div id="level1" class="level-value">--</div>
+</div>
+
+<div class="level">
+<div class="level-name">🥕 第二關</div>
+<div id="level2" class="level-value">--</div>
+</div>
+
+<div class="level">
+<div class="level-name">🥕 第三關</div>
+<div id="level3" class="level-value">--</div>
+</div>
+
+<div class="level">
+<div class="level-name">🛡️ 月線支撐</div>
+<div id="support" class="level-value">--</div>
+</div>
+
+<div class="level">
+<div class="level-name">⚠️ 跌破警戒</div>
+<div id="warning" class="level-value">--</div>
+</div>
+
+<div class="level">
+<div class="level-name">🎯 目標價</div>
+<div id="target" class="level-value">--</div>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- 幸運 -->
+
+<div class="card">
+
+<div class="title">
+🍀 幸運股票
+</div>
+
+<div id="lucky" class="lucky">
+🐰 仙兔祝你股市順利、一路上漲！
+</div>
+
+<div class="actions">
+
+<button class="lucky-btn" onclick="lucky()">
+🍀 送幸運
+</button>
+
+<button class="clear-btn" onclick="clearAll()">
+🧹 清除股票
+</button>
+
+</div>
+
+</div>
+
+
+<div class="footer">
+股票關卡計算機 V7
+</div>
+
+</div>
+
+
+<script>
+
+let data=null;
+let timer=null;
+
+
+/* ==========================
+   查詢股票
+========================== */
+
+async function searchStock(){
+
+const stock=document
+.getElementById("stockInput")
+.value
+.trim();
+
+if(!stock){
+
+setStatus(
+"❌ 請輸入股票代號",
+"error"
+);
+
+return;
+}
+
+setStatus(
+"📡 正在連線行情...",
+""
+);
+
+try{
+
+/*
+上市行情
+*/
+
+let url=
+"https://mis.twse.com.tw/stock/api/getStockInfo.jsp"+
+"?ex_ch=tse_"+stock+".tw"+
+"&json=1"+
+"&delay=0"+
+"&_="+Date.now();
+
+let res=await fetch(url);
+
+let json=await res.json();
 
 
 /*
- * ============================
- * 數字處理
- * ============================
- */
+如果上市查不到
+改查上櫃
+*/
 
-function parseNumber(value) {
-  if (value === null || value === undefined) {
-    return null;
-  }
+if(
+!json.msgArray||
+json.msgArray.length===0
+){
 
-  const cleaned =
-    String(value)
-      .replace(/,/g, "")
-      .replace(/,/g, "")
-      .trim();
+url=
+"https://mis.twse.com.tw/stock/api/getStockInfo.jsp"+
+"?ex_ch=otc_"+stock+".tw"+
+"&json=1"+
+"&delay=0"+
+"&_="+Date.now();
 
-  if (
-    cleaned === "" ||
-    cleaned === "--" ||
-    cleaned === "-"
-  ) {
-    return null;
-  }
+res=await fetch(url);
 
-  const n = Number(cleaned);
+json=await res.json();
 
-  return Number.isFinite(n)
-    ? n
-    : null;
 }
 
-function toNumber(value) {
-  return parseNumber(value);
+
+if(
+!json.msgArray||
+json.msgArray.length===0
+){
+
+throw new Error(
+"找不到這支股票"
+);
+
 }
+
+
+const q=json.msgArray[0];
+
+const price=num(q.z);
+
+const yesterday=num(q.y);
+
+const open=num(q.o);
+
+const high=num(q.h);
+
+const low=num(q.l);
+
+const volume=num(q.v);
+
+const bid=
+q.b ?
+num(String(q.b).split("_")[0])
+:null;
+
+const ask=
+q.a ?
+num(String(q.a).split("_")[0])
+:null;
+
+
+data={
+stock,
+name:q.n||"--",
+price,
+yesterday,
+open,
+high,
+low,
+volume,
+bid,
+ask
+};
+
+
+render();
+
+await getMA(stock);
+
+calculate();
+
+
+setStatus(
+"🟢 行情已連線・5秒自動更新",
+"ok"
+);
+
+
+if(timer){
+clearInterval(timer);
+}
+
+timer=setInterval(
+searchStock,
+5000
+);
+
+
+}catch(e){
+
+console.error(e);
+
+setStatus(
+"❌ 連線失敗："+e.message,
+"error"
+);
+
+}
+
+}
+
+
+/* ==========================
+   月線
+========================== */
+
+async function getMA(stock){
+
+try{
+
+let closes=[];
+
+const now=new Date();
+
+
+/*
+抓最近3個月
+*/
+
+for(let i=0;i<3;i++){
+
+const d=new Date(
+now.getFullYear(),
+now.getMonth()-i,
+1
+);
+
+const yyyy=d.getFullYear();
+
+const mm=String(
+d.getMonth()+1
+).padStart(2,"0");
+
+
+const date=
+yyyy+mm+"01";
+
+
+const url=
+"https://www.twse.com.tw/exchangeReport/STOCK_DAY"+
+"?response=json"+
+"&date="+date+
+"&stockNo="+stock+
+"&_="+Date.now();
+
+
+const res=await fetch(url);
+
+const json=await res.json();
+
+
+if(
+json.data &&
+Array.isArray(json.data)
+){
+
+for(const row of json.data){
+
+if(row.length>=7){
+
+const close=parseNumber(
+row[6]
+);
+
+if(close!==null){
+
+closes.push(close);
+
+}
+
+}
+
+}
+
+}
+
+}
+
+
+/*
+最近20筆
+*/
+
+closes=closes.slice(-20);
+
+
+/*
+加上目前價格
+*/
+
+if(
+data &&
+data.price!==null
+){
+
+closes.push(data.price);
+
+closes=closes.slice(-20);
+
+}
+
+
+if(closes.length>=20){
+
+const sum=
+closes.reduce(
+(a,b)=>a+b,
+0
+);
+
+const ma=
+sum/closes.length;
+
+data.ma20=
+Math.round(
+ma*100
+)/100;
+
+}else{
+
+data.ma20=null;
+
+}
+
+
+document.getElementById(
+"ma20"
+).textContent=
+format(data.ma20);
+
+
+}catch(e){
+
+console.log(
+"月線抓取失敗",
+e
+);
+
+document.getElementById(
+"ma20"
+).textContent="--";
+
+}
+
+}
+
+
+/* ==========================
+   顯示
+========================== */
+
+function render(){
+
+document.getElementById("name")
+.textContent=data.name;
+
+document.getElementById("code")
+.textContent=data.stock;
+
+document.getElementById("price")
+.textContent=format(data.price);
+
+document.getElementById("yesterday")
+.textContent=format(data.yesterday);
+
+document.getElementById("open")
+.textContent=format(data.open);
+
+document.getElementById("highlow")
+.textContent=
+format(data.high)+
+" / "+
+format(data.low);
+
+document.getElementById("volume")
+.textContent=
+data.volume!==null
+?data.volume.toLocaleString()
+:"--";
+
+document.getElementById("bid")
+.textContent=format(data.bid);
+
+document.getElementById("ask")
+.textContent=format(data.ask);
+
+
+/*
+判斷收盤
+*/
+
+const now=new Date();
+
+const hour=now.getHours();
+
+const minute=now.getMinutes();
+
+
+if(
+hour>13 ||
+(hour===13 && minute>=30)
+){
+
+document.getElementById("close")
+.textContent=
+format(data.price);
+
+}else{
+
+document.getElementById("close")
+.textContent="盤中";
+
+}
+
+
+/*
+漲跌顏色
+*/
+
+const p=document.getElementById("price");
+
+p.classList.remove(
+"red",
+"green"
+);
+
+if(
+data.price!==null &&
+data.yesterday!==null
+){
+
+if(data.price>data.yesterday){
+
+p.classList.add("red");
+
+}
+
+if(data.price<data.yesterday){
+
+p.classList.add("green");
+
+}
+
+}
+
+}
+
+
+/* ==========================
+   成本
+========================== */
+
+function calculate(){
+
+if(!data||
+data.price===null){
+
+return;
+
+}
+
+const cost=Number(
+document.getElementById("cost")
+.value
+);
+
+
+if(!cost){
+
+document.getElementById("profit")
+.textContent="--";
+
+document.getElementById("profitPercent")
+.textContent="--";
+
+}else{
+
+const profit=
+data.price-cost;
+
+const percent=
+profit/cost*100;
+
+
+document.getElementById("profit")
+.textContent=
+profit.toFixed(2);
+
+
+document.getElementById("profitPercent")
+.textContent=
+percent.toFixed(2)+"%";
+
+
+const p=
+document.getElementById("profit");
+
+const pp=
+document.getElementById(
+"profitPercent"
+);
+
+p.classList.remove(
+"red",
+"green"
+);
+
+pp.classList.remove(
+"red",
+"green"
+);
+
+if(profit>0){
+
+p.classList.add("red");
+pp.classList.add("red");
+
+}
+
+if(profit<0){
+
+p.classList.add("green");
+pp.classList.add("green");
+
+}
+
+}
+
+
+/*
+仙兔關卡
+*/
+
+const price=data.price;
+
+const l1=price*1.03;
+const l2=price*1.06;
+const l3=price*1.10;
+
+const support=
+data.ma20 ||
+price*0.97;
+
+const warning=
+support*0.98;
+
+const target=l3;
+
+
+document.getElementById("level1")
+.textContent=l1.toFixed(2);
+
+document.getElementById("level2")
+.textContent=l2.toFixed(2);
+
+document.getElementById("level3")
+.textContent=l3.toFixed(2);
+
+document.getElementById("support")
+.textContent=
+Number(support).toFixed(2);
+
+document.getElementById("warning")
+.textContent=
+Number(warning).toFixed(2);
+
+document.getElementById("target")
+.textContent=
+target.toFixed(2);
+
+}
+
+
+/* ==========================
+   幸運
+========================== */
+
+function lucky(){
+
+const arr=[
+
+"🐰 仙兔送你幸運：今天順順利利！",
+
+"🍀 好運來了：買賣都順心！",
+
+"💰 財運滿滿：穩穩賺！",
+
+"🚀 祝你股票一路順風！",
+
+"✨ 心想事成、獲利滿滿！",
+
+"🐰 仙兔保佑：守住支撐、突破關卡！"
+
+];
+
+const i=
+Math.floor(
+Math.random()*arr.length
+);
+
+document.getElementById(
+"lucky"
+).textContent=
+arr[i];
+
+}
+
+
+/* ==========================
+   清除
+========================== */
+
+function clearAll(){
+
+if(timer){
+clearInterval(timer);
+timer=null;
+}
+
+data=null;
+
+document.getElementById(
+"stockInput"
+).value="";
+
+document.getElementById(
+"cost"
+).value="";
+
+
+const ids=[
+"name",
+"code",
+"price",
+"yesterday",
+"open",
+"close",
+"highlow",
+"volume",
+"bid",
+"ask",
+"ma20",
+"profit",
+"profitPercent",
+"level1",
+"level2",
+"level3",
+"support",
+"warning",
+"target"
+];
+
+
+ids.forEach(id=>{
+document.getElementById(id)
+.textContent="--";
+});
+
+
+setStatus(
+"📡 尚未連線行情",
+""
+);
+
+}
+
+
+/* ==========================
+   工具
+========================== */
+
+function num(v){
+
+if(
+v===null||
+v===undefined||
+v===""||
+v==="-"||
+v==="--"
+){
+
+return null;
+
+}
+
+const n=Number(
+String(v).replace(/,/g,"")
+);
+
+return Number.isFinite(n)
+?n
+:null;
+
+}
+
+
+function parseNumber(v){
+
+if(
+v===null||
+v===undefined
+){
+
+return null;
+
+}
+
+let s=String(v)
+.replace(/,/g,"")
+.trim();
+
+
+/*
+證交所資料可能包含
+逗號、文字
+*/
+
+if(
+s===""||
+s==="-"||
+s==="--"
+){
+
+return null;
+
+}
+
+
+const n=Number(s);
+
+return Number.isFinite(n)
+?n
+:null;
+
+}
+
+
+function format(v){
+
+if(
+v===null||
+v===undefined||
+Number.isNaN(Number(v))
+){
+
+return "--";
+
+}
+
+return Number(v).toFixed(2);
+
+}
+
+
+function setStatus(text,type){
+
+const el=
+document.getElementById("status");
+
+el.textContent=text;
+
+el.className="status";
+
+if(type){
+
+el.classList.add(type);
+
+}
+
+}
+
+
+/* ==========================
+   Enter 查詢
+========================== */
+
+document
+.getElementById("stockInput")
+.addEventListener(
+"keydown",
+function(e){
+
+if(e.key==="Enter"){
+
+searchStock();
+
+}
+
+});
+
+
+/*
+自動第一次查詢
+*/
+
+searchStock();
+
+</script>
+
+</body>
+</html>
