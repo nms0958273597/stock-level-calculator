@@ -1,0 +1,101 @@
+from pathlib import Path
+
+from PIL import Image
+
+# Build a polished photo-backed version using the four uploaded images.
+
+srcs = [
+
+    Path("/mnt/data/5F3E1628-090B-4FA3-9BAF-85EB3ED6B171.jpeg"),
+
+    Path("/mnt/data/3E7CD9D9-14FA-4E9C-92C2-842748D74BCE.jpeg"),
+
+    Path("/mnt/data/207748A5-2F9F-406B-9450-9C1DEAFF9922.jpeg"),
+
+    Path("/mnt/data/B5BA507A-8BCC-432A-A2D9-D7A0039A2572.jpeg"),
+
+]
+
+# Make web-friendly copies next to the HTML.
+
+img_names = []
+
+for i, src in enumerate(srcs, 1):
+
+    if src.exists():
+
+        out = Path(f"/mnt/data/asang_photo_{i}.jpg")
+
+        im = Image.open(src).convert("RGB")
+
+        im.thumbnail((1200, 1200))
+
+        im.save(out, quality=88, optimize=True)
+
+        img_names.append(out.name)
+
+path = Path("/mnt/data/asang-order.html")
+
+html = path.read_text(encoding="utf-8")
+
+# Insert a visual gallery under the header if not already present.
+
+gallery = f"""
+
+<section class="hero-gallery">
+
+  <img src="{img_names[0]}" alt="阿桑大腸麵線">
+
+  <div class="gallery-small">
+
+    <img src="{img_names[1]}" alt="阿桑招牌餐點">
+
+    <img src="{img_names[2]}" alt="阿桑麵線">
+
+    <img src="{img_names[3]}" alt="阿桑店面">
+
+  </div>
+
+</section>
+
+"""
+
+if "hero-gallery" not in html:
+
+    html = html.replace(
+
+        '<main class="container">',
+
+        gallery + '\n<main class="container">'
+
+    )
+
+# Add gallery CSS.
+
+css = """
+
+.hero-gallery{max-width:680px;margin:14px auto 0;padding:0 14px;display:grid;grid-template-columns:1.55fr 1fr;gap:8px}
+
+.hero-gallery img{width:100%;height:100%;object-fit:cover;border-radius:16px;display:block}
+
+.hero-gallery>img{height:300px}
+
+.gallery-small{display:grid;grid-template-rows:repeat(3,1fr);gap:8px}
+
+.gallery-small img{min-height:94px}
+
+@media(max-width:520px){
+
+ .hero-gallery>img{height:235px}
+
+ .gallery-small img{min-height:73px}
+
+}
+
+"""
+
+html = html.replace("</style>", css + "</style>")
+
+path.write_text(html, encoding="utf-8")
+
+print("完成：已將4張店家照片加入點餐網站首頁與圖片展示區。")
