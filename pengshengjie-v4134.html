@@ -1,68 +1,144 @@
-from pathlib import Path
-import re
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>📈 股票關卡計算機 V36｜台股＋美股</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f6fa;color:#18263a;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif}
+.wrap{max-width:820px;margin:auto;padding:12px}.title{text-align:center;font-size:29px;font-weight:950;margin:12px 0 4px}
+.sub{text-align:center;color:#687486;line-height:1.6;font-size:14px;margin-bottom:14px}
+.card{background:#fff;border-radius:28px;padding:18px;margin:14px 0;box-shadow:0 7px 24px rgba(35,55,80,.08)}
+h2{font-size:23px;margin:0 0 14px;font-weight:950}
+label{display:block;font-weight:850;margin:9px 0 6px}
+input,select{width:100%;height:56px;border:0;border-radius:18px;background:#f0f4f8;padding:10px 14px;font-size:19px;outline:0;color:#18263a}
+.search{display:grid;grid-template-columns:1fr 120px;gap:10px}.grid2,.basic,.funds{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{border:0;border-radius:18px;min-height:56px;padding:10px 16px;font-size:18px;font-weight:950}
+.black{background:#202020;color:#fff}.purple{background:linear-gradient(90deg,#5c5ff2,#a64cf0);color:#fff}
+.status,.note{margin-top:11px;padding:13px 15px;border-radius:16px;background:#f1f3f5;font-weight:800;line-height:1.6}
+.ok{background:#e7f8ed;color:#14652f}.warn{background:#fff5d8;color:#755500}.err{background:#ffe8e8;color:#9e0000}
+.box{background:#f1f4f8;border-radius:18px;padding:14px;min-height:82px}.box span{display:block;color:#87919c;font-size:14px}.box b{display:block;font-size:21px;margin-top:7px;word-break:break-word}
+.rabbit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.rabbit-card{border-radius:24px;padding:17px 16px;min-height:205px}
+.rabbit-name{font-size:18px;font-weight:950}.rabbit-price{font-size:34px;font-weight:1000;margin:8px 0}.rabbit-desc{font-size:14px;color:#66717f;font-weight:800}
+.green{background:#e8f9ed}.blue{background:#e9f1ff}.purplebg{background:#f0e8ff}.yellow{background:#fff4d2}.orange{background:#ffecd9}
+.start{width:100%;font-size:25px;min-height:68px}.small{font-size:13px;color:#74808d;line-height:1.7}
+.market-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.tab{background:#edf1f6}.tab.active{background:#202020;color:#fff}
+.hidden{display:none}
+.portfolio-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.portfolio-list{display:grid;gap:10px;margin-top:12px}
+.portfolio-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#f1f4f8;border-radius:18px;padding:13px 15px}
+.danger{background:#ffe7e7;color:#a40000}
+.chip-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.chip-list{display:grid;gap:9px;margin-top:12px}
+.chip-row{display:grid;grid-template-columns:92px 1fr 90px;gap:8px;align-items:center;background:#f1f4f8;border-radius:14px;padding:10px 12px}
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.plan-card{border-radius:22px;padding:15px;min-height:145px}
+.plan-card h3{margin:0 0 10px;font-size:19px}
+@media(max-width:520px){.wrap{padding:10px}.title{font-size:25px}.card{border-radius:25px;padding:16px}.rabbit-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="title">📈 股票關卡計算機 V36</div>
+<div class="sub">🇹🇼 台股／ETF＋🇺🇸 美股｜📊 三大法人完整版｜📈 5日線／20日線｜🐰 仙兔關卡｜🎯 交易計畫</div>
 
-src = Path("/mnt/data/pengshengjie-v35.html")
-html = src.read_text(encoding="utf-8")
+<div class="card">
+<h2>🔎 搜尋股票</h2>
+<div class="market-tabs">
+<button id="twTab" class="tab active" onclick="setMarket('TW')">🇹🇼 台股／ETF</button>
+<button id="usTab" class="tab" onclick="setMarket('US')">🇺🇸 美國股票</button>
+</div>
+<label>股票代號／名稱</label>
+<div class="search">
+<input id="search" placeholder="台股：2330、台化、0050；美股：AAPL、NVDA、TSLA">
+<button class="black" onclick="searchStock()">搜尋</button>
+</div>
+<div id="status" class="status">尚未查詢</div>
+</div>
 
-# Version
-html = html.replace("股票關卡計算機 V35", "股票關卡計算機 V36")
-html = html.replace("🟢 V35｜", "🟢 V36｜")
+<div class="card">
+<h2>📊 基本資訊</h2>
+<div class="basic">
+<div class="box"><span>股票代號</span><b id="symbol">--</b></div>
+<div class="box"><span>股票名稱</span><b id="name">--</b></div>
+<div class="box"><span>交易日期</span><b id="date">--</b></div>
+<div class="box"><span>市場</span><b id="market">--</b></div>
+<div class="box"><span>現價</span><b id="price">--</b></div>
+<div class="box"><span>昨收</span><b id="prev">--</b></div>
+<div class="box"><span>開盤</span><b id="open">--</b></div>
+<div class="box"><span>最高</span><b id="high">--</b></div>
+<div class="box"><span>最低</span><b id="low">--</b></div>
+<div class="box"><span>成交量</span><b id="volume">--</b></div>
+<div class="box"><span>📈 5日線</span><b id="ma5">--</b></div>
+<div class="box"><span>📈 20日線</span><b id="ma20">--</b></div><div class="box"><span>📈 60日線（季線）</span><b id="ma60">--</b></div>
+</div>
+</div>
 
-# ---------- 60-day line ----------
-ma20_html = '<div class="box"><span>📈 20日線</span><b id="ma20">--</b></div>'
-if ma20_html in html:
-    html = html.replace(
-        ma20_html,
-        ma20_html + '<div class="box"><span>📈 60日線（季線）</span><b id="ma60">--</b></div>',
-        1
-    )
-else:
-    raise RuntimeError("找不到20日線顯示區")
+<div id="twOnly">
+<div class="card">
+<h2>🌍 三大法人（完整算法）</h2>
+<div class="funds">
+<div class="box"><span>🌍 外資及陸資（張）</span><b id="foreign">--</b></div>
+<div class="box"><span>🏦 投信（張）</span><b id="trust">--</b></div>
+<div class="box"><span>🏢 自營商（自行＋避險／張）</span><b id="dealer">--</b></div>
+<div class="box"><span>🔥 三大法人合計（張）</span><b id="fundTotal">--</b></div>
+</div>
+<div class="small">原始資料以股計算；畫面統一換算為張。外資及陸資＝Foreign_Investor＋Foreign_Dealer_Self；自營商＝Dealer＋Dealer_self＋Dealer_Hedging；三大法人＝外資及陸資＋投信＋自營商。2014 年後自營商拆為自行與避險，不能漏算。</div>
+<div id="fundStatus" class="status">搜尋台股後取得最近交易日資料。</div>
+</div>
 
-# Request enough history for 60MA
-html = html.replace('start_date:dstr(days(-90))', 'start_date:dstr(days(-180))')
+<div class="card">
+<h2>💳 融資券</h2>
+<div class="funds">
+<div class="box"><span>融資買進</span><b id="marginBuy">--</b></div>
+<div class="box"><span>融資賣出</span><b id="marginSell">--</b></div>
+<div class="box"><span>融資餘額</span><b id="marginBal">--</b></div>
+<div class="box"><span>融券買進</span><b id="shortBuy">--</b></div>
+<div class="box"><span>融券賣出</span><b id="shortSell">--</b></div>
+<div class="box"><span>融券餘額</span><b id="shortBal">--</b></div>
+</div>
+<div id="marginStatus" class="status">搜尋股票後取得資料。</div>
+</div>
+</div>
 
-# Add ma60 to TWSE fallback
-html = html.replace(
-    '$("ma5").textContent="需歷史資料";$("ma20").textContent="需歷史資料";return;',
-    '$("ma5").textContent="需歷史資料";$("ma20").textContent="需歷史資料";$("ma60").textContent="需歷史資料";return;',
-    1
-)
+<div class="card">
+<h2>🐰 仙兔關卡</h2>
+<div class="grid2">
+<div><label>💰 現價</label><input id="currentPrice" type="number" step="0.01"></div>
+<div><label>🐰 主力／外資成本價</label><input id="cost" type="number" step="0.01"></div>
+<div><label>🚀 營收飆漲價</label><input id="revenueTarget" type="number" step="0.01"></div>
+<div><label>📐 關卡間距 %</label><input id="stepPct" type="number" step="0.1" value="3"></div>
+</div>
+<div class="note">📌 「勝率參考」是價格位置參考，不是真實歷史勝率。<br>📌 美股與台股都可使用關卡計算。</div>
+<div id="levels"></div>
+</div>
 
-# Add MA60 to Taiwan loadPrice
-tw_pat = re.compile(r'(\$\("ma20"\)\.textContent=\s*c\.length>=20\s*\?F\(c\.slice\(-20\)\.reduce\(\(a,b\)=>a\+b,0\)/20\)\s*:"--";)', re.S)
-m = tw_pat.search(html)
-if not m:
-    raise RuntimeError("找不到台股20日線計算")
-html = html[:m.end()] + '\n$("ma60").textContent=c.length>=60?F(c.slice(-60).reduce((a,b)=>a+b,0)/60):"--";' + html[m.end():]
+<div class="card">
+<h2>🚀 營收飆漲</h2>
+<div id="revenueSummary" class="note">填好現價、成本、營收飆漲價後按「開始計算」。</div>
+</div>
 
-# Add MA60 to US loadPrice
-us_pat = re.compile(r'(\$\("ma20"\)\.textContent=c\.length>=20\?F\(c\.slice\(-20\)\.reduce\(\(a,b\)=>a\+b,0\)/20\):"--";)')
-m = us_pat.search(html)
-if not m:
-    raise RuntimeError("找不到美股20日線計算")
-html = html[:m.end()] + '\n$("ma60").textContent=c.length>=60?F(c.slice(-60).reduce((a,b)=>a+b,0)/60):"--";' + html[m.end():]
+<div class="card">
+<button class="purple start" onclick="startCalculate()">🚀 開始計算</button>
+<div id="calcStatus" class="status">等待輸入。</div>
+</div>
 
-# ---------- Trading judgement uses 60MA ----------
-html = html.replace(
-    'const m20=N($("ma20").textContent);\n  if(p==null || c==null || p<=0 || c<=0){',
-    'const m20=N($("ma20").textContent);\n  const m60=N($("ma60").textContent);\n  if(p==null || c==null || p<=0 || c<=0){',
-    1
-)
-html = html.replace(
-    '系統會一起參考20日線。";',
-    '系統會一起參考20日線與60日線。";',
-    1
-)
-html = html.replace(
-    'const observeLow=Math.min(c, m20??c);\n  const observeHigh=Math.max(c, m20??c);\n  const breakout=Math.max(c*1.08, m20??c);',
-    'const trendBase=m60??m20??c;\n  const observeLow=Math.min(c, m20??trendBase);\n  const observeHigh=Math.max(c, m20??trendBase);\n  const breakout=Math.max(c*1.08, m20??c, trendBase);',
-    1
-)
+<div class="card">
+<h2>🧭 交易判斷區</h2>
+<div class="grid2">
+<div class="box"><span>🐰 主力／外資成本</span><b id="judgeCost">--</b></div>
+<div class="box"><span>📍 第一進場區</span><b id="entry1">--</b></div>
+<div class="box"><span>🟡 觀察區</span><b id="observe">--</b></div>
+<div class="box"><span>🚀 突破關卡</span><b id="breakoutPrice">--</b></div>
+<div class="box"><span>🔴 建議止損</span><b id="judgeSL">--</b></div>
+<div class="box"><span>🎯 第一止盈</span><b id="judgeTP">--</b></div>
+</div>
+<div id="judgeSummary" class="status">填入成本價後按「開始計算」，系統會產生價格位置判斷。</div>
+<div class="small">📌 這是價格與均線位置的規則化參考，不代表保證獲利，也不是投資保證。</div>
+</div>
 
-# ---------- V27-style Hot Chip K line ----------
-marker = '<div class="card">\n<h2>🎯 我的交易計畫</h2>'
-chip_card = '''<div class="card">
+<div class="card">
 <h2>📊 熱門籌碼 K 線</h2>
 <div class="note">
 籌碼 K 線屬第三方分析入口；本頁不假裝抓取第三方網站內部資料。
@@ -79,31 +155,21 @@ chip_card = '''<div class="card">
 <div id="chipList" class="chip-list"></div>
 </div>
 
-'''
-if marker not in html:
-    raise RuntimeError("找不到我的交易計畫")
-html = html.replace(marker, chip_card + marker, 1)
-
-# CSS for restored sections
-css = '''.portfolio-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.portfolio-list{display:grid;gap:10px;margin-top:12px}
-.portfolio-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#f1f4f8;border-radius:18px;padding:13px 15px}
-.danger{background:#ffe7e7;color:#a40000}
-.chip-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.chip-list{display:grid;gap:9px;margin-top:12px}
-.chip-row{display:grid;grid-template-columns:92px 1fr 90px;gap:8px;align-items:center;background:#f1f4f8;border-radius:14px;padding:10px 12px}
-.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-.plan-card{border-radius:22px;padding:15px;min-height:145px}
-.plan-card h3{margin:0 0 10px;font-size:19px}
-'''
-html = html.replace("@media(max-width:520px){", css + "@media(max-width:520px){", 1)
-
-# ---------- Three add positions ----------
-pnl_pat = re.compile(r'(<div class="box" style="margin-top:10px">\s*<span>📊 目前損益</span>\s*<b id="pnl">--</b>\s*</div>)', re.S)
-m = pnl_pat.search(html)
-if not m:
-    raise RuntimeError("找不到目前損益")
-adds = r'''\1
+<div class="card">
+<h2>🎯 我的交易計畫</h2>
+<div class="grid2">
+<div><label>我的實際成本</label><input id="myCost" type="number" step="0.01"></div>
+<div><label>持有股數</label><input id="shares" type="number" step="1"></div>
+</div>
+<div class="grid2" style="margin-top:10px">
+<div class="box"><span>🟢 第一止盈</span><b id="tp1">--</b></div>
+<div class="box"><span>🟢 第二止盈</span><b id="tp2">--</b></div>
+<div class="box"><span>🟢 第三止盈</span><b id="tp3">--</b></div>
+<div class="box"><span>🔴 第一止損</span><b id="sl1">--</b></div>
+<div class="box"><span>🔴 第二止損</span><b id="sl2">--</b></div>
+<div class="box"><span>🔴 第三止損</span><b id="sl3">--</b></div>
+</div>
+\1
 <div class="plan-grid">
 <div class="plan-card yellow"><h3>🟡 第一補倉</h3><div class="box"><span>自動建議</span><b id="add1">--</b></div></div>
 <div class="plan-card yellow"><h3>🟡 第二補倉</h3><div class="box"><span>自動建議</span><b id="add2">--</b></div></div>
@@ -112,13 +178,15 @@ adds = r'''\1
 <div class="note">
 ⚠️ 自動建議是計算模型，不代表跌到價格就一定應該買進，也不代表一定應該賣出。
 請搭配5日線、20日線、60日線、法人與大盤環境確認。
-</div>'''
-html = html[:m.start()] + adds + html[m.end():]
+</div>
+</div>
 
-# ---------- My stocks ----------
-# Insert before the final source-information card.
-last_card = html.rfind('<div class="card">')
-portfolio = '''<div class="card">
+<div class="card">
+<h2>📈 均線位置</h2>
+<div id="breakout" class="note">搜尋股票後自動判斷。</div>
+</div>
+
+<div class="card">
 <h2>💾 我的股票</h2>
 <div class="note">把常看的股票保存於本機瀏覽器，方便下次快速查看。資料不會上傳到網站。</div>
 <div class="portfolio-actions">
@@ -128,12 +196,230 @@ portfolio = '''<div class="card">
 <div id="portfolioList" class="portfolio-list"></div>
 </div>
 
-'''
-html = html[:last_card] + portfolio + html[last_card:]
+<div class="card"><div class="small">
+🟢 V36｜台股行情／籌碼使用 FinMind，台股行情失敗時嘗試 TWSE。<br>
+🇺🇸 美股使用 FinMind USStockPrice 日線資料。<br>
+📌 網頁顯示的是資料來源目前提供的最新交易資料，不保證逐筆即時。<br>
+📌 不會在抓不到資料時自行亂填數字。
+</div></div>
+</div>
 
-# ---------- JS: chip watch + saved stocks ----------
-needle = "function calculate(){"
-helpers = '''function addChip(){
+<script>
+const FIN="https://api.finmindtrade.com/api/v4/data";
+const TWSE="https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL";
+const $=id=>document.getElementById(id);
+const N=x=>{const n=parseFloat(String(x??"").replace(/,/g,""));return Number.isFinite(n)?n:null};
+const F=x=>x==null?"--":Number(x).toLocaleString("zh-TW",{maximumFractionDigits:2});
+const dstr=d=>d.toISOString().slice(0,10);
+const days=n=>{const d=new Date();d.setDate(d.getDate()+n);return d};
+let mode="TW", current={code:"",name:"",market:"",currency:"TWD"};
+
+const usNames={
+AAPL:"Apple 蘋果",NVDA:"NVIDIA 輝達",MSFT:"Microsoft 微軟",AMZN:"Amazon 亞馬遜",
+GOOGL:"Alphabet Google",GOOG:"Alphabet Google",META:"Meta",TSLA:"Tesla 特斯拉",
+AMD:"AMD",AVGO:"Broadcom 博通",NFLX:"Netflix",INTC:"Intel 英特爾",QCOM:"Qualcomm",
+MU:"Micron 美光",ARM:"Arm",PLTR:"Palantir",ORCL:"Oracle",CRM:"Salesforce",
+COST:"Costco",JPM:"JPMorgan",V:"Visa",MA:"Mastercard",COIN:"Coinbase"
+};
+
+function msg(t,c=""){ $("status").textContent=t;$("status").className="status "+c; }
+async function fetchJSON(url){
+ const r=await fetch(url,{cache:"no-store"});
+ if(!r.ok)throw Error("HTTP "+r.status);
+ return await r.json();
+}
+async function fin(dataset,params={}){
+ const q=new URLSearchParams({dataset,...params});
+ const j=await fetchJSON(FIN+"?"+q.toString());
+ if(!j.data)throw Error(j.msg||"FinMind 無資料");
+ return j.data;
+}
+function setMarket(m){
+ mode=m;
+ $("twTab").classList.toggle("active",m==="TW");
+ $("usTab").classList.toggle("active",m==="US");
+ $("twOnly").classList.toggle("hidden",m!=="TW");
+ $("search").placeholder=m==="TW"?"2330、台化、0050":"AAPL、NVDA、TSLA、MSFT";
+ msg(m==="TW"?"目前搜尋：台股／ETF":"目前搜尋：美國股票","ok");
+}
+async function searchStock(){
+ const raw=$("search").value.trim();
+ if(!raw){msg("請輸入股票代號或名稱","warn");return}
+ msg("搜尋中："+raw+" …");
+ try{
+   if(mode==="TW") await searchTW(raw); else await searchUS(raw);
+ }catch(e){msg("查詢失敗："+e.message,"err")}
+}
+async function searchTW(raw){
+ let code=raw,name=raw,market="台股";
+ if(!/^[0-9]{4,6}$/.test(raw)){
+   const info=await fin("TaiwanStockInfo");
+   let hit=info.find(x=>String(x.stock_id).toUpperCase()===raw.toUpperCase());
+   if(!hit)hit=info.find(x=>String(x.stock_name||"").trim()===raw);
+   if(!hit)hit=info.find(x=>String(x.stock_name||"").includes(raw));
+   if(!hit)throw Error("找不到台股／ETF");
+   code=String(hit.stock_id);name=String(hit.stock_name||raw);market=String(hit.market||"台股");
+ }else{
+   try{
+     const info=await fin("TaiwanStockInfo");
+     const hit=info.find(x=>String(x.stock_id)===raw);
+     if(hit){name=String(hit.stock_name||raw);market=String(hit.market||"台股")}
+   }catch(e){}
+ }
+ current={code,name,market,currency:"TWD"};
+ $("symbol").textContent=code;$("name").textContent=name;$("market").textContent=market;
+ msg("已找到 "+name+"（"+code+"），正在抓行情…","ok");
+ await loadTWPrice(); await loadFunds(); await loadMargin(); finishSearch();
+}
+async function searchUS(raw){
+ let code=raw.toUpperCase().replace(/\s+/g,"");
+ if(!/^[A-Z][A-Z0-9.^-]{0,9}$/.test(code)){
+   const hit=Object.entries(usNames).find(([k,v])=>v.toUpperCase().includes(raw.toUpperCase()));
+   if(!hit)throw Error("美股請輸入代號，例如 AAPL、NVDA、TSLA");
+   code=hit[0];
+ }
+ let name=usNames[code]||code;
+ try{
+   const info=await fin("USStockInfo");
+   const hit=info.find(x=>String(x.stock_id).toUpperCase()===code);
+   if(hit)name=String(hit.stock_name||name);
+ }catch(e){}
+ current={code,name,market:"美國",currency:"USD"};
+ $("symbol").textContent=code;$("name").textContent=name;$("market").textContent="🇺🇸 美國";
+ msg("已找到 "+name+"（"+code+"），正在抓美股行情…","ok");
+ await loadUSPrice(); finishSearch();
+}
+function finishSearch(){
+ const p=N($("price").textContent);
+ $("currentPrice").value=p??"";
+ renderBreakout();
+}
+async function loadTWPrice(){
+ let rows=[];
+ try{rows=await fin("TaiwanStockPrice",{data_id:current.code,start_date:dstr(days(-180)),end_date:dstr(new Date())})}catch(e){}
+ if(!rows.length && /^[0-9]+$/.test(current.code)){
+   try{
+    const all=await fetchJSON(TWSE);const r=all.find(x=>String(x.Code)===current.code);
+    if(r){
+      $("date").textContent=r.Date||"--";$("price").textContent=F(N(r.ClosingPrice));$("prev").textContent="--";
+      $("open").textContent=F(N(r.OpeningPrice));$("high").textContent=F(N(r.HighestPrice));$("low").textContent=F(N(r.LowestPrice));
+      $("volume").textContent=F(N(r.TradeVolume));$("ma5").textContent="需歷史資料";$("ma20").textContent="需歷史資料";$("ma60").textContent="需歷史資料";return;
+    }
+   }catch(e){}
+ }
+ if(!rows.length)throw Error("台股行情資料目前無法取得");
+ rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ const r=rows[rows.length-1], c=rows.map(x=>N(x.close)).filter(x=>x!=null);
+ $("date").textContent=r.date||"--";$("price").textContent=F(N(r.close));
+ $("prev").textContent=rows.length>1?F(N(rows[rows.length-2].close)):"--";
+ $("open").textContent=F(N(r.open));$("high").textContent=F(N(r.max));$("low").textContent=F(N(r.min));$("volume").textContent=F(N(r.Trading_Volume));
+ $("ma5").textContent=c.length>=5?F(c.slice(-5).reduce((a,b)=>a+b,0)/5):"--";
+ $("ma20").textContent=c.length>=20?F(c.slice(-20).reduce((a,b)=>a+b,0)/20):"--";
+$("ma60").textContent=c.length>=60?F(c.slice(-60).reduce((a,b)=>a+b,0)/60):"--";
+$("ma60").textContent=c.length>=60?F(c.slice(-60).reduce((a,b)=>a+b,0)/60):"--";
+}
+async function loadUSPrice(){
+ const rows=await fin("USStockPrice",{data_id:current.code,start_date:dstr(days(-180)),end_date:dstr(new Date())});
+ if(!rows.length)throw Error("美股行情資料目前無法取得");
+ rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ const r=rows[rows.length-1],c=rows.map(x=>N(x.Close)).filter(x=>x!=null);
+ $("date").textContent=r.date||"--";$("price").textContent=F(N(r.Close));$("prev").textContent=rows.length>1?F(N(rows[rows.length-2].Close)):"--";
+ $("open").textContent=F(N(r.Open));$("high").textContent=F(N(r.High));$("low").textContent=F(N(r.Low));$("volume").textContent=F(N(r.Volume));
+ $("ma5").textContent=c.length>=5?F(c.slice(-5).reduce((a,b)=>a+b,0)/5):"--";
+ $("ma20").textContent=c.length>=20?F(c.slice(-20).reduce((a,b)=>a+b,0)/20):"--";
+}
+async function loadFunds(){
+ try{
+  const rows=await fin("TaiwanStockInstitutionalInvestorsBuySellWide",{data_id:current.code,start_date:dstr(days(-45)),end_date:dstr(new Date())});
+  if(!rows.length)throw Error();
+  rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  const r=rows[rows.length-1];
+  let foreign=0, trust=0, dealer=0;
+  const hasWide = Object.keys(r).some(k => /Dealer_Hedging|Dealer_self|Foreign_Investor|Investment_Trust/.test(k));
+  if(hasWide){
+    foreign=(N(r.Foreign_Investor_buy)||0)-(N(r.Foreign_Investor_sell)||0)
+           +(N(r.Foreign_Dealer_Self_buy)||0)-(N(r.Foreign_Dealer_Self_sell)||0);
+    trust=(N(r.Investment_Trust_buy)||0)-(N(r.Investment_Trust_sell)||0);
+    dealer=(N(r.Dealer_buy)||0)-(N(r.Dealer_sell)||0)
+          +(N(r.Dealer_self_buy)||0)-(N(r.Dealer_self_sell)||0)
+          +(N(r.Dealer_Hedging_buy)||0)-(N(r.Dealer_Hedging_sell)||0);
+  }else{
+    day.forEach(x=>{
+      const n=String(x.name||"");
+      const v=(N(x.buy)||0)-(N(x.sell)||0);
+      if(n==="Foreign_Investor" || n==="Foreign_Dealer_Self") foreign+=v;
+      else if(n==="Investment_Trust") trust+=v;
+      else if(n==="Dealer" || n==="Dealer_self" || n==="Dealer_Self" || n==="Dealer_Hedging") dealer+=v;
+    });
+  }
+  const total=foreign+trust+dealer;
+  $("foreign").textContent=F(foreign/1000);
+  $("trust").textContent=F(trust/1000);
+  $("dealer").textContent=F(dealer/1000);
+  $("fundTotal").textContent=F(total/1000);
+  $("fundStatus").textContent="已取得 "+r.date+" 三大法人資料；畫面單位：張。";$("fundStatus").className="status ok";
+ }catch(e){
+  ["foreign","trust","dealer","fundTotal"].forEach(id=>$(id).textContent="暫缺");
+  $("fundStatus").textContent="三大法人暫時無法取得。";$("fundStatus").className="status warn";
+ }
+}
+async function loadMargin(){
+ try{
+  const rows=await fin("TaiwanStockMarginPurchaseShortSale",{data_id:current.code,start_date:dstr(days(-45)),end_date:dstr(new Date())});
+  if(!rows.length)throw Error();
+  rows.sort((a,b)=>String(a.date).localeCompare(String(b.date)));const r=rows[rows.length-1];
+  $("marginBuy").textContent=F(N(r.MarginPurchaseBuy));$("marginSell").textContent=F(N(r.MarginPurchaseSell));$("marginBal").textContent=F(N(r.MarginPurchaseTodayBalance));
+  $("shortBuy").textContent=F(N(r.ShortSaleBuy));$("shortSell").textContent=F(N(r.ShortSaleSell));$("shortBal").textContent=F(N(r.ShortSaleTodayBalance));
+  $("marginStatus").textContent="已取得 "+r.date+" 融資券資料。";$("marginStatus").className="status ok";
+ }catch(e){
+  ["marginBuy","marginSell","marginBal","shortBuy","shortSell","shortBal"].forEach(id=>$(id).textContent="暫缺");
+  $("marginStatus").textContent="融資券暫時無法取得。";$("marginStatus").className="status warn";
+ }
+}
+function renderBreakout(){
+ const p=N($("price").textContent),m5=N($("ma5").textContent),m20=N($("ma20").textContent);
+ if(p==null){$("breakout").textContent="行情資料暫缺。";return}
+ $("breakout").innerHTML="現價：<b>"+F(p)+"</b>｜5日線：<b>"+F(m5)+"</b>｜20日線：<b>"+F(m20)+"</b><br>"+
+ (m5!=null?(p>=m5?"🟢 現價在5日線之上":"🔴 現價在5日線之下"):"5日線暫缺")+"｜"+
+ (m20!=null?(p>=m20?"🟢 現價在20日線之上":"🔴 現價在20日線之下"):"20日線暫缺");
+}
+function makeTradingJudgement(){
+  const p=N($("currentPrice").value);
+  const c=N($("cost").value);
+  const m20=N($("ma20").textContent);
+  const m60=N($("ma60").textContent);
+  if(p==null || c==null || p<=0 || c<=0){
+    ["judgeCost","entry1","observe","breakoutPrice","judgeSL","judgeTP"].forEach(id=>$(id).textContent="--");
+    $("judgeSummary").textContent="請先填入主力／外資成本價；若有搜尋行情，系統會一起參考20日線與60日線。";
+    $("judgeSummary").className="status warn";
+    return;
+  }
+  const entry=Math.min(c*1.03, p);
+  const trendBase=m60??m20??c;
+  const observeLow=Math.min(c, m20??trendBase);
+  const observeHigh=Math.max(c, m20??trendBase);
+  const breakout=Math.max(c*1.08, m20??c, trendBase);
+  const sl=c*0.97;
+  const tp=c*1.10;
+  $("judgeCost").textContent=F(c);
+  $("entry1").textContent=F(entry);
+  $("observe").textContent=F(observeLow)+" ～ "+F(observeHigh);
+  $("breakoutPrice").textContent=F(breakout);
+  $("judgeSL").textContent=F(sl);
+  $("judgeTP").textContent=F(tp);
+  let text;
+  if(p>=breakout){
+    text="🚀 突破區：現價已高於規則化突破關卡，可觀察是否站穩。";
+  }else if(p>=c){
+    text="🟡 成本上方：以續強與站穩20日線為主要觀察重點。";
+  }else{
+    text="🔴 成本下方：先觀察能否重新站回成本與20日線，勿急著追價。";
+  }
+  $("judgeSummary").textContent=text;
+  $("judgeSummary").className="status "+(p>=breakout?"ok":p>=c?"warn":"err");
+}
+
+function addChip(){
   const v=$("chipSearch").value.trim();
   if(!v)return;
   const a=JSON.parse(localStorage.getItem("chipWatch")||"[]");
@@ -198,17 +484,27 @@ async function loadSavedStock(i){
   await searchStock();
 }
 
-'''
-if needle not in html:
-    raise RuntimeError("找不到 calculate")
-html = html.replace(needle, helpers + needle, 1)
-
-# Add-position values in startCalculate.
-start_pat = re.compile(r'function startCalculate\(\)\{.*?\n\}', re.S)
-m = start_pat.search(html)
-if not m:
-    raise RuntimeError("找不到 startCalculate")
-new_start = '''function startCalculate(){
+function calculate(){
+ const p=N($("currentPrice").value),cost=N($("cost").value),target=N($("revenueTarget").value);
+ if(p==null||cost==null||target==null||p<=0||cost<=0||target<=0){
+  $("levels").innerHTML="";$("revenueSummary").textContent="請填入現價、成本價、營收飆漲價。";$("calcStatus").textContent="等待輸入。";$("calcStatus").className="status warn";return;
+ }
+ const up=(target/p-1)*100;
+ $("revenueSummary").innerHTML="💰 現價 <b>"+F(p)+"</b> → 🐰 成本 <b>"+F(cost)+"</b> → 🚀 營收飆漲 <b>"+F(target)+"</b><br>🚀 現價到目標：<b>"+F(up)+"%</b>";
+ const names=["🥜 起飛","🌱 關卡一","🌿 關卡二","🐰 關卡三","🚀 營收飆漲"],cls=["green","blue","purplebg","yellow","orange"];
+ let html="";
+ for(let i=0;i<5;i++){
+  const v=i===0?cost:i===4?target:cost+(target-cost)*(i/4),completion=p/v*100,need=(v/p-1)*100;
+  html+=`<div class="rabbit-card ${cls[i]}"><div class="rabbit-name">${names[i]}</div><div class="rabbit-price">${F(v)}</div>
+  <div class="rabbit-desc">${i===0?"主力／外資成本起點":i===4?"營收飆漲目標":"第 "+i+" 關目標"}</div>
+  <div style="font-size:17px;font-weight:950;margin-top:8px">📊 完成度：${F(completion)}%</div>
+  <div style="font-size:15px;font-weight:900;margin-top:6px">📈 還需：${F(need)}%</div>
+  <div style="font-size:15px;font-weight:900;margin-top:6px">🏆 勝率參考：${F(completion)}%</div></div>`;
+ }
+ $("levels").innerHTML='<div class="rabbit-grid">'+html+"</div>";
+ $("calcStatus").textContent="🟢 計算完成｜現價距離營收飆漲目標 "+F(up)+"%";$("calcStatus").className="status ok";
+}
+function startCalculate(){
   calculate();
   const c=N($("myCost").value);
 
@@ -229,31 +525,12 @@ new_start = '''function startCalculate(){
 
   updatePnL();
   makeTradingJudgement();
-}'''
-html = html[:m.start()] + new_start + html[m.end():]
-
-# Initialize saved lists before </script>
-html = html.replace("</script>", "renderChips();\nrenderPortfolio();\n</script>", 1)
-
-out = Path("/mnt/data/pengshengjie-v36.html")
-out.write_text(html, encoding="utf-8")
-
-# Basic structural checks.
-checks = [
-    'id="ma60"',
-    'function makeTradingJudgement()',
-    'function addChip()',
-    'function saveCurrentStock()',
-    'id="add1"',
-    'id="add2"',
-    'id="add3"',
-    'USStockPrice',
-    'Dealer_Hedging'
-]
-missing = [x for x in checks if x not in html]
-if missing:
-    raise RuntimeError("產生後缺少：" + ", ".join(missing))
-
-print(f"完成：{out.name}")
-print(f"檔案大小：{out.stat().st_size:,} bytes")
-print("已加入：5日線／20日線／60日線、三段補倉、熱門籌碼觀察、我的股票。")
+}
+function updatePnL(){const p=N($("price").textContent),c=N($("myCost").value),s=N($("shares").value);$("pnl").textContent=p!=null&&c!=null&&s!=null?F((p-c)*s)+" "+current.currency:"--"}
+["myCost","shares"].forEach(id=>$(id).addEventListener("input",updatePnL));
+$("search").addEventListener("keydown",e=>{if(e.key==="Enter")searchStock()});
+renderChips();
+renderPortfolio();
+</script>
+</body>
+</html>
