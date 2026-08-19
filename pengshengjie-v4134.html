@@ -1,0 +1,259 @@
+from pathlib import Path
+import re
+
+src = Path("/mnt/data/pengshengjie-v35.html")
+html = src.read_text(encoding="utf-8")
+
+# Version
+html = html.replace("股票關卡計算機 V35", "股票關卡計算機 V36")
+html = html.replace("🟢 V35｜", "🟢 V36｜")
+
+# ---------- 60-day line ----------
+ma20_html = '<div class="box"><span>📈 20日線</span><b id="ma20">--</b></div>'
+if ma20_html in html:
+    html = html.replace(
+        ma20_html,
+        ma20_html + '<div class="box"><span>📈 60日線（季線）</span><b id="ma60">--</b></div>',
+        1
+    )
+else:
+    raise RuntimeError("找不到20日線顯示區")
+
+# Request enough history for 60MA
+html = html.replace('start_date:dstr(days(-90))', 'start_date:dstr(days(-180))')
+
+# Add ma60 to TWSE fallback
+html = html.replace(
+    '$("ma5").textContent="需歷史資料";$("ma20").textContent="需歷史資料";return;',
+    '$("ma5").textContent="需歷史資料";$("ma20").textContent="需歷史資料";$("ma60").textContent="需歷史資料";return;',
+    1
+)
+
+# Add MA60 to Taiwan loadPrice
+tw_pat = re.compile(r'(\$\("ma20"\)\.textContent=\s*c\.length>=20\s*\?F\(c\.slice\(-20\)\.reduce\(\(a,b\)=>a\+b,0\)/20\)\s*:"--";)', re.S)
+m = tw_pat.search(html)
+if not m:
+    raise RuntimeError("找不到台股20日線計算")
+html = html[:m.end()] + '\n$("ma60").textContent=c.length>=60?F(c.slice(-60).reduce((a,b)=>a+b,0)/60):"--";' + html[m.end():]
+
+# Add MA60 to US loadPrice
+us_pat = re.compile(r'(\$\("ma20"\)\.textContent=c\.length>=20\?F\(c\.slice\(-20\)\.reduce\(\(a,b\)=>a\+b,0\)/20\):"--";)')
+m = us_pat.search(html)
+if not m:
+    raise RuntimeError("找不到美股20日線計算")
+html = html[:m.end()] + '\n$("ma60").textContent=c.length>=60?F(c.slice(-60).reduce((a,b)=>a+b,0)/60):"--";' + html[m.end():]
+
+# ---------- Trading judgement uses 60MA ----------
+html = html.replace(
+    'const m20=N($("ma20").textContent);\n  if(p==null || c==null || p<=0 || c<=0){',
+    'const m20=N($("ma20").textContent);\n  const m60=N($("ma60").textContent);\n  if(p==null || c==null || p<=0 || c<=0){',
+    1
+)
+html = html.replace(
+    '系統會一起參考20日線。";',
+    '系統會一起參考20日線與60日線。";',
+    1
+)
+html = html.replace(
+    'const observeLow=Math.min(c, m20??c);\n  const observeHigh=Math.max(c, m20??c);\n  const breakout=Math.max(c*1.08, m20??c);',
+    'const trendBase=m60??m20??c;\n  const observeLow=Math.min(c, m20??trendBase);\n  const observeHigh=Math.max(c, m20??trendBase);\n  const breakout=Math.max(c*1.08, m20??c, trendBase);',
+    1
+)
+
+# ---------- V27-style Hot Chip K line ----------
+marker = '<div class="card">\n<h2>🎯 我的交易計畫</h2>'
+chip_card = '''<div class="card">
+<h2>📊 熱門籌碼 K 線</h2>
+<div class="note">
+籌碼 K 線屬第三方分析入口；本頁不假裝抓取第三方網站內部資料。
+你可以把想觀察的股票加入清單。
+</div>
+<div class="search">
+<input id="chipSearch" placeholder="例如 2330、1326、0050">
+<button class="black" onclick="addChip()">加入觀察</button>
+</div>
+<div class="chip-actions">
+<button class="tab active" onclick="renderChips()">🔥 查看熱門籌碼</button>
+<button class="tab" onclick="clearChips()">🗑️ 清除</button>
+</div>
+<div id="chipList" class="chip-list"></div>
+</div>
+
+'''
+if marker not in html:
+    raise RuntimeError("找不到我的交易計畫")
+html = html.replace(marker, chip_card + marker, 1)
+
+# CSS for restored sections
+css = '''.portfolio-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.portfolio-list{display:grid;gap:10px;margin-top:12px}
+.portfolio-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#f1f4f8;border-radius:18px;padding:13px 15px}
+.danger{background:#ffe7e7;color:#a40000}
+.chip-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.chip-list{display:grid;gap:9px;margin-top:12px}
+.chip-row{display:grid;grid-template-columns:92px 1fr 90px;gap:8px;align-items:center;background:#f1f4f8;border-radius:14px;padding:10px 12px}
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.plan-card{border-radius:22px;padding:15px;min-height:145px}
+.plan-card h3{margin:0 0 10px;font-size:19px}
+'''
+html = html.replace("@media(max-width:520px){", css + "@media(max-width:520px){", 1)
+
+# ---------- Three add positions ----------
+pnl_pat = re.compile(r'(<div class="box" style="margin-top:10px">\s*<span>📊 目前損益</span>\s*<b id="pnl">--</b>\s*</div>)', re.S)
+m = pnl_pat.search(html)
+if not m:
+    raise RuntimeError("找不到目前損益")
+adds = r'''\1
+<div class="plan-grid">
+<div class="plan-card yellow"><h3>🟡 第一補倉</h3><div class="box"><span>自動建議</span><b id="add1">--</b></div></div>
+<div class="plan-card yellow"><h3>🟡 第二補倉</h3><div class="box"><span>自動建議</span><b id="add2">--</b></div></div>
+<div class="plan-card yellow"><h3>🟡 第三補倉</h3><div class="box"><span>自動建議</span><b id="add3">--</b></div></div>
+</div>
+<div class="note">
+⚠️ 自動建議是計算模型，不代表跌到價格就一定應該買進，也不代表一定應該賣出。
+請搭配5日線、20日線、60日線、法人與大盤環境確認。
+</div>'''
+html = html[:m.start()] + adds + html[m.end():]
+
+# ---------- My stocks ----------
+# Insert before the final source-information card.
+last_card = html.rfind('<div class="card">')
+portfolio = '''<div class="card">
+<h2>💾 我的股票</h2>
+<div class="note">把常看的股票保存於本機瀏覽器，方便下次快速查看。資料不會上傳到網站。</div>
+<div class="portfolio-actions">
+<button class="black" onclick="saveCurrentStock()">＋ 儲存目前股票</button>
+<button class="danger" onclick="clearPortfolio()">🗑️ 清除全部</button>
+</div>
+<div id="portfolioList" class="portfolio-list"></div>
+</div>
+
+'''
+html = html[:last_card] + portfolio + html[last_card:]
+
+# ---------- JS: chip watch + saved stocks ----------
+needle = "function calculate(){"
+helpers = '''function addChip(){
+  const v=$("chipSearch").value.trim();
+  if(!v)return;
+  const a=JSON.parse(localStorage.getItem("chipWatch")||"[]");
+  if(!a.includes(v))a.push(v);
+  localStorage.setItem("chipWatch",JSON.stringify(a));
+  $("chipSearch").value="";
+  renderChips();
+}
+function clearChips(){
+  localStorage.removeItem("chipWatch");
+  renderChips();
+}
+function renderChips(){
+  const a=JSON.parse(localStorage.getItem("chipWatch")||"[]"),e=$("chipList");
+  if(!a.length){
+    e.innerHTML='<div class="status">目前沒有籌碼觀察股。可輸入股票代號加入。</div>';
+    return;
+  }
+  e.innerHTML=a.map((x,i)=>`<div class="chip-row"><b>🔥 ${x}</b><span>熱門籌碼／K線觀察</span><button class="black" onclick="removeChip(${i})">移除</button></div>`).join("");
+}
+function removeChip(i){
+  const a=JSON.parse(localStorage.getItem("chipWatch")||"[]");
+  a.splice(i,1);
+  localStorage.setItem("chipWatch",JSON.stringify(a));
+  renderChips();
+}
+function saveCurrentStock(){
+  if(!current.code){
+    msg("請先搜尋一檔股票再儲存。","warn");
+    return;
+  }
+  const a=JSON.parse(localStorage.getItem("myStocks")||"[]");
+  const it={code:current.code,name:current.name,market:current.market};
+  const i=a.findIndex(x=>x.code===it.code&&x.market===it.market);
+  if(i>=0)a[i]=it;else a.push(it);
+  localStorage.setItem("myStocks",JSON.stringify(a));
+  renderPortfolio();
+}
+function clearPortfolio(){
+  localStorage.removeItem("myStocks");
+  renderPortfolio();
+}
+function removePortfolio(i){
+  const a=JSON.parse(localStorage.getItem("myStocks")||"[]");
+  a.splice(i,1);
+  localStorage.setItem("myStocks",JSON.stringify(a));
+  renderPortfolio();
+}
+function renderPortfolio(){
+  const a=JSON.parse(localStorage.getItem("myStocks")||"[]"),e=$("portfolioList");
+  if(!a.length){
+    e.innerHTML='<div class="status">尚未儲存個人股票。</div>';
+    return;
+  }
+  e.innerHTML=a.map((x,i)=>`<div class="portfolio-item"><div><b>${x.market==="美國"?"🇺🇸":"🇹🇼"} ${x.code}</b><br><span class="small">${x.name||""}</span></div><button class="black" onclick="loadSavedStock(${i})">查看</button></div>`).join("");
+}
+async function loadSavedStock(i){
+  const a=JSON.parse(localStorage.getItem("myStocks")||"[]"),x=a[i];
+  if(!x)return;
+  $("search").value=x.code;
+  if(typeof setMarket==="function")setMarket(x.market==="美國"?"US":"TW");
+  await searchStock();
+}
+
+'''
+if needle not in html:
+    raise RuntimeError("找不到 calculate")
+html = html.replace(needle, helpers + needle, 1)
+
+# Add-position values in startCalculate.
+start_pat = re.compile(r'function startCalculate\(\)\{.*?\n\}', re.S)
+m = start_pat.search(html)
+if not m:
+    raise RuntimeError("找不到 startCalculate")
+new_start = '''function startCalculate(){
+  calculate();
+  const c=N($("myCost").value);
+
+  if(c!=null){
+    $("tp1").textContent=F(c*1.05);
+    $("tp2").textContent=F(c*1.10);
+    $("tp3").textContent=F(c*1.15);
+
+    $("sl1").textContent=F(c*.97);
+    $("sl2").textContent=F(c*.94);
+    $("sl3").textContent=F(c*.90);
+
+    const pNow=N($("price").textContent)||N($("currentPrice").value);
+    $("add1").textContent=F((pNow??c)*.97);
+    $("add2").textContent=F((pNow??c)*.94);
+    $("add3").textContent=F((pNow??c)*.90);
+  }
+
+  updatePnL();
+  makeTradingJudgement();
+}'''
+html = html[:m.start()] + new_start + html[m.end():]
+
+# Initialize saved lists before </script>
+html = html.replace("</script>", "renderChips();\nrenderPortfolio();\n</script>", 1)
+
+out = Path("/mnt/data/pengshengjie-v36.html")
+out.write_text(html, encoding="utf-8")
+
+# Basic structural checks.
+checks = [
+    'id="ma60"',
+    'function makeTradingJudgement()',
+    'function addChip()',
+    'function saveCurrentStock()',
+    'id="add1"',
+    'id="add2"',
+    'id="add3"',
+    'USStockPrice',
+    'Dealer_Hedging'
+]
+missing = [x for x in checks if x not in html]
+if missing:
+    raise RuntimeError("產生後缺少：" + ", ".join(missing))
+
+print(f"完成：{out.name}")
+print(f"檔案大小：{out.stat().st_size:,} bytes")
+print("已加入：5日線／20日線／60日線、三段補倉、熱門籌碼觀察、我的股票。")
