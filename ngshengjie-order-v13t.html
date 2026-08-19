@@ -1,5 +1,242 @@
-from pathlib import Path
-src = Path("/mnt/data/ngshengjie-order-v20.html")
-out = Path("/mnt/data/index海鮮杰.html")
-out.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
-print(out)
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>🧾 商品訂單／貨款管理 v15</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fa;color:#18263a;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif}
+.wrap{max-width:900px;margin:auto;padding:10px}
+.title{text-align:center;font-size:27px;font-weight:950;margin:12px 0 5px}
+.sub{text-align:center;color:#687585;font-size:14px;line-height:1.6;margin-bottom:14px}
+.card{background:#fff;border-radius:25px;padding:16px;margin:14px 0;box-shadow:0 7px 24px rgba(35,55,80,.08)}
+h2{margin:0 0 13px;font-size:22px;font-weight:950}
+input,select{width:100%;height:54px;border:0;border-radius:17px;background:#eef3f8;padding:10px 14px;font-size:18px;outline:none;color:#18263a}
+button{border:0;border-radius:17px;min-height:52px;padding:10px 15px;font-size:17px;font-weight:950}
+.black{background:#202020;color:#fff}.greenbtn{background:#dff7e7;color:#14652f}
+.redbtn{background:#ffe5e5;color:#a00000}.bluebtn{background:#e4efff;color:#174a91}
+.purple{background:linear-gradient(90deg,#5b5ff2,#a84cf0);color:#fff}
+.balance{background:linear-gradient(135deg,#fff4cc,#fff9e9);border-radius:24px;padding:19px}
+.balance-title{text-align:center;font-size:20px;font-weight:950}
+.balance-money{text-align:center;font-size:39px;font-weight:1000;margin:8px 0;color:#14652f}
+.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.moneybox{background:rgba(255,255,255,.8);border-radius:17px;padding:12px}.moneybox span{display:block;font-size:13px;color:#777}.moneybox b{display:block;font-size:22px;margin-top:5px}
+label{display:block;font-weight:900;margin:10px 0 6px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.search{display:grid;grid-template-columns:1fr 100px;gap:9px}.filters{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.count{text-align:center;color:#66717e;font-weight:850;margin-top:10px}
+.product-list{display:grid;gap:10px;margin-top:12px}
+.product{background:#f1f4f8;border-radius:19px;padding:13px}
+.product-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.product-name{font-size:18px;font-weight:950}.price{font-size:20px;font-weight:1000;color:#b00000;white-space:nowrap}
+.spec{font-size:13px;color:#707b88;margin-top:5px;line-height:1.5}
+.product-action{display:grid;grid-template-columns:110px 1fr;gap:8px;margin-top:10px}.qty{height:50px}
+.order-item{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:#f1f4f8;border-radius:16px;padding:11px 13px;margin-top:8px}
+.order-name{font-weight:900}.order-detail{font-size:13px;color:#6d7783;margin-top:3px}.totalbox{background:#eaf8ee;border-radius:20px;padding:16px;margin-top:12px}
+.total-row{display:flex;justify-content:space-between;align-items:center;margin:6px 0;font-weight:900}.total-main{font-size:25px;color:#a00000}.remaining{font-size:28px;color:#14652f}
+.notice{background:#f1f3f5;border-radius:15px;padding:12px 14px;line-height:1.6;font-weight:800;margin-top:10px}
+.ok{background:#e7f8ed;color:#14652f}.warn{background:#fff4d4;color:#765600}.err{background:#ffe7e7;color:#a00000}
+.empty{text-align:center;color:#7b8794;padding:18px}.small{font-size:13px;color:#74808d;line-height:1.7}
+.result{background:#f1f4f8;border-radius:17px;padding:13px;margin-top:9px}
+@media(max-width:600px){
+ .wrap{padding:9px}.card{padding:15px}.title{font-size:24px}.balance-money{font-size:34px}
+ .filters{grid-template-columns:1fr}.product-top{display:block}.price{margin-top:6px}
+ .order-item{grid-template-columns:1fr auto}.order-item button{grid-row:1 / span 2}
+}
+
+.product-action{display:grid;grid-template-columns:52px 78px 52px 1fr;gap:7px;margin-top:9px}
+.qty{height:48px;text-align:center;font-weight:950;padding:8px}
+.qtybtn{min-height:48px;height:48px;padding:4px;font-size:22px}
+.addbtn{min-height:48px;height:48px}
+@media(max-width:600px){
+.product-action{grid-template-columns:48px 70px 48px 1fr}
+.qtybtn,.addbtn{height:46px;min-height:46px}
+}
+
+.order-qty{width:72px;height:48px;text-align:center;font-weight:950}
+@media(max-width:600px){
+.order-qty{width:62px}
+.product{padding:11px}
+.product-name{font-size:17px}
+.price{font-size:18px}
+.spec{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="title">🧾 商品訂單／貨款管理</div>
+<div class="sub">📋 商品價格表｜🛒 下單計算｜💰 貨款自動扣款<br><b>46 種商品｜手機版</b></div>
+
+<div class="card">
+ <div class="balance">
+  <div class="balance-title">💰 貨款餘額</div>
+  <div id="balanceMoney" class="balance-money">$0</div>
+  <div class="balance-grid">
+   <div class="moneybox"><span>目前貨款</span><b id="originalMoney">$0</b></div>
+   <div class="moneybox"><span>已扣款</span><b id="spentMoney">$0</b></div>
+  </div>
+ </div>
+ <label>💰 輸入／設定貨款</label>
+ <input id="fundInput" type="number" min="0" step="1" placeholder="例如 50000">
+ <div class="actions">
+  <button class="black" onclick="setFund()">設定貨款</button>
+  <button class="bluebtn" onclick="resetFund()">重新設定</button>
+ </div>
+ <div id="fundStatus" class="notice">請先輸入貨款餘額。</div>
+</div>
+
+<div class="card">
+ <h2>🔎 商品搜尋</h2>
+ <div class="search">
+  <input id="search" placeholder="輸入商品名稱，例如蝦、鮭魚、香腸">
+  <button class="black" onclick="filterProducts()">搜尋</button>
+ </div>
+ <div class="filters">
+  <select id="category" onchange="filterProducts()">
+   <option value="">全部分類</option><option value="海鮮">🐟 海鮮</option><option value="蝦">🦐 蝦類</option>
+   <option value="肉類">🥩 肉類</option><option value="加工">🥟 加工／食品</option><option value="蔬菜">🥦 蔬菜</option><option value="其他">📦 其他</option>
+  </select>
+  <button class="greenbtn" onclick="showAll()">顯示全部商品</button>
+ </div>
+ <div id="count" class="count"></div>
+ <div id="products" class="product-list"></div>
+</div>
+
+<div class="card">
+ <h2>🛒 本次訂單</h2>
+ <div id="orderList"></div>
+ <div class="totalbox">
+  <div class="total-row"><span>🧾 本次訂單金額</span><b id="orderTotal" class="total-main">$0</b></div>
+  <div class="total-row"><span>💰 扣款前餘額</span><b id="beforeBalance">$0</b></div>
+  <div class="total-row"><span>💸 本次扣款</span><b id="deduct">$0</b></div><hr>
+  <div class="total-row"><span>🟢 扣款後餘額</span><b id="afterBalance" class="remaining">$0</b></div>
+ </div>
+ <div class="actions">
+  <button class="purple" onclick="checkout()">💸 確認下單並扣款</button>
+  <button class="redbtn" onclick="clearOrder()">🗑️ 清空本次訂單</button>
+ </div>
+ <div id="orderStatus" class="notice">尚未建立訂單。</div>
+</div>
+
+<div class="card">
+ <h2>📜 最近扣款紀錄</h2>
+ <div id="history"></div>
+ <div class="actions">
+  <button class="black" onclick="clearHistory()">清除扣款紀錄</button>
+  <button class="bluebtn" onclick="exportText()">複製訂單紀錄</button>
+ </div>
+</div>
+
+<div class="card"><h2>📋 46種商品價格總表</h2><div id="allTable"></div></div>
+
+<div class="card"><div class="small">
+❤️ 使用方式：先設定貨款 → 商品數量可<b>直接手動輸入</b> → 按「＋加入訂單」 → 確認下單並扣款。<br>
+💡 不需要一直按「＋」；例如直接輸入 10、20、50 都可以。<br>
+💰 每次確認下單後，系統會從目前貨款餘額扣除。<br>
+📌 商品價格依您提供的商品資料整理。<br>
+</div></div>
+</div>
+
+<script>
+const products=[
+["月亮蝦餅",360,"包","600g／包、3片／包","加工"],
+["古早味芒果青",100,"包","500g／包","其他"],
+["南僑熟凍烏龍麵",100,"包","180g／份、一包5份","加工"],
+["智利鮭魚菲力",600,"公斤","約2公斤／片","海鮮"],
+["智利鮭魚頭",300,"顆","約1.2公斤／顆、對半切","海鮮"],
+["東北角小卷",130,"盒","300g／盒、6～12尾","海鮮"],
+["特級煙燻豬耳絲",200,"包","王記","肉類"],
+["大尺寸智利鮭魚",170,"片","新群組優惠價","海鮮"],
+["格陵蘭3L比目魚",280,"片","3L特大規格","海鮮"],
+["鯖魚片",65,"片","約180～220g／片","海鮮"],
+["金目鱸魚片",100,"片","約200～300g／片","海鮮"],
+["天然白蝦仁",300,"包","600g／包","蝦"],
+["紅龍雞塊",200,"包","1kg／包","肉類"],
+["香椿抓餅",130,"包","10片／包","加工"],
+["午仔魚一夜干",140,"尾","200～250g／尾","海鮮"],
+["爆卵特大母香魚",200,"尾","宜蘭產地直送","海鮮"],
+["冷凍海瓜子肉",200,"包","冷凍","海鮮"],
+["德國豬腳",250,"顆","約800～1000g／顆","肉類"],
+["黑金流沙包",150,"包","10顆／包、添加食用級金箔","加工"],
+["日本辛味明太子",140,"盒","80g／盒、3～4條","海鮮"],
+["鯛魚下巴",150,"包","7～8片／包","海鮮"],
+["冷凍毛豆莢",100,"包","1公斤／包","蔬菜"],
+["野生紅鮋魚片（石狗公）",100,"片","每片100g以上","海鮮"],
+["嚴選宜蘭山泉鱸魚",230,"尾","600～700g／尾、整尾蝴蝶切","海鮮"],
+["20/30紅太陽大白蝦",250,"盒","急速冷凍、20/30規格","蝦"],
+["40/50生白蝦",200,"盒","700g／盒、約20隻","蝦"],
+["半殼淡菜",120,"包","500g／包","海鮮"],
+["東北角三排小卷",130,"盒","300g／盒、15～20隻","海鮮"],
+["船凍透抽",520,"公斤","約300g／隻","海鮮"],
+["宴席御用－翡翠",80,"盒","300g／盒","加工"],
+["泰國原味香水椰果凍",100,"顆","300g","其他"],
+["生凍小龍蝦",350,"隻","約200～300g／隻","蝦"],
+["生食級開背赤蝦",350,"盒","最大規格5L、20尾／盒","蝦"],
+["正點辣味雞球",200,"包","1kg／包","肉類"],
+["炸冰堡",150,"包","開封即食","加工"],
+["小包裝煙燻鮭魚",280,"包","250g／包、退冰即食","海鮮"],
+["日式風味蟹味棒",75,"包","270g／包","海鮮"],
+["生食級小干貝",500,"包","生食級","海鮮"],
+["花椰菜",85,"包","冷凍蔬菜","蔬菜"],
+["毛豆仁",180,"包","冷凍蔬菜","蔬菜"],
+["玉米粒",110,"包","冷凍蔬菜","蔬菜"],
+["玉米筍",160,"包","冷凍蔬菜","蔬菜"],
+["秋葵",150,"包","冷凍蔬菜","蔬菜"],
+["宏裕行花枝丸",350,"袋","600g／袋","加工"],
+["宏裕行墨魚香腸",460,"盒","10條／盒","加工"],
+["宏裕行飛魚卵花枝香腸",480,"包","10條／包","加工"]
+];
+
+let fund=Number(localStorage.getItem("fundBalance_v15")||0);
+let order=JSON.parse(localStorage.getItem("currentOrder_v15")||"[]");
+let history=JSON.parse(localStorage.getItem("orderHistory_v15")||"[]");
+
+const money=n=>"$"+Number(n||0).toLocaleString("zh-TW");
+function save(){localStorage.setItem("fundBalance_v15",fund);localStorage.setItem("currentOrder_v15",JSON.stringify(order));localStorage.setItem("orderHistory_v15",JSON.stringify(history));}
+function setFund(){let v=Number(document.getElementById("fundInput").value);if(!Number.isFinite(v)||v<0){status("fundStatus","notice err","請輸入正確的貨款金額。");return}fund=v;save();render();status("fundStatus","notice ok","🟢 貨款餘額已設定為 "+money(fund));}
+function resetFund(){if(!confirm("確定要重新設定貨款餘額嗎？"))return;fund=0;document.getElementById("fundInput").value="";save();render();status("fundStatus","notice warn","貨款餘額已重新設定。");}
+function status(id,cls,msg){let e=document.getElementById(id);e.className=cls;e.textContent=msg;}
+function filterProducts(){let q=document.getElementById("search").value.trim().toLowerCase(),c=document.getElementById("category").value;renderProducts(products.map((p,i)=>({p,i})).filter(x=>(!q||(x.p[0]+x.p[3]).toLowerCase().includes(q))&&(!c||x.p[4]===c)));}
+function showAll(){document.getElementById("search").value="";document.getElementById("category").value="";renderProducts(products.map((p,i)=>({p,i})));}
+function renderProducts(arr=products.map((p,i)=>({p,i}))){document.getElementById("count").textContent="目前顯示 "+arr.length+" 種商品";document.getElementById("products").innerHTML=arr.map(x=>{let p=x.p,i=x.i;return `<div class="product"><div class="product-top"><div><div class="product-name">${i+1}. ${p[0]}</div><div class="spec">${p[3]}</div></div><div class="price">${money(p[1])}/${p[2]}</div></div><div class="product-action"><input id="qty${i}" class="qty" type="number" min="1" step="1" value="1" inputmode="numeric"><button class="greenbtn" onclick="add(${i})">＋ 加入訂單</button></div></div>`}).join("");}
+function add(i){let qty=Math.floor(Number(document.getElementById("qty"+i)?.value||1));if(qty<1)qty=1;let old=order.find(x=>x.i===i);if(old)old.qty+=qty;else order.push({i,qty});save();renderOrder();status("orderStatus","notice ok","🛒 已加入："+products[i][0]+" × "+qty);}
+function change(i,d){order[i].qty+=d;if(order[i].qty<=0)order.splice(i,1);save();renderOrder();}
+function remove(i){order.splice(i,1);save();renderOrder();}
+function total(){return order.reduce((s,x)=>s+products[x.i][1]*x.qty,0);}
+function renderOrder(){let t=total(),after=fund-t;document.getElementById("orderTotal").textContent=money(t);document.getElementById("beforeBalance").textContent=money(fund);document.getElementById("deduct").textContent=money(t);document.getElementById("afterBalance").textContent=money(after);document.getElementById("afterBalance").style.color=after<0?"#a00000":"#14652f";document.getElementById("orderList").innerHTML=order.length?order.map((x,i)=>{let p=products[x.i],sub=p[1]*x.qty;return `<div class="order-item"><div><div class="order-name">${p[0]}</div><div class="order-detail">${money(p[1])}/${p[2]} × ${x.qty} ＝ ${money(sub)}</div></div><button class="bluebtn" onclick="change(${i},1)">＋</button><button class="redbtn" onclick="remove(${i})">刪除</button></div>`}).join(""):'<div class="empty">目前沒有商品。</div>';}
+
+function buildOrderMessage(){
+if(!order.length)return "";
+let lines=["🧾 商品訂單"];
+order.forEach(x=>{
+let p=products[x.index];
+lines.push(p.name+" × "+x.qty+" = "+money(p.price*x.qty));
+});
+lines.push("本次訂單金額："+money(orderTotal()));
+return lines.join("\n");
+}
+function sendSMS(){
+let msg=buildOrderMessage();
+if(!msg){alert("目前沒有商品訂單。");return;}
+location.href="sms:0975801211?body="+encodeURIComponent(msg);
+}
+function sendLINE(){
+let msg=buildOrderMessage();
+if(!msg){alert("目前沒有商品訂單。");return;}
+location.href="https://line.me/R/msg/text/?"+encodeURIComponent(msg);
+}
+
+function checkout(){let t=total();if(!order.length){status("orderStatus","notice warn","目前沒有商品，無法下單。");return}if(fund<=0){status("orderStatus","notice err","請先設定貨款餘額。");return}if(t>fund){status("orderStatus","notice err","❌ 貨款不足！本次需要 "+money(t)+"，目前只有 "+money(fund)+"。");return}let before=fund;fund-=t;history.unshift({date:new Date().toLocaleString("zh-TW"),total:t,before,after:fund,items:order.map(x=>({name:products[x.i][0],qty:x.qty,price:products[x.i][1]}))});order=[];save();render();status("orderStatus","notice ok","🟢 下單成功！已扣款 "+money(t)+"；目前貨款餘額 "+money(fund));}
+function clearOrder(){if(!order.length)return;if(!confirm("確定清空本次訂單嗎？"))return;order=[];save();renderOrder();status("orderStatus","notice warn","本次訂單已清空。");}
+function renderHistory(){let e=document.getElementById("history");if(!history.length){e.innerHTML='<div class="empty">尚無扣款紀錄。</div>';return}e.innerHTML=history.map((h,i)=>`<div class="result"><b>第 ${history.length-i} 筆</b><div class="small">${h.date}</div><div style="margin-top:6px">${h.items.map(x=>x.name+" × "+x.qty).join("、")}</div><div style="margin-top:7px">扣款：<b>${money(h.total)}</b></div><div>餘額：<b style="color:#14652f">${money(h.after)}</b></div></div>`).join("");}
+function clearHistory(){if(!history.length)return;if(!confirm("確定清除所有扣款紀錄嗎？"))return;history=[];save();renderHistory();}
+function renderTable(){document.getElementById("allTable").innerHTML=products.map((p,i)=>`<div class="result" style="display:flex;justify-content:space-between;gap:10px"><div><b>${i+1}. ${p[0]}</b><div class="small">${p[3]}</div></div><strong style="color:#b00000;white-space:nowrap">${money(p[1])}/${p[2]}</strong></div>`).join("");}
+function exportText(){if(!history.length){alert("目前沒有訂單紀錄。");return}let text="🧾 商品訂單紀錄\\n\\n";history.forEach((h,i)=>{text+="第 "+(history.length-i)+" 筆\\n"+h.date+"\\n";h.items.forEach(x=>text+=x.name+" × "+x.qty+" = "+money(x.price*x.qty)+"\\n");text+="本次支出："+money(h.total)+"\\n扣款後餘額："+money(h.after)+"\\n\\n"});if(navigator.clipboard)navigator.clipboard.writeText(text).then(()=>alert("已複製訂單紀錄，可以貼到 LINE。")).catch(()=>prompt("請複製以下內容：",text));else prompt("請複製以下內容：",text);}
+function render(){document.getElementById("balanceMoney").textContent=money(fund);document.getElementById("originalMoney").textContent=money(fund);document.getElementById("spentMoney").textContent=money(history.reduce((s,x)=>s+x.total,0));document.getElementById("fundInput").value=fund||"";renderOrder();renderHistory();}
+document.getElementById("search").addEventListener("keydown",e=>{if(e.key==="Enter")filterProducts()});
+renderProducts();renderTable();render();
+</script>
+</body>
+</html>
