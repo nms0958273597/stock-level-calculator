@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>🧾 商品訂單／貨款餘額管理</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fa;color:#18263a;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif}
+.wrap{max-width:900px;margin:auto;padding:12px}
+.title{text-align:center;font-size:28px;font-weight:950;margin:12px 0 5px}
+.sub{text-align:center;color:#6b7684;font-size:14px;line-height:1.6;margin-bottom:14px}
+.card{background:#fff;border-radius:25px;padding:17px;margin:14px 0;box-shadow:0 7px 24px rgba(35,55,80,.08)}
+h2{margin:0 0 13px;font-size:22px;font-weight:950}
+label{display:block;font-weight:900;margin:8px 0 6px}
+input,select{width:100%;height:54px;border:0;border-radius:17px;background:#f0f4f8;padding:10px 14px;font-size:18px;outline:none;color:#18263a}
+button{border:0;border-radius:17px;min-height:52px;padding:10px 15px;font-size:17px;font-weight:950;cursor:pointer}
+.black{background:#202020;color:#fff}
+.greenbtn{background:#dff7e7;color:#14652f}
+.redbtn{background:#ffe6e6;color:#a00000}
+.bluebtn{background:#e5efff;color:#174a91}
+.purple{background:linear-gradient(90deg,#5b5ff2,#a84cf0);color:#fff}
+.balance{background:linear-gradient(135deg,#fff4cc,#fff9e9);border-radius:24px;padding:20px}
+.balance-title{text-align:center;font-size:20px;font-weight:950}
+.balance-money{text-align:center;font-size:40px;font-weight:1000;margin:8px 0;color:#14652f}
+.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.moneybox{background:rgba(255,255,255,.8);border-radius:17px;padding:12px}
+.moneybox span{display:block;font-size:13px;color:#777}
+.moneybox b{display:block;font-size:22px;margin-top:5px}
+.search{display:grid;grid-template-columns:1fr 100px;gap:9px}
+.filters{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.product-list{display:grid;gap:10px;margin-top:12px}
+.product{background:#f1f4f8;border-radius:19px;padding:13px}
+.product-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.product-name{font-size:18px;font-weight:950}
+.price{font-size:20px;font-weight:1000;color:#b00000;white-space:nowrap}
+.spec{font-size:13px;color:#707b88;margin-top:5px;line-height:1.5}
+.product-action{display:grid;grid-template-columns:90px 1fr;gap:8px;margin-top:10px}
+.qty{height:50px}
+.order-item{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;background:#f1f4f8;border-radius:16px;padding:11px 13px}
+.order-name{font-weight:900}
+.order-detail{font-size:13px;color:#6d7783;margin-top:3px}
+.order-price{font-weight:950}
+.totalbox{background:#eaf8ee;border-radius:20px;padding:16px;margin-top:12px}
+.total-row{display:flex;justify-content:space-between;align-items:center;margin:6px 0;font-weight:900}
+.total-main{font-size:25px;color:#a00000}
+.remaining{font-size:28px;color:#14652f}
+.notice{background:#f1f3f5;border-radius:15px;padding:12px 14px;line-height:1.6;font-weight:800;margin-top:10px}
+.ok{background:#e7f8ed;color:#14652f}
+.warn{background:#fff4d4;color:#765600}
+.err{background:#ffe7e7;color:#a00000}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.empty{text-align:center;color:#7b8794;padding:18px}
+.small{font-size:13px;color:#74808d;line-height:1.7}
+.count{text-align:center;color:#66717e;font-weight:850;margin-top:9px}
+@media(max-width:600px){
+.wrap{padding:9px}
+.card{padding:15px}
+.title{font-size:24px}
+.balance-money{font-size:34px}
+.filters{grid-template-columns:1fr}
+.product-top{display:block}
+.price{margin-top:6px}
+.order-item{grid-template-columns:1fr auto}
+.order-item button{grid-row:1 / span 2;grid-column:3}
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<div class="title">🧾 商品訂單／貨款管理</div>
+
+<div class="sub">
+📋 商品價格表｜🛒 下單計算｜💰 貨款自動扣款<br>
+共 46 種商品｜手機版
+</div>
+
+<div class="card">
+<div class="balance">
+
+<div class="balance-title">💰 貨款餘額</div>
+
+<div id="balanceMoney" class="balance-money">
+$0
+</div>
+
+<div class="balance-grid">
+
+<div class="moneybox">
+<span>原始貨款</span>
+<b id="originalMoney">$0</b>
+</div>
+
+<div class="moneybox">
+<span>目前已支出</span>
+<b id="spentMoney">$0</b>
+</div>
+
+</div>
+
+</div>
+
+<label>💰 輸入／設定貨款</label>
+
+<input id="fundInput" type="number" min="0" step="1" placeholder="例如 50000">
+
+<div class="actions">
+<button class="black" onclick="setFund()">設定貨款</button>
+<button class="bluebtn" onclick="resetFund()">重新設定</button>
+</div>
+
+<div id="fundStatus" class="notice">
+請先輸入貨款餘額。
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>🔎 商品搜尋</h2>
+
+<div class="search">
+<input id="search" placeholder="輸入商品名稱，例如蝦、鮭魚、香腸">
+<button class="black" onclick="filterProducts()">搜尋</button>
+</div>
+
+<div class="filters">
+<select id="category" onchange="filterProducts()">
+<option value="">全部分類</option>
+<option value="海鮮">🐟 海鮮</option>
+<option value="蝦">🦐 蝦類</option>
+<option value="肉類">🥩 肉類</option>
+<option value="加工">🥟 加工／食品</option>
+<option value="蔬菜">🥦 蔬菜</option>
+<option value="其他">📦 其他</option>
+</select>
+
+<button class="greenbtn" onclick="showAll()">顯示全部商品</button>
+</div>
+
+<div id="count" class="count"></div>
+
+<div id="products" class="product-list"></div>
+
+</div>
+
+
+<div class="card">
+
+<h2>🛒 本次訂單</h2>
+
+<div id="orderList"></div>
+
+<div class="totalbox">
+
+<div class="total-row">
+<span>🧾 本次訂單金額</span>
+<b id="orderTotal" class="total-main">$0</b>
+</div>
+
+<div class="total-row">
+<span>💰 扣款前餘額</span>
+<b id="beforeBalance">$0</b>
+</div>
+
+<div class="total-row">
+<span>💸 本次扣款</span>
+<b id="deduct">$0</b>
+</div>
+
+<hr>
+
+<div class="total-row">
+<span>🟢 扣款後餘額</span>
+<b id="afterBalance" class="remaining">$0</b>
+</div>
+
+</div>
+
+<div class="actions">
+<button class="purple" onclick="checkout()">💸 確認下單並扣款</button>
+<button class="redbtn" onclick="clearOrder()">🗑️ 清空本次訂單</button>
+</div>
+
+<div id="orderStatus" class="notice">
+尚未建立訂單。
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>📜 最近扣款紀錄</h2>
+
+<div id="history"></div>
+
+<div class="actions">
+<button class="black" onclick="clearHistory()">清除扣款紀錄</button>
+<button class="bluebtn" onclick="exportText()">複製訂單紀錄</button>
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>📋 46種商品價格總表</h2>
+
+<div id="allTable"></div>
+
+</div>
+
+
+<div class="card">
+
+<div class="small">
+❤️ 使用方式：先設定貨款 → 選商品與數量 → 加入訂單 → 確認下單並扣款。<br>
+💰 每次確認下單後，系統會將本次支出從目前貨款餘額扣除。<br>
+📌 商品價格依您提供的商品資料整理。<br>
+📌 「消費滿 $880、$100 加購鮭魚腹條」屬優惠活動，不列入一般商品。<br>
+📌 月亮蝦餅重複資料已合併為一項。
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+const products=[
+
+{name:"月亮蝦餅",price:360,unit:"包",spec:"600g／包、3片／包",cat:"加工"},
+
+{name:"古早味芒果青",price:100,unit:"包",spec:"500g／包",cat:"其他"},
+
+{name:"南僑熟凍烏龍麵",price:100,unit:"包",spec:"180g／份、一包5份",cat:"加工"},
+
+{name:"智利鮭魚菲力",price:600,unit:"公斤",spec:"約2公斤／片",cat:"海鮮"},
+
+{name:"智利鮭魚頭",price:300,unit:"顆",spec:"約1.2公斤／顆、對半切",cat:"海鮮"},
+
+{name:"東北角小卷",price:130,unit:"盒",spec:"300g／盒、6～12尾",cat:"海鮮"},
+
+{name:"特級煙燻豬耳絲",price:200,unit:"包",spec:"王記",cat:"肉類"},
+
+{name:"大尺寸智利鮭魚",price:170,unit:"片",spec:"新群組優惠價",cat:"海鮮"},
+
+{name:"格陵蘭3L比目魚",price:280,unit:"片",spec:"3L特大規格",cat:"海鮮"},
+
+{name:"鯖魚片",price:65,unit:"片",spec:"約180～220g／片",cat:"海鮮"},
+
+{name:"金目鱸魚片",price:100,unit:"片",spec:"約200～300g／片",cat:"海鮮"},
+
+{name:"天然白蝦仁",price:300,unit:"包",spec:"600g／包",cat:"蝦"},
+
+{name:"紅龍雞塊",price:200,unit:"包",spec:"1kg／包",cat:"肉類"},
+
+{name:"香椿抓餅",price:130,unit:"包",spec:"10片／包",cat:"加工"},
+
+{name:"午仔魚一夜干",price:140,unit:"尾",spec:"200～250g／尾",cat:"海鮮"},
+
+{name:"爆卵特大母香魚",price:200,unit:"尾",spec:"宜蘭產地直送",cat:"海鮮"},
+
+{name:"冷凍海瓜子肉",price:200,unit:"包",spec:"冷凍",cat:"海鮮"},
+
+{name:"德國豬腳",price:250,unit:"顆",spec:"約800～1000g／顆",cat:"肉類"},
+
+{name:"黑金流沙包",price:150,unit:"包",spec:"10顆／包、添加食用級金箔",cat:"加工"},
+
+{name:"日本辛味明太子",price:140,unit:"盒",spec:"80g／盒、3～4條",cat:"海鮮"},
+
+{name:"鯛魚下巴",price:150,unit:"包",spec:"7～8片／包",cat:"海鮮"},
+
+{name:"冷凍毛豆莢",price:100,unit:"包",spec:"1公斤／包",cat:"蔬菜"},
+
+{name:"野生紅鮋魚片（石狗公）",price:100,unit:"片",spec:"每片100g以上",cat:"海鮮"},
+
+{name:"嚴選宜蘭山泉鱸魚",price:230,unit:"尾",spec:"600～700g／尾、整尾蝴蝶切六",cat:"海鮮"},
+
+{name:"20/30紅太陽大白蝦",price:250,unit:"盒",spec:"急速冷凍、20/30規格",cat:"蝦"},
+
+{name:"40/50生白蝦",price:200,unit:"盒",spec:"700g／盒、約20隻",cat:"蝦"},
+
+{name:"半殼淡菜",price:120,unit:"包",spec:"500g／包",cat:"海鮮"},
+
+{name:"東北角三排小卷",price:130,unit:"盒",spec:"300g／盒、15～20隻",cat:"海鮮"},
+
+{name:"船凍透抽",price:520,unit:"公斤",spec:"約300g／隻",cat:"海鮮"},
+
+{name:"宴席御用－翡翠",price:80,unit:"盒",spec:"300g／盒",cat:"加工"},
+
+{name:"泰國原味香水椰果凍",price:100,unit:"顆",spec:"300g",cat:"其他"},
+
+{name:"生凍小龍蝦",price:350,unit:"隻",spec:"約200～300g／隻",cat:"蝦"},
+
+{name:"生食級開背赤蝦",price:350,unit:"盒",spec:"最大規格5L、20尾／盒",cat:"蝦"},
+
+{name:"正點辣味雞球",price:200,unit:"包",spec:"1kg／包",cat:"肉類"},
+
+{name:"炸冰堡",price:150,unit:"包",spec:"開封即食",cat:"加工"},
+
+{name:"小包裝煙燻鮭魚",price:280,unit:"包",spec:"250g／包、退冰即食",cat:"海鮮"},
+
+{name:"日式風味蟹味棒",price:75,unit:"包",spec:"270g／包",cat:"海鮮"},
+
+{name:"生食級小干貝",price:500,unit:"包",spec:"生食級",cat:"海鮮"},
+
+{name:"花椰菜",price:85,unit:"包",spec:"冷凍蔬菜",cat:"蔬菜"},
+
+{name:"毛豆仁",price:180,unit:"包",spec:"冷凍蔬菜",cat:"蔬菜"},
+
+{name:"玉米粒",price:110,unit:"包",spec:"冷凍蔬菜",cat:"蔬菜"},
+
+{name:"玉米筍",price:160,unit:"包",spec:"冷凍蔬菜",cat:"蔬菜"},
+
+{name:"秋葵",price:150,unit:"包",spec:"冷凍蔬菜",cat:"蔬菜"},
+
+{name:"宏裕行花枝丸",price:350,unit:"袋",spec:"600g／袋",cat:"加工"},
+
+{name:"宏裕行墨魚香腸",price:460,unit:"盒",spec:"10條／盒",cat:"加工"},
+
+{name:"宏裕行飛魚卵花枝香腸",price:480,unit:"包",spec:"10條／包",cat:"加工"}
+
+];
+
+let fund=Number(localStorage.getItem("fundBalance")||0);
+let order=JSON.parse(localStorage.getItem("currentOrder")||"[]");
+let history=JSON.parse(localStorage.getItem("orderHistory")||"[]");
+
+function money(n){
+return "$"+Number(n||0).toLocaleString("zh-TW");
+}
+
+function saveData(){
+localStorage.setItem("fundBalance",String(fund));
+localStorage.setItem("currentOrder",JSON.stringify(order));
+localStorage.setItem("orderHistory",JSON.stringify(history));
+}
+
+function setFund(){
+
+let v=Number(
+document.getElementById("fundInput").value
+);
+
+if(!Number.isFinite(v)||v<0){
+
+document.getElementById("fundStatus").className="notice err";
+
+document.getElementById("fundStatus").textContent=
+"請輸入正確的貨款金額。";
+
+return;
+
+}
+
+fund=v;
+
+saveData();
+
+render();
+
+document.getElementById("fundStatus").className=
+"notice ok";
+
+document.getElementById("fundStatus").textContent=
+"🟢 貨款餘額已設定為 "+money(fund);
+
+}
+
+function resetFund(){
+
+if(!confirm("確定要重新設定貨款餘額嗎？"))return;
+
+fund=0;
+
+document.getElementById("fundInput").value="";
+
+saveData();
+
+render();
+
+document.getElementById("fundStatus").className=
+"notice warn";
+
+document.getElementById("fundStatus").textContent=
+"貨款餘額已重新設定。";
+
+}
+
+function filterProducts(){
+
+let q=
+document.getElementById("search")
+.value
+.trim()
+.toLowerCase();
+
+let cat=
+document.getElementById("category")
+.value;
+
+let arr=
+products.filter(p=>{
+
+let okName=
+!q||
+p.name.toLowerCase().includes(q)||
+p.spec.toLowerCase().includes(q);
+
+let okCat=
+!cat||
+p.cat===cat;
+
+return okName&&okCat;
+
+});
+
+renderProducts(arr);
+
+}
+
+function showAll(){
+
+document.getElementById("search").value="";
+
+document.getElementById("category").value="";
+
+renderProducts(products);
+
+}
+
+function renderProducts(arr=products){
+
+document.getElementById("count").textContent=
+"目前顯示 "+arr.length+" 種商品";
+
+document.getElementById("products").innerHTML=
+arr.map((p,i)=>{
+
+let index=
+products.indexOf(p);
+
+return `
+<div class="product">
+
+<div class="product-top">
+
+<div>
+<div class="product-name">
+${index+1}. ${p.name}
+</div>
+
+<div class="spec">
+${p.spec}
+</div>
+</div>
+
+<div class="price">
+${money(p.price)}/${p.unit}
+</div>
+
+</div>
+
+<div class="product-action">
+
+<input
+id="qty${index}"
+class="qty"
+type="number"
+min="1"
+step="1"
+value="1"
+>
+
+<button
+class="greenbtn"
+onclick="addProduct(${index})"
+>
+＋ 加入訂單
+</button>
+
+</div>
+
+</div>
+`;
+
+}).join("");
+
+}
+
+function addProduct(i){
+
+let p=products[i];
+
+let qty=
+Number(
+document.getElementById("qty"+i).value
+);
+
+if(!qty||qty<1){
+
+qty=1;
+
+}
+
+let old=
+order.find(
+x=>x.index===i
+);
+
+if(old){
+
+old.qty+=qty;
+
+}else{
+
+order.push({
+index:i,
+qty:qty
+});
+
+}
+
+saveData();
+
+renderOrder();
+
+document.getElementById("orderStatus").className=
+"notice ok";
+
+document.getElementById("orderStatus").textContent=
+"🛒 已加入："+p.name+" × "+qty;
+
+}
+
+function removeItem(i){
+
+order.splice(i,1);
+
+saveData();
+
+renderOrder();
+
+}
+
+function changeQty(i,delta){
+
+order[i].qty+=delta;
+
+if(order[i].qty<=0){
+
+order.splice(i,1);
+
+}
+
+saveData();
+
+renderOrder();
+
+}
+
+function orderTotal(){
+
+return order.reduce(
+(sum,x)=>
+sum+
+products[x.index].price*x.qty,
+0
+);
+
+}
+
+function renderOrder(){
+
+let total=
+orderTotal();
+
+document.getElementById("orderTotal").textContent=
+money(total);
+
+document.getElementById("beforeBalance").textContent=
+money(fund);
+
+document.getElementById("deduct").textContent=
+money(total);
+
+let after=
+fund-total;
+
+document.getElementById("afterBalance").textContent=
+money(after);
+
+document.getElementById("afterBalance").style.color=
+after<0
+?"#a00000"
+:"#14652f";
+
+if(!order.length){
+
+document.getElementById("orderList").innerHTML=
+'<div class="empty">目前沒有商品。</div>';
+
+return;
+
+}
+
+document.getElementById("orderList").innerHTML=
+order.map((x,i)=>{
+
+let p=
+products[x.index];
+
+let subtotal=
+p.price*x.qty;
+
+return `
+<div class="order-item">
+
+<div>
+<div class="order-name">
+${p.name}
+</div>
+
+<div class="order-detail">
+${money(p.price)}/${p.unit}
+× ${x.qty}
+＝ ${money(subtotal)}
+</div>
+</div>
+
+<button
+class="bluebtn"
+onclick="changeQty(${i},1)"
+>
+＋
+</button>
+
+<button
+class="redbtn"
+onclick="removeItem(${i})"
+>
+刪除
+</button>
+
+</div>
+`;
+
+}).join("");
+
+}
+
+function checkout(){
+
+let total=
+orderTotal();
+
+if(!order.length){
+
+document.getElementById("orderStatus").className=
+"notice warn";
+
+document.getElementById("orderStatus").textContent=
+"目前沒有商品，無法下單。";
+
+return;
+
+}
+
+if(fund<=0){
+
+document.getElementById("orderStatus").className=
+"notice err";
+
+document.getElementById("orderStatus").textContent=
+"請先設定貨款餘額。";
+
+return;
+
+}
+
+if(total>fund){
+
+document.getElementById("orderStatus").className=
+"notice err";
+
+document.getElementById("orderStatus").textContent=
+"❌ 貨款不足！本次需要 "+
+money(total)+
+"，目前只有 "+
+money(fund)+"。";
+
+return;
+
+}
+
+let before=
+fund;
+
+fund-=total;
+
+let record={
+date:new Date().toLocaleString("zh-TW"),
+total:total,
+before:before,
+after:fund,
+items:order.map(x=>({
+name:products[x.index].name,
+qty:x.qty,
+price:products[x.index].price
+}))
+};
+
+history.unshift(record);
+
+order=[];
+
+saveData();
+
+render();
+
+document.getElementById("orderStatus").className=
+"notice ok";
+
+document.getElementById("orderStatus").textContent=
+"🟢 下單成功！已扣款 "+
+money(total)+
+"；目前貨款餘額 "+
+money(fund);
+
+}
+
+function clearOrder(){
+
+if(!order.length)return;
+
+if(!confirm("確定清空本次訂單嗎？"))return;
+
+order=[];
+
+saveData();
+
+renderOrder();
+
+document.getElementById("orderStatus").className=
+"notice warn";
+
+document.getElementById("orderStatus").textContent=
+"本次訂單已清空。";
+
+}
+
+function renderHistory(){
+
+let el=
+document.getElementById("history");
+
+if(!history.length){
+
+el.innerHTML=
+'<div class="empty">尚無扣款紀錄。</div>';
+
+return;
+
+}
+
+el.innerHTML=
+history.map((h,i)=>{
+
+let names=
+h.items.map(
+x=>x.name+" × "+x.qty
+).join("、");
+
+return `
+<div class="result" style="background:#f1f4f8;border-radius:17px;padding:13px;margin-top:9px">
+
+<b>第 ${history.length-i} 筆</b>
+
+<div class="small">
+${h.date}
+</div>
+
+<div style="margin-top:6px">
+${names}
+</div>
+
+<div style="margin-top:7px">
+扣款：<b>${money(h.total)}</b>
+</div>
+
+<div>
+餘額：
+<b style="color:#14652f">
+${money(h.after)}
+</b>
+</div>
+
+</div>
+`;
+
+}).join("");
+
+}
+
+function clearHistory(){
+
+if(!history.length)return;
+
+if(!confirm("確定清除所有扣款紀錄嗎？"))return;
+
+history=[];
+
+saveData();
+
+renderHistory();
+
+}
+
+function renderAllTable(){
+
+document.getElementById("allTable").innerHTML=
+products.map(
+(p,i)=>
+`
+<div class="result"
+style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+
+<div>
+<b>${i+1}. ${p.name}</b>
+<div class="small">
+${p.spec}
+</div>
+</div>
+
+<strong style="color:#b00000;white-space:nowrap">
+${money(p.price)}/${p.unit}
+</strong>
+
+</div>
+`
+).join("");
+
+}
+
+function exportText(){
+
+if(!history.length){
+
+alert("目前沒有訂單紀錄。");
+
+return;
+
+}
+
+let text=
+"🧾 商品訂單紀錄\n\n";
+
+history.forEach(
+(h,i)=>{
+
+text+=
+"第 "+
+(history.length-i)+
+" 筆\n";
+
+text+=
+h.date+"\n";
+
+h.items.forEach(
+x=>{
+text+=
+x.name+
+" × "+
+x.qty+
+" = "+
+money(x.price*x.qty)+
+"\n";
+}
+);
+
+text+=
+"本次支出："+money(h.total)+"\n";
+
+text+=
+"扣款後餘額："+money(h.after)+"\n\n";
+
+}
+);
+
+if(
+navigator.clipboard
+){
+
+navigator.clipboard
+.writeText(text)
+.then(()=>{
+alert("已複製訂單紀錄，可以貼到 LINE。");
+})
+.catch(()=>{
+prompt("請複製以下內容：",text);
+});
+
+}else{
+
+prompt(
+"請複製以下內容：",
+text
+);
+
+}
+
+}
+
+function render(){
+
+document.getElementById("balanceMoney").textContent=
+money(fund);
+
+document.getElementById("originalMoney").textContent=
+money(fund);
+
+let spent=
+history.reduce(
+(s,x)=>s+x.total,
+0
+);
+
+document.getElementById("spentMoney").textContent=
+money(spent);
+
+renderOrder();
+
+renderHistory();
+
+}
+
+document
+.getElementById("search")
+.addEventListener(
+"keydown",
+e=>{
+if(e.key==="Enter")
+filterProducts();
+}
+);
+
+document
+.getElementById("fundInput")
+.value=
+fund||"";
+
+renderProducts();
+
+renderAllTable();
+
+render();
+
+</script>
+
+</body>
+</html>
