@@ -3,14 +3,15 @@ from pathlib import Path
 src = Path("/mnt/data/index數字易經進階測試V4.html")
 html = src.read_text(encoding="utf-8")
 
-# Add an integrated "三碼網路庫存綜合版" section before the special triple-data section.
+# 1) Add integrated triple-inventory UI before the existing special triple-data section.
 marker = '<div class="card">\n<h2>⑫ 本次使用的特殊三碼資料</h2>'
+if marker not in html:
+    raise RuntimeError("找不到 V4 的插入位置")
 
-integrated = r'''
-<div class="card">
+integrated_ui = r'''<div class="card">
 <h2>⑫ 三碼網路庫存綜合版｜已整合進主程式</h2>
 <div class="small">
-現在主程式會把輸入號碼自動拆成所有連續三碼，先查內建三碼庫，再查你之後自己新增的本機資料。
+目前號碼會自動拆成所有連續三碼，先查內建三碼資料，再查你自己新增的本機資料。
 </div>
 
 <div id="tripleInventory" class="analysis" style="margin-top:12px"></div>
@@ -27,16 +28,9 @@ integrated = r'''
 
 <div class="card">
 <h2>⑬ 本次使用的特殊三碼資料</h2>'''
+html = html.replace(marker, integrated_ui, 1)
 
-html = html.replace(marker, integrated)
-
-# Renumber the explanatory section after it.
-html = html.replace(
-    '<h2>⑬ 本次使用的特殊三碼資料</h2>',
-    '<h2>⑬ 本次使用的特殊三碼資料</h2>'
-)
-
-# Add inventory CSS before footer.
+# 2) Add CSS.
 css_marker = 'footer{text-align:center;color:#777;font-size:12px;padding:20px}'
 css_add = r'''
 .inventory-item{border:1px solid #ddd;border-radius:11px;padding:11px;margin:7px 0}
@@ -44,12 +38,17 @@ css_add = r'''
 .inventory-wait{background:#fafafa;color:#777}
 .inventory-code{font-size:18px;font-weight:900}
 '''
-html = html.replace(css_marker, css_add + "\n" + css_marker)
+if css_marker not in html:
+    raise RuntimeError("找不到 CSS 插入位置")
+html = html.replace(css_marker, css_add + "\n" + css_marker, 1)
 
-# Add integrated database JS before the existing run("custom") call.
+# 3) Add the triple database + functions before the final run("custom").
 js_marker = 'run("custom");'
+if js_marker not in html:
+    raise RuntimeError("找不到初始化位置")
 
 js_add = r'''
+/* ===== 三碼網路庫存綜合版 ===== */
 const builtInTripleDB = {
 "319":"天醫＋延年＝老闆；花錢有智慧，當用則用；可考慮桃花",
 "278":"鐵公雞；小錢大智慧",
@@ -97,16 +96,21 @@ const builtInTripleDB = {
 
 function getTripleInventory(){
     let custom = {};
-    try {
+    try{
         custom = JSON.parse(localStorage.getItem("myTripleInventory") || "{}");
-    } catch(e) {}
+    }catch(e){
+        custom = {};
+    }
     return Object.assign({}, builtInTripleDB, custom);
 }
 
 function renderTripleInventory(n){
-    const db = getTripleInventory();
-    const codes = getTriples(n);
     const box = document.getElementById("tripleInventory");
+    if(!box) return;
+
+    const number = String(n || "").replace(/\D/g,"");
+    const codes = getTriples(number);
+    const db = getTripleInventory();
 
     if(!codes.length){
         box.innerHTML = "<div class='small'>目前沒有足夠數字產生三碼。</div>";
@@ -114,30 +118,28 @@ function renderTripleInventory(n){
     }
 
     let hit = 0;
-    let html = "";
+    let out = "";
 
     codes.forEach(code=>{
         if(db[code]){
             hit++;
-            html += `<div class="inventory-item inventory-hit">
+            out += `<div class="inventory-item inventory-hit">
                 <div class="inventory-code">${code}　✅ 已找到</div>
                 <div>${db[code]}</div>
             </div>`;
         }else{
-            html += `<div class="inventory-item inventory-wait">
+            out += `<div class="inventory-item inventory-wait">
                 <div class="inventory-code">${code}　⏳ 待查</div>
                 <div>目前三碼庫沒有這組解讀，可在下面新增。</div>
             </div>`;
         }
     });
 
-    html = `<div class="alert">
+    box.innerHTML = `<div class="alert">
         本次共有 <strong>${codes.length}</strong> 組三碼；
         已找到 <strong>${hit}</strong> 組；
         待查 <strong>${codes.length-hit}</strong> 組。
-    </div>` + html;
-
-    box.innerHTML = html;
+    </div>` + out;
 }
 
 function saveTripleToInventory(){
@@ -154,9 +156,11 @@ function saveTripleToInventory(){
     }
 
     let custom = {};
-    try {
+    try{
         custom = JSON.parse(localStorage.getItem("myTripleInventory") || "{}");
-    } catch(e) {}
+    }catch(e){
+        custom = {};
+    }
 
     custom[code] = meaning;
     localStorage.setItem("myTripleInventory", JSON.stringify(custom));
@@ -164,27 +168,45 @@ function saveTripleToInventory(){
     document.getElementById("tripleCodeInput").value = "";
     document.getElementById("tripleMeaningInput").value = "";
 
-    renderTripleInventory(currentNumber || document.getElementById("edit").value);
+    const current = document.getElementById("edit").value.replace(/\D/g,"");
+    renderTripleInventory(current);
     alert("已加入三碼庫存！");
 }
 
 function clearTripleInventory(){
-    if(!confirm("確定要清除你自己新增的三碼資料嗎？")){
-        return;
-    }
+    if(!confirm("確定要清除你自己新增的三碼資料嗎？")) return;
     localStorage.removeItem("myTripleInventory");
-    renderTripleInventory(currentNumber || document.getElementById("edit").value);
+    const current = document.getElementById("edit").value.replace(/\D/g,"");
+    renderTripleInventory(current);
 }
 
-const oldShowForInventory = show;
+/* 包裝原本的 show：每次分析後同步更新三碼庫 */
+const originalShowForTripleInventory = show;
 show = function(n){
-    oldShowForInventory(n);
+    originalShowForTripleInventory(n);
     renderTripleInventory(n);
 };
+/* ===== 三碼網路庫存綜合版結束 ===== */
 '''
+html = html.replace(js_marker, js_add + "\n" + js_marker, 1)
 
-html = html.replace(js_marker, js_add + "\n" + js_marker)
+# 4) Make the final initialization explicitly render the integrated inventory.
+html = html.replace('run("custom");', 'run("custom");\nrenderTripleInventory(document.getElementById("edit").value);', 1)
 
-out = Path("/mnt/data/index數字易經進階測試V5_整合三碼庫.html")
+# 5) Sanity checks: the final file must be actual HTML, not Python.
+checks = [
+    html.lstrip().startswith("<!DOCTYPE html>"),
+    html.rstrip().endswith("</html>"),
+    "from pathlib import Path" not in html,
+    "src = Path(" not in html,
+    "html = html.replace(" not in html,
+    "const builtInTripleDB" in html,
+    "三碼網路庫存綜合版" in html,
+]
+if not all(checks):
+    raise RuntimeError("HTML 清理檢查失敗")
+
+out = Path("/mnt/data/index佳_完整修正版V6.html")
 out.write_text(html, encoding="utf-8")
-print(out)
+print(f"已修正：{out}")
+print(f"檔案大小：{out.stat().st_size} bytes")
