@@ -1,14 +1,164 @@
-from pathlib import Path
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>數字易經｜進階測試版 V2</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f3f3;color:#222;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif}
+.wrap{max-width:960px;margin:auto;padding:12px}
+.header{background:linear-gradient(135deg,#171717,#383838);color:#fff;border-radius:18px;padding:22px 16px;text-align:center}
+.header h1{margin:0;font-size:25px}.header p{margin:8px 0 0;font-size:14px;opacity:.86}
+.card{background:#fff;border-radius:16px;padding:16px;margin-top:12px;box-shadow:0 2px 12px #0001}
+h2{font-size:19px;margin:0 0 13px}
+label{display:block;font-weight:700;margin:10px 0 6px}
+input,textarea,button{width:100%;border-radius:11px;font-size:16px;padding:12px}
+input,textarea{border:1px solid #ccc;background:#fff}
+textarea{min-height:80px}
+button{border:0;background:#171717;color:#fff;font-weight:700;margin-top:9px}
+.secondary{background:#e9e9e9;color:#222}
+.danger{background:#f1e1e1;color:#8b1111}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.result{font-size:26px;font-weight:800;text-align:center;letter-spacing:2px;border:2px solid #222;border-radius:13px;padding:16px;word-break:break-all}
+.pairs{display:flex;flex-wrap:wrap;gap:7px}
+.pair{min-width:67px;padding:9px 7px;border-radius:9px;text-align:center;font-weight:800}
+.pair small{display:block;font-size:11px;margin-top:3px;font-weight:500}
+.good{background:#e4f5e8;color:#17652a}.bad{background:#fde6e6;color:#9a1c1c}.neutral{background:#eee;color:#555}
+.analysis{line-height:1.7}
+.tag{display:inline-block;padding:5px 9px;border-radius:999px;background:#eee;margin:3px;font-size:13px;font-weight:700}
+.tag.good{background:#e4f5e8}.tag.bad{background:#fde6e6}
+.alert{border-left:5px solid #222;background:#f7f7f7;padding:11px;border-radius:8px;line-height:1.65;margin-top:10px}
+table{width:100%;border-collapse:collapse;min-width:620px}
+.tablewrap{overflow-x:auto}
+th,td{border:1px solid #ddd;padding:9px;text-align:center}th{background:#222;color:#fff}
+.small{font-size:13px;color:#666;line-height:1.65}
+.star-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.star-card{border:1px solid #ddd;border-radius:12px;padding:12px;background:#fafafa}
+.star-name{font-weight:800;font-size:17px}
+.star-count{font-size:25px;font-weight:900;margin-top:4px}
+.bar{height:8px;background:#e8e8e8;border-radius:99px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:#222;border-radius:99px}
+.control-box{border:2px solid #222;border-radius:13px;padding:14px;background:#fafafa}
+.control-chain{font-size:20px;font-weight:900;letter-spacing:2px;text-align:center;margin:8px 0}
+.example{display:inline-block;background:#eee;border-radius:8px;padding:6px 9px;margin:4px;font-weight:800}
+.inventory-item{border:1px solid #ddd;border-radius:11px;padding:11px;margin:7px 0}
+.inventory-hit{background:#eef8ef}
+.inventory-wait{background:#fafafa;color:#777}
+.inventory-code{font-size:18px;font-weight:900}
+footer{text-align:center;color:#777;font-size:12px;padding:20px}
+@media(max-width:600px){
+.grid{grid-template-columns:1fr}
+.result{font-size:21px}
+.star-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
 
-src = Path("/mnt/data/index數字易經進階測試V4.html")
-html = src.read_text(encoding="utf-8")
+<div class="header">
+<h1>☯ 數字易經｜進階測試版 V2</h1>
+<p>身分證・出生年月日・手機・自訂數字｜二碼＋三碼＋大運分析</p>
+</div>
 
-# 1) Add integrated triple-inventory UI before the existing special triple-data section.
-marker = '<div class="card">\n<h2>⑫ 本次使用的特殊三碼資料</h2>'
-if marker not in html:
-    raise RuntimeError("找不到 V4 的插入位置")
+<div class="card">
+<h2>① 輸入資料</h2>
+<label>姓名（測試用，可不填）</label>
+<input id="name" value="測試者">
 
-integrated_ui = r'''<div class="card">
+<label>身分證字號</label>
+<input id="id" value="A123456789" maxlength="10">
+
+<label>出生年月日</label>
+<input id="birth" type="date" value="1992-10-27">
+
+<label>手機號碼</label>
+<input id="phone" value="0912345678">
+
+<label>自訂數字</label>
+<input id="custom" value="413481913194">
+</div>
+
+<div class="card">
+<h2>② 選擇分析來源</h2>
+<div class="grid">
+<button onclick="run('id')">身分證</button>
+<button onclick="run('birth')">出生年月日</button>
+<button onclick="run('phone')">手機號碼</button>
+<button onclick="run('custom')">自訂數字</button>
+</div>
+</div>
+
+<div class="card">
+<h2>③ 大運數字</h2>
+<div id="result" class="result">413481913194</div>
+
+<label>可直接修改後重新分析</label>
+<input id="edit" value="413481913194" inputmode="numeric">
+
+<button onclick="applyEdit()">✏️ 套用修改</button>
+</div>
+
+<div class="card">
+<h2>④ 二碼八星自動對照</h2>
+<div id="pairs" class="pairs"></div>
+</div>
+
+<div class="card">
+<h2>⑤ 三碼特殊解讀</h2>
+<div id="triples" class="analysis"></div>
+</div>
+
+<div class="card">
+<h2>⑥ 五鬼制化檢查</h2>
+<div id="fiveGhost" class="analysis"></div>
+</div>
+
+<div class="card">
+<h2>⑦ 讀號順序</h2>
+<div id="reading" class="analysis"></div>
+</div>
+
+<div class="card">
+<h2>⑧ 八星數量自動統計</h2>
+<div class="small">
+程式會把目前號碼的每一組「相鄰兩碼」全部拆開，統計八星各出現幾次。
+</div>
+<div id="starCount" style="margin-top:12px"></div>
+<div id="starSummary" class="analysis" style="margin-top:12px"></div>
+</div>
+
+<div class="card">
+<h2>⑨ 五鬼制化：必須用什麼＋什麼？</h2>
+<div id="controlResult" class="analysis"></div>
+</div>
+
+<div class="card">
+<h2>⑩ 制化組合快速檢查</h2>
+<div id="controlPairs" class="analysis"></div>
+</div>
+
+<div class="card">
+<h2>⑪ 人生大運階段</h2>
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th>階段</th>
+<th>對應二碼</th>
+<th>對應三碼</th>
+<th>三碼解讀</th>
+<th>磁場</th>
+<th>類型</th>
+</tr>
+</thead>
+<tbody id="life"></tbody>
+</table>
+</div>
+</div>
+
+<div class="card">
 <h2>⑫ 三碼網路庫存綜合版｜已整合進主程式</h2>
 <div class="small">
 目前號碼會自動拆成所有連續三碼，先查內建三碼資料，再查你自己新增的本機資料。
@@ -27,64 +177,94 @@ integrated_ui = r'''<div class="card">
 </div>
 
 <div class="card">
-<h2>⑬ 本次使用的特殊三碼資料</h2>'''
-html = html.replace(marker, integrated_ui, 1)
+<h2>⑬ 本次使用的特殊三碼資料</h2>
+<div class="small">
+此區依照你剛提供的筆記建立。程式會找「連續三碼」，例如 319 = 31（天醫）＋19（延年）。
+</div>
+<div id="dictionary" class="small" style="margin-top:10px"></div>
+</div>
 
-# 2) Add CSS.
-css_marker = 'footer{text-align:center;color:#777;font-size:12px;padding:20px}'
-css_add = r'''
-.inventory-item{border:1px solid #ddd;border-radius:11px;padding:11px;margin:7px 0}
-.inventory-hit{background:#eef8ef}
-.inventory-wait{background:#fafafa;color:#777}
-.inventory-code{font-size:18px;font-weight:900}
-'''
-if css_marker not in html:
-    raise RuntimeError("找不到 CSS 插入位置")
-html = html.replace(css_marker, css_add + "\n" + css_marker, 1)
+<div class="card">
+<div class="alert">
+<strong>人生大運對應方式：</strong><br>
+每一個人生階段現在同時顯示「對應二碼」與「對應三碼」，並把三碼特殊解讀一起列出。
+</div>
+</div>
 
-# 3) Add the triple database + functions before the final run("custom").
-js_marker = 'run("custom");'
-if js_marker not in html:
-    raise RuntimeError("找不到初始化位置")
+<div class="card">
+<div class="alert">
+<strong>民俗算法提醒：</strong><br>
+這是依照你提供的「數字易經」資料做的程式化整理與自動對照，不是科學驗證的命運或醫療預測。健康相關文字僅保留為傳統數字解讀，不應取代醫師診斷。
+</div>
+</div>
 
-js_add = r'''
-/* ===== 三碼網路庫存綜合版 ===== */
-const builtInTripleDB = {
+<footer>數字易經進階測試版 V2</footer>
+</div>
+
+<script>
+const stars={
+"生氣":["14","41","67","76","39","93","28","82"],
+"天醫":["13","31","68","86","49","94","27","72"],
+"延年":["19","91","78","87","34","43","26","62"],
+"伏位":["11","22","99","88","66","77","33","44"],
+"六煞":["16","61","47","74","38","83","29","92"],
+"禍害":["17","71","89","98","46","64","23","32"],
+"五鬼":["18","81","79","97","36","63","24","42"],
+"絕命":["12","21","69","96","48","84","37","73"]
+};
+
+const map={};
+for(const s in stars){
+for(const p of stars[s]) map[p]=s;
+}
+
+const type={
+"生氣":"吉",
+"天醫":"吉",
+"延年":"吉",
+"伏位":"中性",
+"六煞":"凶",
+"禍害":"凶",
+"五鬼":"凶",
+"絕命":"凶"
+};
+
+const special={
 "319":"天醫＋延年＝老闆；花錢有智慧，當用則用；可考慮桃花",
 "278":"鐵公雞；小錢大智慧",
 "411":"2個貴人；易掉東西；2人合夥就倒",
 "412":"因朋友賠錢；可能是直銷／保險；此時41不能單獨解釋為貴人",
 "413":"貴人帶財",
 "414":"同411；一個貴人",
-"416":"很想結婚；沒正桃花",
-"417":"貴人變小人；像412",
-"418":"18懷疑；朋友很多，卻幫不上忙",
-"419":"19＝專業；主管／老師格局",
-"611":"2個家；8611可作買兩套房或坪數2N的原始筆記解讀",
-"612":"因家人或女人破財；若問開公司，原筆記解讀為會倒",
-"613":"家庭主婦；家裡人給她錢；開公司會帶財",
-"614":"偏桃花；不想結婚",
+"416":"很想結婚；沒有正桃花",
+"417":"貴人變小人；類似412",
+"418":"18懷疑；朋友很多卻幫不上忙",
+"419":"19＝專業；主管／老師格局；687中規中矩，會計可找這種",
+"611":"2個家；8611可解為買兩套房或坪數2N",
+"612":"因家人或女人破財；若問開公司，傳統解讀為會倒",
+"613":"家庭主婦；家裡人給她錢（老公或小孩會賺）；開公司會帶財",
+"614":"有偏桃花就開心；不想結婚",
 "616":"同611",
 "617":"情緒來亂說話",
 "618":"演藝圈數字",
-"619":"顧家的人；需看另一半手機；61有偏桃花",
-"711":"病／併發症；2次意外／2個小人（原筆記解讀）",
-"712":"敢吃；通常比較胖；因小人或意外破財；不講道理",
+"619":"顧家的人；哪裡的家要看另一半的手機；61有偏桃花",
+"711":"病／併發症；2次意外／2個小人",
+"712":"敢吃的人，通常比較胖；因小人或意外破財；不講道理",
 "713":"開口就有錢或桃花；舌燦蓮花",
 "714":"開口就有貴人幫",
 "716":"說話不會控制情緒",
-"717":"和711相似；原筆記另提及企管／肺",
-"718":"說話反覆雙動；業務員或講師；原筆記列為最大禍害／血光",
-"719":"說話耿直；愛講道理",
-"811":"容易恍神、精神不集中；原筆記列2次血光／開刀",
+"717":"與711相似；企管引發併發症（原筆記說法）",
+"718":"說話反覆雙動；業務員或講師；最大禍害；血光",
+"719":"說話耿直，愛講道理的人",
+"811":"容易恍神、精神不集中；2次血光／開刀（原筆記說法）",
 "812":"花錢買藝術品或五鬼類：3C、培訓、宗教、養生、珠寶等",
-"813":"宗教命理賺錢等原始筆記解讀",
-"814":"有想法就開心，不一定去做；有絕命才會行動",
-"816":"演藝圈；漂亮；國外＋家可作貿易公司",
-"817":"原筆記列最大血光意外／很會忽悠人",
+"813":"在宗教命理賺錢；陰暗處賺錢；若工作和廠商或錢有關，原筆記提到回扣",
+"814":"有想法就開心，不會去做；有絕命才會行動",
+"816":"演藝圈數字；漂亮；國外＋家＝貿易公司",
+"817":"最大血光意外；很會忽悠人（原筆記說法）",
 "818":"同811，但1次",
-"819":"想法專業；頂尖聰明；仍需看整體結構",
-"911":"延年太多；耗精神、睡不好等原始筆記解讀",
+"819":"想法專業、頂尖聰明；要看是好人壞人",
+"911":"延年太多，耗精神、睡不好；髮白、掉髮（原筆記說法）",
 "912":"因工作賠錢；過度自信、投資失敗",
 "913":"一分耕耘，一分收穫",
 "914":"延年＋生氣；樂在工作",
@@ -94,119 +274,626 @@ const builtInTripleDB = {
 "919":"一份工作"
 };
 
+const age=[
+"0～10歲",
+"11～15歲",
+"16～20歲",
+"21～25歲",
+"26～30歲",
+"31～35歲",
+"36～40歲",
+"41～45歲",
+"46～50歲",
+"51～60歲",
+"61～70歲"
+];
+
+const ghostControl=[
+"4134",
+"9319",
+"6276",
+"314",
+"276",
+"394"
+];
+
+function idToNum(s){
+s=(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+if(!s)return "";
+if(/[A-Z]/.test(s[0])){
+s=String(s.charCodeAt(0)-64).padStart(2,"0")+s.slice(1);
+}
+return s.replace(/\D/g,"");
+}
+
+function getPairs(n){
+let a=[];
+for(let i=0;i<n.length-1;i++){
+a.push(n.slice(i,i+2));
+}
+return a;
+}
+
+function getTriples(n){
+let a=[];
+for(let i=0;i<n.length-2;i++){
+a.push(n.slice(i,i+3));
+}
+return a;
+}
+
+function run(src){
+let n="";
+
+if(src==="id"){
+n=idToNum(document.getElementById("id").value);
+}
+
+if(src==="birth"){
+n=document.getElementById("birth").value.replace(/-/g,"");
+}
+
+if(src==="phone"){
+n=document.getElementById("phone").value.replace(/\D/g,"");
+}
+
+if(src==="custom"){
+n=document.getElementById("custom").value.replace(/\D/g,"");
+}
+
+if(n.length<2){
+alert("至少需要2個數字");
+return;
+}
+
+show(n);
+}
+
+function show(n){
+
+document.getElementById("result").textContent=n;
+document.getElementById("edit").value=n;
+
+const ps=getPairs(n);
+const box=document.getElementById("pairs");
+
+box.innerHTML="";
+
+ps.forEach(p=>{
+let s=map[p]||"未收錄";
+let cls=type[s]==="吉"?"good":type[s]==="凶"?"bad":"neutral";
+
+box.innerHTML+=`
+<div class="pair ${cls}">
+<b>${p}</b>
+<small>${s}</small>
+</div>`;
+});
+
+const ts=getTriples(n);
+const tbox=document.getElementById("triples");
+
+tbox.innerHTML="";
+
+let found=0;
+
+ts.forEach(t=>{
+if(special[t]){
+found++;
+
+tbox.innerHTML+=`
+<div class="alert">
+<strong>${t}</strong>　${special[t]}
+</div>`;
+}
+});
+
+if(!found){
+tbox.innerHTML="<div class='small'>本次數字沒有命中目前收錄的特殊三碼解讀。</div>";
+}
+
+let f=document.getElementById("fiveGhost");
+let hits=ghostControl.filter(x=>n.includes(x));
+let ghosts=ps.filter(p=>map[p]==="五鬼");
+
+if(hits.length){
+
+f.innerHTML=`
+<span class="tag good">發現制化組合</span><br>
+${hits.map(x=>`
+<div class="alert">
+<strong>${x}</strong>：常見五鬼制化參考組合
+</div>`).join("")}`;
+
+}else{
+
+f.innerHTML=`
+<div class="alert">
+本組數字中的五鬼二碼：
+<strong>${ghosts.length?ghosts.join("、"):"沒有"}</strong>。
+<br>
+目前沒有命中 4134／9319／6276／314／276／394 這些你提供的制化參考組合。
+</div>`;
+}
+
+let reading=[];
+
+if(ps.some(p=>map[p]==="絕命")){
+reading.push("① 先看絕命：傳統讀法優先觀察破財／高風險結構");
+}else if(ps.some(p=>map[p]==="禍害")){
+reading.push("① 沒有絕命時，看禍害：傳統讀法觀察小人／劫財");
+}else{
+reading.push("① 未發現絕命、禍害：先看整體吉星結構");
+}
+
+reading.push("② 感情：依你的筆記特別檢查 19、87 等結構");
+reading.push("③ 健康：依你的筆記以 NO.1、NO.2 的結構做傳統民俗解讀");
+reading.push("④ 工作：延年可作工作／態度參考；未婚時天醫可作未來另一半參考；婚後再依整體結構看");
+
+document.getElementById("reading").innerHTML=
+reading.map(x=>`<div class="tag">${x}</div>`).join("");
+
+let life=document.getElementById("life");
+
+life.innerHTML="";
+
+age.forEach((a,i)=>{
+
+let p=ps[i]||"--";
+let s=map[p]||"未收錄";
+let t=ts[i]||"--";
+let td=special[t]||"未收錄特殊三碼解讀";
+
+life.innerHTML+=`
+<tr>
+<td>${a}</td>
+<td><b>${p}</b></td>
+<td><b>${t}</b></td>
+<td style="text-align:left">${td}</td>
+<td>${s}</td>
+<td>${type[s]||"—"}</td>
+</tr>`;
+});
+
+let dict=document.getElementById("dictionary");
+
+dict.innerHTML=
+Object.entries(special)
+.map(([k,v])=>`
+<div style="margin:7px 0">
+<strong>${k}</strong>：${v}
+</div>`)
+.join("");
+}
+
+function applyEdit(){
+
+let n=document.getElementById("edit").value.replace(/\D/g,"");
+
+if(n.length<2){
+alert("至少需要2個數字");
+return;
+}
+
+show(n);
+}
+
+function renderStarCount(n){
+
+const counts={
+"生氣":0,
+"天醫":0,
+"延年":0,
+"五鬼":0,
+"伏位":0,
+"六煞":0,
+"禍害":0,
+"絕命":0
+};
+
+const ps=getPairs(n);
+
+ps.forEach(p=>{
+const s=map[p];
+
+if(s && counts.hasOwnProperty(s)){
+counts[s]++;
+}
+});
+
+const max=Math.max(1,...Object.values(counts));
+
+const order=[
+"生氣",
+"天醫",
+"延年",
+"五鬼",
+"伏位",
+"六煞",
+"禍害",
+"絕命"
+];
+
+document.getElementById("starCount").innerHTML=
+`<div class="star-grid">`+
+order.map(s=>`
+<div class="star-card">
+<div class="star-name">${s}</div>
+<div class="star-count">${counts[s]} 組</div>
+<div class="bar">
+<i style="width:${counts[s]/max*100}%"></i>
+</div>
+</div>
+`).join("")+
+`</div>`;
+
+const goodTotal=
+counts["生氣"]+
+counts["天醫"]+
+counts["延年"];
+
+const badTotal=
+counts["五鬼"]+
+counts["六煞"]+
+counts["禍害"]+
+counts["絕命"];
+
+document.getElementById("starSummary").innerHTML=
+`
+<div class="alert">
+四吉／主要吉星合計：
+<strong>${goodTotal}</strong> 組
+（生氣＋天醫＋延年）
+<br>
+四凶星合計：
+<strong>${badTotal}</strong> 組
+（五鬼＋六煞＋禍害＋絕命）
+<br>
+伏位：
+<strong>${counts["伏位"]}</strong> 組
+</div>`;
+}
+
+function renderControl(n){
+
+const ghosts=getPairs(n).filter(p=>map[p]==="五鬼");
+const hit=ghostControl.filter(x=>n.includes(x));
+
+let html=`
+<div class="control-box">
+<strong>依你提供的數字易經規則：</strong>
+<br><br>
+<div>五鬼的制化核心是：</div>
+<div class="control-chain">生氣 → 天醫 → 延年</div>
+<div>順序不可任意調換。</div>
+<br>
+<div>你提供的常見參考組合：</div>
+<div>
+<span class="example">4134</span>
+<span class="example">9319</span>
+<span class="example">6276</span>
+<span class="example">314</span>
+<span class="example">276</span>
+<span class="example">394</span>
+</div>
+</div>`;
+
+if(ghosts.length){
+
+html+=`
+<div class="alert">
+目前號碼發現五鬼：
+<strong>${[...new Set(ghosts)].join("、")}</strong>
+<br>
+建議先檢查是否能在整串數字中形成「生氣＋天醫＋延年」的制化結構。
+</div>`;
+
+}else{
+
+html+=`
+<div class="alert">
+目前相鄰兩碼沒有發現五鬼。
+</div>`;
+}
+
+if(hit.length){
+
+html+=`
+<div class="alert">
+<strong>已命中你提供的制化參考：</strong>
+<br>
+${hit.map(x=>`<span class="example">${x}</span>`).join("")}
+</div>`;
+}
+
+document.getElementById("controlResult").innerHTML=html;
+
+const checks=[
+["4134","生氣＋天醫＋延年"],
+["9319","天醫＋生氣＋延年"],
+["6276","延年＋天醫＋生氣"],
+["314","天醫＋生氣"],
+["276","天醫＋生氣"],
+["394","天醫＋延年"]
+];
+
+document.getElementById("controlPairs").innerHTML=
+checks.map(([num,desc])=>{
+
+const found=n.includes(num);
+
+return `
+<div class="alert">
+<strong>${num}</strong>｜${desc}
+${found?"　✅ 目前號碼有出現":"　— 未出現"}
+</div>`;
+
+}).join("");
+}
+
+const oldShow=show;
+
+show=function(n){
+oldShow(n);
+renderStarCount(n);
+renderControl(n);
+};
+
+/* ===== 三碼網路庫存綜合版 ===== */
+
+const builtInTripleDB={
+
+"319":"天醫＋延年＝老闆；花錢有智慧，當用則用；可考慮桃花",
+
+"278":"鐵公雞；小錢大智慧",
+
+"411":"2個貴人；易掉東西；2人合夥就倒",
+
+"412":"因朋友賠錢；可能是直銷／保險；此時41不能單獨解釋為貴人",
+
+"413":"貴人帶財",
+
+"414":"同411；一個貴人",
+
+"416":"很想結婚；沒正桃花",
+
+"417":"貴人變小人；像412",
+
+"418":"18懷疑；朋友很多，卻幫不上忙",
+
+"419":"19＝專業；主管／老師格局",
+
+"611":"2個家；8611可作買兩套房或坪數2N的原始筆記解讀",
+
+"612":"因家人或女人破財；若問開公司，原筆記解讀為會倒",
+
+"613":"家庭主婦；家裡人給她錢；開公司會帶財",
+
+"614":"偏桃花；不想結婚",
+
+"616":"同611",
+
+"617":"情緒來亂說話",
+
+"618":"演藝圈數字",
+
+"619":"顧家的人；需看另一半手機；61有偏桃花",
+
+"711":"病／併發症；2次意外／2個小人（原筆記解讀）",
+
+"712":"敢吃；通常比較胖；因小人或意外破財；不講道理",
+
+"713":"開口就有錢或桃花；舌燦蓮花",
+
+"714":"開口就有貴人幫",
+
+"716":"說話不會控制情緒",
+
+"717":"和711相似；原筆記另提及企管／肺",
+
+"718":"說話反覆雙動；業務員或講師；原筆記列為最大禍害／血光",
+
+"719":"說話耿直；愛講道理",
+
+"811":"容易恍神、精神不集中；原筆記列2次血光／開刀",
+
+"812":"花錢買藝術品或五鬼類：3C、培訓、宗教、養生、珠寶等",
+
+"813":"宗教命理賺錢等原始筆記解讀",
+
+"814":"有想法就開心，不一定去做；有絕命才會行動",
+
+"816":"演藝圈；漂亮；國外＋家可作貿易公司",
+
+"817":"原筆記列最大血光意外／很會忽悠人",
+
+"818":"同811，但1次",
+
+"819":"想法專業；頂尖聰明；仍需看整體結構",
+
+"911":"延年太多；耗精神、睡不好等原始筆記解讀",
+
+"912":"因工作賠錢；過度自信、投資失敗",
+
+"913":"一分耕耘，一分收穫",
+
+"914":"延年＋生氣；樂在工作",
+
+"916":"因工作壓力導致憂鬱（原筆記說法）",
+
+"917":"工作容易不開心或出意外",
+
+"918":"不想繼續工作；大公司／公家機關想換單位；學生想換科系或轉學",
+
+"919":"一份工作"
+};
+
 function getTripleInventory(){
-    let custom = {};
-    try{
-        custom = JSON.parse(localStorage.getItem("myTripleInventory") || "{}");
-    }catch(e){
-        custom = {};
-    }
-    return Object.assign({}, builtInTripleDB, custom);
+
+let custom={};
+
+try{
+custom=JSON.parse(
+localStorage.getItem("myTripleInventory")||"{}"
+);
+}catch(e){
+custom={};
+}
+
+return Object.assign(
+{},
+builtInTripleDB,
+custom
+);
 }
 
 function renderTripleInventory(n){
-    const box = document.getElementById("tripleInventory");
-    if(!box) return;
 
-    const number = String(n || "").replace(/\D/g,"");
-    const codes = getTriples(number);
-    const db = getTripleInventory();
+const box=document.getElementById("tripleInventory");
 
-    if(!codes.length){
-        box.innerHTML = "<div class='small'>目前沒有足夠數字產生三碼。</div>";
-        return;
-    }
+if(!box)return;
 
-    let hit = 0;
-    let out = "";
+const number=String(n||"").replace(/\D/g,"");
+const codes=getTriples(number);
+const db=getTripleInventory();
 
-    codes.forEach(code=>{
-        if(db[code]){
-            hit++;
-            out += `<div class="inventory-item inventory-hit">
-                <div class="inventory-code">${code}　✅ 已找到</div>
-                <div>${db[code]}</div>
-            </div>`;
-        }else{
-            out += `<div class="inventory-item inventory-wait">
-                <div class="inventory-code">${code}　⏳ 待查</div>
-                <div>目前三碼庫沒有這組解讀，可在下面新增。</div>
-            </div>`;
-        }
-    });
+if(!codes.length){
 
-    box.innerHTML = `<div class="alert">
-        本次共有 <strong>${codes.length}</strong> 組三碼；
-        已找到 <strong>${hit}</strong> 組；
-        待查 <strong>${codes.length-hit}</strong> 組。
-    </div>` + out;
+box.innerHTML=
+"<div class='small'>目前沒有足夠數字產生三碼。</div>";
+
+return;
+}
+
+let hit=0;
+let out="";
+
+codes.forEach(code=>{
+
+if(db[code]){
+
+hit++;
+
+out+=`
+<div class="inventory-item inventory-hit">
+<div class="inventory-code">
+${code}　✅ 已找到
+</div>
+<div>${db[code]}</div>
+</div>`;
+
+}else{
+
+out+=`
+<div class="inventory-item inventory-wait">
+<div class="inventory-code">
+${code}　⏳ 待查
+</div>
+<div>
+目前三碼庫沒有這組解讀，可在下面新增。
+</div>
+</div>`;
+}
+
+});
+
+box.innerHTML=
+`
+<div class="alert">
+本次共有 <strong>${codes.length}</strong> 組三碼；
+已找到 <strong>${hit}</strong> 組；
+待查 <strong>${codes.length-hit}</strong> 組。
+</div>
+`+out;
 }
 
 function saveTripleToInventory(){
-    const code = document.getElementById("tripleCodeInput").value.replace(/\D/g,"");
-    const meaning = document.getElementById("tripleMeaningInput").value.trim();
 
-    if(code.length !== 3){
-        alert("請輸入完整三碼，例如 413");
-        return;
-    }
-    if(!meaning){
-        alert("請輸入這組三碼的解讀");
-        return;
-    }
+const code=
+document.getElementById("tripleCodeInput")
+.value.replace(/\D/g,"");
 
-    let custom = {};
-    try{
-        custom = JSON.parse(localStorage.getItem("myTripleInventory") || "{}");
-    }catch(e){
-        custom = {};
-    }
+const meaning=
+document.getElementById("tripleMeaningInput")
+.value.trim();
 
-    custom[code] = meaning;
-    localStorage.setItem("myTripleInventory", JSON.stringify(custom));
+if(code.length!==3){
 
-    document.getElementById("tripleCodeInput").value = "";
-    document.getElementById("tripleMeaningInput").value = "";
+alert("請輸入完整三碼，例如 413");
 
-    const current = document.getElementById("edit").value.replace(/\D/g,"");
-    renderTripleInventory(current);
-    alert("已加入三碼庫存！");
+return;
+}
+
+if(!meaning){
+
+alert("請輸入這組三碼的解讀");
+
+return;
+}
+
+let custom={};
+
+try{
+
+custom=JSON.parse(
+localStorage.getItem("myTripleInventory")||"{}"
+);
+
+}catch(e){
+
+custom={};
+
+}
+
+custom[code]=meaning;
+
+localStorage.setItem(
+"myTripleInventory",
+JSON.stringify(custom)
+);
+
+document.getElementById("tripleCodeInput").value="";
+document.getElementById("tripleMeaningInput").value="";
+
+const current=
+document.getElementById("edit")
+.value.replace(/\D/g,"");
+
+renderTripleInventory(current);
+
+alert("已加入三碼庫存！");
 }
 
 function clearTripleInventory(){
-    if(!confirm("確定要清除你自己新增的三碼資料嗎？")) return;
-    localStorage.removeItem("myTripleInventory");
-    const current = document.getElementById("edit").value.replace(/\D/g,"");
-    renderTripleInventory(current);
+
+if(!confirm("確定要清除你自己新增的三碼資料嗎？")){
+return;
 }
 
-/* 包裝原本的 show：每次分析後同步更新三碼庫 */
-const originalShowForTripleInventory = show;
-show = function(n){
-    originalShowForTripleInventory(n);
-    renderTripleInventory(n);
+localStorage.removeItem("myTripleInventory");
+
+const current=
+document.getElementById("edit")
+.value.replace(/\D/g,"");
+
+renderTripleInventory(current);
+}
+
+const originalShowForTripleInventory=show;
+
+show=function(n){
+
+originalShowForTripleInventory(n);
+
+renderTripleInventory(n);
 };
-/* ===== 三碼網路庫存綜合版結束 ===== */
-'''
-html = html.replace(js_marker, js_add + "\n" + js_marker, 1)
 
-# 4) Make the final initialization explicitly render the integrated inventory.
-html = html.replace('run("custom");', 'run("custom");\nrenderTripleInventory(document.getElementById("edit").value);', 1)
+run("custom");
 
-# 5) Sanity checks: the final file must be actual HTML, not Python.
-checks = [
-    html.lstrip().startswith("<!DOCTYPE html>"),
-    html.rstrip().endswith("</html>"),
-    "from pathlib import Path" not in html,
-    "src = Path(" not in html,
-    "html = html.replace(" not in html,
-    "const builtInTripleDB" in html,
-    "三碼網路庫存綜合版" in html,
-]
-if not all(checks):
-    raise RuntimeError("HTML 清理檢查失敗")
+renderTripleInventory(
+document.getElementById("edit").value
+);
 
-out = Path("/mnt/data/index佳_完整修正版V6.html")
-out.write_text(html, encoding="utf-8")
-print(f"已修正：{out}")
-print(f"檔案大小：{out.stat().st_size} bytes")
+</script>
+</body>
+</html>
