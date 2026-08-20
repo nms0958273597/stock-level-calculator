@@ -1,34 +1,190 @@
-<html lang="zh-Hant">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>數字易經｜進階測試版 V2</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#f3f3f3;color:#222;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif}
-.wrap{max-width:960px;margin:auto;padding:12px}
-.header{background:linear-gradient(135deg,#171717,#383838);color:#fff;border-radius:18px;padding:22px 16px;text-align:center}
-.header h1{margin:0;font-size:25px}.header p{margin:8px 0 0;font-size:14px;opacity:.86}
-.card{background:#fff;border-radius:16px;padding:16px;margin-top:12px;box-shadow:0 2px 12px #0001}
-h2{font-size:19px;margin:0 0 13px}
-label{display:block;font-weight:700;margin:10px 0 6px}
-input,textarea,button{width:100%;border-radius:11px;font-size:16px;padding:12px}
-input,textarea{border:1px solid #ccc;background:#fff}
-textarea{min-height:80px}
-button{border:0;background:#171717;color:#fff;font-weight:700;margin-top:9px}
-.secondary{background:#e9e9e9;color:#222}
-.danger{background:#f1e1e1;color:#8b1111}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
-.result{font-size:26px;font-weight:800;text-align:center;letter-spacing:2px;border:2px solid #222;border-radius:13px;padding:16px;word-break:break-all}
-.pairs{display:flex;flex-wrap:wrap;gap:7px}
-.pair{min-width:67px;padding:9px 7px;border-radius:9px;text-align:center;font-weight:800}
-.pair small{display:block;font-size:11px;margin-top:3px;font-weight:500}
-.good{background:#e4f5e8;color:#17652a}.bad{background:#fde6e6;color:#9a1c1c}.neutral{background:#eee;color:#555}
-.analysis{line-height:1.7}
-.tag{display:inline-block;padding:5px 9px;border-radius:999px;background:#eee;margin:3px;font-size:13px;font-weight:700}
-.tag.good{background:#e4f5e8}.tag.bad{background:#fde6e6}
-.alert{border-left:5px solid #222;background:#f7f7f7;padding:11px;border-radius:8px;line-height:1.65;margin-top:10px}
-table{width:100%;border-collapse:collapse;min-width:620px}
-.tablewrap{overflow-x:auto}
-th,td{border:1px solid #ddd;padding:9px;text-align:center}th{background:#222;color:#fff}
-.small{font-size:13px;color:#666;line-height:1.65}
+from pathlib import Path
+
+src = Path("/mnt/data/index數字易經進階測試V4.html")
+html = src.read_text(encoding="utf-8")
+
+# Add an integrated "三碼網路庫存綜合版" section before the special triple-data section.
+marker = '<div class="card">\n<h2>⑫ 本次使用的特殊三碼資料</h2>'
+
+integrated = r'''
+<div class="card">
+<h2>⑫ 三碼網路庫存綜合版｜已整合進主程式</h2>
+<div class="small">
+現在主程式會把輸入號碼自動拆成所有連續三碼，先查內建三碼庫，再查你之後自己新增的本機資料。
+</div>
+
+<div id="tripleInventory" class="analysis" style="margin-top:12px"></div>
+
+<label>新增／修改三碼庫存</label>
+<input id="tripleCodeInput" maxlength="3" inputmode="numeric" placeholder="例如：413">
+
+<label>三碼解讀</label>
+<textarea id="tripleMeaningInput" placeholder="例如：貴人帶財"></textarea>
+
+<button class="secondary" onclick="saveTripleToInventory()">💾 儲存三碼到庫存</button>
+<button class="danger" onclick="clearTripleInventory()">清除自訂三碼庫存</button>
+</div>
+
+<div class="card">
+<h2>⑬ 本次使用的特殊三碼資料</h2>'''
+
+html = html.replace(marker, integrated)
+
+# Renumber the explanatory section after it.
+html = html.replace(
+    '<h2>⑬ 本次使用的特殊三碼資料</h2>',
+    '<h2>⑬ 本次使用的特殊三碼資料</h2>'
+)
+
+# Add inventory CSS before footer.
+css_marker = 'footer{text-align:center;color:#777;font-size:12px;padding:20px}'
+css_add = r'''
+.inventory-item{border:1px solid #ddd;border-radius:11px;padding:11px;margin:7px 0}
+.inventory-hit{background:#eef8ef}
+.inventory-wait{background:#fafafa;color:#777}
+.inventory-code{font-size:18px;font-weight:900}
+'''
+html = html.replace(css_marker, css_add + "\n" + css_marker)
+
+# Add integrated database JS before the existing run("custom") call.
+js_marker = 'run("custom");'
+
+js_add = r'''
+const builtInTripleDB = {
+"319":"天醫＋延年＝老闆；花錢有智慧，當用則用；可考慮桃花",
+"278":"鐵公雞；小錢大智慧",
+"411":"2個貴人；易掉東西；2人合夥就倒",
+"412":"因朋友賠錢；可能是直銷／保險；此時41不能單獨解釋為貴人",
+"413":"貴人帶財",
+"414":"同411；一個貴人",
+"416":"很想結婚；沒正桃花",
+"417":"貴人變小人；像412",
+"418":"18懷疑；朋友很多，卻幫不上忙",
+"419":"19＝專業；主管／老師格局",
+"611":"2個家；8611可作買兩套房或坪數2N的原始筆記解讀",
+"612":"因家人或女人破財；若問開公司，原筆記解讀為會倒",
+"613":"家庭主婦；家裡人給她錢；開公司會帶財",
+"614":"偏桃花；不想結婚",
+"616":"同611",
+"617":"情緒來亂說話",
+"618":"演藝圈數字",
+"619":"顧家的人；需看另一半手機；61有偏桃花",
+"711":"病／併發症；2次意外／2個小人（原筆記解讀）",
+"712":"敢吃；通常比較胖；因小人或意外破財；不講道理",
+"713":"開口就有錢或桃花；舌燦蓮花",
+"714":"開口就有貴人幫",
+"716":"說話不會控制情緒",
+"717":"和711相似；原筆記另提及企管／肺",
+"718":"說話反覆雙動；業務員或講師；原筆記列為最大禍害／血光",
+"719":"說話耿直；愛講道理",
+"811":"容易恍神、精神不集中；原筆記列2次血光／開刀",
+"812":"花錢買藝術品或五鬼類：3C、培訓、宗教、養生、珠寶等",
+"813":"宗教命理賺錢等原始筆記解讀",
+"814":"有想法就開心，不一定去做；有絕命才會行動",
+"816":"演藝圈；漂亮；國外＋家可作貿易公司",
+"817":"原筆記列最大血光意外／很會忽悠人",
+"818":"同811，但1次",
+"819":"想法專業；頂尖聰明；仍需看整體結構",
+"911":"延年太多；耗精神、睡不好等原始筆記解讀",
+"912":"因工作賠錢；過度自信、投資失敗",
+"913":"一分耕耘，一分收穫",
+"914":"延年＋生氣；樂在工作",
+"916":"因工作壓力導致憂鬱（原筆記說法）",
+"917":"工作容易不開心或出意外",
+"918":"不想繼續工作；大公司／公家機關想換單位；學生想換科系或轉學",
+"919":"一份工作"
+};
+
+function getTripleInventory(){
+    let custom = {};
+    try {
+        custom = JSON.parse(localStorage.getItem("myTripleInventory") || "{}");
+    } catch(e) {}
+    return Object.assign({}, builtInTripleDB, custom);
+}
+
+function renderTripleInventory(n){
+    const db = getTripleInventory();
+    const codes = getTriples(n);
+    const box = document.getElementById("tripleInventory");
+
+    if(!codes.length){
+        box.innerHTML = "<div class='small'>目前沒有足夠數字產生三碼。</div>";
+        return;
+    }
+
+    let hit = 0;
+    let html = "";
+
+    codes.forEach(code=>{
+        if(db[code]){
+            hit++;
+            html += `<div class="inventory-item inventory-hit">
+                <div class="inventory-code">${code}　✅ 已找到</div>
+                <div>${db[code]}</div>
+            </div>`;
+        }else{
+            html += `<div class="inventory-item inventory-wait">
+                <div class="inventory-code">${code}　⏳ 待查</div>
+                <div>目前三碼庫沒有這組解讀，可在下面新增。</div>
+            </div>`;
+        }
+    });
+
+    html = `<div class="alert">
+        本次共有 <strong>${codes.length}</strong> 組三碼；
+        已找到 <strong>${hit}</strong> 組；
+        待查 <strong>${codes.length-hit}</strong> 組。
+    </div>` + html;
+
+    box.innerHTML = html;
+}
+
+function saveTripleToInventory(){
+    const code = document.getElementById("tripleCodeInput").value.replace(/\D/g,"");
+    const meaning = document.getElementById("tripleMeaningInput").value.trim();
+
+    if(code.length !== 3){
+        alert("請輸入完整三碼，例如 413");
+        return;
+    }
+    if(!meaning){
+        alert("請輸入這組三碼的解讀");
+        return;
+    }
+
+    let custom = {};
+    try {
+        custom = JSON.parse(localStorage.getItem("myTripleInventory") || "{}");
+    } catch(e) {}
+
+    custom[code] = meaning;
+    localStorage.setItem("myTripleInventory", JSON.stringify(custom));
+
+    document.getElementById("tripleCodeInput").value = "";
+    document.getElementById("tripleMeaningInput").value = "";
+
+    renderTripleInventory(currentNumber || document.getElementById("edit").value);
+    alert("已加入三碼庫存！");
+}
+
+function clearTripleInventory(){
+    if(!confirm("確定要清除你自己新增的三碼資料嗎？")){
+        return;
+    }
+    localStorage.removeItem("myTripleInventory");
+    renderTripleInventory(currentNumber || document.getElementById("edit").value);
+}
+
+const oldShowForInventory = show;
+show = function(n){
+    oldShowForInventory(n);
+    renderTripleInventory(n);
+};
+'''
+
+html = html.replace(js_marker, js_add + "\n" + js_marker)
+
+out = Path("/mnt/data/index數字易經進階測試V5_整合三碼庫.html")
+out.write_text(html, encoding="utf-8")
+print(out)
