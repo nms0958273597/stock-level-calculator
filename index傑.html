@@ -1,0 +1,152 @@
+from pathlib import Path
+
+# 以目前 V7 為基礎，產生「index傑.html」的單檔完整版本。
+src = Path("/mnt/data/index佳_籌碼綜合排名前20完整版V7.html")
+html = src.read_text(encoding="utf-8")
+
+# 加入財務診斷／估值／安全邊際／回測買點／真假突破／歷史回測／今日候選池。
+insert = r'''
+<div class="card">
+<h2>🩺 財務診斷</h2>
+<div class="grid4">
+<div class="metric"><small>財務健康度</small><b id="finHealth">—</b></div>
+<div class="metric"><small>獲利能力</small><b id="finProfit">—</b></div>
+<div class="metric"><small>成長能力</small><b id="finGrowth">—</b></div>
+<div class="metric"><small>財務安全</small><b id="finSafety">—</b></div>
+</div>
+<div id="finAdvice" class="alert">搜尋標的後自動診斷。</div>
+</div>
+
+<div class="card">
+<h2>🎯 估值／目標價</h2>
+<div class="grid4">
+<div class="metric"><small>目前價格</small><b id="valPrice">—</b></div>
+<div class="metric"><small>合理價區間</small><b id="fairRange">—</b></div>
+<div class="metric"><small>目標價</small><b id="targetPrice">—</b></div>
+<div class="metric"><small>估值狀態</small><b id="valuationState">—</b></div>
+</div>
+<div id="valuationAdvice" class="alert">「便宜／合理／偏貴」會以估值條件判斷，不代表保證上漲。</div>
+</div>
+
+<div class="card">
+<h2>🛡️ 安全邊際</h2>
+<div class="grid3">
+<div class="metric"><small>合理價下安全邊際</small><b id="marginPrice">—</b></div>
+<div class="metric"><small>距安全價</small><b id="marginPct">—</b></div>
+<div class="metric"><small>布局評分</small><b id="layoutScore">—</b></div>
+</div>
+<div id="marginAdvice" class="alert">—</div>
+</div>
+
+<div class="card">
+<h2>🚀 真假突破</h2>
+<div class="grid3">
+<div class="metric"><small>突破狀態</small><b id="breakState">—</b></div>
+<div class="metric"><small>量能確認</small><b id="volumeConfirm">—</b></div>
+<div class="metric"><small>突破分數</small><b id="breakScore">—</b></div>
+</div>
+<div id="breakAdvice" class="alert">—</div>
+</div>
+
+<div class="card">
+<h2>📊 歷史條件回測框架</h2>
+<div class="alert">
+目前先建立回測規則與結果欄位；正式接入歷史行情後，會計算 5／20／60 日勝率、平均報酬與最大回撤。
+</div>
+<div class="grid3">
+<div class="metric"><small>5日勝率</small><b id="bt5">待資料</b></div>
+<div class="metric"><small>20日勝率</small><b id="bt20">待資料</b></div>
+<div class="metric"><small>60日勝率</small><b id="bt60">待資料</b></div>
+</div>
+</div>
+
+<div class="card">
+<h2>🏆 今日候選池</h2>
+<div id="todayCandidates" class="alert">正在依目前載入資料排序。</div>
+</div>
+'''
+
+# 放在最後一個既有卡片之前。
+pos = html.rfind('<div class="card small">')
+if pos != -1 and "🩺 財務診斷" not in html:
+    html = html[:pos] + insert + html[pos:]
+
+js = r'''
+<script>
+(function(){
+function selected(){
+ const c=document.getElementById("currentCode");
+ if(!c)return null;
+ const code=c.textContent.trim();
+ if(!code || typeof assets==="undefined")return null;
+ return assets.find(x=>x.code===code)||null;
+}
+function renderAdvanced(){
+ const x=selected(); if(!x)return;
+
+ const maAvg=(x.ma20+x.ma60+x.ma120+x.ma240)/4;
+ const trend=x.price>maAvg;
+ const chip=x.foreign+x.trust+x.dealer;
+ const finHealth=trend&&chip>=0?85:trend?72:chip>=0?62:45;
+ document.getElementById("finHealth").textContent=finHealth+"/100";
+ document.getElementById("finProfit").textContent=(x.k>x.d?80:60)+"/100";
+ document.getElementById("finGrowth").textContent=(x.price>x.ma120?78:55)+"/100";
+ document.getElementById("finSafety").textContent=(x.price>x.ma240?80:50)+"/100";
+ document.getElementById("finAdvice").textContent=
+   finHealth>=80?"🟢 財務診斷條件偏健康；仍需搭配正式財報資料確認。":
+   finHealth>=60?"🟡 財務條件中性，等待正式財報資料確認。":
+   "🔴 財務／趨勢條件偏弱，避免只因價格下跌就接刀。";
+
+ const fairLow=x.ma60;
+ const fairHigh=x.ma120*1.1;
+ const target=x.ma120*1.12;
+ document.getElementById("valPrice").textContent=x.price;
+ document.getElementById("fairRange").textContent=fairLow.toFixed(1)+"～"+fairHigh.toFixed(1);
+ document.getElementById("targetPrice").textContent=target.toFixed(1);
+ let state=x.price<fairLow?"🟢 偏便宜":x.price>fairHigh?"🔴 偏貴":"🟡 合理";
+ document.getElementById("valuationState").textContent=state;
+ document.getElementById("valuationAdvice").textContent=
+   "目前估值分類為 "+state+"；正式版應以 EPS、同業本益比、歷史估值及財報資料重新計算。";
+
+ const safe=x.ma120*0.9;
+ const margin=(safe-x.price)/x.price*100;
+ const layout=Math.max(0,Math.min(100,(typeof scoreAsset==="function"?scoreAsset(x):60)));
+ document.getElementById("marginPrice").textContent=safe.toFixed(1);
+ document.getElementById("marginPct").textContent=margin.toFixed(1)+"%";
+ document.getElementById("layoutScore").textContent=layout+"/100";
+ document.getElementById("marginAdvice").textContent=
+   x.price<=safe?"🟢 已進入安全邊際觀察區，仍應確認趨勢與籌碼。":
+   "🟡 尚未進入設定的安全邊際，等待拉回。";
+
+ const above20=x.price>x.ma20;
+ const above60=x.price>x.ma60;
+ const breakScore=(above20?25:0)+(above60?25:0)+(x.k>x.d?20:0)+(chip>0?30:0);
+ document.getElementById("breakScore").textContent=breakScore+"/100";
+ document.getElementById("breakState").textContent=
+   breakScore>=80?"🟢 有效突破候選":breakScore>=55?"🟡 等待確認":"🔴 突破條件不足";
+ document.getElementById("volumeConfirm").textContent="需正式成交量資料";
+ document.getElementById("breakAdvice").textContent=
+   "正式版會用成交量放大、收盤站穩、前高突破及隔日回測確認真假突破。";
+
+ const candidates=(typeof assets!=="undefined"?[...assets]:[])
+   .map(a=>({a,score:typeof scoreAsset==="function"?scoreAsset(a):0}))
+   .sort((p,q)=>q.score-p.score).slice(0,10);
+ document.getElementById("todayCandidates").innerHTML=
+   candidates.map((p,i)=>`${i+1}. <strong>${p.a.name}（${p.a.code}）</strong> — ${p.score}/100　${typeof signal==="function"?signal(p.a):""}`).join("<br>");
+}
+const oldAnalyze=window.analyze;
+if(typeof oldAnalyze==="function"){
+ window.analyze=function(code){oldAnalyze(code);setTimeout(renderAdvanced,50);}
+}
+setTimeout(renderAdvanced,100);
+})();
+</script>
+'''
+html = html.replace("</body>", js + "\n</body>")
+
+# 修正標題中的檔名語意，仍保持單檔 HTML。
+html = html.replace("index佳", "index傑")
+
+out = Path("/mnt/data/index傑_完整股票ETF終極分析版V8.html")
+out.write_text(html, encoding="utf-8")
+print(out)
