@@ -1,0 +1,121 @@
+<!-- 日期 -->
+<div>
+  <strong>日期：</strong>
+  <span id="today"></span>
+</div>
+
+<!-- 貨款餘額 -->
+<div>
+  <label>💰 貨款餘額：</label>
+  <input type="number" id="balance" value="0" min="0">
+</div>
+
+<!-- 大腸 -->
+<div>
+  <label>大腸（100元／斤）：</label>
+  <input type="number" id="intestineQty" value="0" min="0" step="0.1">
+  <span>斤</span>
+  <span id="intestineTotal">0 元</span>
+</div>
+
+<!-- 訂單金額 -->
+<div>
+  <label>訂單金額：</label>
+  <input type="number" id="orderAmount" value="0" min="0">
+</div>
+
+<!-- 扣除貨款餘額 -->
+<div>
+  <strong>扣除貨款後：</strong>
+  <span id="finalAmount">0 元</span>
+</div>
+
+<!-- 複製訂單 -->
+<button onclick="copyOrder()">📋 複製訂單</button>
+
+<script>
+function updateToday() {
+  const now = new Date();
+
+  const week = [
+    "星期日",
+    "星期一",
+    "星期二",
+    "星期三",
+    "星期四",
+    "星期五",
+    "星期六"
+  ];
+
+  const date =
+    now.getFullYear() + "/" +
+    String(now.getMonth() + 1).padStart(2, "0") + "/" +
+    String(now.getDate()).padStart(2, "0") +
+    " " + week[now.getDay()];
+
+  document.getElementById("today").textContent = date;
+}
+
+function calculate() {
+  const balance =
+    Number(document.getElementById("balance").value) || 0;
+
+  const orderAmount =
+    Number(document.getElementById("orderAmount").value) || 0;
+
+  const intestineQty =
+    Number(document.getElementById("intestineQty").value) || 0;
+
+  // 大腸固定100元／斤
+  const intestineTotal = intestineQty * 100;
+
+  document.getElementById("intestineTotal").textContent =
+    intestineTotal.toLocaleString() + " 元";
+
+  // 訂單金額扣除貨款餘額
+  const finalAmount = orderAmount - balance;
+
+  document.getElementById("finalAmount").textContent =
+    finalAmount.toLocaleString() + " 元";
+}
+
+function copyOrder() {
+  const balance =
+    Number(document.getElementById("balance").value) || 0;
+
+  const orderAmount =
+    Number(document.getElementById("orderAmount").value) || 0;
+
+  const intestineQty =
+    Number(document.getElementById("intestineQty").value) || 0;
+
+  const intestineTotal = intestineQty * 100;
+  const finalAmount = orderAmount - balance;
+
+  const text =
+`日期：${document.getElementById("today").textContent}
+貨款餘額：${balance.toLocaleString()} 元
+大腸：${intestineQty} 斤 × 100 = ${intestineTotal.toLocaleString()} 元
+訂單金額：${orderAmount.toLocaleString()} 元
+扣除貨款餘額後：${finalAmount.toLocaleString()} 元`;
+
+  navigator.clipboard.writeText(text);
+
+  alert("✅ 訂單內容已複製！");
+}
+
+document
+  .getElementById("balance")
+  .addEventListener("input", calculate);
+
+document
+  .getElementById("orderAmount")
+  .addEventListener("input", calculate);
+
+document
+  .getElementById("intestineQty")
+  .addEventListener("input", calculate);
+
+updateToday();
+calculate();
+</script>
