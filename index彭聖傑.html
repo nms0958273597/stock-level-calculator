@@ -4,1467 +4,1046 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>每日營業記帳</title>
-
 <style>
-*{
-    box-sizing:border-box;
-}
-
-body{
-    margin:0;
-    padding:20px 12px 40px;
-    background:#f5f5f5;
-    color:#222;
-    font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",
-    "Noto Sans TC","Microsoft JhengHei",sans-serif;
-}
-
-.container{
-    max-width:650px;
-    margin:0 auto;
-}
-
-.card{
-    background:#fff;
-    border-radius:18px;
-    padding:20px;
-    margin-bottom:16px;
-    box-shadow:0 4px 15px rgba(0,0,0,.08);
-}
-
-.title{
-    text-align:center;
-    font-size:24px;
-    font-weight:800;
-    margin-bottom:8px;
-}
-
-.date{
-    text-align:center;
-    font-size:18px;
-    font-weight:700;
-    margin-bottom:5px;
-}
-
-.today{
-    text-align:center;
-    color:#777;
-    font-size:14px;
-}
-
-h2{
-    font-size:20px;
-    margin:0 0 15px;
-}
-
-.row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin:10px 0;
-}
-
-.label{
-    flex:1;
-    font-size:17px;
-    font-weight:600;
-}
-
-input{
-    width:145px;
-    padding:10px 12px;
-    border:1px solid #ccc;
-    border-radius:10px;
-    font-size:18px;
-    text-align:right;
-    background:#fff;
-}
-
-input:focus{
-    outline:none;
-    border-color:#777;
-    box-shadow:0 0 0 2px rgba(0,0,0,.08);
-}
-
-.fixed{
-    font-size:22px;
-    font-weight:800;
-    text-align:center;
-    padding:14px;
-    border-radius:12px;
-    background:#f0f0f0;
-    margin:15px 0;
-}
-
-.total{
-    display:flex;
-    justify-content:space-between;
-    font-size:19px;
-    font-weight:800;
-    padding-top:12px;
-    margin-top:12px;
-    border-top:1px solid #ddd;
-}
-
-.hint{
-    color:#777;
-    font-size:14px;
-    margin-top:8px;
-    line-height:1.6;
-}
-
-.calc-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:10px 0;
-    font-size:18px;
-}
-
-.calc-row strong{
-    font-size:20px;
-}
-
-.big-number{
-    font-size:30px;
-    font-weight:900;
-}
-
-.profit{
-    background:#f0fff4;
-}
-
-.expense{
-    background:#fff8f0;
-}
-
-.result{
-    background:#f5f5f5;
-    border-radius:15px;
-    padding:16px;
-    margin-top:10px;
-}
-
-.result.final{
-    margin-top:18px;
-    text-align:center;
-}
-
-.final-label{
-    font-size:20px;
-    font-weight:800;
-    margin-bottom:6px;
-}
-
-.final-number{
-    font-size:34px;
-    font-weight:900;
-}
-
-.negative{
-    color:#d93025;
-}
-
-.positive{
-    color:#188038;
-}
-
-.detail-title{
-    font-size:22px;
-    font-weight:900;
-    margin-bottom:15px;
-}
-
-.detail-section{
-    background:#f7f7f7;
-    border-radius:14px;
-    padding:14px;
-    margin-bottom:12px;
-}
-
-.detail-section-title{
-    font-size:18px;
-    font-weight:800;
-    margin-bottom:8px;
-}
-
-.detail-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    padding:8px 0;
-    border-bottom:1px solid #e3e3e3;
-    font-size:16px;
-}
-
-.detail-row:last-child{
-    border-bottom:none;
-}
-
-.detail-name{
-    flex:1;
-}
-
-.detail-value{
-    text-align:right;
-    font-weight:700;
-}
-
-.detail-sub{
-    color:#777;
-    font-size:14px;
-}
-
-.detail-total{
-    display:flex;
-    justify-content:space-between;
-    font-size:19px;
-    font-weight:900;
-    padding-top:12px;
-    margin-top:8px;
-    border-top:2px solid #ccc;
-}
-
-.detail-profit{
-    font-size:22px;
-    font-weight:900;
-}
-
-button{
-    width:100%;
-    padding:14px;
-    border:0;
-    border-radius:12px;
-    background:#222;
-    color:#fff;
-    font-size:18px;
-    font-weight:700;
-    margin-top:10px;
-    cursor:pointer;
-}
-
-button:active{
-    transform:scale(.98);
-}
-
+*{box-sizing:border-box}
+body{margin:0;padding:20px 12px 40px;background:#f5f5f5;color:#222;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+.container{max-width:650px;margin:0 auto}
+.card{background:#fff;border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 4px 15px rgba(0,0,0,.08)}
+.title{text-align:center;font-size:24px;font-weight:800;margin-bottom:8px}
+.date{text-align:center;font-size:18px;font-weight:700;margin-bottom:5px}
+.today{text-align:center;color:#777;font-size:14px}
+h2{font-size:20px;margin:0 0 15px}
+.row{display:flex;align-items:center;gap:10px;margin:10px 0}
+.label{flex:1;font-size:17px;font-weight:600}
+input{width:145px;padding:10px 12px;border:1px solid #ccc;border-radius:10px;font-size:18px;text-align:right;background:#fff}
+input:focus{outline:none;border-color:#777;box-shadow:0 0 0 2px rgba(0,0,0,.08)}
+.fixed{font-size:22px;font-weight:800;text-align:center;padding:14px;border-radius:12px;background:#f0f0f0;margin:15px 0}
+.total{display:flex;justify-content:space-between;font-size:19px;font-weight:800;padding-top:12px;margin-top:12px;border-top:1px solid #ddd}
+.hint{color:#777;font-size:14px;margin-top:8px;line-height:1.7}
+.manual{background:#fff8e8;border:2px solid #ead8a8;padding:12px;border-radius:12px;margin-top:14px}
+.manual-title{font-size:16px;font-weight:800;margin-bottom:8px}
+.calc-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;font-size:18px}
+.calc-row strong{font-size:20px}
+.big-number{font-size:30px;font-weight:900}
+.profit{background:#f0fff4}
+.expense{background:#fff8f0}
+.result{background:#f5f5f5;border-radius:15px;padding:16px;margin-top:10px}
+.result.final{margin-top:18px;text-align:center}
+.final-label{font-size:20px;font-weight:800;margin-bottom:6px}
+.final-number{font-size:34px;font-weight:900}
+.negative{color:#d93025}
+.positive{color:#188038}
+.detail-title{font-size:22px;font-weight:900;margin-bottom:12px}
+.copy-btn{width:100%;padding:12px;border:0;border-radius:12px;background:#333;color:#fff;font-size:17px;font-weight:700;margin-bottom:15px;cursor:pointer}
+.copy-btn:active{transform:scale(.98)}
+.copy-message{text-align:center;color:#188038;font-size:14px;min-height:20px;margin-bottom:8px}
+.detail-section{background:#f7f7f7;border-radius:14px;padding:14px;margin-bottom:12px}
+.detail-section-title{font-size:18px;font-weight:800;margin-bottom:8px}
+.detail-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #e3e3e3;font-size:16px}
+.detail-row:last-child{border-bottom:none}
+.detail-name{flex:1}
+.detail-value{text-align:right;font-weight:700}
+.detail-sub{color:#777;font-size:14px;margin-top:3px}
+.detail-total{display:flex;justify-content:space-between;font-size:19px;font-weight:900;padding-top:12px;margin-top:8px;border-top:2px solid #ccc}
+.detail-profit{font-size:22px;font-weight:900}
+.note{color:#777;font-size:13px;line-height:1.6;margin-top:8px}
+button.reset{width:100%;padding:14px;border:0;border-radius:12px;background:#222;color:#fff;font-size:18px;font-weight:700;margin-top:10px;cursor:pointer}
 @media(max-width:480px){
-
-    body{
-        padding:12px 8px 30px;
-    }
-
-    .card{
-        padding:16px;
-    }
-
-    .title{
-        font-size:22px;
-    }
-
-    input{
-        width:130px;
-    }
-
-    .label{
-        font-size:16px;
-    }
-
-    .detail-row{
-        font-size:15px;
-    }
-
+body{padding:12px 8px 30px}
+.card{padding:16px}
+.title{font-size:22px}
+input{width:130px}
+.label{font-size:16px}
+.detail-row{font-size:15px}
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-    <!-- 標題 -->
-    <div class="card">
-
-        <div class="title">
-            美滿快樂健康平安幸福❤️
-        </div>
-
-        <div class="date" id="dateDisplay">
-            讀取日期中...
-        </div>
-
-        <div class="today">
-            📅 每次開啟自動更新台灣日期
-        </div>
-
-    </div>
-
-
-    <!-- 固定成本 -->
-    <div class="card">
-
-        <h2>🔒 固定成本</h2>
-
-        <div class="row">
-            <div class="label">水電</div>
-            <div>600 元</div>
-        </div>
-
-        <div class="row">
-            <div class="label">房租</div>
-            <div>1,000 元</div>
-        </div>
-
-        <div class="row">
-            <div class="label">彭聖傑</div>
-            <div>　</div>
-        </div>
-
-        <div class="row">
-            <div class="label">彭姑姑</div>
-            <div>　</div>
-        </div>
-
-        <div class="row">
-            <div class="label">彭叔叔</div>
-            <div>　</div>
-        </div>
-
-        <div class="row">
-            <div class="label">樊嬸嬸</div>
-            <div>　</div>
-        </div>
-
-        <div class="fixed">
-            以上固定成本：9,400 元
-        </div>
-
-    </div>
-
-
-    <!-- 其他成本 -->
-    <div class="card">
-
-        <h2>📦 其他成本</h2>
-
-        <div class="row">
-            <div class="label">大腸</div>
-            <input
-                id="largeIntestine"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="0"
-                oninput="calculate()">
-            <div>元</div>
-        </div>
-
-        <div class="row">
-            <div class="label">蚵仔</div>
-            <input
-                id="oyster"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="0"
-                oninput="calculate()">
-            <div>元</div>
-        </div>
-
-        <div class="row">
-            <div class="label">禾田</div>
-            <input
-                id="hetian"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="0"
-                oninput="calculate()">
-            <div>元</div>
-        </div>
-
-        <div class="row">
-            <div class="label">錦泰</div>
-            <input
-                id="jintai"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="0"
-                oninput="calculate()">
-            <div>元</div>
-        </div>
-
-        <div class="row">
-            <div class="label">🍊🍋</div>
-            <input
-                id="orangeLemon"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="0"
-                oninput="calculate()">
-            <div>元</div>
-        </div>
-
-        <div class="hint">
-            ※ 金額直接手動填寫<br>
-            ※ 空白視為 0 元
-        </div>
-
-        <div class="total">
-            <span>其他成本</span>
-            <span id="otherCost">0 元</span>
-        </div>
-
-    </div>
-
-
-    <!-- 飲料 -->
-    <div class="card">
-
-        <h2>🥤 飲料</h2>
-
-        <div class="row">
-
-            <div class="label">
-                大杯：50元
-            </div>
-
-            <input
-                id="largeDrink"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="0"
-                oninput="calculate()">
-
-            <div>杯</div>
-
-        </div>
-
-        <div class="row">
-
-            <div class="label">
-                小杯：40元
-            </div>
-
-            <input
-                id="smallDrink"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="0"
-                oninput="calculate()">
-
-            <div>杯</div>
-
-        </div>
-
-        <div class="result">
-
-            <div class="calc-row">
-                <span>大杯收入</span>
-                <strong id="largeDrinkIncome">0 元</strong>
-            </div>
-
-            <div class="calc-row">
-                <span>小杯收入</span>
-                <strong id="smallDrinkIncome">0 元</strong>
-            </div>
-
-            <div class="total">
-                <span>飲料總計</span>
-                <span id="drinkTotal">0 杯</span>
-            </div>
-
-            <div class="total">
-                <span>飲料收入</span>
-                <span id="drinkIncome">0 元</span>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- 煮鍋 -->
-    <div class="card">
-
-        <h2>🍲 煮鍋</h2>
-
-        <div class="row">
-
-            <div class="label">
-                煮鍋
-            </div>
-
-            <input
-                id="potCount"
-                type="number"
-                min="0"
-                step="0.5"
-                placeholder="0"
-                oninput="calculate()">
-
-            <div>鍋</div>
-
-        </div>
-
-        <div class="hint">
-            1鍋＝110碗<br>
-            2鍋＝220碗<br>
-            2.5鍋＝275碗<br>
-            1碗＝55元
-        </div>
-
-        <div class="result">
-
-            <div class="calc-row">
-                <span>總碗數</span>
-                <strong id="bowlTotal">0 碗</strong>
-            </div>
-
-            <div class="calc-row">
-                <span>每碗</span>
-                <strong>55 元</strong>
-            </div>
-
-            <div class="total">
-                <span>煮鍋收入</span>
-                <span id="potIncome">0 元</span>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- 詳細明細 -->
-    <div class="card">
-
-        <div class="detail-title">
-            📋 詳細明細
-        </div>
-
-
-        <!-- 收入明細 -->
-        <div class="detail-section">
-
-            <div class="detail-section-title">
-                💰 收入明細
-            </div>
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    大杯
-                    <div
-                        class="detail-sub"
-                        id="largeDrinkDetail">
-                        0 杯 × 50 元
-                    </div>
-                </div>
-
-                <div
-                    class="detail-value"
-                    id="largeDrinkDetailMoney">
-                    0 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    小杯
-                    <div
-                        class="detail-sub"
-                        id="smallDrinkDetail">
-                        0 杯 × 40 元
-                    </div>
-                </div>
-
-                <div
-                    class="detail-value"
-                    id="smallDrinkDetailMoney">
-                    0 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    煮鍋
-                    <div
-                        class="detail-sub"
-                        id="potDetail">
-                        0 鍋 → 0 碗 × 55 元
-                    </div>
-                </div>
-
-                <div
-                    class="detail-value"
-                    id="potDetailMoney">
-                    0 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-total">
-
-                <span>
-                    總盈利
-                </span>
-
-                <span
-                    id="detailProfit"
-                    class="detail-profit">
-                    0 元
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <!-- 成本明細 -->
-        <div class="detail-section">
-
-            <div class="detail-section-title">
-                📦 成本明細
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    固定成本
-                </div>
-
-                <div class="detail-value">
-                    9,400 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    水電
-                </div>
-
-                <div class="detail-value">
-                    600 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    房租
-                </div>
-
-                <div class="detail-value">
-                    1,000 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    大腸
-                </div>
-
-                <div
-                    class="detail-value"
-                    id="largeIntestineDetail">
-                    0 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    蚵仔
-                </div>
-
-                <div
-                    class="detail-value"
-                    id="oysterDetail">
-                    0 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    禾田
-                </div>
-
-                <div
-                    class="detail-value"
-                    id="hetianDetail">
-                    0 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    錦泰
-                </div>
-
-                <div
-                    class="detail-value"
-                    id="jintaiDetail">
-                    0 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    🍊🍋
-                </div>
-
-                <div
-                    class="detail-value"
-                    id="orangeLemonDetail">
-                    0 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-total">
-
-                <span>
-                    總支出
-                </span>
-
-                <span
-                    id="detailExpense"
-                    class="detail-profit">
-                    9,400 元
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <!-- 最後結果 -->
-        <div class="detail-section">
-
-            <div class="detail-section-title">
-                🧮 最後結算
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    盈利
-                </div>
-
-                <div
-                    class="detail-value"
-                    id="detailProfit2">
-                    0 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <div class="detail-name">
-                    支出
-                </div>
-
-                <div
-                    class="detail-value"
-                    id="detailExpense2">
-                    9,400 元
-                </div>
-
-            </div>
-
-
-            <div class="detail-total">
-
-                <span>
-                    盈餘
-                </span>
-
-                <span
-                    id="detailSurplus"
-                    class="detail-profit negative">
-                    -9,400 元
-                </span>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- 最後結算 -->
-    <div class="card">
-
-        <h2>💰 最後結算</h2>
-
-        <div class="result profit">
-
-            <div class="calc-row">
-
-                <span>
-                    飲料收入
-                </span>
-
-                <strong id="finalDrinkIncome">
-                    0 元
-                </strong>
-
-            </div>
-
-
-            <div class="calc-row">
-
-                <span>
-                    煮鍋收入
-                </span>
-
-                <strong id="finalPotIncome">
-                    0 元
-                </strong>
-
-            </div>
-
-
-            <div class="total">
-
-                <span>
-                    盈利
-                </span>
-
-                <span
-                    id="profit"
-                    class="big-number">
-                    0 元
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="result expense">
-
-            <div class="calc-row">
-
-                <span>
-                    固定成本
-                </span>
-
-                <strong>
-                    9,400 元
-                </strong>
-
-            </div>
-
-
-            <div class="calc-row">
-
-                <span>
-                    其他成本
-                </span>
-
-                <strong id="finalOtherCost">
-                    0 元
-                </strong>
-
-            </div>
-
-
-            <div class="total">
-
-                <span>
-                    支出
-                </span>
-
-                <span
-                    id="expense"
-                    class="big-number">
-                    9,400 元
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="result final">
-
-            <div class="final-label">
-                盈餘
-            </div>
-
-            <div
-                id="surplus"
-                class="final-number negative">
-                -9,400 元
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <button onclick="resetAll()">
-        🔄 清除數量重新計算
-    </button>
+<div class="card">
+<div class="title">美滿快樂健康平安幸福❤️</div>
+<div class="date" id="dateDisplay">讀取日期中...</div>
+<div class="today">📅 每次開啟自動更新台灣日期</div>
+</div>
+
+<div class="card">
+<h2>🔒 固定成本</h2>
+
+<div class="row"><div class="label">水電</div><div>600 元</div></div>
+<div class="row"><div class="label">房租</div><div>1,000 元</div></div>
+<div class="row"><div class="label">彭聖傑</div><div>　</div></div>
+<div class="row"><div class="label">彭姑姑</div><div>　</div></div>
+<div class="row"><div class="label">彭叔叔</div><div>　</div></div>
+<div class="row"><div class="label">樊嬸嬸</div><div>　</div></div>
+
+<div class="fixed">以上固定成本：9,400 元</div>
+
+<div class="note">
+※ 9,400 元為固定成本，只計算一次。
+</div>
+</div>
+
+<div class="card">
+<h2>📦 其他成本</h2>
+
+<div class="row">
+<div class="label">大腸</div>
+<input id="largeIntestine" type="number" min="0" step="1" placeholder="0" oninput="calculate()">
+<div>元</div>
+</div>
+
+<div class="row">
+<div class="label">蚵仔</div>
+<input id="oyster" type="number" min="0" step="1" placeholder="0" oninput="calculate()">
+<div>元</div>
+</div>
+
+<div class="row">
+<div class="label">禾田</div>
+<input id="hetian" type="number" min="0" step="1" placeholder="0" oninput="calculate()">
+<div>元</div>
+</div>
+
+<div class="row">
+<div class="label">錦泰</div>
+<input id="jintai" type="number" min="0" step="1" placeholder="0" oninput="calculate()">
+<div>元</div>
+</div>
+
+<div class="hint">
+※ 以上金額全部手動填寫。<br>
+※ 空白視為 0 元。<br>
+※ 🍊🍋 不需手動填寫，會依飲料總杯數自動計算。
+</div>
+
+<div class="total">
+<span>其他成本</span>
+<span id="otherCost">0 元</span>
+</div>
+</div>
+
+<div class="card">
+<h2>🥤 飲料</h2>
+
+<div class="row">
+<div class="label">大杯：50元</div>
+<input id="largeDrink" type="number" min="0" step="1" placeholder="0" oninput="calculate()">
+<div>杯</div>
+</div>
+
+<div class="row">
+<div class="label">小杯：40元</div>
+<input id="smallDrink" type="number" min="0" step="1" placeholder="0" oninput="calculate()">
+<div>杯</div>
+</div>
+
+<div class="result">
+
+<div class="calc-row">
+<span>大杯收入</span>
+<strong id="largeDrinkIncome">0 元</strong>
+</div>
+
+<div class="calc-row">
+<span>小杯收入</span>
+<strong id="smallDrinkIncome">0 元</strong>
+</div>
+
+<div class="total">
+<span>飲料總計</span>
+<span id="drinkTotal">0 杯</span>
+</div>
+
+<div class="calc-row">
+<span>🍊🍋 自動成本</span>
+<strong id="orangeLemonCost">0 元</strong>
+</div>
+
+<div class="hint">
+🍊🍋 成本＝飲料總杯數 ÷ 25 × 300
+</div>
+
+<div class="total">
+<span>飲料收入</span>
+<span id="drinkIncome">0 元</span>
+</div>
+
+</div>
+</div>
+
+<div class="card">
+<h2>🍲 煮鍋</h2>
+
+<div class="row">
+<div class="label">煮鍋</div>
+<input id="potCount" type="number" min="0" step="0.5" placeholder="0" oninput="calculate()">
+<div>鍋</div>
+</div>
+
+<div class="hint">
+1鍋＝110碗<br>
+2鍋＝220碗<br>
+2.5鍋＝275碗<br>
+1碗＝55元
+</div>
+
+<div class="manual">
+<div class="manual-title">✏️ 手動填寫碗數</div>
+
+<div class="row">
+<div class="label">實際碗數</div>
+<input id="manualBowls" type="number" min="0" step="1" placeholder="空白自動計算" oninput="calculate()">
+<div>碗</div>
+</div>
+
+<div class="hint">
+※ 有填寫時，以手動碗數為準。<br>
+※ 空白時，自動使用「鍋數 × 110碗」。
+</div>
+</div>
+
+<div class="result">
+
+<div class="calc-row">
+<span>計算碗數</span>
+<strong id="bowlTotal">0 碗</strong>
+</div>
+
+<div class="calc-row">
+<span>每碗</span>
+<strong>55 元</strong>
+</div>
+
+<div class="total">
+<span>煮鍋收入</span>
+<span id="potIncome">0 元</span>
+</div>
+
+</div>
+</div>
+
+<!-- 詳細明細 -->
+<div class="card">
+
+<div class="detail-title">
+📋 詳細明細
+</div>
+
+<button class="copy-btn" onclick="copyDetails()">
+📄 複製完整明細
+</button>
+
+<div class="copy-message" id="copyMessage"></div>
+
+<div class="detail-section">
+
+<div class="detail-section-title">
+💰 收入明細
+</div>
+
+<div class="detail-row">
+<div class="detail-name">
+大杯
+<div class="detail-sub" id="largeDrinkDetail">0 杯 × 50 元</div>
+</div>
+<div class="detail-value" id="largeDrinkDetailMoney">0 元</div>
+</div>
+
+<div class="detail-row">
+<div class="detail-name">
+小杯
+<div class="detail-sub" id="smallDrinkDetail">0 杯 × 40 元</div>
+</div>
+<div class="detail-value" id="smallDrinkDetailMoney">0 元</div>
+</div>
+
+<div class="detail-row">
+<div class="detail-name">
+飲料總數
+<div class="detail-sub" id="drinkTotalDetail">0 杯</div>
+</div>
+<div class="detail-value" id="drinkIncomeDetail">0 元</div>
+</div>
+
+<div class="detail-row">
+<div class="detail-name">
+煮鍋
+<div class="detail-sub" id="potDetail">0 鍋 → 0 碗 × 55 元</div>
+</div>
+<div class="detail-value" id="potDetailMoney">0 元</div>
+</div>
+
+<div class="detail-total">
+<span>總盈利</span>
+<span id="detailProfit" class="detail-profit">0 元</span>
+</div>
 
 </div>
 
+<div class="detail-section">
+
+<div class="detail-section-title">
+📦 成本明細
+</div>
+
+<div class="detail-row">
+<div class="detail-name">固定成本</div>
+<div class="detail-value">9,400 元</div>
+</div>
+
+<div class="detail-row">
+<div class="detail-name">大腸</div>
+<div class="detail-value" id="largeIntestineDetail">0 元</div>
+</div>
+
+<div class="detail-row">
+<div class="detail-name">蚵仔</div>
+<div class="detail-value" id="oysterDetail">0 元</div>
+</div>
+
+<div class="detail-row">
+<div class="detail-name">禾田</div>
+<div class="detail-value" id="hetianDetail">0 元</div>
+</div>
+
+<div class="detail-row">
+<div class="detail-name">錦泰</div>
+<div class="detail-value" id="jintaiDetail">0 元</div>
+</div>
+
+<div class="detail-row">
+<div class="detail-name">
+🍊🍋
+<div class="detail-sub" id="orangeLemonDetailSub">
+0杯 ÷ 25 × 300
+</div>
+</div>
+<div class="detail-value" id="orangeLemonDetail">0 元</div>
+</div>
+
+<div class="detail-total">
+<span>總支出</span>
+<span id="detailExpense" class="detail-profit">9,400 元</span>
+</div>
+
+</div>
+
+<div class="detail-section">
+
+<div class="detail-section-title">
+🧮 最後結算
+</div>
+
+<div class="detail-row">
+<div class="detail-name">盈利</div>
+<div class="detail-value" id="detailProfit2">0 元</div>
+</div>
+
+<div class="detail-row">
+<div class="detail-name">支出</div>
+<div class="detail-value" id="detailExpense2">9,400 元</div>
+</div>
+
+<div class="detail-total">
+<span>盈餘</span>
+<span id="detailSurplus" class="detail-profit negative">-9,400 元</span>
+</div>
+
+</div>
+</div>
+
+<!-- 最後結算 -->
+<div class="card">
+
+<h2>💰 最後結算</h2>
+
+<div class="result profit">
+
+<div class="calc-row">
+<span>飲料收入</span>
+<strong id="finalDrinkIncome">0 元</strong>
+</div>
+
+<div class="calc-row">
+<span>煮鍋收入</span>
+<strong id="finalPotIncome">0 元</strong>
+</div>
+
+<div class="total">
+<span>盈利</span>
+<span id="profit" class="big-number">0 元</span>
+</div>
+
+</div>
+
+<div class="result expense">
+
+<div class="calc-row">
+<span>固定成本</span>
+<strong>9,400 元</strong>
+</div>
+
+<div class="calc-row">
+<span>其他成本</span>
+<strong id="finalOtherCost">0 元</strong>
+</div>
+
+<div class="total">
+<span>支出</span>
+<span id="expense" class="big-number">9,400 元</span>
+</div>
+
+</div>
+
+<div class="result final">
+
+<div class="final-label">
+盈餘
+</div>
+
+<div id="surplus" class="final-number negative">
+-9,400 元
+</div>
+
+</div>
+
+</div>
+
+<button class="reset" onclick="resetAll()">
+🔄 清除數量重新計算
+</button>
+
+</div>
 
 <script>
 
-/* =========================================
-   固定設定
-   ========================================= */
-
 const FIXED_COST = 9400;
-
 const LARGE_DRINK_PRICE = 50;
-
 const SMALL_DRINK_PRICE = 40;
-
 const BOWLS_PER_POT = 110;
-
 const BOWL_PRICE = 55;
+const ORANGE_LEMON_PER_25 = 300;
 
 
-/* =========================================
-   自動日期
-   使用台灣時間 Asia/Taipei
-   ========================================= */
+/* 自動日期 */
 
 function updateDate(){
 
-    const now = new Date();
+const now = new Date();
 
-    const dateFormatter =
-        new Intl.DateTimeFormat(
-            'zh-TW',
-            {
-                timeZone:'Asia/Taipei',
-                year:'numeric',
-                month:'numeric',
-                day:'numeric',
-                weekday:'long'
-            }
-        );
+const formatter =
+new Intl.DateTimeFormat(
+'zh-TW',
+{
+timeZone:'Asia/Taipei',
+year:'numeric',
+month:'numeric',
+day:'numeric',
+weekday:'long'
+});
 
-    const parts =
-        dateFormatter.formatToParts(now);
+const parts =
+formatter.formatToParts(now);
 
-    let year = '';
-    let month = '';
-    let day = '';
-    let weekday = '';
+let year='';
+let month='';
+let day='';
+let weekday='';
 
-    parts.forEach(function(part){
+parts.forEach(function(part){
 
-        if(part.type === 'year'){
-            year = part.value;
-        }
+if(part.type==='year') year=part.value;
+if(part.type==='month') month=part.value;
+if(part.type==='day') day=part.value;
+if(part.type==='weekday') weekday=part.value;
 
-        if(part.type === 'month'){
-            month = part.value;
-        }
+});
 
-        if(part.type === 'day'){
-            day = part.value;
-        }
+let yearText='';
 
-        if(part.type === 'weekday'){
-            weekday = part.value;
-        }
+if(year==='2026'){
+yearText='2026丙午年';
+}else{
+yearText=year+'年';
+}
 
-    });
-
-
-    let yearText = '';
-
-    if(year === '2026'){
-        yearText = '2026丙午年';
-    }else{
-        yearText = year + '年';
-    }
-
-
-    document.getElementById(
-        'dateDisplay'
-    ).textContent =
-        yearText +
-        ' ' +
-        month +
-        '月' +
-        day +
-        '日　' +
-        weekday;
+document.getElementById('dateDisplay').textContent =
+yearText+' '+month+'月'+day+'日　'+weekday;
 
 }
 
 
-/* =========================================
-   取得輸入數字
-   空白 = 0
-   ========================================= */
+/* 取得數字 */
 
 function getValue(id){
 
-    const element =
-        document.getElementById(id);
+const element=document.getElementById(id);
 
-    if(!element){
-        return 0;
-    }
+if(!element) return 0;
 
-    const value =
-        parseFloat(element.value);
+const value=parseFloat(element.value);
 
-    if(isNaN(value) || value < 0){
-        return 0;
-    }
+if(isNaN(value)||value<0) return 0;
 
-    return value;
+return value;
 
 }
 
 
-/* =========================================
-   金額格式
-   ========================================= */
+/* 金額 */
 
 function money(value){
 
-    return Math.round(value)
-        .toLocaleString('zh-TW') + ' 元';
+return Math.round(value)
+.toLocaleString('zh-TW')+' 元';
 
 }
 
 
-/* =========================================
-   主要計算
-   ========================================= */
+/* 計算 */
 
 function calculate(){
 
-    /* ---------- 其他成本 ---------- */
+/* 成本 */
 
-    const largeIntestine =
-        getValue('largeIntestine');
+const largeIntestine=getValue('largeIntestine');
+const oyster=getValue('oyster');
+const hetian=getValue('hetian');
+const jintai=getValue('jintai');
 
-    const oyster =
-        getValue('oyster');
 
-    const hetian =
-        getValue('hetian');
+/* 飲料 */
 
-    const jintai =
-        getValue('jintai');
+const largeDrink=getValue('largeDrink');
+const smallDrink=getValue('smallDrink');
 
-    const orangeLemon =
-        getValue('orangeLemon');
+const largeDrinkIncome=
+largeDrink*LARGE_DRINK_PRICE;
 
+const smallDrinkIncome=
+smallDrink*SMALL_DRINK_PRICE;
 
-    const otherCost =
-        largeIntestine +
-        oyster +
-        hetian +
-        jintai +
-        orangeLemon;
+const drinkTotal=
+largeDrink+smallDrink;
 
+const drinkIncome=
+largeDrinkIncome+smallDrinkIncome;
 
-    /* ---------- 飲料 ---------- */
 
-    const largeDrink =
-        getValue('largeDrink');
+/* 🍊🍋 自動成本 */
 
-    const smallDrink =
-        getValue('smallDrink');
+const orangeLemonCost=
+drinkTotal/25*ORANGE_LEMON_PER_25;
 
 
-    const largeDrinkIncome =
-        largeDrink *
-        LARGE_DRINK_PRICE;
+/* 其他成本 */
 
+const otherCost=
+largeIntestine+
+oyster+
+hetian+
+jintai+
+orangeLemonCost;
 
-    const smallDrinkIncome =
-        smallDrink *
-        SMALL_DRINK_PRICE;
 
+/* 煮鍋 */
 
-    const drinkTotal =
-        largeDrink +
-        smallDrink;
+const potCount=getValue('potCount');
 
+const manualBowlsElement=
+document.getElementById('manualBowls');
 
-    const drinkIncome =
-        largeDrinkIncome +
-        smallDrinkIncome;
+const manualBowlsValue=
+manualBowlsElement.value.trim();
 
+let bowlTotal=0;
+let bowlMode='自動';
 
-    /* ---------- 煮鍋 ---------- */
+if(manualBowlsValue!==''){
 
-    const potCount =
-        getValue('potCount');
+bowlTotal=
+getValue('manualBowls');
 
+bowlMode='手動';
 
-    const bowlTotal =
-        potCount *
-        BOWLS_PER_POT;
+}else{
 
-
-    const potIncome =
-        bowlTotal *
-        BOWL_PRICE;
-
-
-    /* ---------- 盈利 ---------- */
-
-    const profit =
-        drinkIncome +
-        potIncome;
-
-
-    /* ---------- 支出 ---------- */
-
-    const expense =
-        FIXED_COST +
-        otherCost;
-
-
-    /* ---------- 盈餘 ---------- */
-
-    const surplus =
-        profit -
-        expense;
-
-
-    /* =========================================
-       飲料
-       ========================================= */
-
-    document.getElementById(
-        'largeDrinkIncome'
-    ).textContent =
-        money(largeDrinkIncome);
-
-
-    document.getElementById(
-        'smallDrinkIncome'
-    ).textContent =
-        money(smallDrinkIncome);
-
-
-    document.getElementById(
-        'drinkTotal'
-    ).textContent =
-        drinkTotal + ' 杯';
-
-
-    document.getElementById(
-        'drinkIncome'
-    ).textContent =
-        money(drinkIncome);
-
-
-    /* =========================================
-       其他成本
-       ========================================= */
-
-    document.getElementById(
-        'otherCost'
-    ).textContent =
-        money(otherCost);
-
-
-    /* =========================================
-       煮鍋
-       ========================================= */
-
-    document.getElementById(
-        'bowlTotal'
-    ).textContent =
-        bowlTotal
-        .toLocaleString('zh-TW')
-        + ' 碗';
-
-
-    document.getElementById(
-        'potIncome'
-    ).textContent =
-        money(potIncome);
-
-
-    /* =========================================
-       最後結算
-       ========================================= */
-
-    document.getElementById(
-        'finalDrinkIncome'
-    ).textContent =
-        money(drinkIncome);
-
-
-    document.getElementById(
-        'finalPotIncome'
-    ).textContent =
-        money(potIncome);
-
-
-    document.getElementById(
-        'profit'
-    ).textContent =
-        money(profit);
-
-
-    document.getElementById(
-        'finalOtherCost'
-    ).textContent =
-        money(otherCost);
-
-
-    document.getElementById(
-        'expense'
-    ).textContent =
-        money(expense);
-
-
-    document.getElementById(
-        'surplus'
-    ).textContent =
-        money(surplus);
-
-
-    /* =========================================
-       詳細明細
-       ========================================= */
-
-    document.getElementById(
-        'largeDrinkDetail'
-    ).textContent =
-        largeDrink +
-        ' 杯 × 50 元';
-
-
-    document.getElementById(
-        'largeDrinkDetailMoney'
-    ).textContent =
-        money(largeDrinkIncome);
-
-
-    document.getElementById(
-        'smallDrinkDetail'
-    ).textContent =
-        smallDrink +
-        ' 杯 × 40 元';
-
-
-    document.getElementById(
-        'smallDrinkDetailMoney'
-    ).textContent =
-        money(smallDrinkIncome);
-
-
-    document.getElementById(
-        'potDetail'
-    ).textContent =
-        potCount +
-        ' 鍋 → ' +
-        bowlTotal
-        .toLocaleString('zh-TW') +
-        ' 碗 × 55 元';
-
-
-    document.getElementById(
-        'potDetailMoney'
-    ).textContent =
-        money(potIncome);
-
-
-    document.getElementById(
-        'detailProfit'
-    ).textContent =
-        money(profit);
-
-
-    document.getElementById(
-        'largeIntestineDetail'
-    ).textContent =
-        money(largeIntestine);
-
-
-    document.getElementById(
-        'oysterDetail'
-    ).textContent =
-        money(oyster);
-
-
-    document.getElementById(
-        'hetianDetail'
-    ).textContent =
-        money(hetian);
-
-
-    document.getElementById(
-        'jintaiDetail'
-    ).textContent =
-        money(jintai);
-
-
-    document.getElementById(
-        'orangeLemonDetail'
-    ).textContent =
-        money(orangeLemon);
-
-
-    document.getElementById(
-        'detailExpense'
-    ).textContent =
-        money(expense);
-
-
-    document.getElementById(
-        'detailProfit2'
-    ).textContent =
-        money(profit);
-
-
-    document.getElementById(
-        'detailExpense2'
-    ).textContent =
-        money(expense);
-
-
-    const detailSurplus =
-        document.getElementById(
-            'detailSurplus'
-        );
-
-
-    detailSurplus.textContent =
-        money(surplus);
-
-
-    /* =========================================
-       盈餘正負顏色
-       ========================================= */
-
-    const surplusElement =
-        document.getElementById(
-            'surplus'
-        );
-
-
-    surplusElement.classList.remove(
-        'positive',
-        'negative'
-    );
-
-
-    detailSurplus.classList.remove(
-        'positive',
-        'negative'
-    );
-
-
-    if(surplus > 0){
-
-        surplusElement.classList.add(
-            'positive'
-        );
-
-        detailSurplus.classList.add(
-            'positive'
-        );
-
-    }else if(surplus < 0){
-
-        surplusElement.classList.add(
-            'negative'
-        );
-
-        detailSurplus.classList.add(
-            'negative'
-        );
-
-    }
+bowlTotal=
+potCount*BOWLS_PER_POT;
 
 }
 
 
-/* =========================================
-   清除
-   ========================================= */
+/* 煮鍋收入 */
+
+const potIncome=
+bowlTotal*BOWL_PRICE;
+
+
+/* 盈利 */
+
+const profit=
+drinkIncome+potIncome;
+
+
+/* 支出 */
+
+const expense=
+FIXED_COST+otherCost;
+
+
+/* 盈餘 */
+
+const surplus=
+profit-expense;
+
+
+/* 顯示飲料 */
+
+document.getElementById('largeDrinkIncome').textContent=
+money(largeDrinkIncome);
+
+document.getElementById('smallDrinkIncome').textContent=
+money(smallDrinkIncome);
+
+document.getElementById('drinkTotal').textContent=
+drinkTotal+' 杯';
+
+document.getElementById('orangeLemonCost').textContent=
+money(orangeLemonCost);
+
+document.getElementById('drinkIncome').textContent=
+money(drinkIncome);
+
+
+/* 顯示成本 */
+
+document.getElementById('otherCost').textContent=
+money(otherCost);
+
+
+/* 顯示煮鍋 */
+
+document.getElementById('bowlTotal').textContent=
+bowlTotal.toLocaleString('zh-TW')+' 碗';
+
+document.getElementById('potIncome').textContent=
+money(potIncome);
+
+
+/* 最後結算 */
+
+document.getElementById('finalDrinkIncome').textContent=
+money(drinkIncome);
+
+document.getElementById('finalPotIncome').textContent=
+money(potIncome);
+
+document.getElementById('profit').textContent=
+money(profit);
+
+document.getElementById('finalOtherCost').textContent=
+money(otherCost);
+
+document.getElementById('expense').textContent=
+money(expense);
+
+document.getElementById('surplus').textContent=
+money(surplus);
+
+
+/* 詳細明細 */
+
+document.getElementById('largeDrinkDetail').textContent=
+largeDrink+' 杯 × 50 元';
+
+document.getElementById('largeDrinkDetailMoney').textContent=
+money(largeDrinkIncome);
+
+document.getElementById('smallDrinkDetail').textContent=
+smallDrink+' 杯 × 40 元';
+
+document.getElementById('smallDrinkDetailMoney').textContent=
+money(smallDrinkIncome);
+
+document.getElementById('drinkTotalDetail').textContent=
+drinkTotal+' 杯';
+
+document.getElementById('drinkIncomeDetail').textContent=
+money(drinkIncome);
+
+
+/* 煮鍋明細 */
+
+let potDetailText='';
+
+if(bowlMode==='手動'){
+
+potDetailText=
+potCount+
+' 鍋 → 手動 '+bowlTotal+
+' 碗 × 55 元';
+
+}else{
+
+potDetailText=
+potCount+
+' 鍋 → '+
+bowlTotal+
+' 碗 × 55 元';
+
+}
+
+document.getElementById('potDetail').textContent=
+potDetailText;
+
+document.getElementById('potDetailMoney').textContent=
+money(potIncome);
+
+
+/* 總盈利 */
+
+document.getElementById('detailProfit').textContent=
+money(profit);
+
+
+/* 成本明細 */
+
+document.getElementById('largeIntestineDetail').textContent=
+money(largeIntestine);
+
+document.getElementById('oysterDetail').textContent=
+money(oyster);
+
+document.getElementById('hetianDetail').textContent=
+money(hetian);
+
+document.getElementById('jintaiDetail').textContent=
+money(jintai);
+
+document.getElementById('orangeLemonDetail').textContent=
+money(orangeLemonCost);
+
+document.getElementById('orangeLemonDetailSub').textContent=
+drinkTotal+
+'杯 ÷ 25 × 300';
+
+document.getElementById('detailExpense').textContent=
+money(expense);
+
+
+/* 最後結算明細 */
+
+document.getElementById('detailProfit2').textContent=
+money(profit);
+
+document.getElementById('detailExpense2').textContent=
+money(expense);
+
+document.getElementById('detailSurplus').textContent=
+money(surplus);
+
+
+/* 顏色 */
+
+const surplusElement=
+document.getElementById('surplus');
+
+const detailSurplus=
+document.getElementById('detailSurplus');
+
+surplusElement.classList.remove('positive','negative');
+detailSurplus.classList.remove('positive','negative');
+
+if(surplus>0){
+
+surplusElement.classList.add('positive');
+detailSurplus.classList.add('positive');
+
+}else if(surplus<0){
+
+surplusElement.classList.add('negative');
+detailSurplus.classList.add('negative');
+
+}
+
+}
+
+
+/* 產生完整明細文字 */
+
+function getDetailsText(){
+
+const largeIntestine=getValue('largeIntestine');
+const oyster=getValue('oyster');
+const hetian=getValue('hetian');
+const jintai=getValue('jintai');
+
+const largeDrink=getValue('largeDrink');
+const smallDrink=getValue('smallDrink');
+
+const drinkTotal=
+largeDrink+smallDrink;
+
+const largeDrinkIncome=
+largeDrink*LARGE_DRINK_PRICE;
+
+const smallDrinkIncome=
+smallDrink*SMALL_DRINK_PRICE;
+
+const drinkIncome=
+largeDrinkIncome+smallDrinkIncome;
+
+const orangeLemonCost=
+drinkTotal/25*ORANGE_LEMON_PER_25;
+
+const otherCost=
+largeIntestine+
+oyster+
+hetian+
+jintai+
+orangeLemonCost;
+
+const potCount=
+getValue('potCount');
+
+const manualValue=
+document.getElementById('manualBowls').value.trim();
+
+let bowlTotal=0;
+
+if(manualValue!==''){
+bowlTotal=getValue('manualBowls');
+}else{
+bowlTotal=potCount*BOWLS_PER_POT;
+}
+
+const potIncome=
+bowlTotal*BOWL_PRICE;
+
+const profit=
+drinkIncome+potIncome;
+
+const expense=
+FIXED_COST+otherCost;
+
+const surplus=
+profit-expense;
+
+
+/* 日期文字 */
+
+const dateText=
+document.getElementById('dateDisplay').textContent;
+
+
+/* 煮鍋文字 */
+
+let potText='';
+
+if(manualValue!==''){
+
+potText=
+potCount+
+'鍋 → 手動填寫 '+
+bowlTotal+
+'碗 × 55元＝'+
+money(potIncome);
+
+}else{
+
+potText=
+potCount+
+'鍋 → '+
+bowlTotal+
+'碗 × 55元＝'+
+money(potIncome);
+
+}
+
+
+/* 完整文字 */
+
+let text='';
+
+text+='美滿快樂健康平安幸福❤️\n\n';
+
+text+=dateText+'\n\n';
+
+text+='━━━━━━━━━━━━\n';
+
+text+='【收入明細】\n';
+
+text+='━━━━━━━━━━━━\n';
+
+text+='大杯：'+
+largeDrink+
+'杯 × 50元＝'+
+money(largeDrinkIncome)+'\n';
+
+text+='小杯：'+
+smallDrink+
+'杯 × 40元＝'+
+money(smallDrinkIncome)+'\n';
+
+text+='飲料總數：'+
+drinkTotal+
+'杯\n';
+
+text+='飲料收入：'+
+money(drinkIncome)+'\n\n';
+
+text+='煮鍋：'+
+potText+'\n\n';
+
+text+='總盈利：'+
+money(profit)+'\n\n';
+
+text+='━━━━━━━━━━━━\n';
+
+text+='【成本明細】\n';
+
+text+='━━━━━━━━━━━━\n';
+
+text+='固定成本：9,400元\n';
+
+text+='大腸：'+
+money(largeIntestine)+'\n';
+
+text+='蚵仔：'+
+money(oyster)+'\n';
+
+text+='禾田：'+
+money(hetian)+'\n';
+
+text+='錦泰：'+
+money(jintai)+'\n';
+
+text+='🍊🍋：'+
+drinkTotal+
+'杯 ÷ 25 × 300＝'+
+money(orangeLemonCost)+'\n\n';
+
+text+='總支出：'+
+money(expense)+'\n\n';
+
+text+='━━━━━━━━━━━━\n';
+
+text+='【最後結算】\n';
+
+text+='━━━━━━━━━━━━\n';
+
+text+='盈利：'+
+money(profit)+'\n';
+
+text+='支出：'+
+money(expense)+'\n';
+
+text+='盈餘：'+
+money(surplus)+'\n';
+
+text+='━━━━━━━━━━━━';
+
+return text;
+
+}
+
+
+/* 複製完整明細 */
+
+async function copyDetails(){
+
+const text=
+getDetailsText();
+
+try{
+
+if(navigator.clipboard &&
+navigator.clipboard.writeText){
+
+await navigator.clipboard.writeText(text);
+
+}else{
+
+const textarea=
+document.createElement('textarea');
+
+textarea.value=text;
+
+textarea.style.position='fixed';
+textarea.style.left='-9999px';
+
+document.body.appendChild(textarea);
+
+textarea.select();
+
+document.execCommand('copy');
+
+document.body.removeChild(textarea);
+
+}
+
+showCopyMessage('✅ 完整明細已複製！');
+
+}catch(error){
+
+showCopyMessage('⚠️ 複製失敗，請再試一次');
+
+}
+
+}
+
+
+/* 複製提示 */
+
+function showCopyMessage(message){
+
+const element=
+document.getElementById('copyMessage');
+
+element.textContent=message;
+
+setTimeout(function(){
+
+element.textContent='';
+
+},2500);
+
+}
+
+
+/* 清除 */
 
 function resetAll(){
 
-    const inputs =
-        document.querySelectorAll('input');
+const inputs=
+document.querySelectorAll('input');
 
+inputs.forEach(function(input){
 
-    inputs.forEach(function(input){
+input.value='';
 
-        input.value = '';
+});
 
-    });
-
-
-    calculate();
+calculate();
 
 }
 
 
-/* =========================================
-   開啟網頁時自動執行
-   ========================================= */
+/* 開啟時執行 */
 
 updateDate();
 
 calculate();
 
 
-/* =========================================
-   每分鐘檢查一次日期
-   如果跨日，自動更新
-   ========================================= */
+/* 每分鐘檢查日期 */
 
 setInterval(function(){
 
-    updateDate();
+updateDate();
 
 },60000);
 
