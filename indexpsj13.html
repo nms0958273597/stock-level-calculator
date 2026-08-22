@@ -13,7 +13,7 @@
 
 body{
   margin:0;
-  padding:12px;
+  padding:10px;
   background:#f2f4f7;
   color:#222;
   font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif;
@@ -29,7 +29,7 @@ body{
 .header{
   background:#222;
   color:#fff;
-  border-radius:20px;
+  border-radius:22px;
   padding:22px 16px;
   margin-bottom:14px;
   text-align:center;
@@ -43,7 +43,7 @@ body{
 
 .date{
   font-size:22px;
-  font-weight:800;
+  font-weight:900;
 }
 
 .card{
@@ -55,33 +55,38 @@ body{
 }
 
 .title{
-  font-size:26px;
+  font-size:27px;
   font-weight:900;
   margin-bottom:16px;
 }
 
 label{
   display:block;
-  font-size:21px;
+  font-size:22px;
   font-weight:900;
   margin:14px 0 8px;
 }
 
 input{
   width:100%;
-  height:62px;
-  border:2px solid #c9ced4;
-  border-radius:14px;
+  height:64px;
+  border:3px solid #c9ced4;
+  border-radius:15px;
   padding:8px 15px;
   background:#fff;
   color:#111;
-  font-size:27px;
-  font-weight:700;
+  font-size:28px;
+  font-weight:800;
   outline:none;
 }
 
 input:focus{
   border-color:#222;
+}
+
+input[readonly]{
+  background:#f1f3f5;
+  color:#111;
 }
 
 .money-card{
@@ -96,7 +101,7 @@ input:focus{
 
 .big-number{
   text-align:center;
-  font-size:42px;
+  font-size:44px;
   font-weight:900;
   padding:8px 0;
 }
@@ -111,40 +116,50 @@ input:focus{
 
 .calculation{
   margin-top:15px;
-  padding:18px 10px;
+  padding:20px 8px;
   background:#fff;
-  border-radius:16px;
+  border-radius:17px;
   text-align:center;
-  font-size:28px;
-  line-height:1.5;
+  font-size:29px;
+  line-height:1.55;
   font-weight:900;
   word-break:break-word;
 }
 
 .calculation .remaining{
   display:block;
-  margin-top:8px;
-  font-size:38px;
+  margin-top:10px;
+  font-size:39px;
 }
 
 .note{
-  margin-top:8px;
+  margin-top:9px;
   color:#666;
   font-size:18px;
   text-align:center;
+  font-weight:700;
 }
 
 .price{
-  font-size:23px;
+  font-size:24px;
   font-weight:900;
-  margin-bottom:10px;
+  margin-bottom:12px;
 }
 
 .total{
   text-align:right;
-  font-size:31px;
+  font-size:32px;
   font-weight:900;
   margin-top:14px;
+}
+
+.auto-order{
+  background:#eef5ff;
+  border:3px solid #4b83d1;
+}
+
+.auto-order .title{
+  color:#245a9d;
 }
 
 .button-grid{
@@ -203,14 +218,14 @@ button{
 }
 
 .history-name{
-  font-size:23px;
+  font-size:24px;
   font-weight:900;
   margin-bottom:8px;
 }
 
 .history-line{
   font-size:18px;
-  line-height:1.7;
+  line-height:1.75;
 }
 
 .empty{
@@ -230,7 +245,7 @@ button{
 @media(max-width:480px){
 
   body{
-    padding:9px;
+    padding:8px;
   }
 
   .card{
@@ -246,11 +261,11 @@ button{
   }
 
   .title{
-    font-size:24px;
+    font-size:25px;
   }
 
   .big-number{
-    font-size:39px;
+    font-size:40px;
   }
 
   .calculation{
@@ -258,7 +273,7 @@ button{
   }
 
   .calculation .remaining{
-    font-size:35px;
+    font-size:36px;
   }
 
   button{
@@ -274,7 +289,7 @@ button{
 
   <!-- 標題 -->
   <div class="header">
-    <h1>📋 訂單管理</h1>
+    <h1>📋 本次訂單</h1>
     <div class="date" id="today"></div>
   </div>
 
@@ -287,13 +302,11 @@ button{
       type="number"
       id="balance"
       inputmode="decimal"
-      placeholder="輸入貨款餘額"
+      placeholder="輸入目前貨款餘額"
       oninput="calculate()"
     >
 
-    <div class="big-number" id="balanceShow">
-      $0
-    </div>
+    <div class="big-number" id="balanceShow">$0</div>
 
   </div>
 
@@ -325,23 +338,6 @@ button{
 
   </div>
 
-  <!-- 訂單 -->
-  <div class="card">
-
-    <div class="title">🧾 本次訂單</div>
-
-    <label>訂單金額</label>
-
-    <input
-      type="number"
-      id="orderAmount"
-      inputmode="decimal"
-      placeholder="輸入本次訂單金額"
-      oninput="calculate()"
-    >
-
-  </div>
-
   <!-- 大腸 -->
   <div class="card">
 
@@ -369,6 +365,24 @@ button{
 
   </div>
 
+  <!-- 自動訂單金額 -->
+  <div class="card auto-order">
+
+    <div class="title">🧾 訂單金額</div>
+
+    <input
+      type="number"
+      id="orderAmount"
+      readonly
+      value="0"
+    >
+
+    <div class="note">
+      由商品金額自動加總
+    </div>
+
+  </div>
+
   <!-- 核心計算 -->
   <div class="card result-card">
 
@@ -389,13 +403,14 @@ button{
       <span id="calcRemaining">$0</span>
 
       <span class="remaining">
-        剩餘貨款：<span id="remainingBalance">$0</span>
+        💵 剩餘貨款：
+        <span id="remainingBalance">$0</span>
       </span>
 
     </div>
 
     <div class="note">
-      貨款餘額 − 本次訂單金額 = 扣除後貨款餘額
+      貨款餘額 − 本次訂單金額 = 剩餘貨款
     </div>
 
   </div>
@@ -462,9 +477,11 @@ button{
 
 </div>
 
+
 <script>
 
 const STORAGE_KEY = "psj13_order_records";
+
 
 /* =========================
    金額格式
@@ -475,6 +492,7 @@ function money(value){
   return Number(value || 0).toLocaleString("zh-TW");
 
 }
+
 
 /* =========================
    日期＋星期
@@ -507,73 +525,128 @@ function updateDate(){
 
 }
 
+
 /* =========================
-   計算
+   核心計算
 ========================= */
 
 function calculate(){
 
+  /* 貨款餘額 */
+
   const balance =
-    Number(document.getElementById("balance").value) || 0;
+    Number(
+      document.getElementById("balance").value
+    ) || 0;
 
-  const orderAmount =
-    Number(document.getElementById("orderAmount").value) || 0;
 
-  const qty =
-    Number(document.getElementById("intestineQty").value) || 0;
+  /* 大腸數量 */
+
+  const intestineQty =
+    Number(
+      document.getElementById("intestineQty").value
+    ) || 0;
+
 
   /* 大腸固定100元／斤 */
 
-  const intestineTotal = qty * 100;
+  const intestineTotal =
+    intestineQty * 100;
 
-  /* 貨款餘額－訂單金額 */
 
-  const remaining = balance - orderAmount;
+  /*
+    ★★★ 重要 ★★★
 
-  /* 上方貨款 */
+    訂單金額不再手動輸入。
+
+    直接由商品自動計算。
+  */
+
+  const orderAmount =
+    intestineTotal;
+
+
+  /*
+    自動把訂單金額填入輸入框
+  */
+
+  document.getElementById("orderAmount").value =
+    orderAmount;
+
+
+  /*
+    貨款餘額 − 訂單金額
+  */
+
+  const remaining =
+    balance - orderAmount;
+
+
+  /* 顯示貨款 */
 
   document.getElementById("balanceShow").textContent =
     "$" + money(balance);
 
-  /* 大腸 */
+
+  /* 顯示大腸金額 */
 
   document.getElementById("intestineTotal").textContent =
     "大腸金額：$" + money(intestineTotal);
 
-  /* ★★★ 完整顯示算式 ★★★ */
+
+  /* 顯示算式 */
 
   document.getElementById("calcBalance").textContent =
     "$" + money(balance);
 
+
   document.getElementById("calcOrder").textContent =
     "$" + money(orderAmount);
 
+
   document.getElementById("calcRemaining").textContent =
     "$" + money(remaining);
+
 
   document.getElementById("remainingBalance").textContent =
     "$" + money(remaining);
 
 }
 
+
 /* =========================
-   取得目前訂單
+   取得目前資料
 ========================= */
 
 function getFormData(){
 
   const balance =
-    Number(document.getElementById("balance").value) || 0;
+    Number(
+      document.getElementById("balance").value
+    ) || 0;
+
+
+  const intestineQty =
+    Number(
+      document.getElementById("intestineQty").value
+    ) || 0;
+
+
+  const intestineTotal =
+    intestineQty * 100;
+
+
+  /*
+    訂單金額自動由商品金額產生
+  */
 
   const orderAmount =
-    Number(document.getElementById("orderAmount").value) || 0;
+    intestineTotal;
 
-  const qty =
-    Number(document.getElementById("intestineQty").value) || 0;
 
-  const intestineTotal = qty * 100;
+  const remaining =
+    balance - orderAmount;
 
-  const remaining = balance - orderAmount;
 
   return {
 
@@ -589,19 +662,25 @@ function getFormData(){
     customerMobile:
       document.getElementById("customerMobile").value.trim(),
 
-    balance:balance,
+    balance:
+      balance,
 
-    orderAmount:orderAmount,
+    orderAmount:
+      orderAmount,
 
-    intestineQty:qty,
+    intestineQty:
+      intestineQty,
 
-    intestineTotal:intestineTotal,
+    intestineTotal:
+      intestineTotal,
 
-    remaining:remaining
+    remaining:
+      remaining
 
   };
 
 }
+
 
 /* =========================
    訂單文字
@@ -611,7 +690,7 @@ function orderText(data){
 
   return [
 
-    "📋 訂單",
+    "📋 本次訂單",
 
     "📅 " + data.date,
 
@@ -628,12 +707,6 @@ function orderText(data){
 
     "",
 
-    "💰 貨款餘額：" +
-      money(data.balance) + " 元",
-
-    "🧾 訂單金額：" +
-      money(data.orderAmount) + " 元",
-
     "🥩 大腸：" +
       data.intestineQty +
       " 斤 × 100 = " +
@@ -642,7 +715,13 @@ function orderText(data){
 
     "",
 
-    "💵 計算：",
+    "🧾 訂單金額：" +
+      money(data.orderAmount) +
+      " 元",
+
+    "",
+
+    "💰 貨款計算：",
 
     money(data.balance) +
       " − " +
@@ -660,15 +739,18 @@ function orderText(data){
 
 }
 
+
 /* =========================
    複製訂單
 ========================= */
 
 async function copyOrder(){
 
-  const data = getFormData();
+  const data =
+    getFormData();
 
-  const text = orderText(data);
+  const text =
+    orderText(data);
 
   try{
 
@@ -683,6 +765,7 @@ async function copyOrder(){
   }
 
 }
+
 
 function fallbackCopy(text){
 
@@ -703,31 +786,41 @@ function fallbackCopy(text){
 
 }
 
+
 /* =========================
    儲存紀錄
 ========================= */
 
 function saveRecord(){
 
-  const data = getFormData();
+  const data =
+    getFormData();
 
-  if(!data.orderAmount){
 
-    alert("⚠️ 請先輸入訂單金額！");
+  if(data.orderAmount <= 0){
+
+    alert(
+      "⚠️ 請先輸入大腸數量！"
+    );
 
     return;
 
   }
 
-  const records = getRecords();
+
+  const records =
+    getRecords();
+
 
   records.unshift({
 
-    id:Date.now(),
+    id:
+      Date.now(),
 
     ...data
 
   });
+
 
   localStorage.setItem(
 
@@ -737,21 +830,31 @@ function saveRecord(){
 
   );
 
+
   renderHistory();
 
+
   /*
-    儲存後，
-    下一筆直接使用扣除後的貨款餘額
+    儲存後：
+
+    例如
+
+    10000 - 4000 = 6000
+
+    下一筆貨款自動變成6000
   */
 
   document.getElementById("balance").value =
     data.remaining;
 
+
   calculate();
 
-  alert("✅ 已儲存紀錄！");
+
+  alert("✅ 訂單已儲存！");
 
 }
+
 
 /* =========================
    讀取紀錄
@@ -777,6 +880,7 @@ function getRecords(){
 
 }
 
+
 /* =========================
    顯示紀錄
 ========================= */
@@ -789,6 +893,7 @@ function renderHistory(){
   const records =
     getRecords();
 
+
   if(!records.length){
 
     box.innerHTML =
@@ -798,14 +903,18 @@ function renderHistory(){
 
   }
 
+
   box.innerHTML =
-    records.map((r,index)=>`
+    records.map(
+      (r,index)=>`
 
       <div class="history">
 
         <div class="history-name">
           #${records.length-index}
-         　${escapeHtml(r.customerName || "未填姓名")}
+         　${escapeHtml(
+            r.customerName || "未填姓名"
+          )}
         </div>
 
         <div class="history-line">
@@ -813,32 +922,35 @@ function renderHistory(){
         </div>
 
         <div class="history-line">
-          ☎️ ${escapeHtml(r.customerPhone || "未填")}
+          ☎️ ${escapeHtml(
+            r.customerPhone || "未填"
+          )}
         </div>
 
         <div class="history-line">
-          📱 ${escapeHtml(r.customerMobile || "未填")}
-        </div>
-
-        <div class="history-line">
-          💰 貨款餘額：
-          ${money(r.balance)} 元
-        </div>
-
-        <div class="history-line">
-          🧾 訂單金額：
-          ${money(r.orderAmount)} 元
+          📱 ${escapeHtml(
+            r.customerMobile || "未填"
+          )}
         </div>
 
         <div class="history-line">
           🥩 大腸：
-          ${r.intestineQty} 斤
-          × 100 =
-          ${money(r.intestineTotal)} 元
+          ${r.intestineQty}
+          斤 × 100 =
+          ${money(r.intestineTotal)}
+          元
         </div>
 
         <div class="history-line">
-          💵 計算：
+          🧾 訂單金額：
+          <strong>
+            ${money(r.orderAmount)}
+            元
+          </strong>
+        </div>
+
+        <div class="history-line">
+          💰 計算：
           ${money(r.balance)}
           −
           ${money(r.orderAmount)}
@@ -851,7 +963,8 @@ function renderHistory(){
         <div class="history-line">
           💵 剩餘貨款：
           <strong>
-            ${money(r.remaining)} 元
+            ${money(r.remaining)}
+            元
           </strong>
         </div>
 
@@ -869,9 +982,11 @@ function renderHistory(){
 
       </div>
 
-    `).join("");
+    `
+    ).join("");
 
 }
+
 
 /* =========================
    刪除單筆
@@ -879,16 +994,22 @@ function renderHistory(){
 
 function deleteRecord(id){
 
-  if(!confirm("確定要刪除這筆紀錄嗎？")){
+  if(
+    !confirm(
+      "確定要刪除這筆紀錄嗎？"
+    )
+  ){
 
     return;
 
   }
 
+
   const records =
     getRecords().filter(
       r => r.id !== id
     );
+
 
   localStorage.setItem(
 
@@ -898,9 +1019,11 @@ function deleteRecord(id){
 
   );
 
+
   renderHistory();
 
 }
+
 
 /* =========================
    清除目前輸入
@@ -908,25 +1031,46 @@ function deleteRecord(id){
 
 function clearForm(){
 
-  if(!confirm("確定要清除目前輸入內容嗎？")){
+  if(
+    !confirm(
+      "確定要清除目前輸入內容嗎？"
+    )
+  ){
 
     return;
 
   }
 
-  document.getElementById("customerName").value = "";
 
-  document.getElementById("customerPhone").value = "";
+  document.getElementById(
+    "customerName"
+  ).value = "";
 
-  document.getElementById("customerMobile").value = "";
 
-  document.getElementById("orderAmount").value = "";
+  document.getElementById(
+    "customerPhone"
+  ).value = "";
 
-  document.getElementById("intestineQty").value = "0";
+
+  document.getElementById(
+    "customerMobile"
+  ).value = "";
+
+
+  document.getElementById(
+    "intestineQty"
+  ).value = "0";
+
+
+  /*
+    貨款餘額不清除，
+    方便繼續下一筆。
+  */
 
   calculate();
 
 }
+
 
 /* =========================
    清除全部紀錄
@@ -934,19 +1078,31 @@ function clearForm(){
 
 function clearAllRecords(){
 
-  if(!confirm("確定要刪除全部紀錄嗎？")){
+  if(
+    !confirm(
+      "確定要刪除全部紀錄嗎？"
+    )
+  ){
 
     return;
 
   }
 
-  localStorage.removeItem(STORAGE_KEY);
+
+  localStorage.removeItem(
+    STORAGE_KEY
+  );
+
 
   renderHistory();
 
-  alert("🗑️ 全部紀錄已清除！");
+
+  alert(
+    "🗑️ 全部紀錄已清除！"
+  );
 
 }
+
 
 /* =========================
    匯出 CSV
@@ -957,16 +1113,21 @@ function exportRecords(){
   const records =
     getRecords();
 
+
   if(!records.length){
 
-    alert("目前沒有紀錄可以匯出！");
+    alert(
+      "目前沒有紀錄可以匯出！"
+    );
 
     return;
 
   }
 
+
   let csv =
-    "日期,姓名,電話,手機,貨款餘額,訂單金額,大腸斤數,大腸金額,扣除後餘額\n";
+    "日期,姓名,電話,手機,貨款餘額,大腸斤數,大腸金額,訂單金額,扣除後餘額\n";
+
 
   records.forEach(r=>{
 
@@ -982,17 +1143,19 @@ function exportRecords(){
 
       r.balance,
 
-      r.orderAmount,
-
       r.intestineQty,
 
       r.intestineTotal,
 
+      r.orderAmount,
+
       r.remaining
 
-    ].join(",") + "\n";
+    ].join(",") +
+    "\n";
 
   });
+
 
   const blob =
     new Blob(
@@ -1006,16 +1169,22 @@ function exportRecords(){
 
     );
 
+
   const url =
     URL.createObjectURL(blob);
+
 
   const a =
     document.createElement("a");
 
-  a.href = url;
+
+  a.href =
+    url;
+
 
   a.download =
     "PSJ13_訂單紀錄.csv";
+
 
   document.body.appendChild(a);
 
@@ -1023,12 +1192,14 @@ function exportRecords(){
 
   a.remove();
 
+
   URL.revokeObjectURL(url);
 
 }
 
+
 /* =========================
-   下載 JSON 紀錄
+   下載 JSON
 ========================= */
 
 function downloadRecords(){
@@ -1036,13 +1207,17 @@ function downloadRecords(){
   const records =
     getRecords();
 
+
   if(!records.length){
 
-    alert("目前沒有紀錄可以下載！");
+    alert(
+      "目前沒有紀錄可以下載！"
+    );
 
     return;
 
   }
+
 
   const data =
     JSON.stringify(
@@ -1050,6 +1225,7 @@ function downloadRecords(){
       null,
       2
     );
+
 
   const blob =
     new Blob(
@@ -1063,16 +1239,22 @@ function downloadRecords(){
 
     );
 
+
   const url =
     URL.createObjectURL(blob);
+
 
   const a =
     document.createElement("a");
 
-  a.href = url;
+
+  a.href =
+    url;
+
 
   a.download =
     "PSJ13_訂單紀錄.json";
+
 
   document.body.appendChild(a);
 
@@ -1080,9 +1262,11 @@ function downloadRecords(){
 
   a.remove();
 
+
   URL.revokeObjectURL(url);
 
 }
+
 
 /* =========================
    手機分享
@@ -1096,15 +1280,18 @@ async function sharePhone(){
   const text =
     orderText(data);
 
+
   if(navigator.share){
 
     try{
 
       await navigator.share({
 
-        title:"訂單",
+        title:
+          "訂單",
 
-        text:text
+        text:
+          text
 
       });
 
@@ -1115,12 +1302,13 @@ async function sharePhone(){
     fallbackCopy(text);
 
     alert(
-      "📋 已複製訂單內容，可以貼到手機訊息。"
+      "📋 訂單已複製，可以貼到手機訊息。"
     );
 
   }
 
 }
+
 
 /* =========================
    LINE
@@ -1134,9 +1322,11 @@ function sendLine(){
   const text =
     orderText(data);
 
+
   const url =
     "https://line.me/R/msg/text/?" +
     encodeURIComponent(text);
+
 
   window.open(
     url,
@@ -1145,8 +1335,9 @@ function sendLine(){
 
 }
 
+
 /* =========================
-   CSV
+   CSV 格式
 ========================= */
 
 function csvCell(value){
@@ -1154,31 +1345,54 @@ function csvCell(value){
   const text =
     String(value ?? "");
 
+
   return '"' +
-    text.replace(/"/g,'""') +
+    text.replace(
+      /"/g,
+      '""'
+    ) +
     '"';
 
 }
 
+
 /* =========================
-   防止 HTML
+   HTML 安全處理
 ========================= */
 
 function escapeHtml(value){
 
-  return String(value ?? "")
+  return String(
+    value ?? ""
+  )
 
-    .replace(/&/g,"&amp;")
+  .replace(
+    /&/g,
+    "&amp;"
+  )
 
-    .replace(/</g,"&lt;")
+  .replace(
+    /</g,
+    "&lt;"
+  )
 
-    .replace(/>/g,"&gt;")
+  .replace(
+    />/g,
+    "&gt;"
+  )
 
-    .replace(/"/g,"&quot;")
+  .replace(
+    /"/g,
+    "&quot;"
+  )
 
-    .replace(/'/g,"&#039;");
+  .replace(
+    /'/g,
+    "&#039;"
+  );
 
 }
+
 
 /* =========================
    啟動
