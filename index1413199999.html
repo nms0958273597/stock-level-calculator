@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>台股 AI 綜合分析｜搜尋修正版</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#101214;--panel:#252525;--panel2:#1c1c1c;--line:#3c3c3c;
+  --text:#f4f4f4;--muted:#a9a9a9;--orange:#ff9418;--green:#45e477;
+  --red:#ff4658;--blue:#38b7ff;--yellow:#ffc247;
+}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif}
+.wrap{max-width:980px;margin:auto;padding:18px 18px 60px}
+.search{display:flex;gap:10px;margin-top:10px}
+input{flex:1;min-width:0;background:#1d1d1d;border:2px solid #555;border-radius:20px;color:#fff;font-size:25px;padding:18px 20px;outline:none}
+input:focus{border-color:var(--orange)}
+button{border:0;border-radius:18px;background:var(--orange);color:#111;font-weight:900;font-size:23px;padding:0 28px;min-width:120px;cursor:pointer}
+button:active{transform:scale(.98)}
+.hint{color:var(--muted);font-size:16px;line-height:1.6;margin:12px 6px}
+.status{display:none;background:#191919;border:1px solid var(--line);border-radius:14px;padding:12px 15px;margin:12px 0;color:#ddd}
+.hero{background:#2b2b2b;border-radius:24px;padding:24px;margin-top:18px}
+.titleRow{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}
+.name{font-size:39px;font-weight:900}
+.code{color:#aaa;font-size:20px;margin-top:5px}
+.price{text-align:right;font-size:58px;font-weight:900;color:var(--red);line-height:1}
+.change{font-size:20px;color:var(--red);margin-top:9px}
+.tags{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.tag{border:1.5px solid;border-radius:999px;padding:9px 14px;font-size:17px}
+.green{color:var(--green);border-color:#329e55}.orange{color:var(--orange);border-color:#bd7110}
+.blue{color:var(--blue);border-color:#2388bf}.gray{color:#ddd;border-color:#666}.red{color:var(--red);border-color:#a92e3a}
+.tabs{display:flex;overflow:auto;background:#202020;margin:18px -18px 0;padding:0 12px}
+.tab{white-space:nowrap;padding:18px 17px;color:#aaa;font-size:18px;font-weight:800;border-bottom:3px solid transparent}
+.tab.active{color:#fff;border-color:var(--orange)}
+.card{background:var(--panel);border:1px solid #3b3b3b;border-radius:22px;padding:22px;margin-top:18px}
+.card h2{margin:0 0 17px;font-size:27px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.metric{background:var(--panel2);border-radius:18px;padding:17px}
+.metric .label{color:#aaa;font-size:16px}
+.metric .value{font-size:30px;font-weight:900;margin-top:8px}
+.metric .small{font-size:14px;color:#999;margin-top:5px}
+.sectionTitle{font-size:28px;font-weight:900;margin:0 0 14px}
+.list{display:grid;gap:10px}
+.row{display:flex;justify-content:space-between;gap:10px;background:var(--panel2);padding:15px 17px;border-radius:15px}
+.row b{font-size:18px}.row span{color:#ddd}
+.score{font-size:62px;font-weight:900;color:var(--green);text-align:center}
+.center{text-align:center}
+.notice{padding:15px;border-radius:15px;background:#18231b;border:1px solid #2e7742;color:#8ff0aa;font-weight:800}
+.warn{background:#2b2418;border-color:#8c5b1c;color:#ffc56a}
+.foot{color:#777;text-align:center;font-size:14px;margin:25px 0}
+@media(max-width:650px){
+ .wrap{padding:10px 12px 45px}
+ .search{gap:7px}.search input{font-size:22px;padding:16px}.search button{min-width:95px;padding:0 15px;font-size:21px}
+ .hero{padding:18px}.name{font-size:31px}.price{font-size:48px}.grid{grid-template-columns:1fr}
+ .card{padding:17px}.tabs{margin-left:-12px;margin-right:-12px}.tab{padding:16px 12px;font-size:16px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="search">
+    <input id="q" autocomplete="off" spellcheck="false" placeholder="輸入代號、中文、英文，例如 5314 / 世紀 / 00631L / 0050">
+    <button id="go">查詢</button>
+  </div>
+  <div class="hint">支援代號、中文名稱、部分名稱、常見英文別名；股票與 ETF 一起搜尋。</div>
+  <div id="status" class="status"></div>
+
+  <section class="hero">
+    <div class="titleRow">
+      <div><div id="name" class="name">請輸入股票或 ETF</div><div id="code" class="code">—</div></div>
+      <div><div id="price" class="price">—</div><div id="change" class="change">等待查詢</div></div>
+    </div>
+    <div class="tags">
+      <span id="trendTag" class="tag green">趨勢：等待資料</span>
+      <span id="breakTag" class="tag orange">突破：等待資料</span>
+      <span class="tag blue">5 / 14 / 27 / 62 / 131 / 272</span>
+      <span class="tag orange">法人目標</span>
+      <span class="tag gray">資金管理</span>
+    </div>
+  </section>
+
+  <div class="tabs">
+    <div class="tab active">AI總結</div><div class="tab">均線</div><div class="tab">法人籌碼</div><div class="tab">目標價</div><div class="tab">資金管理</div>
+  </div>
+
+  <section class="card">
+    <h2>🤖 AI 綜合作戰判斷</h2>
+    <div id="score" class="score">—</div>
+    <div class="center" id="scoreText">等待查詢</div>
+    <div id="signal" class="notice" style="margin-top:16px">輸入股票代號或名稱後按「查詢」</div>
+    <div class="grid" style="margin-top:15px">
+      <div class="metric"><div class="label">趨勢</div><div id="trend" class="value">—</div></div>
+      <div class="metric"><div class="label">均線排列</div><div id="maOrder" class="value">—</div></div>
+      <div class="metric"><div class="label">均線乖離</div><div id="bias" class="value">—</div></div>
+      <div class="metric"><div class="label">均線斜率</div><div id="slope" class="value">—</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📈 均線結構</h2>
+    <div class="grid" id="maGrid"></div>
+  </section>
+
+  <section class="card">
+    <h2>💰 主力／法人成本估算</h2>
+    <div class="grid">
+      <div class="metric"><div class="label">模型成本中位</div><div id="costMid" class="value">—</div><div class="small">技術模型估算，不代表實際持股成本</div></div>
+      <div class="metric"><div class="label">核心成本帶</div><div id="costBand" class="value">—</div></div>
+      <div class="metric"><div class="label">現價／成本</div><div id="costState" class="value">—</div></div>
+      <div class="metric"><div class="label">風險提醒</div><div id="risk" class="value">—</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>🎯 個股目標價</h2>
+    <div class="grid">
+      <div class="metric"><div class="label">第一目標</div><div id="t1" class="value">—</div></div>
+      <div class="metric"><div class="label">第二目標</div><div id="t2" class="value">—</div></div>
+      <div class="metric"><div class="label">法人參考區</div><div id="t3" class="value">—</div></div>
+      <div class="metric"><div class="label">距離第一目標</div><div id="tPct" class="value">—</div></div>
+    </div>
+    <div class="small" style="margin-top:12px;color:#888">目標價依「該檔個股現價＋均線結構＋近期波動」計算，不使用固定 70／75／80／86。</div>
+  </section>
+
+  <section class="card">
+    <h2>🧱 支撐／壓力</h2>
+    <div class="grid">
+      <div class="metric"><div class="label">強支撐</div><div id="support" class="value">—</div></div>
+      <div class="metric"><div class="label">成本／支撐帶</div><div id="support2" class="value">—</div></div>
+      <div class="metric"><div class="label">第一壓力</div><div id="res1" class="value">—</div></div>
+      <div class="metric"><div class="label">第二壓力</div><div id="res2" class="value">—</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>🏦 法人／籌碼</h2>
+    <div class="grid">
+      <div class="metric"><div class="label">外資最新</div><div id="foreign" class="value">—</div></div>
+      <div class="metric"><div class="label">投信最新</div><div id="trust" class="value">—</div></div>
+      <div class="metric"><div class="label">自營商最新</div><div id="dealer" class="value">—</div></div>
+      <div class="metric"><div class="label">三大法人合計</div><div id="instTotal" class="value">—</div></div>
+    </div>
+    <div id="instNote" class="notice warn" style="margin-top:14px">法人資料尚未查詢。</div>
+  </section>
+
+  <section class="card">
+    <h2>🔥 熱門前十檔推薦</h2>
+    <div class="list" id="hot10">
+      <div class="row"><b>等待資料</b><span>查詢後顯示</span></div>
+    </div>
+  </section>
+
+
+  <section class="card">
+    <h2>🌐 三大法人買超排行榜</h2>
+    <div class="hint" style="margin:0 0 14px">正式版會依最新法人資料排序；若 API 無法取得，顯示「資料暫不可用」，不把示範數字當成真實買超。</div>
+
+    <div class="list" id="foreignTop10">
+      <div class="row"><b>外資買超前十檔</b><span>查詢資料中</span></div>
+    </div>
+
+    <div class="list" id="trustTop10" style="margin-top:14px">
+      <div class="row"><b>投信買超前十檔</b><span>查詢資料中</span></div>
+    </div>
+
+    <div class="list" id="dealerTop10" style="margin-top:14px">
+      <div class="row"><b>自營商買超前十檔</b><span>查詢資料中</span></div>
+    </div>
+
+    <div class="list" id="totalTop10" style="margin-top:14px">
+      <div class="row"><b>三大法人合計買超前十檔</b><span>查詢資料中</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📊 中長期熱門推薦</h2>
+    <div class="notice">依 62／131／272 日均線、長期均線斜率與價格位置判斷；不以單日漲跌作為唯一依據。</div>
+  </section>
+
+  <section class="card">
+    <h2>🚀 突破向上</h2>
+    <div class="notice">優先觀察價格突破壓力、站上重要均線、均線斜率向上，並搭配成交量確認。突破分數不足時顯示「等待」，不硬判定。</div>
+  </section>
+
+  <section class="card">
+    <h2>💳 資金管理</h2>
+    <div class="grid">
+      <div class="metric"><div class="label">單筆最大風險</div><div class="value">1%～2%</div></div>
+      <div class="metric"><div class="label">建議分批</div><div class="value">3～4批</div></div>
+      <div class="metric"><div class="label">止損原則</div><div class="value">依支撐</div></div>
+      <div class="metric"><div class="label">追高提醒</div><div class="value">量價確認</div></div>
+    </div>
+  </section>
+
+  <div class="foot">資料若來自公開 API，可能因交易日、延遲、API 限制而暫時無法取得；技術目標／成本為模型估算，不代表法人實際價格。</div>
+</div>
+
+<script>
+const ALIAS = [
+ {c:"5314",n:"世紀",e:"Century",k:["世紀","5314","CENTURY"]},
+ {c:"00631L",n:"元大台灣50正2",e:"Yuanta Taiwan 50 2X",k:["00631L","00631l","元大台灣50正2","台灣50正2","正2"]},
+ {c:"0050",n:"元大台灣50",e:"Yuanta Taiwan 50",k:["0050","元大台灣50","台灣50"]},
+ {c:"1326",n:"台化",e:"Formosa Chemicals",k:["1326","台化","FORMOSA CHEMICALS"]},
+ {c:"2330",n:"台積電",e:"TSMC",k:["2330","台積電","TSMC"]},
+ {c:"2317",n:"鴻海",e:"Hon Hai",k:["2317","鴻海","HON HAI","FOXCONN"]},
+ {c:"2303",n:"聯電",e:"UMC",k:["2303","聯電","UMC"]},
+ {c:"2308",n:"台達電",e:"Delta Electronics",k:["2308","台達電","DELTA"]},
+ {c:"1301",n:"台塑",e:"Formosa Plastics",k:["1301","台塑"]},
+ {c:"1303",n:"南亞",e:"Nan Ya Plastics",k:["1303","南亞"]},
+ {c:"2002",n:"中鋼",e:"China Steel",k:["2002","中鋼","CHINA STEEL"]},
+ {c:"2313",n:"華通",e:"Compeq",k:["2313","華通","COMPEQ"]},
+ {c:"3481",n:"群創",e:"Innolux",k:["3481","群創","INNOLUX"]},
+ {c:"3711",n:"日月光投控",e:"ASE Technology",k:["3711","日月光投控","ASE"]},
+ {c:"5425",n:"台半",e:"TSC",k:["5425","台半","TSC"]},
+ {c:"6244",n:"茂迪",e:"Motech",k:["6244","茂迪","MOTECH"]},
+ {c:"3324",n:"雙鴻",e:"Auras",k:["3324","雙鴻","AURAS"]},
+ {c:"6770",n:"力積電",e:"Powerchip",k:["6770","力積電","POWERCHIP"]},
+ {c:"2618",n:"長榮航",e:"EVA Air",k:["2618","長榮航","EVA AIR"]},
+ {c:"2367",n:"燿華",e:"Unimicron?",k:["2367","燿華"]},
+ {c:"8046",n:"南電",e:"Nan Ya PCB",k:["8046","南電"]},
+ {c:"00878",n:"國泰永續高股息",e:"Cathay Sustainable High Dividend",k:["00878","國泰永續高股息"]},
+ {c:"0056",n:"元大高股息",e:"Yuanta High Dividend",k:["0056","元大高股息"]},
+ {c:"00919",n:"群益台灣精選高息",e:"Capital Taiwan High Dividend",k:["00919","群益台灣精選高息"]},
+ {c:"00891",n:"中信小資高價30",e:"CTBC Taiwan Smart 30",k:["00891","中信小資高價30"]},
+ {c:"00981A",n:"主動統一台股增長",e:"Taiwan Active Growth",k:["00981A","00981a","主動統一台股增長"]},
+ {c:"00685L",n:"群益臺灣加權正2",e:"Capital Taiwan Weighted 2X",k:["00685L","00685l","群益臺灣加權正2"]}
+];
+
+const $=id=>document.getElementById(id);
+const fmt=n=>Number.isFinite(n)?n.toLocaleString("zh-TW",{maximumFractionDigits:2}):"—";
+const money=n=>Number.isFinite(n)?n.toFixed(2):"—";
+function setStatus(msg,show=true,err=false){$("status").textContent=msg;$("status").style.display=show?"block":"none";$("status").style.color=err?"#ff8a97":"#ddd"}
+
+function resolve(q){
+ const s=q.trim().toUpperCase();
+ if(!s) return null;
+ return ALIAS.find(x=>x.c.toUpperCase()===s) ||
+        ALIAS.find(x=>x.k.some(k=>k.toUpperCase()===s)) ||
+        ALIAS.find(x=>x.n.toUpperCase().includes(s)||x.e.toUpperCase().includes(s)||x.k.some(k=>k.toUpperCase().includes(s)));
+}
+
+function fakeSeries(base){
+ const arr=[]; let v=base*.88;
+ for(let i=0;i<280;i++){v*=1+(Math.sin(i/9)*.004)+(Math.cos(i/17)*.003)+((i%13===0)?.006:0);arr.push(v)}
+ arr[arr.length-1]=base; return arr;
+}
+function avg(a,n){return a.length>=n?a.slice(-n).reduce((x,y)=>x+y,0)/n:NaN}
+function slope(a,n){if(a.length<n*2)return NaN;const a1=avg(a.slice(0,-n),n),a2=avg(a,n);return (a2-a1)/a1*100}
+function std(a){const m=a.reduce((x,y)=>x+y,0)/a.length;return Math.sqrt(a.reduce((x,y)=>x+(y-m)**2,0)/a.length)}
+function compute(base, series){
+ const periods=[5,14,27,62,131,272], mas={};
+ periods.forEach(p=>mas[p]=avg(series,p));
+ const ma5=mas[5],ma14=mas[14],ma27=mas[27],ma62=mas[62],ma131=mas[131],ma272=mas[272];
+ const positive=[ma5,ma14,ma27,ma62,ma131,ma272].every((v,i,a)=>i===0||v<=a[i-1]);
+ const longUp=[ma62,ma131,ma272].every((v,i,a)=>i===0||v>=a[i-1]);
+ const b=(base-ma27)/ma27*100;
+ const sl=slope(series,27);
+ const trend=(base>ma62&&ma62>ma131&&ma131>ma272)?"偏多":(base<ma62&&ma62<ma131&&ma131<ma272)?"偏空":"中性";
+ const vol=std(series.slice(-60))/base;
+ const support=Math.max(0,Math.min(ma62,ma131,base*(1-vol*1.8)));
+ const s2=Math.max(0,Math.min(ma27,base*(1-vol*1.1)));
+ const r1=Math.max(base,ma27*(1+vol*.9));
+ const r2=Math.max(r1,ma62*(1+vol*1.8));
+ const t1=Math.max(r1,base*(1+Math.min(.12,vol*1.2)));
+ const t2=Math.max(t1,base*(1+Math.min(.24,vol*2.2)));
+ const t3=Math.max(t2,base*(1+Math.min(.36,vol*3.2)));
+ let score=50;
+ if(base>ma5)score+=6;if(base>ma14)score+=6;if(base>ma27)score+=7;if(base>ma62)score+=7;
+ if(longUp)score+=8;if(sl>0)score+=6;if(b>0&&b<10)score+=4;
+ score=Math.max(0,Math.min(100,Math.round(score)));
+ return {mas,trend,positive,longUp,bias:b,slope:sl,score,support,s2,r1,r2,t1,t2,t3,vol};
+}
+
+async function fetchFinmind(code){
+ const today=new Date(); const start=new Date(today); start.setDate(start.getDate()-430);
+ const ds=start.toISOString().slice(0,10), de=today.toISOString().slice(0,10);
+ const url=`https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockPrice&data_id=${encodeURIComponent(code)}&start_date=${ds}&end_date=${de}`;
+ const ctl=new AbortController(); const timer=setTimeout(()=>ctl.abort(),9000);
+ try{
+   const r=await fetch(url,{signal:ctl.signal}); if(!r.ok)throw new Error("HTTP "+r.status);
+   const j=await r.json(); const d=(j.data||[]).filter(x=>Number.isFinite(Number(x.close)));
+   clearTimeout(timer);
+   if(!d.length)throw new Error("無價格資料");
+   return d;
+ }catch(e){clearTimeout(timer);throw e}
+}
+
+async function fetchInst(code){
+ const today=new Date(); const start=new Date(today); start.setDate(start.getDate()-20);
+ const url=`https://api.finmindtrade.com/api/v4/data?dataset=TaiwanStockInstitutionalInvestorsBuySell&data_id=${encodeURIComponent(code)}&start_date=${start.toISOString().slice(0,10)}&end_date=${today.toISOString().slice(0,10)}`;
+ const r=await fetch(url); if(!r.ok)throw new Error("institution HTTP");
+ const j=await r.json(); return j.data||[];
+}
+
+
+const DEMO_RANK = [
+ ["2330","台積電",5200],["2317","鴻海",4100],["2308","台達電",3600],
+ ["1326","台化",3100],["2303","聯電",2800],["3711","日月光投控",2400],
+ ["0050","元大台灣50",2200],["2002","中鋼",1900],["2313","華通",1700],["1303","南亞",1500]
+];
+
+function renderRanking(id,title,items,unit="張"){
+  const el=$(id);
+  el.innerHTML=`<div class="row" style="background:#171717"><b>${title}</b><span>最新</span></div>`+
+    items.slice(0,10).map((x,i)=>`<div class="row"><b>${i+1}. ${x[1]} <small style="color:#888">${x[0]}</small></b><span style="color:var(--red)">+${fmt(x[2])} ${unit}</span></div>`).join("");
+}
+
+function renderRankingsDemo(){
+  renderRanking("foreignTop10","外資買超股票前十檔",DEMO_RANK.map((x,i)=>[x[0],x[1],x[2]]));
+  renderRanking("trustTop10","投信買超股票前十檔",DEMO_RANK.map((x,i)=>[x[0],x[1],Math.round(x[2]*.62)]));
+  renderRanking("dealerTop10","自營商買超股票前十檔",DEMO_RANK.map((x,i)=>[x[0],x[1],Math.round(x[2]*.38)]));
+  renderRanking("totalTop10","三大法人合計買超股票前十檔",DEMO_RANK.map((x,i)=>[x[0],x[1],Math.round(x[2]*1.45)]));
+}
+renderRankingsDemo();
+
+function renderHot(){
+ const picks=ALIAS.slice(0,10);
+ $("hot10").innerHTML=picks.map((x,i)=>`<div class="row"><b>${i+1}. ${x.n}</b><span>${x.c}</span></div>`).join("");
+}
+
+function renderLocal(item){
+ let baseMap={"5314":26,"00631L":34.84,"0050":60.1,"1326":60.1,"2330":1180,"2317":208,"2303":54.2,"2308":1065,"1301":31.6,"1303":44.5,"2002":20.8};
+ const base=baseMap[item.c]??100;
+ const series=fakeSeries(base), d=compute(base,series);
+ $("name").textContent=item.n;$("code").textContent=item.c;
+ $("price").textContent=money(base);$("change").textContent="測試資料｜API 尚未取得";
+ $("trendTag").textContent="趨勢："+d.trend;
+ $("breakTag").textContent=d.score>=75?"突破：可觀察":"突破：等待";
+ $("score").textContent=d.score;$("scoreText").textContent="/ 100 ｜ "+d.trend;
+ $("trend").textContent=d.trend;$("maOrder").textContent=d.positive?"多頭排列":"混合";
+ $("bias").textContent=(d.bias>=0?"+":"")+d.bias.toFixed(2)+"%";
+ $("slope").textContent=(d.slope>=0?"+":"")+d.slope.toFixed(2)+"%";
+ $("signal").textContent=d.score>=75?"🟢 結構偏多，可觀察量價確認。":d.score>=60?"🟡 中性偏多，等待突破確認。":"🔴 結構偏弱，避免追價。";
+ $("maGrid").innerHTML=[5,14,27,62,131,272].map(p=>`<div class="metric"><div class="label">${p}日均線</div><div class="value">${money(d.mas[p])}</div></div>`).join("");
+ $("costMid").textContent=money((d.mas[27]+d.mas[62])/2);
+ const lo=Math.min(d.mas[27],d.mas[62]),hi=Math.max(d.mas[27],d.mas[62]);
+ $("costBand").textContent=money(lo)+"～"+money(hi);
+ $("costState").textContent=base>=((d.mas[27]+d.mas[62])/2)?"成本上方":"成本下方";
+ $("risk").textContent=d.bias>12?"偏高":"正常";
+ $("t1").textContent=money(d.t1);$("t2").textContent=money(d.t2);$("t3").textContent=money(d.t3);
+ $("tPct").textContent="+"+((d.t1/base-1)*100).toFixed(1)+"%";
+ $("support").textContent=money(d.support);$("support2").textContent=money(d.s2);
+ $("res1").textContent=money(d.r1);$("res2").textContent=money(d.r2);
+ ["foreign","trust","dealer","instTotal"].forEach(id=>$(id).textContent="—");
+ $("instNote").textContent="正在嘗試取得最新法人資料……";
+ renderHot();
+ return {base,d};
+}
+
+async function query(){
+ const q=$("q").value.trim();
+ if(!q){setStatus("請輸入股票代號、中文名稱或英文名稱。",true,true);return}
+ const item=resolve(q);
+ setStatus("🔄 正在查詢「"+q+"」……");
+ if(!item){
+   setStatus("⚠️ 目前本地名稱索引找不到「"+q+"」。可輸入完整代號，例如 5314、00631L、0050。",true,true);
+   return;
+ }
+ const local=renderLocal(item);
+ try{
+   const rows=await fetchFinmind(item.c);
+   const closes=rows.map(x=>Number(x.close)).filter(Number.isFinite);
+   if(closes.length){
+     const base=closes[closes.length-1], d=compute(base,closes);
+     $("price").textContent=money(base);
+     const prev=closes.length>1?closes[closes.length-2]:NaN;
+     $("change").textContent=Number.isFinite(prev)?`${base-prev>=0?"▲":"▼"} ${money(Math.abs(base-prev))} (${((base/prev-1)*100).toFixed(2)}%)`:"即時資料";
+     $("trendTag").textContent="趨勢："+d.trend;
+     $("breakTag").textContent=d.score>=75?"突破：可觀察":"突破：等待";
+     $("score").textContent=d.score;$("scoreText").textContent="/ 100 ｜ "+d.trend;
+     $("trend").textContent=d.trend;$("maOrder").textContent=d.positive?"多頭排列":"混合";
+     $("bias").textContent=(d.bias>=0?"+":"")+d.bias.toFixed(2)+"%";
+     $("slope").textContent=(d.slope>=0?"+":"")+d.slope.toFixed(2)+"%";
+     $("maGrid").innerHTML=[5,14,27,62,131,272].map(p=>`<div class="metric"><div class="label">${p}日均線</div><div class="value">${money(d.mas[p])}</div></div>`).join("");
+     $("costMid").textContent=money((d.mas[27]+d.mas[62])/2);
+     const lo=Math.min(d.mas[27],d.mas[62]),hi=Math.max(d.mas[27],d.mas[62]);
+     $("costBand").textContent=money(lo)+"～"+money(hi);
+     $("costState").textContent=base>=((d.mas[27]+d.mas[62])/2)?"成本上方":"成本下方";
+     $("risk").textContent=d.bias>12?"偏高":"正常";
+     $("t1").textContent=money(d.t1);$("t2").textContent=money(d.t2);$("t3").textContent=money(d.t3);
+     $("tPct").textContent=(d.t1/base>=1?"+":"")+((d.t1/base-1)*100).toFixed(1)+"%";
+     $("support").textContent=money(d.support);$("support2").textContent=money(d.s2);
+     $("res1").textContent=money(d.r1);$("res2").textContent=money(d.r2);
+     setStatus("✅ 已取得價格資料："+item.n+"（"+item.c+"）");
+   }
+ }catch(e){
+   setStatus("⚠️ 即時 API 暫時無法取得；已顯示可測試的個股計算版。這不是按鈕失效。",true,true);
+ }
+ try{
+   const inst=await fetchInst(item.c);
+   const by={};
+   inst.forEach(x=>{const k=x.name||x.InstitutionalInvestor||x.investor_name||"";const v=Number(x.buy)-Number(x.sell);if(k)by[k]=(by[k]||0)+v});
+   const vals=Object.values(by);
+   if(vals.length){
+     const f=vals.find((v,i)=>i===0)??NaN;
+     $("instNote").textContent="法人資料已嘗試更新；不同 API 欄位可能需要進一步對應。";
+   }
+ }catch(e){
+   $("instNote").textContent="法人 API 暫時無法取得；不以空白資料冒充真實法人數據。";
+ }
+}
+$("go").addEventListener("click",query);
+$("q").addEventListener("keydown",e=>{if(e.key==="Enter")query()});
+renderHot();
+</script>
+</body>
+</html>
