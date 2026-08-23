@@ -162,6 +162,15 @@ input[readonly]{
   color:#245a9d;
 }
 
+.salesman-card{
+  background:#fff0f6;
+  border:3px solid #d45b91;
+}
+
+.salesman-card .title{
+  color:#a83268;
+}
+
 .button-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -293,6 +302,20 @@ button{
     <div class="date" id="today"></div>
   </div>
 
+  <!-- 營業員 -->
+  <div class="card salesman-card">
+
+    <div class="title">👨‍💼 營業員</div>
+
+    <input
+      type="text"
+      id="salesperson"
+      value="賣大腸"
+      placeholder="輸入營業員"
+    >
+
+  </div>
+
   <!-- 貨款餘額 -->
   <div class="card money-card">
 
@@ -316,6 +339,7 @@ button{
     <div class="title">👤 客人資料</div>
 
     <label>姓名</label>
+
     <input
       type="text"
       id="customerName"
@@ -323,6 +347,7 @@ button{
     >
 
     <label>電話</label>
+
     <input
       type="tel"
       id="customerPhone"
@@ -330,6 +355,7 @@ button{
     >
 
     <label>手機</label>
+
     <input
       type="tel"
       id="customerMobile"
@@ -477,10 +503,11 @@ button{
 
 </div>
 
-
 <script>
 
 const STORAGE_KEY = "psj13_order_records";
+
+const ORDER_PHONE = "0919335529";
 
 
 /* =========================
@@ -532,15 +559,11 @@ function updateDate(){
 
 function calculate(){
 
-  /* 貨款餘額 */
-
   const balance =
     Number(
       document.getElementById("balance").value
     ) || 0;
 
-
-  /* 大腸數量 */
 
   const intestineQty =
     Number(
@@ -548,53 +571,29 @@ function calculate(){
     ) || 0;
 
 
-  /* 大腸固定100元／斤 */
-
   const intestineTotal =
     intestineQty * 100;
 
-
-  /*
-    ★★★ 重要 ★★★
-
-    訂單金額不再手動輸入。
-
-    直接由商品自動計算。
-  */
 
   const orderAmount =
     intestineTotal;
 
 
-  /*
-    自動把訂單金額填入輸入框
-  */
-
   document.getElementById("orderAmount").value =
     orderAmount;
 
-
-  /*
-    貨款餘額 − 訂單金額
-  */
 
   const remaining =
     balance - orderAmount;
 
 
-  /* 顯示貨款 */
-
   document.getElementById("balanceShow").textContent =
     "$" + money(balance);
 
 
-  /* 顯示大腸金額 */
-
   document.getElementById("intestineTotal").textContent =
     "大腸金額：$" + money(intestineTotal);
 
-
-  /* 顯示算式 */
 
   document.getElementById("calcBalance").textContent =
     "$" + money(balance);
@@ -636,10 +635,6 @@ function getFormData(){
     intestineQty * 100;
 
 
-  /*
-    訂單金額自動由商品金額產生
-  */
-
   const orderAmount =
     intestineTotal;
 
@@ -652,6 +647,9 @@ function getFormData(){
 
     date:
       document.getElementById("today").textContent,
+
+    salesperson:
+      document.getElementById("salesperson").value.trim(),
 
     customerName:
       document.getElementById("customerName").value.trim(),
@@ -693,6 +691,11 @@ function orderText(data){
     "📋 本次訂單",
 
     "📅 " + data.date,
+
+    "",
+
+    "👨‍💼 營業員：" +
+      (data.salesperson || "未填"),
 
     "",
 
@@ -839,9 +842,9 @@ function saveRecord(){
 
     例如
 
-    10000 - 4000 = 6000
+    10000 - 3000 = 7000
 
-    下一筆貨款自動變成6000
+    下一筆貨款自動變成7000
   */
 
   document.getElementById("balance").value =
@@ -912,13 +915,20 @@ function renderHistory(){
 
         <div class="history-name">
           #${records.length-index}
-         　${escapeHtml(
+          　${escapeHtml(
             r.customerName || "未填姓名"
           )}
         </div>
 
         <div class="history-line">
           📅 ${escapeHtml(r.date)}
+        </div>
+
+        <div class="history-line">
+          👨‍💼 營業員：
+          ${escapeHtml(
+            r.salesperson || "未填"
+          )}
         </div>
 
         <div class="history-line">
@@ -1043,6 +1053,11 @@ function clearForm(){
 
 
   document.getElementById(
+    "salesperson"
+  ).value = "賣大腸";
+
+
+  document.getElementById(
     "customerName"
   ).value = "";
 
@@ -1126,7 +1141,7 @@ function exportRecords(){
 
 
   let csv =
-    "日期,姓名,電話,手機,貨款餘額,大腸斤數,大腸金額,訂單金額,扣除後餘額\n";
+    "日期,營業員,姓名,電話,手機,貨款餘額,大腸斤數,大腸金額,訂單金額,扣除後餘額\n";
 
 
   records.forEach(r=>{
@@ -1134,6 +1149,8 @@ function exportRecords(){
     csv += [
 
       csvCell(r.date),
+
+      csvCell(r.salesperson),
 
       csvCell(r.customerName),
 
@@ -1270,6 +1287,7 @@ function downloadRecords(){
 
 /* =========================
    手機分享
+   固定收件人：0919335529
 ========================= */
 
 async function sharePhone(){
@@ -1281,31 +1299,23 @@ async function sharePhone(){
     orderText(data);
 
 
-  if(navigator.share){
+  /*
+    iPhone / Android 簡訊
+    使用 sms: 開啟簡訊
 
-    try{
+    收件人固定：
+    0919335529
+  */
 
-      await navigator.share({
+  const smsUrl =
+    "sms:" +
+    ORDER_PHONE +
+    "?&body=" +
+    encodeURIComponent(text);
 
-        title:
-          "訂單",
 
-        text:
-          text
-
-      });
-
-    }catch(e){}
-
-  }else{
-
-    fallbackCopy(text);
-
-    alert(
-      "📋 訂單已複製，可以貼到手機訊息。"
-    );
-
-  }
+  window.location.href =
+    smsUrl;
 
 }
 
