@@ -1,2944 +1,773 @@
-<!DOCTYPE html>
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>🌸 芳療師月記錄｜完整版本</title>
-
 <style>
 *{box-sizing:border-box}
-
-body{
-margin:0;
-background:#f5f5f7;
-color:#222;
-font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
-padding:12px 8px 40px
-}
-
-.wrap{
-max-width:760px;
-margin:auto
-}
-
-.card{
-background:#fff;
-border-radius:22px;
-padding:18px;
-margin-bottom:15px;
-box-shadow:0 3px 15px #00000012
-}
-
-h1{
-text-align:center;
-font-size:24px;
-margin:3px 0 8px
-}
-
-h2{
-font-size:21px;
-margin:0 0 14px
-}
-
-.sub{
-text-align:center;
-color:#777;
-line-height:1.7
-}
-
-.date{
-font-size:19px;
-font-weight:900;
-text-align:center;
-margin:10px 0
-}
-
-.row{
-display:flex;
-align-items:center;
-gap:8px;
-margin:11px 0
-}
-
-.label{
-flex:1;
-font-weight:800
-}
-
-input,select{
-border:1px solid #ccc;
-border-radius:12px;
-padding:12px;
-font-size:18px;
-background:#fff
-}
-
-input[type=number]{
-width:130px;
-text-align:right
-}
-
-input[type=date]{
-width:165px
-}
-
-input[type=month]{
-width:165px
-}
-
-input[type=search]{
-width:100%;
-text-align:left
-}
-
-input[type=text]{
-min-width:0
-}
-
-.price{
-background:#fff8e5;
-border:2px solid #ead79c;
-border-radius:15px;
-padding:13px
-}
-
-.box{
-background:#f7f7f7;
-border-radius:15px;
-padding:13px;
-margin-top:12px
-}
-
-.line{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-padding:9px 0;
-border-bottom:1px solid #ddd;
-font-size:17px
-}
-
-.line:last-child{
-border:0
-}
-
-.total{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-border-top:2px solid #aaa;
-padding-top:12px;
-margin-top:7px;
-font-size:21px;
-font-weight:900
-}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:9px
-}
-
-.stat{
-background:#fff;
-border-radius:13px;
-padding:12px
-}
-
-.stat small{
-color:#777
-}
-
-.stat b{
-display:block;
-font-size:21px;
-margin-top:4px
-}
-
-button{
-border:0;
-border-radius:13px;
-padding:13px 15px;
-font-size:16px;
-font-weight:900;
-cursor:pointer
-}
-
-.full{
-width:100%
-}
-
-.green{
-background:#198754;
-color:#fff
-}
-
-.dark{
-background:#222;
-color:#fff
-}
-
-.gray{
-background:#eee;
-color:#222
-}
-
-.red{
-background:#d9362e;
-color:#fff
-}
-
-.blue{
-background:#2878d0;
-color:#fff
-}
-
-.purple{
-background:#7652c7;
-color:#fff
-}
-
-.orange{
-background:#e67e22;
-color:#fff
-}
-
-.notice{
-text-align:center;
-color:#188038;
-font-weight:800;
-min-height:22px;
-margin:8px
-}
-
-.hint{
-font-size:13px;
-color:#777;
-line-height:1.7
-}
-
-.tablewrap{
-overflow-x:auto
-}
-
-table{
-border-collapse:collapse;
-width:100%;
-min-width:700px
-}
-
-th,td{
-padding:10px 7px;
-border-bottom:1px solid #ddd;
-text-align:right;
-white-space:nowrap
-}
-
-th:first-child,
-td:first-child{
-text-align:left
-}
-
-th{
-background:#eee
-}
-
-.history{
-background:#f7f7f7;
-border-radius:14px;
-padding:12px;
-margin-top:10px
-}
-
-.actions{
-display:flex;
-gap:8px;
-margin-top:10px
-}
-
-.actions button{
-flex:1
-}
-
-.good{
-color:#188038
-}
-
-.bad{
-color:#d93025
-}
-
-.smallBtn{
-padding:9px 11px;
-font-size:14px
-}
-
-.center{
-text-align:center
-}
-
-.monthTitle{
-font-size:20px;
-font-weight:900;
-text-align:center;
-margin-bottom:10px
-}
-
-.bigMoney{
-font-size:34px;
-font-weight:900;
-text-align:center;
-margin:8px 0
-}
-
-.switchRow{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:12px;
-padding:12px;
-background:#f7f7f7;
-border-radius:15px;
-margin-bottom:12px
-}
-
-.switchText{
-font-weight:900;
-font-size:18px
-}
-
-.switch{
-position:relative;
-display:inline-block;
-width:58px;
-height:32px;
-flex:none
-}
-
-.switch input{
-opacity:0;
-width:0;
-height:0
-}
-
-.slider{
-position:absolute;
-cursor:pointer;
-top:0;
-left:0;
-right:0;
-bottom:0;
-background:#ccc;
-transition:.25s;
-border-radius:32px
-}
-
-.slider:before{
-content:"";
-position:absolute;
-height:26px;
-width:26px;
-left:3px;
-top:3px;
-background:#fff;
-transition:.25s;
-border-radius:50%;
-box-shadow:0 2px 5px #0003
-}
-
-.switch input:checked + .slider{
-background:#198754
-}
-
-.switch input:checked + .slider:before{
-transform:translateX(26px)
-}
-
-.settleCard{
-background:#fff8f0;
-border:2px solid #f0c9a5;
-border-radius:16px;
-padding:14px;
-margin-top:12px
-}
-
-.settleTitle{
-font-size:19px;
-font-weight:900;
-margin-bottom:8px
-}
-
-.settleRange{
-font-size:15px;
-color:#666;
-margin-bottom:10px
-}
-
-.settleResult{
-background:#fff;
-border-radius:13px;
-padding:10px
-}
-
-.shareGrid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
-margin-top:10px
-}
-
-.status{
-font-size:14px;
-color:#666;
-text-align:center;
-margin-top:8px;
-min-height:20px
-}
-
+body{margin:0;background:#f5f5f7;color:#222;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;padding:12px 8px 40px}
+.wrap{max-width:760px;margin:auto}
+.card{background:#fff;border-radius:22px;padding:18px;margin-bottom:15px;box-shadow:0 3px 15px #00000012}
+h1{text-align:center;font-size:24px;margin:3px 0 8px}
+h2{font-size:21px;margin:0 0 14px}
+.sub{text-align:center;color:#777;line-height:1.7}
+.date{font-size:19px;font-weight:900;text-align:center;margin:10px 0}
+.row{display:flex;align-items:center;gap:8px;margin:11px 0}
+.label{flex:1;font-weight:800}
+input,select{border:1px solid #ccc;border-radius:12px;padding:12px;font-size:18px;background:#fff}
+input[type=number]{width:130px;text-align:right}
+input[type=date]{width:165px}
+input[type=month]{width:165px}
+input[type=search]{width:100%;text-align:left}
+input[type=text]{min-width:0}
+.price{background:#fff8e5;border:2px solid #ead79c;border-radius:15px;padding:13px}
+.box{background:#f7f7f7;border-radius:15px;padding:13px;margin-top:12px}
+.line{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #ddd;font-size:17px}
+.line:last-child{border:0}
+.total{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:2px solid #aaa;padding-top:12px;margin-top:7px;font-size:21px;font-weight:900}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat{background:#fff;border-radius:13px;padding:12px}
+.stat small{color:#777}
+.stat b{display:block;font-size:21px;margin-top:4px}
+button{border:0;border-radius:13px;padding:13px 15px;font-size:16px;font-weight:900;cursor:pointer}
+.full{width:100%}
+.green{background:#198754;color:#fff}
+.dark{background:#222;color:#fff}
+.gray{background:#eee;color:#222}
+.red{background:#d9362e;color:#fff}
+.blue{background:#2878d0;color:#fff}
+.purple{background:#7652c7;color:#fff}
+.orange{background:#e67e22;color:#fff}
+.notice{text-align:center;color:#188038;font-weight:800;min-height:22px;margin:8px}
+.hint{font-size:13px;color:#777;line-height:1.7}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:700px}
+th,td{padding:10px 7px;border-bottom:1px solid #ddd;text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{background:#eee}
+.history{background:#f7f7f7;border-radius:14px;padding:12px;margin-top:10px}
+.actions{display:flex;gap:8px;margin-top:10px}
+.actions button{flex:1}
+.good{color:#188038}
+.bad{color:#d93025}
+.smallBtn{padding:9px 11px;font-size:14px}
+.center{text-align:center}
+.monthTitle{font-size:20px;font-weight:900;text-align:center;margin-bottom:10px}
+.bigMoney{font-size:34px;font-weight:900;text-align:center;margin:8px 0}
+.switchRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#f7f7f7;border-radius:15px;margin-bottom:12px}
+.switchText{font-weight:900;font-size:18px}
+.switch{position:relative;display:inline-block;width:58px;height:32px;flex:none}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#ccc;transition:.25s;border-radius:32px}
+.slider:before{content:"";position:absolute;height:26px;width:26px;left:3px;top:3px;background:#fff;transition:.25s;border-radius:50%;box-shadow:0 2px 5px #0003}
+.switch input:checked + .slider{background:#198754}
+.switch input:checked + .slider:before{transform:translateX(26px)}
+.settleCard{background:#fff8f0;border:2px solid #f0c9a5;border-radius:16px;padding:14px;margin-top:12px}
+.settleTitle{font-size:19px;font-weight:900;margin-bottom:5px}
+.settleRange{font-size:15px;color:#666;margin-bottom:10px}
+.settleResult{background:#fff;border-radius:13px;padding:10px;line-height:1.8}
+.shareGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.status{font-size:14px;color:#666;text-align:center;margin-top:8px;min-height:20px}
+.autoButton{margin-top:8px}
 @media(max-width:480px){
-
-h1{
-font-size:21px
-}
-
-input[type=number]{
-width:110px
-}
-
-input[type=date],
-input[type=month]{
-width:150px
-}
-
-.grid{
-grid-template-columns:1fr 1fr
-}
-
-.shareGrid{
-grid-template-columns:1fr
-}
-
+h1{font-size:21px}
+input[type=number]{width:110px}
+input[type=date],input[type=month]{width:150px}
+.grid{grid-template-columns:1fr 1fr}
+.shareGrid{grid-template-columns:1fr}
 }
 </style>
 </head>
-
 <body>
-
 <div class="wrap">
 
-<!-- 標題 -->
 <div class="card">
-
 <h1>🌸 芳療師月記錄</h1>
-
 <div id="todayText" class="date"></div>
-
-<div class="sub">
-📅 日期自動帶入今天<br>
-👤 客人手動填寫　｜　🌸 節數手動填寫
+<div class="sub">📅 日期自動帶入今天<br>👤 客人手動填寫　｜　🌸 節數手動填寫</div>
 </div>
 
-</div>
-
-
-<!-- 收費設定 -->
 <div class="card">
-
 <h2>💰 收費設定</h2>
-
 <div class="price">
-
 <div class="row">
-
-<div class="label">
-🌸 1節價格
-</div>
-
-<input
-id="unitPrice"
-type="number"
-min="0"
-step="50"
-value="300"
->
-
+<div class="label">🌸 1節價格</div>
+<input id="unitPrice" type="number" min="0" step="50" value="300">
 <span>元</span>
-
+</div>
+<div class="hint">1節＝300元<br>半節＝150元<br>1.5節＝450元<br>2.5節＝750元<br>節數可輸入 0.5、1.5、2.5、11.5 等。</div>
+</div>
 </div>
 
-<div class="hint">
-1節＝300元<br>
-半節＝150元<br>
-1.5節＝450元<br>
-2.5節＝750元<br>
-節數可輸入 0.5、1.5、2.5、11.5 等。
-</div>
-
-</div>
-
-</div>
-
-
-<!-- 自動功能 -->
 <div class="card">
-
 <h2>⚙️ 自動功能</h2>
 
 <div class="switchRow">
-
 <div>
 <div class="switchText">💾 自動儲存</div>
-<div class="hint">
-輸入資料時會自動保存，重新開啟網站也不會消失。
+<div class="hint">輸入資料時自動保存草稿，重新開啟網站可恢復。</div>
 </div>
-</div>
-
 <label class="switch">
-<input
-id="autoSave"
-type="checkbox"
->
+<input id="autoSave" type="checkbox">
 <span class="slider"></span>
 </label>
-
 </div>
 
-<div class="box">
-
-<div class="line">
-
-<span>
-📅 每月16號
-</span>
-
-<b>
-結算1～15號
-</b>
-
+<div class="settleCard">
+<div class="settleTitle">📅 每月16號</div>
+<div class="settleRange">自動累計當月 1～15號</div>
+<div id="autoFirstResult" class="settleResult">尚未計算</div>
+<div class="shareGrid">
+<button class="purple" onclick="copySettlement('first')">📋 複製1～15號</button>
+<button class="orange" onclick="shareSettlement('first')">📤 分享 LINE／簡訊</button>
+</div>
 </div>
 
-<div class="line">
-
-<span>
-📅 月底
-</span>
-
-<b>
-結算16號～月底
-</b>
-
+<div class="settleCard">
+<div class="settleTitle">📅 月底</div>
+<div class="settleRange">自動累計當月 16號～月底</div>
+<div id="autoSecondResult" class="settleResult">尚未計算</div>
+<div class="shareGrid">
+<button class="purple" onclick="copySettlement('second')">📋 複製16號～月底</button>
+<button class="orange" onclick="shareSettlement('second')">📤 分享 LINE／簡訊</button>
+</div>
 </div>
 
-<div class="line">
-
-<span>
-📱 傳送方式
-</span>
-
-<b>
-複製／LINE／簡訊
-</b>
-
+<div id="autoStatus" class="status"></div>
 </div>
 
-</div>
-
-<div class="hint" style="margin-top:10px">
-💡 網站會自動累計每天已儲存的客人與節數。
-<br>
-📌 16號與月底我會另外提醒你，再按下面的結算分享按鈕即可。
-</div>
-
-</div>
-
-
-<!-- 今日輸入 -->
 <div class="card">
-
 <h2>➕ 新增／修改記錄</h2>
 
-<div class="row">
+<div class="row"><div class="label">📅 日期</div><input id="date" type="date"></div>
 
-<div class="label">
-📅 日期
-</div>
+<div class="row"><div class="label">👤 客人</div><input id="clients" type="number" min="0" step="1" placeholder="請輸入客數"><span>客</span></div>
 
-<input
-id="date"
-type="date"
->
+<div class="row"><div class="label">🌸 節數</div><input id="sessions" type="number" min="0" step="0.5" placeholder="請輸入節數"><span>節</span></div>
 
-</div>
-
-
-<div class="row">
-
-<div class="label">
-👤 客人
-</div>
-
-<input
-id="clients"
-type="number"
-min="0"
-step="1"
-placeholder="請輸入客數"
->
-
-<span>客</span>
-
-</div>
-
-
-<div class="row">
-
-<div class="label">
-🌸 節數
-</div>
-
-<input
-id="sessions"
-type="number"
-min="0"
-step="0.5"
-placeholder="請輸入節數"
->
-
-<span>節</span>
-
-</div>
-
-
-<div class="row">
-
-<div class="label">
-📝 備註
-</div>
-
-<input
-id="note"
-type="text"
-placeholder="可不填"
-style="flex:1;width:auto"
->
-
-</div>
-
+<div class="row"><div class="label">📝 備註</div><input id="note" type="text" placeholder="可不填" style="flex:1;width:auto"></div>
 
 <div class="box">
-
-<div class="line">
-
-<span>
-🌸 節數
-</span>
-
-<b id="previewSessions">
-0 節
-</b>
-
-</div>
-
-
-<div class="line">
-
-<span>
-👤 客人
-</span>
-
-<b id="previewClients">
-0 客
-</b>
-
-</div>
-
-
-<div class="total">
-
-<span>
-💰 本筆收入
-</span>
-
-<span id="preview">
-$0
-</span>
-
-</div>
-
+<div class="line"><span>🌸 節數</span><b id="previewSessions">0 節</b></div>
+<div class="line"><span>👤 客人</span><b id="previewClients">0 客</b></div>
+<div class="total"><span>💰 本筆收入</span><span id="preview">$0</span></div>
 </div>
 
 <br>
-
-<button
-id="saveButton"
-class="green full"
-onclick="saveRecord()"
->
-💾 儲存這一天
-</button>
-
+<button id="saveButton" class="green full" onclick="saveRecord()">💾 儲存這一天</button>
 <div id="notice" class="notice"></div>
-
 </div>
 
-
-<!-- 月份 -->
 <div class="card">
-
 <h2>📅 查看月份</h2>
-
-<div class="row">
-
-<div class="label">
-選擇月份
+<div class="row"><div class="label">選擇月份</div><input id="viewMonth" type="month"></div>
+<button class="blue full" onclick="goCurrentMonth()">📅 回到本月</button>
 </div>
 
-<input
-id="viewMonth"
-type="month"
->
-
-</div>
-
-<button
-class="blue full"
-onclick="goCurrentMonth()"
->
-📅 回到本月
-</button>
-
-</div>
-
-
-<!-- 本月總覽 -->
 <div class="card">
-
 <h2>📊 月份總覽</h2>
-
-<div
-id="monthTitle"
-class="monthTitle"
->
-</div>
-
+<div id="monthTitle" class="monthTitle"></div>
 <div class="grid">
-
-<div class="stat">
-
-<small>
-👤 總客數
-</small>
-
-<b id="totalClients">
-0 客
-</b>
-
+<div class="stat"><small>👤 總客數</small><b id="totalClients">0 客</b></div>
+<div class="stat"><small>🌸 總節數</small><b id="totalSessions">0 節</b></div>
+<div class="stat"><small>💰 總收入</small><b id="totalIncome">$0</b></div>
+<div class="stat"><small>📅 營業天數</small><b id="workDays">0 天</b></div>
+<div class="stat"><small>📈 平均每日收入</small><b id="avgDay">$0</b></div>
+<div class="stat"><small>👤 平均每客節數</small><b id="avgClient">0 節</b></div>
+</div>
 </div>
 
-
-<div class="stat">
-
-<small>
-🌸 總節數
-</small>
-
-<b id="totalSessions">
-0 節
-</b>
-
-</div>
-
-
-<div class="stat">
-
-<small>
-💰 總收入
-</small>
-
-<b id="totalIncome">
-$0
-</b>
-
-</div>
-
-
-<div class="stat">
-
-<small>
-📅 營業天數
-</small>
-
-<b id="workDays">
-0 天
-</b>
-
-</div>
-
-
-<div class="stat">
-
-<small>
-📈 平均每日收入
-</small>
-
-<b id="avgDay">
-$0
-</b>
-
-</div>
-
-
-<div class="stat">
-
-<small>
-👤 平均每客節數
-</small>
-
-<b id="avgClient">
-0 節
-</b>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- 半月／月底結算 -->
 <div class="card">
-
 <h2>📤 半月／月底結算</h2>
 
 <div class="settleCard">
-
-<div class="settleTitle">
-🌸 1～15號結算
-</div>
-
-<div id="firstHalfRange" class="settleRange">
-本月1號～15號
-</div>
-
-<div id="firstHalfResult" class="settleResult">
-尚未計算
-</div>
-
+<div class="settleTitle">🌸 1～15號結算</div>
+<div id="firstHalfRange" class="settleRange"></div>
+<div id="firstHalfResult" class="settleResult"></div>
 <div class="shareGrid">
-
-<button
-class="purple"
-onclick="copySettlement('first')"
->
-📋 複製1～15號
-</button>
-
-<button
-class="orange"
-onclick="shareSettlement('first')"
->
-📤 分享1～15號
-</button>
-
+<button class="purple" onclick="copySettlement('first')">📋 複製1～15號</button>
+<button class="orange" onclick="shareSettlement('first')">📤 分享1～15號</button>
 </div>
-
 </div>
-
 
 <div class="settleCard">
-
-<div class="settleTitle">
-🌸 16號～月底結算
-</div>
-
-<div id="secondHalfRange" class="settleRange">
-本月16號～月底
-</div>
-
-<div id="secondHalfResult" class="settleResult">
-尚未計算
-</div>
-
+<div class="settleTitle">🌸 16號～月底結算</div>
+<div id="secondHalfRange" class="settleRange"></div>
+<div id="secondHalfResult" class="settleResult"></div>
 <div class="shareGrid">
-
-<button
-class="purple"
-onclick="copySettlement('second')"
->
-📋 複製16號～月底
-</button>
-
-<button
-class="orange"
-onclick="shareSettlement('second')"
->
-📤 分享16號～月底
-</button>
-
+<button class="purple" onclick="copySettlement('second')">📋 複製16號～月底</button>
+<button class="orange" onclick="shareSettlement('second')">📤 分享16號～月底</button>
 </div>
-
 </div>
 
 <div id="settlementStatus" class="status"></div>
-
 </div>
 
-
-<!-- 每日明細 -->
 <div class="card">
-
 <h2>📋 每日完整明細</h2>
-
 <div class="tablewrap">
-
 <table>
-
-<thead>
-
-<tr>
-
-<th>日期</th>
-<th>客人</th>
-<th>節數</th>
-<th>單價</th>
-<th>收入</th>
-<th>備註</th>
-<th>操作</th>
-
-</tr>
-
-</thead>
-
-<tbody id="tableBody">
-</tbody>
-
+<thead><tr><th>日期</th><th>客人</th><th>節數</th><th>單價</th><th>收入</th><th>備註</th><th>操作</th></tr></thead>
+<tbody id="tableBody"></tbody>
 </table>
-
 </div>
-
 <br>
-
-<button
-class="dark full"
-onclick="copyMonth()"
->
-📄 複製本月完整明細
-</button>
-
+<button class="dark full" onclick="copyMonth()">📄 複製本月完整明細</button>
 </div>
 
-
-<!-- 月份比較 -->
 <div class="card">
-
 <h2>📈 月份營收比較</h2>
-
-<div class="row">
-
-<div class="label">
-第一月份
-</div>
-
-<input
-id="compareA"
-type="month"
->
-
-</div>
-
-
-<div class="row">
-
-<div class="label">
-第二月份
-</div>
-
-<input
-id="compareB"
-type="month"
->
-
-</div>
-
-
-<button
-class="green full"
-onclick="compareMonths()"
->
-📊 開始比較
-</button>
-
+<div class="row"><div class="label">第一月份</div><input id="compareA" type="month"></div>
+<div class="row"><div class="label">第二月份</div><input id="compareB" type="month"></div>
+<button class="green full" onclick="compareMonths()">📊 開始比較</button>
 <div id="compareResult"></div>
-
 </div>
 
-
-<!-- 歷年比較 -->
 <div class="card">
-
 <h2>📅 歷年同月份比較</h2>
-
 <div class="row">
-
-<div class="label">
-月份
+<div class="label">月份</div>
+<select id="compareMonth" style="width:170px;padding:12px;border:1px solid #ccc;border-radius:12px;font-size:17px"></select>
 </div>
-
-<select
-id="compareMonth"
-style="width:170px;padding:12px;border:1px solid #ccc;border-radius:12px;font-size:17px"
->
-</select>
-
-</div>
-
 <div id="yearResult"></div>
-
 </div>
 
-
-<!-- 搜尋 -->
 <div class="card">
-
 <h2>🔎 歷史搜尋</h2>
-
-<input
-id="search"
-type="search"
-placeholder="輸入日期、客人、節數、備註、年份..."
->
-
+<input id="search" type="search" placeholder="輸入日期、客人、節數、備註、年份...">
 <div id="history"></div>
-
 </div>
 
-
-<!-- 資料管理 -->
 <div class="card">
-
 <h2>💾 資料管理</h2>
-
-<button
-class="gray full"
-onclick="exportData()"
->
-📤 備份全部資料
-</button>
-
+<button class="gray full" onclick="exportData()">📤 備份全部資料</button>
 <br><br>
-
-<label
-class="gray full"
-style="display:block;text-align:center;padding:13px;border-radius:13px;font-weight:900;cursor:pointer"
->
-
+<label class="gray full" style="display:block;text-align:center;padding:13px;border-radius:13px;font-weight:900;cursor:pointer">
 📥 匯入歷史資料
-
-<input
-type="file"
-accept=".json"
-onchange="importData(event)"
-style="display:none"
->
-
+<input type="file" accept=".json" onchange="importData(event)" style="display:none">
 </label>
-
 <br>
-
-<button
-class="red full"
-onclick="clearAll()"
->
-⚠️ 清除全部資料
-</button>
-
+<button class="red full" onclick="clearAll()">⚠️ 清除全部資料</button>
 </div>
 
 </div>
-
 
 <script>
-
 const KEY="aroma_therapist_records_v913";
-
 const SETTINGS_KEY="aroma_therapist_settings_v913";
-
 const DRAFT_KEY="aroma_therapist_draft_v913";
-
 const SETTLE_KEY="aroma_therapist_settlement_v913";
-
 const $=id=>document.getElementById(id);
 
+function money(n){return "$"+Math.round(Number(n)||0).toLocaleString("zh-TW")}
+function sf(n){return Number(n||0).toLocaleString("zh-TW",{maximumFractionDigits:1})}
 
-/* 金額 */
-function money(n){
-
-return "$"+
-Math.round(Number(n)||0)
-.toLocaleString("zh-TW");
-
-}
-
-
-/* 小數 */
-function sf(n){
-
-return Number(n||0)
-.toLocaleString(
-"zh-TW",
-{
-maximumFractionDigits:1
-}
-);
-
-}
-
-
-/* 台灣時間 */
 function nowTW(){
-
-return new Date(
-new Date().toLocaleString(
-"en-US",
-{
-timeZone:"Asia/Taipei"
-}
-)
-);
-
+return new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Taipei"}));
 }
 
-
-/* YYYY-MM-DD */
 function dateKey(d){
-
-return d.getFullYear()+
-"-"+
-String(d.getMonth()+1).padStart(2,"0")+
-"-"+
-String(d.getDate()).padStart(2,"0");
-
+return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
 
-
-/* 顯示日期 */
 function showDate(d){
-
-const w=[
-"星期日",
-"星期一",
-"星期二",
-"星期三",
-"星期四",
-"星期五",
-"星期六"
-];
-
-return d.getFullYear()+
-"年 "+
-(d.getMonth()+1)+
-"月 "+
-d.getDate()+
-"日　"+
-w[d.getDay()];
-
+const w=["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
+return d.getFullYear()+"年 "+(d.getMonth()+1)+"月 "+d.getDate()+"日　"+w[d.getDay()];
 }
 
-
-/* 讀取資料 */
 function records(){
-
 try{
-
-const x=
-JSON.parse(
-localStorage.getItem(KEY)||"[]"
-);
-
+const x=JSON.parse(localStorage.getItem(KEY)||"[]");
 return Array.isArray(x)?x:[];
-
-}catch(e){
-
-return[];
-
+}catch(e){return []}
 }
 
-}
+function saveRecords(a){localStorage.setItem(KEY,JSON.stringify(a))}
 
-
-/* 儲存資料 */
-function saveRecords(a){
-
-localStorage.setItem(
-KEY,
-JSON.stringify(a)
-);
-
-}
-
-
-/* 讀取設定 */
 function getSettings(){
-
 try{
-
-const x=
-JSON.parse(
-localStorage.getItem(SETTINGS_KEY)||"{}"
-);
-
-return{
-
-autoSave:!!x.autoSave
-
-};
-
-}catch(e){
-
-return{
-
-autoSave:false
-
-};
-
+const x=JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}");
+return {autoSave:!!x.autoSave};
+}catch(e){return {autoSave:false}}
 }
 
-}
-
-
-/* 儲存設定 */
 function saveSettings(){
-
-localStorage.setItem(
-SETTINGS_KEY,
-JSON.stringify({
-
-autoSave:$("autoSave").checked
-
-})
-);
-
+localStorage.setItem(SETTINGS_KEY,JSON.stringify({autoSave:$("autoSave").checked}));
 }
 
-
-/* 草稿 */
 function saveDraft(){
-
 if(!$("autoSave").checked)return;
-
-const draft={
-
+localStorage.setItem(DRAFT_KEY,JSON.stringify({
 date:$("date").value,
-
 clients:$("clients").value,
-
 sessions:$("sessions").value,
-
 price:$("unitPrice").value,
-
 note:$("note").value
-
-};
-
-localStorage.setItem(
-DRAFT_KEY,
-JSON.stringify(draft)
-);
-
+}));
 }
 
-
-/* 讀取草稿 */
 function loadDraft(){
-
-const s=getSettings();
-
-if(!s.autoSave)return;
-
+if(!getSettings().autoSave)return;
 try{
-
-const x=
-JSON.parse(
-localStorage.getItem(DRAFT_KEY)||"null"
-);
-
+const x=JSON.parse(localStorage.getItem(DRAFT_KEY)||"null");
 if(!x)return;
-
 if(x.date)$("date").value=x.date;
-
-if(x.clients!=="")
-$("clients").value=x.clients;
-
-if(x.sessions!=="")
-$("sessions").value=x.sessions;
-
-if(x.price)
-$("unitPrice").value=x.price;
-
-if(x.note)
-$("note").value=x.note;
-
+if(x.clients!=="")$("clients").value=x.clients;
+if(x.sessions!=="")$("sessions").value=x.sessions;
+if(x.price)$("unitPrice").value=x.price;
+if(x.note)$("note").value=x.note;
 }catch(e){}
-
 }
 
+function clearDraft(){localStorage.removeItem(DRAFT_KEY)}
 
-/* 清除草稿 */
-function clearDraft(){
+function currentMonth(){return $("viewMonth").value}
 
-localStorage.removeItem(DRAFT_KEY);
-
-}
-
-
-/* 取得今天月份 */
-function currentMonth(){
-
-return $("viewMonth").value;
-
-}
-
-
-/* 初始化 */
 function init(){
-
 const t=nowTW();
-
 const today=dateKey(t);
+const month=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0");
 
-const month=t.getFullYear()+
-"-"+
-String(t.getMonth()+1).padStart(2,"0");
-
-
-$("todayText").textContent=
-showDate(t);
-
-$("date").value=
-today;
-
-$("viewMonth").value=
-month;
-
+$("todayText").textContent=showDate(t);
+$("date").value=today;
+$("viewMonth").value=month;
 $("unitPrice").value=300;
+$("autoSave").checked=getSettings().autoSave;
 
-
-/* 自動儲存設定 */
-
-const settings=getSettings();
-
-$("autoSave").checked=
-settings.autoSave;
-
-
-/* 比較月份 */
-
-$("compareA").value=
-month;
-
+$("compareA").value=month;
 const p=new Date(t);
+p.setMonth(p.getMonth()-1);
+$("compareB").value=p.getFullYear()+"-"+String(p.getMonth()+1).padStart(2,"0");
 
-p.setMonth(
-p.getMonth()-1
-);
-
-$("compareB").value=
-p.getFullYear()+
-"-"+
-String(p.getMonth()+1).padStart(2,"0");
-
-
-/* 歷年月份 */
-
-const select=
-$("compareMonth");
-
+const select=$("compareMonth");
 select.innerHTML="";
-
 for(let i=1;i<=12;i++){
-
-const o=
-document.createElement("option");
-
-o.value=
-String(i).padStart(2,"0");
-
-o.textContent=
-i+"月";
-
-if(i===t.getMonth()+1){
-
-o.selected=true;
-
-}
-
+const o=document.createElement("option");
+o.value=String(i).padStart(2,"0");
+o.textContent=i+"月";
+if(i===t.getMonth()+1)o.selected=true;
 select.appendChild(o);
-
 }
-
 loadDraft();
-
 }
 
-
-/* 預覽 */
 function updatePreview(){
-
-const sessions=
-parseFloat(
-$("sessions").value
-)||0;
-
-const clients=
-parseFloat(
-$("clients").value
-)||0;
-
-const price=
-parseFloat(
-$("unitPrice").value
-)||0;
-
-$("previewSessions").textContent=
-sf(sessions)+" 節";
-
-$("previewClients").textContent=
-sf(clients)+" 客";
-
-$("preview").textContent=
-money(
-sessions*price
-);
-
+const sessions=parseFloat($("sessions").value)||0;
+const clients=parseFloat($("clients").value)||0;
+const price=parseFloat($("unitPrice").value)||0;
+$("previewSessions").textContent=sf(sessions)+" 節";
+$("previewClients").textContent=sf(clients)+" 客";
+$("preview").textContent=money(sessions*price);
 }
 
+["sessions","clients","unitPrice","note","date"].forEach(id=>{
+$(id).addEventListener("input",()=>{updatePreview();saveDraft()});
+$(id).addEventListener("change",()=>{updatePreview();saveDraft()});
+});
 
-/* 自動儲存草稿 */
-function autoDraft(){
-
-updatePreview();
-
-saveDraft();
-
-}
-
-
-/* 輸入時即時計算 */
-
-$("sessions")
-.addEventListener(
-"input",
-autoDraft
-);
-
-$("clients")
-.addEventListener(
-"input",
-autoDraft
-);
-
-$("unitPrice")
-.addEventListener(
-"input",
-autoDraft
-);
-
-$("note")
-.addEventListener(
-"input",
-autoDraft
-);
-
-$("date")
-.addEventListener(
-"change",
-autoDraft
-);
-
-
-/* 自動儲存開關 */
-
-$("autoSave")
-.addEventListener(
-"change",
-function(){
-
+$("autoSave").addEventListener("change",()=>{
 saveSettings();
+if($("autoSave").checked)saveDraft();
+$("notice").textContent=$("autoSave").checked?"✅ 已開啟自動儲存":"⏸️ 已關閉自動儲存";
+setTimeout(()=>$("notice").textContent="",2500);
+});
 
-if(this.checked){
-
-saveDraft();
-
-$("notice").textContent=
-"✅ 已開啟自動儲存";
-
-}else{
-
-$("notice").textContent=
-"⏸️ 已關閉自動儲存";
-
-}
-
-setTimeout(()=>{
-
-$("notice").textContent="";
-
-},2500);
-
-}
-);
-
-
-/* 儲存 */
 function saveRecord(){
+const date=$("date").value;
+const clients=parseFloat($("clients").value)||0;
+const sessions=parseFloat($("sessions").value)||0;
+const price=parseFloat($("unitPrice").value)||0;
+const note=$("note").value.trim();
 
-const date=
-$("date").value;
-
-const clients=
-parseFloat(
-$("clients").value
-)||0;
-
-const sessions=
-parseFloat(
-$("sessions").value
-)||0;
-
-const price=
-parseFloat(
-$("unitPrice").value
-)||0;
-
-const note=
-$("note").value.trim();
-
-
-if(!date){
-
-alert("請選擇日期");
-
-return;
-
-}
-
-
-if(clients<=0){
-
-alert("請輸入客人數");
-
-return;
-
-}
-
-
-if(sessions<=0){
-
-alert("請輸入節數");
-
-return;
-
-}
-
-
-if(price<=0){
-
-alert("請確認1節價格");
-
-return;
-
-}
-
+if(!date){alert("請選擇日期");return}
+if(clients<=0){alert("請輸入客人數");return}
+if(sessions<=0){alert("請輸入節數");return}
+if(price<=0){alert("請確認1節價格");return}
 
 let a=records();
-
-
-const item={
-
-date:date,
-
-clients:clients,
-
-sessions:sessions,
-
-price:price,
-
-income:sessions*price,
-
-note:note
-
-};
-
-
-const idx=
-a.findIndex(
-x=>x.date===date
-);
-
+const item={date,clients,sessions,price,income:sessions*price,note};
+const idx=a.findIndex(x=>x.date===date);
 
 if(idx>=0){
-
-if(!confirm(
-date+
-" 已經有紀錄。\n\n要覆蓋這一天的資料嗎？"
-)){
-
-return;
-
-}
-
+if(!confirm(date+" 已經有紀錄。\n\n要覆蓋這一天的資料嗎？"))return;
 a[idx]=item;
-
-}else{
-
-a.push(item);
-
-}
-
+}else a.push(item);
 
 saveRecords(a);
-
 clearDraft();
 
-
-$("viewMonth").value=
-date.slice(0,7);
-
-
+$("viewMonth").value=date.slice(0,7);
 $("clients").value="";
 $("sessions").value="";
 $("note").value="";
+$("date").value=dateKey(nowTW());
+$("saveButton").textContent="💾 儲存這一天";
 
-
-$("date").value=
-dateKey(nowTW());
-
-
-$("saveButton").textContent=
-"💾 儲存這一天";
-
-
-$("notice").textContent=
-"✅ "+date+" 已成功儲存";
-
-
+$("notice").textContent="✅ "+date+" 已成功儲存";
 updatePreview();
-
 renderAll();
 
-
-setTimeout(()=>{
-
-$("notice").textContent="";
-
-},2500);
-
+setTimeout(()=>$("notice").textContent="",2500);
 }
 
-
-/* 月份資料 */
 function monthRecords(m){
-
-return records()
-
-.filter(
-x=>x.date.slice(0,7)===m
-)
-
-.sort(
-(a,b)=>
-a.date.localeCompare(b.date)
-);
-
+return records().filter(x=>x.date.slice(0,7)===m).sort((a,b)=>a.date.localeCompare(b.date));
 }
 
-
-/* 日期區間統計 */
-function rangeSummary(startDate,endDate){
-
-const a=
-records()
-.filter(x=>
-x.date>=startDate &&
-x.date<=endDate
-);
-
-return{
-
-clients:a.reduce(
-(s,x)=>
-s+(Number(x.clients)||0),
-0
-),
-
-sessions:a.reduce(
-(s,x)=>
-s+(Number(x.sessions)||0),
-0
-),
-
-income:a.reduce(
-(s,x)=>
-s+(Number(x.income)||0),
-0
-),
-
-days:a.length
-
-};
-
-}
-
-
-/* 月份統計 */
 function summary(m){
-
-const a=
-monthRecords(m);
-
+const a=monthRecords(m);
 return{
-
-clients:a.reduce(
-(s,x)=>
-s+(Number(x.clients)||0),
-0
-),
-
-sessions:a.reduce(
-(s,x)=>
-s+(Number(x.sessions)||0),
-0
-),
-
-income:a.reduce(
-(s,x)=>
-s+(Number(x.income)||0),
-0
-),
-
+clients:a.reduce((s,x)=>s+(Number(x.clients)||0),0),
+sessions:a.reduce((s,x)=>s+(Number(x.sessions)||0),0),
+income:a.reduce((s,x)=>s+(Number(x.income)||0),0),
 days:a.length
-
 };
-
 }
 
+function rangeSummary(startDate,endDate){
+const a=records().filter(x=>x.date>=startDate&&x.date<=endDate);
+return{
+clients:a.reduce((s,x)=>s+(Number(x.clients)||0),0),
+sessions:a.reduce((s,x)=>s+(Number(x.sessions)||0),0),
+income:a.reduce((s,x)=>s+(Number(x.income)||0),0),
+days:a.length
+};
+}
 
-/* 顯示主要月份 */
 function render(){
-
-const m=
-currentMonth();
-
+const m=currentMonth();
 if(!m)return;
+const a=monthRecords(m);
+const z=summary(m);
 
+$("monthTitle").textContent=m.replace("-","年 ")+"月";
+$("totalClients").textContent=sf(z.clients)+" 客";
+$("totalSessions").textContent=sf(z.sessions)+" 節";
+$("totalIncome").textContent=money(z.income);
+$("workDays").textContent=z.days+" 天";
+$("avgDay").textContent=money(z.days?z.income/z.days:0);
+$("avgClient").textContent=sf(z.clients?z.sessions/z.clients:0)+" 節";
 
-const a=
-monthRecords(m);
-
-const z=
-summary(m);
-
-
-$("monthTitle").textContent=
-m.replace("-","年 ")+"月";
-
-
-$("totalClients").textContent=
-sf(z.clients)+" 客";
-
-
-$("totalSessions").textContent=
-sf(z.sessions)+" 節";
-
-
-$("totalIncome").textContent=
-money(z.income);
-
-
-$("workDays").textContent=
-z.days+" 天";
-
-
-$("avgDay").textContent=
-money(
-z.days?
-z.income/z.days:
-0
-);
-
-
-$("avgClient").textContent=
-sf(
-z.clients?
-z.sessions/z.clients:
-0
-)+" 節";
-
-
-const tb=
-$("tableBody");
-
+const tb=$("tableBody");
 tb.innerHTML="";
 
-
 if(!a.length){
-
-tb.innerHTML=
-'<tr>'+
-'<td colspan="7" style="text-align:center;padding:25px">'+
-'本月尚無資料'+
-'</td>'+
-'</tr>';
-
+tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:25px">本月尚無資料</td></tr>';
 renderSettlement();
-
 return;
-
 }
 
-
 a.forEach(x=>{
-
-const tr=
-document.createElement("tr");
-
-
+const tr=document.createElement("tr");
 tr.innerHTML=
-
-"<td>"+
-x.date.slice(5)+
-"</td>"+
-
-"<td>"+
-sf(x.clients)+
-" 客</td>"+
-
-"<td>"+
-sf(x.sessions)+
-" 節</td>"+
-
-"<td>"+
-money(x.price)+
-"</td>"+
-
-"<td><b>"+
-money(x.income)+
-"</b></td>"+
-
-"<td>"+
-escapeHTML(x.note||"")+
-"</td>"+
-
-"<td>"+
-
-"<button "+
-"class='gray smallBtn' "+
-"onclick=\"editRecord('"+
-x.date+
-"')\">"+
-"修改"+
-"</button>"+
-
-"</td>";
-
-
+"<td>"+x.date.slice(5)+"</td>"+
+"<td>"+sf(x.clients)+" 客</td>"+
+"<td>"+sf(x.sessions)+" 節</td>"+
+"<td>"+money(x.price)+"</td>"+
+"<td><b>"+money(x.income)+"</b></td>"+
+"<td>"+escapeHTML(x.note||"")+"</td>"+
+"<td><button class='gray smallBtn' onclick=\"editRecord('"+x.date+"')\">修改</button></td>";
 tb.appendChild(tr);
-
 });
-
 renderSettlement();
-
 }
 
-
-/* 防止備註HTML */
 function escapeHTML(str){
-
-return String(str)
-
-.replace(/&/g,"&amp;")
-
-.replace(/</g,"&lt;")
-
-.replace(/>/g,"&gt;")
-
-.replace(/"/g,"&quot;")
-
-.replace(/'/g,"&#039;");
-
+return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 }
 
-
-/* 修改 */
 function editRecord(date){
-
-const x=
-records().find(
-r=>r.date===date
-);
-
+const x=records().find(r=>r.date===date);
 if(!x)return;
-
-
-$("date").value=
-x.date;
-
-$("clients").value=
-x.clients;
-
-$("sessions").value=
-x.sessions;
-
-$("unitPrice").value=
-x.price;
-
-$("note").value=
-x.note||"";
-
-
-$("viewMonth").value=
-x.date.slice(0,7);
-
-
-$("saveButton").textContent=
-"💾 覆蓋儲存這一天";
-
-
+$("date").value=x.date;
+$("clients").value=x.clients;
+$("sessions").value=x.sessions;
+$("unitPrice").value=x.price;
+$("note").value=x.note||"";
+$("viewMonth").value=x.date.slice(0,7);
+$("saveButton").textContent="💾 覆蓋儲存這一天";
 updatePreview();
-
-window.scrollTo({
-top:0,
-behavior:"smooth"
-});
-
+window.scrollTo({top:0,behavior:"smooth"});
 }
 
-
-/* 回到本月 */
 function goCurrentMonth(){
-
-const t=
-nowTW();
-
-const m=
-t.getFullYear()+
-"-"+
-String(t.getMonth()+1).padStart(2,"0");
-
-
-$("viewMonth").value=m;
-
-$("date").value=
-dateKey(t);
-
+const t=nowTW();
+$("viewMonth").value=t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0");
+$("date").value=dateKey(t);
 render();
-
 }
 
-
-/* 複製本月 */
-function copyMonth(){
-
-const m=
-currentMonth();
-
-const a=
-monthRecords(m);
-
-const z=
-summary(m);
-
-
-let text=
-"🌸 芳療師月記錄\n\n";
-
-text+=
-"📅 "+
-m.replace("-","年 ")+"月\n";
-
-text+=
-"1節＝"+
-($("unitPrice").value||300)+
-"元\n\n";
-
-
-if(!a.length){
-
-text+="本月尚無資料\n";
-
-}else{
-
-a.forEach(x=>{
-
-text+=
-x.date+
-"　"+
-x.clients+
-"客　"+
-sf(x.sessions)+
-"節　"+
-money(x.income)+
-(x.note?
-"　"+x.note:
-"")+
-"\n";
-
-});
-
-}
-
-
-text+=
-"\n━━━━━━━━━━━━\n";
-
-text+=
-"👤 總客數："+
-sf(z.clients)+
-"客\n";
-
-text+=
-"🌸 總節數："+
-sf(z.sessions)+
-"節\n";
-
-text+=
-"💰 總收入："+
-money(z.income)+
-"\n";
-
-text+=
-"📅 營業天數："+
-z.days+
-"天\n";
-
-text+=
-"━━━━━━━━━━━━";
-
-
-copyText(
-text,
-"✅ 本月完整明細已複製"
-);
-
-}
-
-
-/* 取得結算區間 */
 function getSettlement(type){
-
-const m=
-currentMonth();
-
+const m=currentMonth();
 if(!m)return null;
-
-
-const parts=m.split("-");
-
-const year=
-Number(parts[0]);
-
-const month=
-Number(parts[1]);
-
+const [year,month]=m.split("-").map(Number);
 
 if(type==="first"){
-
-const start=
-m+"-01";
-
-const end=
-m+"-15";
-
 return{
-
-start:start,
-
-end:end,
-
-label:
-year+"年 "+month+
-"月 1日～15日",
-
-title:
-"🌸 芳療師半月結算"
-
+start:m+"-01",
+end:m+"-15",
+label:year+"年 "+month+"月 1日～15日",
+title:"🌸 芳療師半月結算"
 };
-
 }
 
-
-const lastDay=
-new Date(
-year,
-month,
-0
-).getDate();
-
-const start=
-m+"-16";
-
-const end=
-m+"-"+String(lastDay).padStart(2,"0");
-
-
+const lastDay=new Date(year,month,0).getDate();
 return{
-
-start:start,
-
-end:end,
-
-label:
-year+"年 "+month+
-"月 16日～"+lastDay+"日",
-
-title:
-"🌸 芳療師月底結算"
-
+start:m+"-16",
+end:m+"-"+String(lastDay).padStart(2,"0"),
+label:year+"年 "+month+"月 16日～"+lastDay+"日",
+title:"🌸 芳療師月底結算"
 };
-
 }
 
-
-/* 取得結算文字 */
 function settlementText(type){
-
-const s=
-getSettlement(type);
-
+const s=getSettlement(type);
 if(!s)return"";
-
-
-const z=
-rangeSummary(
-s.start,
-s.end
-);
-
-
-let text="";
-
-text+=s.title+"\n\n";
-
-text+="📅 結算期間："+
-s.label+"\n";
-
-text+="👤 客人總數："+
-sf(z.clients)+
-" 客\n";
-
-text+="🌸 節數總數："+
-sf(z.sessions)+
-" 節\n";
-
-text+="💰 總收入："+
-money(z.income)+"\n";
-
-text+="📅 營業天數："+
-z.days+" 天\n";
-
-text+="━━━━━━━━━━━━\n";
-
-text+="🌸 芳療師月記錄";
-
-return text;
-
+const z=rangeSummary(s.start,s.end);
+return s.title+"\n\n"+
+"📅 結算期間："+s.label+"\n"+
+"👤 客人總數："+sf(z.clients)+" 客\n"+
+"🌸 節數總數："+sf(z.sessions)+" 節\n"+
+"💰 總收入："+money(z.income)+"\n"+
+"📅 營業天數："+z.days+" 天\n"+
+"━━━━━━━━━━━━\n"+
+"🌸 芳療師月記錄";
 }
 
-
-/* 顯示結算 */
 function renderSettlement(){
+const f=getSettlement("first");
+const s=getSettlement("second");
+if(!f||!s)return;
 
-const m=
-currentMonth();
+$("firstHalfRange").textContent=f.label;
+$("secondHalfRange").textContent=s.label;
 
-if(!m)return;
-
-
-const f=
-getSettlement("first");
-
-const s=
-getSettlement("second");
-
-
-$("firstHalfRange").textContent=
-f.label;
-
-$("secondHalfRange").textContent=
-s.label;
-
-
-const a=
-rangeSummary(
-f.start,
-f.end
-);
-
-const b=
-rangeSummary(
-s.start,
-s.end
-);
-
+const a=rangeSummary(f.start,f.end);
+const b=rangeSummary(s.start,s.end);
 
 $("firstHalfResult").innerHTML=
-
-"👤 客人：<b>"+
-sf(a.clients)+
-" 客</b><br>"+
-"🌸 節數：<b>"+
-sf(a.sessions)+
-" 節</b><br>"+
-"💰 收入：<b>"+
-money(a.income)+
-"</b>";
-
+"👤 客人：<b>"+sf(a.clients)+" 客</b><br>"+
+"🌸 節數：<b>"+sf(a.sessions)+" 節</b><br>"+
+"💰 收入：<b>"+money(a.income)+"</b>";
 
 $("secondHalfResult").innerHTML=
+"👤 客人：<b>"+sf(b.clients)+" 客</b><br>"+
+"🌸 節數：<b>"+sf(b.sessions)+" 節</b><br>"+
+"💰 收入：<b>"+money(b.income)+"</b>";
 
-"👤 客人：<b>"+
-sf(b.clients)+
-" 客</b><br>"+
-"🌸 節數：<b>"+
-sf(b.sessions)+
-" 節</b><br>"+
-"💰 收入：<b>"+
-money(b.income)+
-"</b>";
+$("autoFirstResult").innerHTML=
+"📅 "+f.label+"<br>👤 客人：<b>"+sf(a.clients)+" 客</b><br>🌸 節數：<b>"+sf(a.sessions)+" 節</b><br>💰 收入：<b>"+money(a.income)+"</b>";
 
+$("autoSecondResult").innerHTML=
+"📅 "+s.label+"<br>👤 客人：<b>"+sf(b.clients)+" 客</b><br>🌸 節數：<b>"+sf(b.sessions)+" 節</b><br>💰 收入：<b>"+money(b.income)+"</b>";
 }
 
-
-/* 結算紀錄 */
-function getSettlementHistory(){
-
+async function copySettlement(type){
+const text=settlementText(type);
+if(!text)return;
 try{
-
-const x=
-JSON.parse(
-localStorage.getItem(SETTLE_KEY)||"{}"
-);
-
-return x&&typeof x==="object"?x:{};
-
+await navigator.clipboard.writeText(text);
+$("notice").textContent="✅ 結算內容已複製，可以貼到 LINE／簡訊";
 }catch(e){
-
-return{};
-
+fallbackCopy(text,"✅ 結算內容已複製，可以貼到 LINE／簡訊");
+}
+setTimeout(()=>$("notice").textContent="",3000);
 }
 
-}
-
-
-/* 記住結算 */
-function markSettlement(type){
-
-const s=
-getSettlementHistory();
-
-const key=
-currentMonth()+"_"+type;
-
-s[key]=
-new Date().toISOString();
-
-localStorage.setItem(
-SETTLE_KEY,
-JSON.stringify(s)
-);
-
-}
-
-
-/* 複製結算 */
-function copySettlement(type){
-
-const text=
-settlementText(type);
-
-if(!text)return;
-
-
-copyText(
-text,
-"✅ 結算內容已複製，可以貼到 LINE／簡訊"
-);
-
-markSettlement(type);
-
-}
-
-
-/* 分享結算 */
 async function shareSettlement(type){
-
-const text=
-settlementText(type);
-
+const text=settlementText(type);
 if(!text)return;
 
-
-markSettlement(type);
-
-
-if(
-navigator.share
-){
-
+if(navigator.share){
 try{
+await navigator.share({title:"🌸 芳療師結算",text:text});
+$("settlementStatus").textContent="✅ 已開啟手機分享，可以選 LINE 或訊息";
+}catch(e){
+if(e.name!=="AbortError")fallbackCopy(text,"✅ 已複製結算內容");
+}
+}else{
+fallbackCopy(text,"✅ 此裝置不支援直接分享，已複製結算內容");
+}
+setTimeout(()=>$("settlementStatus").textContent="",3000);
+}
 
-await navigator.share({
+function copyMonth(){
+const m=currentMonth();
+const a=monthRecords(m);
+const z=summary(m);
+let text="🌸 芳療師月記錄\n\n";
+text+="📅 "+m.replace("-","年 ")+"月\n";
+text+="1節＝"+($("unitPrice").value||300)+"元\n\n";
 
-title:"🌸 芳療師結算",
-text:text
-
+if(!a.length)text+="本月尚無資料\n";
+else a.forEach(x=>{
+text+=x.date+"　"+x.clients+"客　"+sf(x.sessions)+"節　"+money(x.income)+(x.note?"　"+x.note:"")+"\n";
 });
 
-$("settlementStatus").textContent=
-"✅ 已開啟手機分享，可以選 LINE 或訊息";
+text+="\n━━━━━━━━━━━━\n";
+text+="👤 總客數："+sf(z.clients)+"客\n";
+text+="🌸 總節數："+sf(z.sessions)+"節\n";
+text+="💰 總收入："+money(z.income)+"\n";
+text+="📅 營業天數："+z.days+"天\n";
+text+="━━━━━━━━━━━━";
 
-}catch(e){
-
-if(e.name!=="AbortError"){
-
-copyText(
-text,
-"✅ 分享功能無法使用，已改為複製結算內容"
-);
-
+copyText(text,"✅ 本月完整明細已複製");
 }
 
-}
-
-}else{
-
-copyText(
-text,
-"✅ 此裝置不支援直接分享，已複製結算內容"
-);
-
-}
-
-}
-
-
-/* 複製文字 */
 function copyText(text,msg){
-
-if(
-navigator.clipboard &&
-navigator.clipboard.writeText
-){
-
-navigator.clipboard
-.writeText(text)
-.then(()=>{
-
+if(navigator.clipboard&&navigator.clipboard.writeText){
+navigator.clipboard.writeText(text).then(()=>{
 $("notice").textContent=msg;
-
-setTimeout(
-()=>$("notice").textContent="",
-3000
-);
-
-})
-.catch(
-()=>fallbackCopy(text,msg)
-);
-
-}else{
-
-fallbackCopy(text,msg);
-
+setTimeout(()=>$("notice").textContent="",2500);
+}).catch(()=>fallbackCopy(text,msg));
+}else fallbackCopy(text,msg);
 }
 
-}
-
-
-/* 備用複製 */
 function fallbackCopy(text,msg){
-
-const t=
-document.createElement("textarea");
-
+const t=document.createElement("textarea");
 t.value=text;
-
 t.style.position="fixed";
-
 t.style.left="-9999px";
-
 document.body.appendChild(t);
-
 t.select();
-
 document.execCommand("copy");
-
 t.remove();
-
 $("notice").textContent=msg;
-
-setTimeout(
-()=>$("notice").textContent="",
-3000
-);
-
+setTimeout(()=>$("notice").textContent="",2500);
 }
 
-
-/* 月份比較 */
 function compareMonths(){
-
-const ma=
-$("compareA").value;
-
-const mb=
-$("compareB").value;
-
-
-if(!ma||!mb){
-
-alert("請選擇兩個月份");
-
-return;
-
-}
-
-
-const a=
-summary(ma);
-
-const b=
-summary(mb);
-
-
-const incomeDiff=
-a.income-b.income;
-
-
-const sessionDiff=
-a.sessions-b.sessions;
-
-
-const clientDiff=
-a.clients-b.clients;
-
+const ma=$("compareA").value;
+const mb=$("compareB").value;
+if(!ma||!mb){alert("請選擇兩個月份");return}
+const a=summary(ma),b=summary(mb);
+const incomeDiff=a.income-b.income;
+const sessionDiff=a.sessions-b.sessions;
+const clientDiff=a.clients-b.clients;
 
 $("compareResult").innerHTML=
-
 '<div class="box">'+
-
-'<div class="line">'+
-
-'<span>📅 第一月份</span>'+
-
-'<b>'+
-ma+
-"</b>"+
-
-"</div>"+
-
-
-'<div class="line">'+
-
-'<span>📅 第二月份</span>'+
-
-'<b>'+
-mb+
-"</b>"+
-
-"</div>"+
-
-
-'<div class="line">'+
-
-'<span>👤 客人</span>'+
-
-'<b>'+
-sf(a.clients)+
-" ／ "+
-sf(b.clients)+
-"　差 "+
-sf(clientDiff)+
-"</b>"+
-
-"</div>"+
-
-
-'<div class="line">'+
-
-'<span>🌸 節數</span>'+
-
-'<b>'+
-sf(a.sessions)+
-" ／ "+
-sf(b.sessions)+
-"　差 "+
-sf(sessionDiff)+
-"</b>"+
-
-"</div>"+
-
-
-'<div class="line">'+
-
-'<span>💰 收入</span>'+
-
-'<b>'+
-money(a.income)+
-" ／ "+
-money(b.income)+
-"</b>"+
-
-"</div>"+
-
-
-'<div class="total">'+
-
-'<span>收入差額</span>'+
-
-'<span class="'+
-(incomeDiff>=0?
-"good":
-"bad")+
-'">'+
-
-money(incomeDiff)+
-
-"</span>"+
-
-"</div>"+
-
+'<div class="line"><span>📅 第一月份</span><b>'+ma+"</b></div>"+
+'<div class="line"><span>📅 第二月份</span><b>'+mb+"</b></div>"+
+'<div class="line"><span>👤 客人</span><b>'+sf(a.clients)+" ／ "+sf(b.clients)+"　差 "+sf(clientDiff)+"</b></div>"+
+'<div class="line"><span>🌸 節數</span><b>'+sf(a.sessions)+" ／ "+sf(b.sessions)+"　差 "+sf(sessionDiff)+"</b></div>"+
+'<div class="line"><span>💰 收入</span><b>'+money(a.income)+" ／ "+money(b.income)+"</b></div>"+
+'<div class="total"><span>收入差額</span><span class="'+(incomeDiff>=0?"good":"bad")+'">'+money(incomeDiff)+"</span></div>"+
 "</div>";
-
 }
 
-
-/* 歷年同月份 */
 function renderYear(){
-
-const m=
-$("compareMonth").value;
-
+const m=$("compareMonth").value;
 if(!m)return;
+const currentYear=nowTW().getFullYear();
+let html='<div class="box"><div class="tablewrap"><table><tr><th>年份</th><th>客人</th><th>節數</th><th>收入</th></tr>';
 
-
-const t=
-nowTW();
-
-const currentYear=
-t.getFullYear();
-
-
-let html=
-
-'<div class="box">'+
-
-'<div class="tablewrap">'+
-
-'<table>'+
-
-"<tr>"+
-
-"<th>年份</th>"+
-
-"<th>客人</th>"+
-
-"<th>節數</th>"+
-
-"<th>收入</th>"+
-
-"</tr>";
-
-
-for(
-let y=currentYear;
-y>=currentYear-5;
-y--
-){
-
-const z=
-summary(
-y+"-"+m
-);
-
-
-html+=
-
-"<tr>"+
-
-"<td>"+
-y+
-"年</td>"+
-
-"<td>"+
-sf(z.clients)+
-"客</td>"+
-
-"<td>"+
-sf(z.sessions)+
-"節</td>"+
-
-"<td>"+
-money(z.income)+
-"</td>"+
-
-"</tr>";
-
+for(let y=currentYear;y>=currentYear-5;y--){
+const z=summary(y+"-"+m);
+html+="<tr><td>"+y+"年</td><td>"+sf(z.clients)+"客</td><td>"+sf(z.sessions)+"節</td><td>"+money(z.income)+"</td></tr>";
 }
 
-
-html+=
-
-"</table>"+
-
-"</div>"+
-
-"</div>";
-
-
-$("yearResult").innerHTML=
-html;
-
+html+="</table></div></div>";
+$("yearResult").innerHTML=html;
 }
 
-
-/* 搜尋 */
 function renderHistory(){
+const k=$("search").value.trim().toLowerCase();
+let a=records().sort((x,y)=>y.date.localeCompare(x.date));
+if(k)a=a.filter(x=>JSON.stringify(x).toLowerCase().includes(k));
 
-const k=
-$("search").value
-.trim()
-.toLowerCase();
-
-
-let a=
-records()
-.sort(
-(x,y)=>
-y.date.localeCompare(x.date)
-);
-
-
-if(k){
-
-a=a.filter(x=>
-JSON.stringify(x)
-.toLowerCase()
-.includes(k)
-);
-
-}
-
-
-const h=
-$("history");
-
+const h=$("history");
 h.innerHTML="";
 
-
 if(!a.length){
-
-h.innerHTML=
-'<div class="hint center" style="padding:20px">'+
-"沒有找到資料"+
-"</div>";
-
+h.innerHTML='<div class="hint center" style="padding:20px">沒有找到資料</div>';
 return;
-
 }
 
-
-a.slice(0,200)
-.forEach(x=>{
-
-const d=
-document.createElement("div");
-
+a.slice(0,200).forEach(x=>{
+const d=document.createElement("div");
 d.className="history";
-
-
 d.innerHTML=
-
-"<b>📅 "+
-x.date+
-"</b>"+
-
-
-'<div class="line">'+
-
-"<span>👤 客人</span>"+
-
-"<b>"+
-sf(x.clients)+
-" 客</b>"+
-
-"</div>"+
-
-
-'<div class="line">'+
-
-"<span>🌸 節數</span>"+
-
-"<b>"+
-sf(x.sessions)+
-" 節</b>"+
-
-"</div>"+
-
-
-'<div class="line">'+
-
-"<span>💰 收入</span>"+
-
-"<b>"+
-money(x.income)+
-"</b>"+
-
-"</div>"+
-
-
-(x.note?
-
-'<div class="hint">'+
-"📝 備註："+
-escapeHTML(x.note)+
-"</div>":
-
-""
-)+
-
-
-'<div class="actions">'+
-
-'<button class="gray" onclick="editRecord(\''+
-x.date+
-'\')">✏️ 修改</button>'+
-
-'<button class="red" onclick="deleteRecord(\''+
-x.date+
-'\')">🗑️ 刪除</button>'+
-
-"</div>";
-
-
+"<b>📅 "+x.date+"</b>"+
+'<div class="line"><span>👤 客人</span><b>'+sf(x.clients)+" 客</b></div>"+
+'<div class="line"><span>🌸 節數</span><b>'+sf(x.sessions)+" 節</b></div>"+
+'<div class="line"><span>💰 收入</span><b>'+money(x.income)+"</b></div>"+
+(x.note?'<div class="hint">📝 備註：'+escapeHTML(x.note)+"</div>":"")+
+'<div class="actions"><button class="gray" onclick="editRecord(\''+x.date+'\')">✏️ 修改</button>'+
+'<button class="red" onclick="deleteRecord(\''+x.date+'\')">🗑️ 刪除</button></div>';
 h.appendChild(d);
-
 });
-
 }
 
+$("search").addEventListener("input",renderHistory);
 
-/* 搜尋輸入 */
-$("search")
-.addEventListener(
-"input",
-renderHistory
-);
-
-
-/* 刪除單日 */
 function deleteRecord(date){
-
-if(!confirm(
-"確定要刪除 "+
-date+
-" 的資料嗎？"
-)){
-
-return;
-
-}
-
-
-let a=
-records()
-.filter(
-x=>x.date!==date
-);
-
-
-saveRecords(a);
-
+if(!confirm("確定要刪除 "+date+" 的資料嗎？"))return;
+saveRecords(records().filter(x=>x.date!==date));
 renderAll();
-
 }
 
-
-/* 備份 */
 function exportData(){
-
-const blob=
-new Blob(
-[
-JSON.stringify(
-records(),
-null,
-2
-)
-],
-{
-type:"application/json"
-}
-);
-
-
-const a=
-document.createElement("a");
-
-
-a.href=
-URL.createObjectURL(blob);
-
-
-a.download=
-"芳療師記錄備份.json";
-
-
+const blob=new Blob([JSON.stringify(records(),null,2)],{type:"application/json"});
+const a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="芳療師記錄備份.json";
 a.click();
-
-
-URL.revokeObjectURL(
-a.href
-);
-
+URL.revokeObjectURL(a.href);
 }
 
-
-/* 匯入 */
 function importData(e){
-
-const file=
-e.target.files[0];
-
+const file=e.target.files[0];
 if(!file)return;
-
-
-const rd=
-new FileReader();
-
-
+const rd=new FileReader();
 rd.onload=()=>{
-
 try{
-
-const x=
-JSON.parse(
-rd.result
-);
-
-
-if(!Array.isArray(x)){
-
-throw new Error();
-
-}
-
-
+const x=JSON.parse(rd.result);
+if(!Array.isArray(x))throw new Error();
 saveRecords(x);
-
 renderAll();
-
-
-alert(
-"✅ 歷史資料匯入成功！"
-);
-
-
+alert("✅ 歷史資料匯入成功！");
 }catch(err){
-
-alert(
-"❌ 匯入失敗，請使用本系統的JSON備份檔。"
-);
-
+alert("❌ 匯入失敗，請使用本系統的JSON備份檔。");
 }
-
 };
-
-
 rd.readAsText(file);
-
 }
 
-
-/* 清除全部 */
 function clearAll(){
-
-if(!confirm(
-"⚠️ 確定要清除全部芳療師歷史資料嗎？\n\n這個動作無法復原！"
-)){
-
-return;
-
-}
-
-
+if(!confirm("⚠️ 確定要清除全部芳療師歷史資料嗎？\n\n這個動作無法復原！"))return;
 localStorage.removeItem(KEY);
-
 renderAll();
-
-
-alert(
-"✅ 全部資料已清除"
-);
-
+alert("✅ 全部資料已清除");
 }
 
-
-/* 全部重新整理 */
 function renderAll(){
-
 render();
-
 renderHistory();
-
 renderYear();
-
 renderSettlement();
-
 }
 
+$("viewMonth").addEventListener("change",render);
+$("compareMonth").addEventListener("change",renderYear);
 
-/* 月份改變 */
-$("viewMonth")
-.addEventListener(
-"change",
-render
-);
-
-
-/* 歷年月份改變 */
-$("compareMonth")
-.addEventListener(
-"change",
-renderYear
-);
-
-
-/* 初始化 */
 init();
-
 renderAll();
-
 updatePreview();
 
-
-/* 每分鐘更新日期與結算 */
-
 setInterval(()=>{
-
-const t=
-nowTW();
-
-$("todayText").textContent=
-showDate(t);
-
+const t=nowTW();
+$("todayText").textContent=showDate(t);
 renderSettlement();
-
 },60000);
-
 </script>
-
 </body>
 </html>
+'''
+
+path = Path("/mnt/data/index13-complete.html")
+path.write_text(html, encoding="utf-8")
+print(f"[下載完整正式版本](sandbox:{path})")
