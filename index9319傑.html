@@ -26,11 +26,13 @@ select{width:155px}
 .line:last-child{border:0}
 .total{display:flex;justify-content:space-between;gap:10px;border-top:2px solid #aaa;padding-top:12px;margin-top:7px;font-size:20px;font-weight:900}
 .manual{background:#fff8e5;border:2px solid #e7d49c;border-radius:13px;padding:12px;margin-top:12px}
-.noodle{background:#fff4df;border:2px solid #e5c477;border-radius:14px;padding:14px;margin-top:12px}
-.noodle b.title{font-size:20px}
-.cumulative{background:#eef7ff;border:2px solid #b9d8f2;border-radius:14px;padding:14px;margin-top:12px}
-.cumulative .line{font-size:18px}
-.cumulative .total{font-size:21px}
+.noodle{background:#fff8e5;border:2px solid #e7d49c;border-radius:14px;padding:14px;margin-top:12px}
+.noodleTitle{font-size:21px;font-weight:900;margin-bottom:8px}
+.cumulative{background:#eef8ff;border:2px solid #b9dff5;border-radius:14px;padding:14px;margin-top:12px}
+.cumulativeTitle{font-size:21px;font-weight:900;margin-bottom:8px}
+.cumProfit{color:#155fa0}
+.cumExpense{color:#b35a00}
+.cumSurplus{color:#188038}
 button{border:0;border-radius:12px;padding:13px 15px;font-size:16px;font-weight:900;cursor:pointer}
 .full{width:100%}
 .green{background:#198754;color:#fff}
@@ -54,12 +56,10 @@ table{border-collapse:collapse;width:100%;min-width:600px}
 th,td{padding:10px 7px;border-bottom:1px solid #ddd;text-align:right}
 th:first-child,td:first-child{text-align:left}
 th{background:#eee}
-.bigNumber{font-size:32px;font-weight:900;text-align:center;margin-top:5px}
 @media(max-width:480px){
 h1{font-size:21px}
 input[type=number]{width:125px}
 .detailTitle{font-size:19px}
-.bigNumber{font-size:28px}
 }
 </style>
 </head>
@@ -130,32 +130,12 @@ input[type=number]{width:125px}
 </div>
 
 <div class="box">
-<div class="line">
-<span>大杯收入</span>
-<b id="largeIncome">0 元</b>
-</div>
-
-<div class="line">
-<span>小杯收入</span>
-<b id="smallIncome">0 元</b>
-</div>
-
-<div class="line">
-<span>飲料總數</span>
-<b id="drinkCount">0 杯</b>
-</div>
-
-<div class="line">
-<span>🍊🍋成本</span>
-<b id="orange">0 元</b>
-</div>
-
+<div class="line"><span>大杯收入</span><b id="largeIncome">0 元</b></div>
+<div class="line"><span>小杯收入</span><b id="smallIncome">0 元</b></div>
+<div class="line"><span>飲料總數</span><b id="drinkCount">0 杯</b></div>
+<div class="line"><span>🍊🍋成本</span><b id="orange">0 元</b></div>
 <div class="hint">🍊🍋成本＝飲料總杯數 ÷ 24 × 514</div>
-
-<div class="total">
-<span>飲料收入</span>
-<span id="drinkIncome">0 元</span>
-</div>
+<div class="total"><span>飲料收入</span><span id="drinkIncome">0 元</span></div>
 </div>
 </div>
 
@@ -198,20 +178,20 @@ input[type=number]{width:125px}
 </div>
 </div>
 
+<!-- 新增：麵線成本直接跟煮鍋連動 -->
 <div class="noodle">
-<b class="title">🍜 麵線成本</b>
+<div class="noodleTitle">🍜 麵線成本</div>
 
-<div class="row">
-<div class="label">麵線鍋數</div>
-<input id="noodlePots" type="number" min="0" step="0.1" placeholder="0">
-<span>鍋</span>
+<div class="line">
+<span>成本單價</span>
+<b>1鍋 × 549 元</b>
 </div>
 
-<div class="hint">
-1鍋＝549元　2鍋＝1,098元　3鍋＝1,647元
+<div class="line">
+<span>煮鍋數</span>
+<b id="noodlePots">0 鍋</b>
 </div>
 
-<div class="box">
 <div class="line">
 <span>計算方式</span>
 <b id="noodleFormula">0 × 549</b>
@@ -221,8 +201,14 @@ input[type=number]{width:125px}
 <span>🍜 麵線成本</span>
 <span id="noodleCost">0 元</span>
 </div>
+
+<div class="hint">
+麵線成本直接依「煮鍋」計算：煮幾鍋就 × 549 元。
+<br>
+例如：2.8鍋 × 549＝1,537.2元。
 </div>
 </div>
+
 </div>
 
 <div class="card">
@@ -246,6 +232,7 @@ input[type=number]{width:125px}
 </div>
 
 <div class="box">
+
 <div class="line">
 <span>固定成本</span>
 <b>15,450 元</b>
@@ -285,56 +272,66 @@ input[type=number]{width:125px}
 <span>支出</span>
 <span id="expense">15,450 元</span>
 </div>
+
 </div>
 
 <div class="box" style="text-align:center">
 <b style="font-size:21px">❤️ 盈餘</b>
-<div id="surplus" style="font-size:36px;font-weight:900" class="bad">-15,450 元</div>
+<div id="surplus" style="font-size:36px;font-weight:900" class="bad">
+-15,450 元
 </div>
 </div>
 
-<!-- 每日累計 -->
-<div class="card">
-<h2>📈 每日累計</h2>
-
-<div class="hint">
-自動把已儲存的歷史資料依日期累加。<br>
-例如：24日＝24日＋23日以前；25日再自動加入25日。
-</div>
-
+<!-- 新增：每日累計 -->
 <div class="cumulative">
 
-<div class="line">
-<span>📅 累計到今天</span>
-<b id="cumDate">0 天</b>
+<div class="cumulativeTitle">
+📈 歷史每日自動累加
 </div>
 
 <div class="line">
-<span>💰 盈利累計</span>
-<b id="cumProfit">0 元</b>
+<span>💰 今日盈利</span>
+<b id="todayProfitCum">0 元</b>
 </div>
 
 <div class="line">
-<span>📦 支出累計</span>
-<b id="cumExpense">0 元</b>
+<span>📦 今日支出</span>
+<b id="todayExpenseCum">15,450 元</b>
+</div>
+
+<div class="line">
+<span>❤️ 今日盈餘</span>
+<b id="todaySurplusCum">-15,450 元</b>
+</div>
+
+<hr>
+
+<div class="line">
+<span>💰 累計盈利</span>
+<b id="cumProfit" class="cumProfit">0 元</b>
+</div>
+
+<div class="line">
+<span>📦 累計支出</span>
+<b id="cumExpense" class="cumExpense">15,450 元</b>
 </div>
 
 <div class="total">
-<span>❤️ 盈餘累計</span>
-<span id="cumSurplus">0 元</span>
+<span>❤️ 累計盈餘</span>
+<span id="cumSurplus" class="cumSurplus">-15,450 元</span>
+</div>
+
+<div class="hint">
+已儲存的歷史日期會自動往前累加。<br>
+例如：24日＝24日＋23日＋22日＋21日……。
 </div>
 
 </div>
 
-<div class="box">
-<div class="bigNumber" id="cumDays">0 天</div>
-<div class="hint" style="text-align:center">
-以上為目前已儲存日期的全部累計
-</div>
-</div>
 </div>
 
 <div class="card">
+
 <div class="detailTitle">
 <span>📋 詳細明細</span>
 <button class="copy" onclick="copyDetails()">📄 複製完整明細</button>
@@ -405,7 +402,7 @@ input[type=number]{width:125px}
 </div>
 
 <div class="line">
-<span>🍜 麵線<br><small id="nd">0鍋 × 549元</small></span>
+<span>🍜 麵線<br><small id="nd">0鍋 × 549</small></span>
 <b id="dn">0 元</b>
 </div>
 
@@ -433,17 +430,40 @@ input[type=number]{width:125px}
 </div>
 
 </div>
+
+<div class="cumulative">
+
+<div class="cumulativeTitle">📈 累計結果</div>
+
+<div class="line">
+<span>💰 累計盈利</span>
+<b id="detailCumProfit">0 元</b>
+</div>
+
+<div class="line">
+<span>📦 累計支出</span>
+<b id="detailCumExpense">15,450 元</b>
+</div>
+
+<div class="total">
+<span>❤️ 累計盈餘</span>
+<span id="detailCumSurplus">-15,450 元</span>
+</div>
+
+</div>
+
 </div>
 
 <div class="card">
 <h2>📚 歷史記帳</h2>
 
 <input id="search" type="search"
-placeholder="🔎 輸入關鍵字：2025、大腸、飲料、麵線、盈餘..."
+placeholder="🔎 輸入關鍵字：2025、大腸、飲料、盈餘..."
 oninput="renderHistory()">
 
 <div class="row">
 <div class="label">快速查詢</div>
+
 <select id="filter" onchange="renderHistory()">
 <option value="all">全部紀錄</option>
 <option value="today">今天</option>
@@ -465,6 +485,7 @@ oninput="renderHistory()">
 
 <div class="row">
 <div class="label">第一區間</div>
+
 <select id="ca">
 <option value="today">今天</option>
 <option value="yesterday">昨天</option>
@@ -477,6 +498,7 @@ oninput="renderHistory()">
 
 <div class="row">
 <div class="label">第二區間</div>
+
 <select id="cb">
 <option value="yesterday">昨天</option>
 <option value="before">前天</option>
@@ -486,15 +508,20 @@ oninput="renderHistory()">
 </select>
 </div>
 
-<button class="green full" onclick="compare()">📊 開始營收對比</button>
+<button class="green full" onclick="compare()">
+📊 開始營收對比
+</button>
+
 <div id="compareResult"></div>
 </div>
 
 <div class="card">
 <h2>📅 去年／前年同日期對帳</h2>
+
 <div class="hint">
 自動比較今天、去年同日期、前年同日期，並計算盈餘差額。
 </div>
+
 <div id="yearCompare"></div>
 </div>
 
@@ -511,46 +538,64 @@ oninput="renderHistory()">
 <input id="end" type="date">
 </div>
 
-<button class="green full" onclick="customSearch()">🔎 查詢</button>
+<button class="green full" onclick="customSearch()">
+🔎 查詢
+</button>
+
 <div id="customResult"></div>
 </div>
 
 <div class="card">
 <h2>💾 資料管理</h2>
 
-<button class="gray full" onclick="saveToday()">💾 立即儲存今天</button>
+<button class="gray full" onclick="saveToday()">
+💾 立即儲存今天
+</button>
+
 <br><br>
 
-<button class="gray full" onclick="exportData()">📤 備份全部資料</button>
+<button class="gray full" onclick="exportData()">
+📤 備份全部資料
+</button>
+
 <br><br>
 
-<label class="gray full" style="display:block;text-align:center;padding:13px;border-radius:12px;font-weight:900;cursor:pointer">
+<label class="gray full"
+style="display:block;text-align:center;padding:13px;border-radius:12px;font-weight:900;cursor:pointer">
+
 📥 匯入歷史資料
-<input type="file" accept=".json" onchange="importData(event)" style="display:none">
+
+<input type="file"
+accept=".json"
+onchange="importData(event)"
+style="display:none">
+
 </label>
 
 <br>
 
-<button class="red full" onclick="clearToday()">🗑️ 清除今天資料</button>
+<button class="red full" onclick="clearToday()">
+🗑️ 清除今天資料
+</button>
+
 <br><br>
 
-<button class="red full" onclick="clearAll()">⚠️ 清除全部歷史資料</button>
+<button class="red full" onclick="clearAll()">
+⚠️ 清除全部歷史資料
+</button>
+
 </div>
 
 </div>
 
 <script>
 
-const KEY="index141319_history_v6";
+const KEY="index141319_history_v7";
 const FIXED=15450;
-const NOODLE_COST=549;
+const NOODLE_UNIT=549;
 
-const fmt=n=>{
-return Number(n||0).toLocaleString("zh-TW",{
-minimumFractionDigits:Number(n||0)%1!==0?1:0,
-maximumFractionDigits:2
-})+" 元";
-};
+const fmt=n=>
+(Math.round(Number(n)*10)/10).toLocaleString("zh-TW")+" 元";
 
 const $=id=>document.getElementById(id);
 
@@ -604,21 +649,23 @@ let dc=l+s;
 
 let li=l*50;
 let si=s*40;
+
 let di=li+si;
 
 let orange=dc/24*514;
 
 let pots=n("pots");
 
-let manual=$("manualBowls").value.trim()!="";
+let manual=$("manualBowls").value.trim()!=="";
 
-let bowls=manual?n("manualBowls"):pots*110;
+let bowls=manual?
+n("manualBowls"):
+pots*110;
 
 let pi=bowls*55;
 
-let noodlePots=n("noodlePots");
-
-let noodleCost=noodlePots*NOODLE_COST;
+/* 麵線成本直接使用煮鍋 */
+let noodleCost=pots*NOODLE_UNIT;
 
 let profit=di+pi;
 
@@ -631,6 +678,8 @@ j+
 orange+
 noodleCost;
 
+let surplus=profit-expense;
+
 return{
 i,o,h,j,
 l,s,
@@ -641,12 +690,12 @@ pots,
 manual,
 bowls,
 pi,
-noodlePots,
 noodleCost,
 profit,
 expense,
-surplus:profit-expense
+surplus
 };
+
 }
 
 function calcUI(){
@@ -662,11 +711,13 @@ $("drinkIncome").textContent=fmt(d.di);
 $("bowls").textContent=d.bowls+" 碗";
 $("potIncome").textContent=fmt(d.pi);
 
-$("noodleFormula").textContent=d.noodlePots+" × 549 =";
+$("noodlePots").textContent=d.pots+" 鍋";
+$("noodleFormula").textContent=d.pots+" × 549";
 $("noodleCost").textContent=fmt(d.noodleCost);
 
 $("fDrink").textContent=fmt(d.di);
 $("fPot").textContent=fmt(d.pi);
+
 $("profit").textContent=fmt(d.profit);
 
 $("eIntestine").textContent=fmt(d.i);
@@ -703,10 +754,14 @@ $("do").textContent=fmt(d.o);
 $("dh").textContent=fmt(d.h);
 $("dj").textContent=fmt(d.j);
 
-$("od").textContent=d.dc+"杯 ÷ 24 × 514";
+$("od").textContent=
+d.dc+"杯 ÷ 24 × 514";
+
 $("dor").textContent=fmt(d.orange);
 
-$("nd").textContent=d.noodlePots+"鍋 × 549元";
+$("nd").textContent=
+d.pots+"鍋 × 549";
+
 $("dn").textContent=fmt(d.noodleCost);
 
 $("de").textContent=fmt(d.expense);
@@ -718,6 +773,7 @@ $("ds").textContent=fmt(d.surplus);
 $("ds").className=d.surplus>=0?"good":"bad";
 
 renderCumulative();
+
 }
 
 function makeRecord(){
@@ -730,11 +786,13 @@ date:key(t),
 display:showDate(t),
 ...d
 };
+
 }
 
 function saveToday(){
 
 let r=records();
+
 let x=makeRecord();
 
 r[x.date]=x;
@@ -745,15 +803,66 @@ calcUI();
 renderHistory();
 renderYear();
 renderCumulative();
+
 }
 
 function autoSave(){
+
 calcUI();
 saveToday();
+
 }
 
 document.querySelectorAll('input[type=number]')
 .forEach(x=>x.addEventListener("input",autoSave));
+
+function cumulative(){
+
+let r=records();
+
+let a=Object.values(r)
+.sort((x,y)=>x.date.localeCompare(y.date));
+
+return a.reduce((q,x)=>{
+
+q.profit+=Number(x.profit)||0;
+q.expense+=Number(x.expense)||0;
+q.surplus+=Number(x.surplus)||0;
+
+return q;
+
+},{
+profit:0,
+expense:0,
+surplus:0
+});
+
+}
+
+function renderCumulative(){
+
+let c=cumulative();
+let d=calc();
+
+$("todayProfitCum").textContent=fmt(d.profit);
+$("todayExpenseCum").textContent=fmt(d.expense);
+$("todaySurplusCum").textContent=fmt(d.surplus);
+
+$("cumProfit").textContent=fmt(c.profit);
+$("cumExpense").textContent=fmt(c.expense);
+$("cumSurplus").textContent=fmt(c.surplus);
+
+$("detailCumProfit").textContent=fmt(c.profit);
+$("detailCumExpense").textContent=fmt(c.expense);
+$("detailCumSurplus").textContent=fmt(c.surplus);
+
+$("cumSurplus").className=
+c.surplus>=0?"cumSurplus":"bad";
+
+$("detailCumSurplus").className=
+c.surplus>=0?"cumSurplus":"bad";
+
+}
 
 function load(x){
 
@@ -764,13 +873,13 @@ function load(x){
 "jintai",
 "large",
 "small",
-"pots",
-"noodlePots"
+"pots"
 ].forEach(id=>{
 $(id).value=x[id]||"";
 });
 
-$("manualBowls").value=x.manual?x.bowls:"";
+$("manualBowls").value=
+x.manual?x.bowls:"";
 
 calcUI();
 
@@ -778,6 +887,7 @@ window.scrollTo({
 top:0,
 behavior:"smooth"
 });
+
 }
 
 function del(date){
@@ -793,6 +903,7 @@ setRecords(r);
 renderHistory();
 renderYear();
 renderCumulative();
+
 }
 
 function clearToday(){
@@ -814,25 +925,28 @@ setRecords(r);
 "large",
 "small",
 "pots",
-"manualBowls",
-"noodlePots"
+"manualBowls"
 ].forEach(id=>$(id).value="");
 
 calcUI();
 renderHistory();
 renderYear();
 renderCumulative();
+
 }
 
 function clearAll(){
 
-if(!confirm("⚠️ 確定刪除全部歷史資料嗎？無法復原！"))return;
+if(!confirm(
+"⚠️ 確定刪除全部歷史資料嗎？無法復原！"
+))return;
 
 localStorage.removeItem(KEY);
 
 renderHistory();
 renderYear();
 renderCumulative();
+
 }
 
 function startDay(d){
@@ -842,12 +956,12 @@ let x=new Date(d);
 x.setHours(0,0,0,0);
 
 return x;
+
 }
 
 function range(type){
 
 let t=startDay(tw());
-
 let s=new Date(t);
 let e=new Date(t);
 
@@ -869,19 +983,39 @@ three:3
 
 s.setDate(s.getDate()-z);
 e=new Date(s);
+
 }
 
 else if(type==="last7"){
+
 s.setDate(s.getDate()-6);
+
 }
 
 else if(type==="month"){
-s=new Date(t.getFullYear(),t.getMonth(),1);
+
+s=new Date(
+t.getFullYear(),
+t.getMonth(),
+1
+);
+
 }
 
 else if(type==="lastMonth"){
-s=new Date(t.getFullYear(),t.getMonth()-1,1);
-e=new Date(t.getFullYear(),t.getMonth(),0);
+
+s=new Date(
+t.getFullYear(),
+t.getMonth()-1,
+1
+);
+
+e=new Date(
+t.getFullYear(),
+t.getMonth(),
+0
+);
+
 }
 
 else if(type==="lastWeek"){
@@ -894,22 +1028,26 @@ s.setDate(s.getDate()-mon-7);
 e=new Date(s);
 
 e.setDate(e.getDate()+6);
+
 }
 
 return{s,e};
+
 }
 
 function listRange(type){
 
 let z=range(type);
 
-return Object.values(records()).filter(x=>{
+return Object.values(records())
+.filter(x=>{
 
 let d=new Date(x.date+"T00:00:00");
 
 return d>=z.s&&d<=z.e;
 
 });
+
 }
 
 function summary(a){
@@ -933,66 +1071,30 @@ profit:0,
 expense:0,
 surplus:0
 });
-}
 
-/* 每日累加 */
-function cumulative(){
-
-let arr=Object.values(records())
-.sort((a,b)=>a.date.localeCompare(b.date));
-
-return arr.reduce((q,x)=>({
-
-profit:q.profit+(+x.profit||0),
-
-expense:q.expense+(+x.expense||0),
-
-surplus:q.surplus+(+x.surplus||0),
-
-days:q.days+1
-
-}),{
-profit:0,
-expense:0,
-surplus:0,
-days:0
-});
-}
-
-function renderCumulative(){
-
-let c=cumulative();
-
-$("cumDate").textContent=c.days+" 天";
-$("cumDays").textContent=c.days+" 天";
-
-$("cumProfit").textContent=fmt(c.profit);
-$("cumExpense").textContent=fmt(c.expense);
-
-$("cumSurplus").textContent=fmt(c.surplus);
-
-$("cumSurplus").className=
-c.surplus>=0?"good":"bad";
 }
 
 function renderHistory(){
 
-let a=Object.values(records())
+let a=
+Object.values(records())
 .sort((x,y)=>y.date.localeCompare(x.date));
 
 let f=$("filter").value;
 
-let k=$("search").value.trim().toLowerCase();
+let k=
+$("search").value.trim().toLowerCase();
 
-if(f!=="all"){
-a=listRange(f).sort((x,y)=>y.date.localeCompare(x.date));
-}
+if(f!=="all")
+a=listRange(f)
+.sort((x,y)=>y.date.localeCompare(x.date));
 
-if(k){
+if(k)
 a=a.filter(x=>
-JSON.stringify(x).toLowerCase().includes(k)
+JSON.stringify(x)
+.toLowerCase()
+.includes(k)
 );
-}
 
 let h=$("history");
 
@@ -1004,6 +1106,7 @@ h.innerHTML=
 '<div class="hint" style="text-align:center;padding:20px">沒有找到紀錄</div>';
 
 return;
+
 }
 
 a.forEach(x=>{
@@ -1013,41 +1116,24 @@ let div=document.createElement("div");
 div.className="history";
 
 div.innerHTML=
+
 '<div class="historyDate">📅 '+x.display+'</div>'+
 
 '<div class="grid">'+
 
-'<div class="mini">'+
-'<small>🥤 飲料</small>'+
-'<b>'+x.dc+' 杯</b>'+
-'</div>'+
+'<div class="mini"><small>🥤 飲料</small><b>'+x.dc+' 杯</b></div>'+
 
-'<div class="mini">'+
-'<small>🍲 碗數</small>'+
-'<b>'+x.bowls+' 碗</b>'+
-'</div>'+
+'<div class="mini"><small>🍲 碗數</small><b>'+x.bowls+' 碗</b></div>'+
 
-'<div class="mini">'+
-'<small>💰 盈利</small>'+
-'<b>'+fmt(x.profit)+'</b>'+
-'</div>'+
+'<div class="mini"><small>🍜 麵線</small><b>'+fmt(x.noodleCost||0)+'</b></div>'+
 
-'<div class="mini">'+
-'<small>📦 支出</small>'+
-'<b>'+fmt(x.expense)+'</b>'+
-'</div>'+
+'<div class="mini"><small>💰 盈利</small><b>'+fmt(x.profit)+'</b></div>'+
 
-'<div class="mini">'+
-'<small>🍜 麵線</small>'+
-'<b>'+fmt(x.noodleCost||0)+'</b>'+
-'</div>'+
+'<div class="mini"><small>📦 支出</small><b>'+fmt(x.expense)+'</b></div>'+
 
-'<div class="mini">'+
-'<small>❤️ 盈餘</small>'+
-'<b class="'+
+'<div class="mini"><small>❤️ 盈餘</small><b class="'+
 (x.surplus>=0?"good":"bad")+
-'">'+fmt(x.surplus)+'</b>'+
-'</div>'+
+'">'+fmt(x.surplus)+'</b></div>'+
 
 '</div>'+
 
@@ -1064,7 +1150,9 @@ x.date+
 '</div>';
 
 h.appendChild(div);
+
 });
+
 }
 
 function label(x){
@@ -1078,21 +1166,27 @@ lastWeek:"上週",
 month:"本月",
 lastMonth:"上個月"
 }[x]||x;
+
 }
 
 function compare(){
 
-let a=summary(listRange($("ca").value));
+let a=
+summary(listRange($("ca").value));
 
-let b=summary(listRange($("cb").value));
+let b=
+summary(listRange($("cb").value));
 
 let diff=(x,y)=>
-Math.round(x-y).toLocaleString("zh-TW");
+Math.round(x-y)
+.toLocaleString("zh-TW");
 
 $("compareResult").innerHTML=
+
 '<div class="box">'+
 '<div class="scroll">'+
 '<table>'+
+
 '<tr>'+
 '<th>項目</th>'+
 '<th>'+label($("ca").value)+'</th>'+
@@ -1138,6 +1232,7 @@ $("compareResult").innerHTML=
 '</table>'+
 '</div>'+
 '</div>';
+
 }
 
 function renderYear(){
@@ -1158,12 +1253,7 @@ let html=
 '<div class="box">'+
 '<div class="scroll">'+
 '<table>'+
-'<tr>'+
-'<th>對帳日</th>'+
-'<th>盈利</th>'+
-'<th>支出</th>'+
-'<th>盈餘</th>'+
-'</tr>';
+'<tr><th>對帳日</th><th>盈利</th><th>支出</th><th>盈餘</th></tr>';
 
 [
 "今年同日",
@@ -1173,30 +1263,17 @@ let html=
 
 html+=
 '<tr>'+
-'<td>'+n+
-'<br><small>'+key(ds[i])+'</small>'+
-'</td>'+
-
-'<td>'+
-(a[i]?fmt(a[i].profit):"無資料")+
-'</td>'+
-
-'<td>'+
-(a[i]?fmt(a[i].expense):"無資料")+
-'</td>'+
-
-'<td>'+
-(a[i]?fmt(a[i].surplus):"無資料")+
-'</td>'+
-
+'<td>'+n+'<br><small>'+key(ds[i])+'</small></td>'+
+'<td>'+(a[i]?fmt(a[i].profit):"無資料")+'</td>'+
+'<td>'+(a[i]?fmt(a[i].expense):"無資料")+'</td>'+
+'<td>'+(a[i]?fmt(a[i].surplus):"無資料")+'</td>'+
 '</tr>';
 
 });
 
 html+='</table></div>';
 
-if(a[0]&&a[1]){
-
+if(a[0]&&a[1])
 html+=
 '<div class="line">'+
 '<span>今年－去年盈餘差額</span>'+
@@ -1204,13 +1281,9 @@ html+=
 (a[0].surplus-a[1].surplus>=0?"good":"bad")+
 '">'+
 fmt(a[0].surplus-a[1].surplus)+
-'</b>'+
-'</div>';
+'</b></div>';
 
-}
-
-if(a[0]&&a[2]){
-
+if(a[0]&&a[2])
 html+=
 '<div class="line">'+
 '<span>今年－前年盈餘差額</span>'+
@@ -1218,19 +1291,16 @@ html+=
 (a[0].surplus-a[2].surplus>=0?"good":"bad")+
 '">'+
 fmt(a[0].surplus-a[2].surplus)+
-'</b>'+
-'</div>';
+'</b></div>';
 
-}
-
-if(!a[0]){
+if(!a[0])
 html+=
 '<div class="hint">今天尚無儲存紀錄。</div>';
-}
 
 html+='</div>';
 
 $("yearCompare").innerHTML=html;
+
 }
 
 function customSearch(){
@@ -1243,90 +1313,119 @@ alert("請選擇開始與結束日期");
 return;
 }
 
-let a=Object.values(records())
+let a=
+Object.values(records())
 .filter(x=>x.date>=s&&x.date<=e);
 
 let z=summary(a);
 
 $("customResult").innerHTML=
+
 '<div class="box">'+
 
 '<h2>'+s+' ～ '+e+'</h2>'+
 
-'<div class="line">'+
-'<span>🥤 飲料</span>'+
-'<b>'+z.drink+' 杯</b>'+
-'</div>'+
+'<div class="line"><span>🥤 飲料</span><b>'+z.drink+' 杯</b></div>'+
 
-'<div class="line">'+
-'<span>🍲 碗數</span>'+
-'<b>'+z.bowls+' 碗</b>'+
-'</div>'+
+'<div class="line"><span>🍲 碗數</span><b>'+z.bowls+' 碗</b></div>'+
 
-'<div class="line">'+
-'<span>💰 盈利</span>'+
-'<b>'+fmt(z.profit)+'</b>'+
-'</div>'+
+'<div class="line"><span>💰 盈利</span><b>'+fmt(z.profit)+'</b></div>'+
 
-'<div class="line">'+
-'<span>📦 支出</span>'+
-'<b>'+fmt(z.expense)+'</b>'+
-'</div>'+
+'<div class="line"><span>📦 支出</span><b>'+fmt(z.expense)+'</b></div>'+
 
-'<div class="total">'+
-'<span>❤️ 盈餘</span>'+
-'<span>'+fmt(z.surplus)+'</span>'+
-'</div>'+
+'<div class="total"><span>❤️ 盈餘</span><span>'+fmt(z.surplus)+'</span></div>'+
 
 '</div>';
+
 }
 
 function copyDetails(){
 
 let d=calc();
 
+let c=cumulative();
+
 let text=
+
 "美滿快樂健康平安幸福❤️\n\n"+
+
 showDate(tw())+
+
 "\n\n━━━━━━━━━━━━\n"+
+
 "【收入完整明細】\n"+
+
 "━━━━━━━━━━━━\n"+
+
 "大杯："+d.l+"杯 × 50元＝"+fmt(d.li)+"\n"+
+
 "小杯："+d.s+"杯 × 40元＝"+fmt(d.si)+"\n"+
+
 "飲料總數："+d.dc+"杯\n"+
+
 "飲料收入："+fmt(d.di)+"\n"+
+
 "煮鍋："+d.pots+"鍋 → "+
+
 (d.manual?"手動 ":"自動 ")+
+
 d.bowls+"碗 × 55元＝"+fmt(d.pi)+"\n"+
+
 "總盈利："+fmt(d.profit)+
 
 "\n\n━━━━━━━━━━━━\n"+
+
 "【支出完整明細】\n"+
+
 "━━━━━━━━━━━━\n"+
+
 "固定成本：15,450元\n"+
+
 "大腸："+fmt(d.i)+"\n"+
+
 "蚵仔："+fmt(d.o)+"\n"+
+
 "禾田："+fmt(d.h)+"\n"+
+
 "錦泰："+fmt(d.j)+"\n"+
-"🍊🍋："+d.dc+
-"杯 ÷ 24 × 514＝"+fmt(d.orange)+"\n"+
-"🍜 麵線："+d.noodlePots+
-"鍋 × 549＝"+fmt(d.noodleCost)+"\n"+
-"總支出："+fmt(d.expense)+
+
+"🍊🍋："+d.dc+"杯 ÷ 24 × 514＝"+fmt(d.orange)+"\n"+
+
+"🍜 麵線："+d.pots+"鍋 × 549＝"+fmt(d.noodleCost)+
+
+"\n總支出："+fmt(d.expense)+
 
 "\n\n━━━━━━━━━━━━\n"+
+
 "【最後結算】\n"+
+
 "━━━━━━━━━━━━\n"+
+
 "盈利："+fmt(d.profit)+"\n"+
+
 "支出："+fmt(d.expense)+"\n"+
+
 "盈餘："+fmt(d.surplus)+
+
+"\n\n━━━━━━━━━━━━\n"+
+
+"【歷史累計】\n"+
+
+"━━━━━━━━━━━━\n"+
+
+"累計盈利："+fmt(c.profit)+"\n"+
+
+"累計支出："+fmt(c.expense)+"\n"+
+
+"累計盈餘："+fmt(c.surplus)+
+
 "\n━━━━━━━━━━━━";
 
 navigator.clipboard.writeText(text)
 .then(()=>{
 
 $("notice").textContent=
-"✅ 完整收入＋支出明細已複製！";
+"✅ 完整收入＋支出＋麵線＋累計明細已複製！";
 
 setTimeout(()=>
 $("notice").textContent="",2500);
@@ -1350,11 +1449,13 @@ $("notice").textContent=
 "✅ 已複製完整明細！";
 
 });
+
 }
 
 function exportData(){
 
-let blob=new Blob(
+let blob=
+new Blob(
 [JSON.stringify(records(),null,2)],
 {type:"application/json"}
 );
@@ -1364,9 +1465,10 @@ let a=document.createElement("a");
 a.href=URL.createObjectURL(blob);
 
 a.download=
-"index141319發_營業資料備份.json";
+"index9319傑_營業資料備份.json";
 
 a.click();
+
 }
 
 function importData(e){
@@ -1403,11 +1505,13 @@ alert("❌ 匯入失敗，請使用本系統備份檔。");
 };
 
 rd.readAsText(file);
+
 }
 
 function updateDate(){
 
-$("todayText").textContent=showDate(tw());
+$("todayText").textContent=
+showDate(tw());
 
 }
 
@@ -1424,5 +1528,6 @@ renderCumulative();
 setInterval(updateDate,60000);
 
 </script>
+
 </body>
 </html>
