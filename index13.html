@@ -195,6 +195,16 @@ background:#2878d0;
 color:#fff
 }
 
+.purple{
+background:#7652c7;
+color:#fff
+}
+
+.orange{
+background:#e67e22;
+color:#fff
+}
+
 .notice{
 text-align:center;
 color:#188038;
@@ -283,6 +293,110 @@ text-align:center;
 margin:8px 0
 }
 
+.switchRow{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+padding:12px;
+background:#f7f7f7;
+border-radius:15px;
+margin-bottom:12px
+}
+
+.switchText{
+font-weight:900;
+font-size:18px
+}
+
+.switch{
+position:relative;
+display:inline-block;
+width:58px;
+height:32px;
+flex:none
+}
+
+.switch input{
+opacity:0;
+width:0;
+height:0
+}
+
+.slider{
+position:absolute;
+cursor:pointer;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:#ccc;
+transition:.25s;
+border-radius:32px
+}
+
+.slider:before{
+content:"";
+position:absolute;
+height:26px;
+width:26px;
+left:3px;
+top:3px;
+background:#fff;
+transition:.25s;
+border-radius:50%;
+box-shadow:0 2px 5px #0003
+}
+
+.switch input:checked + .slider{
+background:#198754
+}
+
+.switch input:checked + .slider:before{
+transform:translateX(26px)
+}
+
+.settleCard{
+background:#fff8f0;
+border:2px solid #f0c9a5;
+border-radius:16px;
+padding:14px;
+margin-top:12px
+}
+
+.settleTitle{
+font-size:19px;
+font-weight:900;
+margin-bottom:8px
+}
+
+.settleRange{
+font-size:15px;
+color:#666;
+margin-bottom:10px
+}
+
+.settleResult{
+background:#fff;
+border-radius:13px;
+padding:10px
+}
+
+.shareGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+margin-top:10px
+}
+
+.status{
+font-size:14px;
+color:#666;
+text-align:center;
+margin-top:8px;
+min-height:20px
+}
+
 @media(max-width:480px){
 
 h1{
@@ -300,6 +414,10 @@ width:150px
 
 .grid{
 grid-template-columns:1fr 1fr
+}
+
+.shareGrid{
+grid-template-columns:1fr
 }
 
 }
@@ -358,6 +476,79 @@ value="300"
 節數可輸入 0.5、1.5、2.5、11.5 等。
 </div>
 
+</div>
+
+</div>
+
+
+<!-- 自動功能 -->
+<div class="card">
+
+<h2>⚙️ 自動功能</h2>
+
+<div class="switchRow">
+
+<div>
+<div class="switchText">💾 自動儲存</div>
+<div class="hint">
+輸入資料時會自動保存，重新開啟網站也不會消失。
+</div>
+</div>
+
+<label class="switch">
+<input
+id="autoSave"
+type="checkbox"
+>
+<span class="slider"></span>
+</label>
+
+</div>
+
+<div class="box">
+
+<div class="line">
+
+<span>
+📅 每月16號
+</span>
+
+<b>
+結算1～15號
+</b>
+
+</div>
+
+<div class="line">
+
+<span>
+📅 月底
+</span>
+
+<b>
+結算16號～月底
+</b>
+
+</div>
+
+<div class="line">
+
+<span>
+📱 傳送方式
+</span>
+
+<b>
+複製／LINE／簡訊
+</b>
+
+</div>
+
+</div>
+
+<div class="hint" style="margin-top:10px">
+💡 網站會自動累計每天已儲存的客人與節數。
+<br>
+📌 16號與月底我會另外提醒你，再按下面的結算分享按鈕即可。
 </div>
 
 </div>
@@ -616,6 +807,85 @@ $0
 </div>
 
 
+<!-- 半月／月底結算 -->
+<div class="card">
+
+<h2>📤 半月／月底結算</h2>
+
+<div class="settleCard">
+
+<div class="settleTitle">
+🌸 1～15號結算
+</div>
+
+<div id="firstHalfRange" class="settleRange">
+本月1號～15號
+</div>
+
+<div id="firstHalfResult" class="settleResult">
+尚未計算
+</div>
+
+<div class="shareGrid">
+
+<button
+class="purple"
+onclick="copySettlement('first')"
+>
+📋 複製1～15號
+</button>
+
+<button
+class="orange"
+onclick="shareSettlement('first')"
+>
+📤 分享1～15號
+</button>
+
+</div>
+
+</div>
+
+
+<div class="settleCard">
+
+<div class="settleTitle">
+🌸 16號～月底結算
+</div>
+
+<div id="secondHalfRange" class="settleRange">
+本月16號～月底
+</div>
+
+<div id="secondHalfResult" class="settleResult">
+尚未計算
+</div>
+
+<div class="shareGrid">
+
+<button
+class="purple"
+onclick="copySettlement('second')"
+>
+📋 複製16號～月底
+</button>
+
+<button
+class="orange"
+onclick="shareSettlement('second')"
+>
+📤 分享16號～月底
+</button>
+
+</div>
+
+</div>
+
+<div id="settlementStatus" class="status"></div>
+
+</div>
+
+
 <!-- 每日明細 -->
 <div class="card">
 
@@ -759,7 +1029,6 @@ onclick="exportData()"
 
 <br><br>
 
-
 <label
 class="gray full"
 style="display:block;text-align:center;padding:13px;border-radius:13px;font-weight:900;cursor:pointer"
@@ -793,6 +1062,12 @@ onclick="clearAll()"
 <script>
 
 const KEY="aroma_therapist_records_v913";
+
+const SETTINGS_KEY="aroma_therapist_settings_v913";
+
+const DRAFT_KEY="aroma_therapist_draft_v913";
+
+const SETTLE_KEY="aroma_therapist_settlement_v913";
 
 const $=id=>document.getElementById(id);
 
@@ -904,6 +1179,120 @@ JSON.stringify(a)
 }
 
 
+/* 讀取設定 */
+function getSettings(){
+
+try{
+
+const x=
+JSON.parse(
+localStorage.getItem(SETTINGS_KEY)||"{}"
+);
+
+return{
+
+autoSave:!!x.autoSave
+
+};
+
+}catch(e){
+
+return{
+
+autoSave:false
+
+};
+
+}
+
+}
+
+
+/* 儲存設定 */
+function saveSettings(){
+
+localStorage.setItem(
+SETTINGS_KEY,
+JSON.stringify({
+
+autoSave:$("autoSave").checked
+
+})
+);
+
+}
+
+
+/* 草稿 */
+function saveDraft(){
+
+if(!$("autoSave").checked)return;
+
+const draft={
+
+date:$("date").value,
+
+clients:$("clients").value,
+
+sessions:$("sessions").value,
+
+price:$("unitPrice").value,
+
+note:$("note").value
+
+};
+
+localStorage.setItem(
+DRAFT_KEY,
+JSON.stringify(draft)
+);
+
+}
+
+
+/* 讀取草稿 */
+function loadDraft(){
+
+const s=getSettings();
+
+if(!s.autoSave)return;
+
+try{
+
+const x=
+JSON.parse(
+localStorage.getItem(DRAFT_KEY)||"null"
+);
+
+if(!x)return;
+
+if(x.date)$("date").value=x.date;
+
+if(x.clients!=="")
+$("clients").value=x.clients;
+
+if(x.sessions!=="")
+$("sessions").value=x.sessions;
+
+if(x.price)
+$("unitPrice").value=x.price;
+
+if(x.note)
+$("note").value=x.note;
+
+}catch(e){}
+
+}
+
+
+/* 清除草稿 */
+function clearDraft(){
+
+localStorage.removeItem(DRAFT_KEY);
+
+}
+
+
 /* 取得今天月份 */
 function currentMonth(){
 
@@ -934,6 +1323,14 @@ $("viewMonth").value=
 month;
 
 $("unitPrice").value=300;
+
+
+/* 自動儲存設定 */
+
+const settings=getSettings();
+
+$("autoSave").checked=
+settings.autoSave;
 
 
 /* 比較月份 */
@@ -981,6 +1378,8 @@ select.appendChild(o);
 
 }
 
+loadDraft();
+
 }
 
 
@@ -1016,24 +1415,79 @@ sessions*price
 }
 
 
+/* 自動儲存草稿 */
+function autoDraft(){
+
+updatePreview();
+
+saveDraft();
+
+}
+
+
 /* 輸入時即時計算 */
 
 $("sessions")
 .addEventListener(
 "input",
-updatePreview
+autoDraft
 );
 
 $("clients")
 .addEventListener(
 "input",
-updatePreview
+autoDraft
 );
 
 $("unitPrice")
 .addEventListener(
 "input",
-updatePreview
+autoDraft
+);
+
+$("note")
+.addEventListener(
+"input",
+autoDraft
+);
+
+$("date")
+.addEventListener(
+"change",
+autoDraft
+);
+
+
+/* 自動儲存開關 */
+
+$("autoSave")
+.addEventListener(
+"change",
+function(){
+
+saveSettings();
+
+if(this.checked){
+
+saveDraft();
+
+$("notice").textContent=
+"✅ 已開啟自動儲存";
+
+}else{
+
+$("notice").textContent=
+"⏸️ 已關閉自動儲存";
+
+}
+
+setTimeout(()=>{
+
+$("notice").textContent="";
+
+},2500);
+
+}
 );
 
 
@@ -1146,24 +1600,24 @@ a.push(item);
 
 saveRecords(a);
 
+clearDraft();
 
-/* 記住剛剛月份 */
 
 $("viewMonth").value=
 date.slice(0,7);
 
-
-/* 清除輸入 */
 
 $("clients").value="";
 $("sessions").value="";
 $("note").value="";
 
 
-/* 恢復今天日期 */
-
 $("date").value=
 dateKey(nowTW());
+
+
+$("saveButton").textContent=
+"💾 儲存這一天";
 
 
 $("notice").textContent=
@@ -1197,6 +1651,43 @@ x=>x.date.slice(0,7)===m
 (a,b)=>
 a.date.localeCompare(b.date)
 );
+
+}
+
+
+/* 日期區間統計 */
+function rangeSummary(startDate,endDate){
+
+const a=
+records()
+.filter(x=>
+x.date>=startDate &&
+x.date<=endDate
+);
+
+return{
+
+clients:a.reduce(
+(s,x)=>
+s+(Number(x.clients)||0),
+0
+),
+
+sessions:a.reduce(
+(s,x)=>
+s+(Number(x.sessions)||0),
+0
+),
+
+income:a.reduce(
+(s,x)=>
+s+(Number(x.income)||0),
+0
+),
+
+days:a.length
+
+};
 
 }
 
@@ -1301,6 +1792,8 @@ tb.innerHTML=
 '</td>'+
 '</tr>';
 
+renderSettlement();
+
 return;
 
 }
@@ -1354,6 +1847,8 @@ x.date+
 tb.appendChild(tr);
 
 });
+
+renderSettlement();
 
 }
 
@@ -1530,6 +2025,305 @@ text,
 }
 
 
+/* 取得結算區間 */
+function getSettlement(type){
+
+const m=
+currentMonth();
+
+if(!m)return null;
+
+
+const parts=m.split("-");
+
+const year=
+Number(parts[0]);
+
+const month=
+Number(parts[1]);
+
+
+if(type==="first"){
+
+const start=
+m+"-01";
+
+const end=
+m+"-15";
+
+return{
+
+start:start,
+
+end:end,
+
+label:
+year+"年 "+month+
+"月 1日～15日",
+
+title:
+"🌸 芳療師半月結算"
+
+};
+
+}
+
+
+const lastDay=
+new Date(
+year,
+month,
+0
+).getDate();
+
+const start=
+m+"-16";
+
+const end=
+m+"-"+String(lastDay).padStart(2,"0");
+
+
+return{
+
+start:start,
+
+end:end,
+
+label:
+year+"年 "+month+
+"月 16日～"+lastDay+"日",
+
+title:
+"🌸 芳療師月底結算"
+
+};
+
+}
+
+
+/* 取得結算文字 */
+function settlementText(type){
+
+const s=
+getSettlement(type);
+
+if(!s)return"";
+
+
+const z=
+rangeSummary(
+s.start,
+s.end
+);
+
+
+let text="";
+
+text+=s.title+"\n\n";
+
+text+="📅 結算期間："+
+s.label+"\n";
+
+text+="👤 客人總數："+
+sf(z.clients)+
+" 客\n";
+
+text+="🌸 節數總數："+
+sf(z.sessions)+
+" 節\n";
+
+text+="💰 總收入："+
+money(z.income)+"\n";
+
+text+="📅 營業天數："+
+z.days+" 天\n";
+
+text+="━━━━━━━━━━━━\n";
+
+text+="🌸 芳療師月記錄";
+
+return text;
+
+}
+
+
+/* 顯示結算 */
+function renderSettlement(){
+
+const m=
+currentMonth();
+
+if(!m)return;
+
+
+const f=
+getSettlement("first");
+
+const s=
+getSettlement("second");
+
+
+$("firstHalfRange").textContent=
+f.label;
+
+$("secondHalfRange").textContent=
+s.label;
+
+
+const a=
+rangeSummary(
+f.start,
+f.end
+);
+
+const b=
+rangeSummary(
+s.start,
+s.end
+);
+
+
+$("firstHalfResult").innerHTML=
+
+"👤 客人：<b>"+
+sf(a.clients)+
+" 客</b><br>"+
+"🌸 節數：<b>"+
+sf(a.sessions)+
+" 節</b><br>"+
+"💰 收入：<b>"+
+money(a.income)+
+"</b>";
+
+
+$("secondHalfResult").innerHTML=
+
+"👤 客人：<b>"+
+sf(b.clients)+
+" 客</b><br>"+
+"🌸 節數：<b>"+
+sf(b.sessions)+
+" 節</b><br>"+
+"💰 收入：<b>"+
+money(b.income)+
+"</b>";
+
+}
+
+
+/* 結算紀錄 */
+function getSettlementHistory(){
+
+try{
+
+const x=
+JSON.parse(
+localStorage.getItem(SETTLE_KEY)||"{}"
+);
+
+return x&&typeof x==="object"?x:{};
+
+}catch(e){
+
+return{};
+
+}
+
+}
+
+
+/* 記住結算 */
+function markSettlement(type){
+
+const s=
+getSettlementHistory();
+
+const key=
+currentMonth()+"_"+type;
+
+s[key]=
+new Date().toISOString();
+
+localStorage.setItem(
+SETTLE_KEY,
+JSON.stringify(s)
+);
+
+}
+
+
+/* 複製結算 */
+function copySettlement(type){
+
+const text=
+settlementText(type);
+
+if(!text)return;
+
+
+copyText(
+text,
+"✅ 結算內容已複製，可以貼到 LINE／簡訊"
+);
+
+markSettlement(type);
+
+}
+
+
+/* 分享結算 */
+async function shareSettlement(type){
+
+const text=
+settlementText(type);
+
+if(!text)return;
+
+
+markSettlement(type);
+
+
+if(
+navigator.share
+){
+
+try{
+
+await navigator.share({
+
+title:"🌸 芳療師結算",
+text:text
+
+});
+
+$("settlementStatus").textContent=
+"✅ 已開啟手機分享，可以選 LINE 或訊息";
+
+}catch(e){
+
+if(e.name!=="AbortError"){
+
+copyText(
+text,
+"✅ 分享功能無法使用，已改為複製結算內容"
+);
+
+}
+
+}
+
+}else{
+
+copyText(
+text,
+"✅ 此裝置不支援直接分享，已複製結算內容"
+);
+
+}
+
+}
+
+
 /* 複製文字 */
 function copyText(text,msg){
 
@@ -1546,7 +2340,7 @@ $("notice").textContent=msg;
 
 setTimeout(
 ()=>$("notice").textContent="",
-2500
+3000
 );
 
 })
@@ -1571,6 +2365,10 @@ document.createElement("textarea");
 
 t.value=text;
 
+t.style.position="fixed";
+
+t.style.left="-9999px";
+
 document.body.appendChild(t);
 
 t.select();
@@ -1580,6 +2378,11 @@ document.execCommand("copy");
 t.remove();
 
 $("notice").textContent=msg;
+
+setTimeout(
+()=>$("notice").textContent="",
+3000
+);
 
 }
 
@@ -2092,6 +2895,8 @@ renderHistory();
 
 renderYear();
 
+renderSettlement();
+
 }
 
 
@@ -2119,17 +2924,7 @@ renderAll();
 updatePreview();
 
 
-/*
-日期自動更新：
-
-每天會更新上方顯示日期。
-
-只有當目前輸入框沒有被使用，
-才會把日期帶回今天。
-
-不會因為時間更新，
-把正在查看的歷史日期偷偷改掉。
-*/
+/* 每分鐘更新日期與結算 */
 
 setInterval(()=>{
 
@@ -2138,6 +2933,8 @@ nowTW();
 
 $("todayText").textContent=
 showDate(t);
+
+renderSettlement();
 
 },60000);
 
