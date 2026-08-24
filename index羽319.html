@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3f6fb">
-<title>股票關卡計算機 V52｜法人＋估值＋短線＋長期佈局</title>
+<title>股票關卡計算機 V54｜法人＋估值＋短線＋長期佈局</title>
 
 <style>
 *{box-sizing:border-box}
@@ -470,7 +470,7 @@ font-size:32px!important
 <div class="top">
 
 <div>
-<div class="title">📈 股票關卡計算機 V52</div>
+<div class="title">📈 股票關卡計算機 V54</div>
 <div class="sub">
 法人＋估值＋熱門 TOP 10＋短線進場＋長期佈局
 </div>
@@ -1200,7 +1200,7 @@ onclick="calcTrade()">
 </section>
 
 <div class="footer">
-V52｜資料僅供研究參考，不構成投資建議。<br>
+V54｜資料僅供研究參考，不構成投資建議。<br>
 行情、法人及估值資料可能因交易時間、休市、API限制或官方資料更新時間而延遲。
 </div>
 
@@ -1243,11 +1243,6 @@ tpex:[]
 
 let directoryLoaded=false;
 
-
-/* =========================
-   數字
-========================= */
-
 function num(x){
 
 if(x===null||x===undefined||x==='')return null;
@@ -1264,7 +1259,6 @@ return Number.isFinite(n)?n:null;
 
 }
 
-
 function fmt(x,d=2){
 
 const n=num(x);
@@ -1278,7 +1272,6 @@ maximumFractionDigits:d
 
 }
 
-
 function intfmt(x){
 
 const n=num(x);
@@ -1289,7 +1282,6 @@ return Math.round(n).toLocaleString('zh-TW');
 
 }
 
-
 function signedFmt(x,d=2){
 
 const n=num(x);
@@ -1299,7 +1291,6 @@ if(n===null)return'—';
 return(n>=0?'+':'')+fmt(n,d);
 
 }
-
 
 function esc(s){
 
@@ -1313,11 +1304,6 @@ return String(s??'').replace(/[&<>"']/g,m=>({
 
 }
 
-
-/* =========================
-   日期
-========================= */
-
 function localDate(d=new Date()){
 
 const y=d.getFullYear();
@@ -1330,7 +1316,6 @@ return y+'-'+m+'-'+day;
 
 }
 
-
 function daysAgo(n){
 
 const d=new Date();
@@ -1341,11 +1326,6 @@ return localDate(d);
 
 }
 
-
-/* =========================
-   狀態
-========================= */
-
 function setStatus(t,type='bad'){
 
 $('status').className='status '+type;
@@ -1353,7 +1333,6 @@ $('status').className='status '+type;
 $('status').textContent=t;
 
 }
-
 
 function setQueryBusy(busy){
 
@@ -1363,11 +1342,6 @@ $('queryBtn').textContent=
 busy?'⏳ 查詢中…':'🔎 查詢';
 
 }
-
-
-/* =========================
-   通用欄位
-========================= */
 
 function first(o,keys){
 
@@ -1389,11 +1363,6 @@ return o[k];
 return null;
 
 }
-
-
-/* =========================
-   API
-========================= */
 
 async function getJSON(url,timeout=API_TIMEOUT){
 
@@ -1443,7 +1412,6 @@ clearTimeout(timer);
 
 }
 
-
 async function finmind(dataset,code,start,end){
 
 const url=
@@ -1461,7 +1429,6 @@ return[];
 
 }
 
-
 async function twseAll(){
 
 const j=await getJSON(
@@ -1472,7 +1439,6 @@ return Array.isArray(j)?j:[];
 
 }
 
-
 async function tpexQuotes(){
 
 const j=await getJSON(
@@ -1482,7 +1448,6 @@ const j=await getJSON(
 return Array.isArray(j)?j:[];
 
 }
-
 
 async function t86(date){
 
@@ -1496,11 +1461,6 @@ return Array.isArray(j)?j:[];
 
 }
 
-
-/* =========================
-   股票代號標準化
-========================= */
-
 function normalizeCode(v){
 
 return String(v??'')
@@ -1509,11 +1469,6 @@ return String(v??'')
 .replace(/\s+/g,'');
 
 }
-
-
-/* =========================
-   找股票
-========================= */
 
 function rowCode(r){
 
@@ -1528,7 +1483,6 @@ return first(r,[
 
 }
 
-
 function rowName(r){
 
 return first(r,[
@@ -1542,7 +1496,6 @@ return first(r,[
 
 }
 
-
 function findStock(rows,code){
 
 const target=normalizeCode(code);
@@ -1552,7 +1505,6 @@ normalizeCode(rowCode(r))===target
 );
 
 }
-
 
 function findStockByName(rows,name){
 
@@ -1575,11 +1527,6 @@ target.includes(n);
 });
 
 }
-
-
-/* =========================
-   建立股票名稱目錄
-========================= */
 
 async function loadDirectory(){
 
@@ -1604,30 +1551,18 @@ directoryLoaded=true;
 
 }
 
-
-/* =========================
-   輸入名稱轉代號
-========================= */
-
 async function resolveStock(input){
 
 const value=normalizeCode(input);
 
 if(!value)return null;
 
-
-/* 看起來像代號 */
-
 const codeLike=/^[0-9A-Z]+$/.test(value);
 
 await loadDirectory();
 
-
 let r=null;
 let market=null;
-
-
-/* 自動 */
 
 if($('market').value==='auto'){
 
@@ -1651,9 +1586,6 @@ market='tpex';
 
 }
 
-
-/* 強制上市 */
-
 if(!r&&$('market').value==='twse'){
 
 r=findStock(stockDirectory.twse,value);
@@ -1662,9 +1594,6 @@ if(r)market='twse';
 
 }
 
-
-/* 強制上櫃 */
-
 if(!r&&$('market').value==='tpex'){
 
 r=findStock(stockDirectory.tpex,value);
@@ -1672,9 +1601,6 @@ r=findStock(stockDirectory.tpex,value);
 if(r)market='tpex';
 
 }
-
-
-/* 名稱搜尋 */
 
 if(!r&&!codeLike){
 
@@ -1711,7 +1637,6 @@ if(r)market='tpex';
 
 }
 
-
 if(r){
 
 return{
@@ -1721,9 +1646,6 @@ market
 };
 
 }
-
-
-/* 最後保留原輸入，讓 FinMind 嘗試 */
 
 if(codeLike){
 
@@ -1738,11 +1660,6 @@ market:null
 return null;
 
 }
-
-
-/* =========================
-   行情解析
-========================= */
 
 function parsePriceRow(r){
 
@@ -1845,11 +1762,6 @@ open:num(first(r,[
 
 }
 
-
-/* =========================
-   上市行情
-========================= */
-
 async function currentTWSE(code){
 
 const rows=await twseAll();
@@ -1867,11 +1779,6 @@ source:'TWSE 官方'
 
 }
 
-
-/* =========================
-   上櫃行情
-========================= */
-
 async function currentTPEX(code){
 
 const rows=await tpexQuotes();
@@ -1888,11 +1795,6 @@ source:'TPEX 官方'
 };
 
 }
-
-
-/* =========================
-   FinMind行情
-========================= */
 
 async function currentFinMind(code){
 
@@ -1920,11 +1822,6 @@ source:'FinMind'
 
 }
 
-
-/* =========================
-   行情主程式
-========================= */
-
 async function currentQuote(code,knownMarket){
 
 if(knownMarket==='twse'){
@@ -1943,7 +1840,6 @@ return await currentTPEX(code);
 
 }
 
-
 const results=await Promise.allSettled([
 currentTWSE(code),
 currentTPEX(code)
@@ -1959,7 +1855,6 @@ return r.value;
 
 }
 
-
 try{
 
 return await currentFinMind(code);
@@ -1969,11 +1864,6 @@ return await currentFinMind(code);
 return null;
 
 }
-
-
-/* =========================
-   清空畫面
-========================= */
 
 function resetDisplay(){
 
@@ -2026,11 +1916,6 @@ resetMyTrade();
 
 }
 
-
-/* =========================
-   基本面
-========================= */
-
 async function loadBasics(code){
 
 let pe=null;
@@ -2082,7 +1967,6 @@ console.warn('FinMind PER failed',e);
 
 }
 
-
 try{
 
 const rows=await getJSON(
@@ -2129,7 +2013,6 @@ console.warn('TWSE BWIBBU failed',e);
 
 }
 
-
 current.pe=pe;
 current.pbr=pbr;
 current.yield=yieldRate;
@@ -2142,7 +2025,6 @@ $('yield').textContent=
 yieldRate===null?
 '—':
 fmt(yieldRate)+'%';
-
 
 if(
 pe!==null&&
@@ -2162,7 +2044,6 @@ $('eps').textContent='—';
 
 }
 
-
 if(
 pbr!==null&&
 current.price!==null&&
@@ -2181,7 +2062,6 @@ $('bvps').textContent='—';
 
 }
 
-
 if(dataDate){
 
 $('date').textContent=dataDate;
@@ -2195,11 +2075,6 @@ yieldRate
 };
 
 }
-
-
-/* =========================
-   歷史
-========================= */
 
 async function loadHistory(code){
 
@@ -2229,7 +2104,6 @@ console.warn('FinMind history failed',e);
 
 }
 
-
 if(
 !closes.length&&
 current.price!==null
@@ -2238,7 +2112,6 @@ current.price!==null
 closes=[current.price];
 
 }
-
 
 for(const n of[5,20,60,120,240]){
 
@@ -2270,11 +2143,6 @@ updateBias();
 
 }
 
-
-/* =========================
-   乖離率
-========================= */
-
 function updateBias(){
 
 const p=current.price;
@@ -2305,12 +2173,10 @@ b5===null?'—':signedFmt(b5)+'%';
 $('bias20').textContent=
 b20===null?'—':signedFmt(b20)+'%';
 
-
 let sideways='資料不足';
 let watch='👀 觀察';
 let strength='資料不足';
 let reason='目前資料不足，先觀察。';
-
 
 if(
 b5!==null&&
@@ -2368,12 +2234,10 @@ reason=
 
 }
 
-
 $('sideways').textContent=sideways;
 $('watch').textContent=watch;
 $('strength').textContent=strength;
 $('stateReason').textContent=reason;
-
 
 if(watch.includes('偏多')){
 
@@ -2390,11 +2254,6 @@ $('stateReason').className='alertbox warnbox';
 }
 
 }
-
-
-/* =========================
-   判斷
-========================= */
 
 function judge(){
 
@@ -2442,10 +2301,8 @@ $('trendChip').className='chip '+cls;
 
 $('marketJudge').textContent=trend;
 
-
 const pe=current.pe;
 const pbr=current.pbr;
-
 
 $('peJudge').textContent=
 pe===null?
@@ -2456,7 +2313,6 @@ pe>25?
 '🔴 偏高':
 '🟡 合理';
 
-
 $('pbrJudge').textContent=
 pbr===null?
 '資料不足':
@@ -2465,7 +2321,6 @@ pbr<1?
 pbr>2?
 '🔴 偏高':
 '🟡 合理';
-
 
 if(
 pe===null&&
@@ -2497,11 +2352,6 @@ $('overall').textContent='🟡 合理';
 calcPriceValuation();
 
 }
-
-
-/* =========================
-   價格估值
-========================= */
 
 function calcPriceValuation(){
 
@@ -2541,7 +2391,6 @@ if(pbr<1)cheapScore++;
 else if(pbr>2)expensiveScore++;
 
 }
-
 
 let judge='🟡 合理';
 let reason='目前估值落在合理區間。';
@@ -2608,7 +2457,6 @@ $('priceJudge').classList.add('judgeFair');
 
 }
 
-
 let low=null;
 let high=null;
 
@@ -2623,7 +2471,6 @@ $('fairRange').textContent=
 low!==null&&high!==null?
 fmt(low)+' ～ '+fmt(high):
 '資料不足';
-
 
 if(
 low!==null&&
@@ -2664,11 +2511,6 @@ $('pricePositionReason').textContent=
 
 }
 
-
-/* =========================
-   短線
-========================= */
-
 function calcShortEntry(){
 
 const p=current.price;
@@ -2691,7 +2533,6 @@ p*1.05;
 
 $('shortEntry1').textContent=fmt(e1);
 $('shortBreakout').textContent=fmt(breakout);
-
 
 let decision='👀 等待';
 let reason='';
@@ -2774,11 +2615,6 @@ $('shortEntryBox').className='alertbox warnbox';
 
 }
 
-
-/* =========================
-   長期
-========================= */
-
 function calcLongEntry(){
 
 const p=current.price;
@@ -2821,7 +2657,6 @@ e2!==null?fmt(e2):'資料不足';
 
 $('longEntry3').textContent=
 e3!==null?fmt(e3):'資料不足';
-
 
 let message='';
 
@@ -2878,11 +2713,6 @@ $('longEntryBox').innerHTML=
 
 }
 
-
-/* =========================
-   關卡
-========================= */
-
 function calcLevels(){
 
 const p=current.price;
@@ -2906,7 +2736,6 @@ $('breakout').textContent=fmt(p*1.05);
 $('stop').textContent=fmt(p*.94);
 
 $('tp1').textContent=fmt(p*1.06);
-
 
 const eps=current.eps;
 
@@ -2940,11 +2769,6 @@ calcShortEntry();
 calcLongEntry();
 
 }
-
-
-/* =========================
-   突破機率
-========================= */
 
 function probability(target){
 
@@ -3008,7 +2832,6 @@ Math.round(score)
 
 }
 
-
 function calcBreakouts(){
 
 const p=current.price;
@@ -3038,11 +2861,6 @@ q3===null?'—':q3+'%';
 
 }
 
-
-/* =========================
-   我的交易
-========================= */
-
 function resetMyTrade(){
 
 [
@@ -3066,11 +2884,9 @@ $('tradeSummary').className=
 
 }
 
-
 function setTradeValue(id,v){
 $(id).textContent=fmt(v);
 }
-
 
 function setTradePct(id,v,profit){
 
@@ -3082,7 +2898,6 @@ $(id).className=
 profit?'profit':'loss';
 
 }
-
 
 function calcTrade(){
 
@@ -3157,7 +2972,6 @@ $('mySL3Money').textContent=
 '預估損失：$'+
 intfmt((sl3-cost)*shares);
 
-
 let currentText='尚未取得目前股價';
 
 if(current.price!==null){
@@ -3207,11 +3021,6 @@ $('tradeSummary').className='alertbox warnbox';
 
 }
 
-
-/* =========================
-   法人
-========================= */
-
 function resetInstitution(){
 
 [
@@ -3231,7 +3040,6 @@ $(id).className='';
 });
 
 }
-
 
 function renderInstCell(id,v){
 
@@ -3253,7 +3061,6 @@ v<0?'sell':
 '';
 
 }
-
 
 function t86Value(r,type){
 
@@ -3314,11 +3121,6 @@ return null;
 
 }
 
-
-/* =========================
-   法人個股
-========================= */
-
 async function loadInstitution(code){
 
 resetInstitution();
@@ -3363,7 +3165,6 @@ dailyDone=true;
 console.warn('T86 failed',e);
 
 }
-
 
 try{
 
@@ -3549,11 +3350,6 @@ console.warn('FinMind institution failed',e);
 
 }
 
-
-/* =========================
-   熱門
-========================= */
-
 async function loadHot(){
 
 $('hot').innerHTML=
@@ -3683,11 +3479,6 @@ $('hot').innerHTML=
 
 }
 
-
-/* =========================
-   法人 TOP
-========================= */
-
 async function loadInstTop(){
 
 $('instTop').innerHTML=
@@ -3798,11 +3589,6 @@ $('instTop').innerHTML=
 
 }
 
-
-/* =========================
-   TOP 點擊
-========================= */
-
 function loadCode(code){
 
 $('code').value=code;
@@ -3818,11 +3604,6 @@ setTimeout(
 );
 
 }
-
-
-/* =========================
-   儲存
-========================= */
 
 function saveRecord(){
 
@@ -3870,13 +3651,13 @@ date:new Date().toLocaleString('zh-TW')
 
 const a=
 JSON.parse(
-localStorage.getItem('stockV52')||'[]'
+localStorage.getItem('stockV54')||'[]'
 );
 
 a.unshift(rec);
 
 localStorage.setItem(
-'stockV52',
+'stockV54',
 JSON.stringify(a.slice(0,30))
 );
 
@@ -3889,31 +3670,21 @@ setStatus(
 
 }
 
-
-/* =========================
-   清除
-========================= */
-
 function clearRecords(){
 
 if(!confirm('確定要清除全部儲存紀錄嗎？'))return;
 
-localStorage.removeItem('stockV52');
+localStorage.removeItem('stockV54');
 
 renderRecords();
 
 }
 
-
-/* =========================
-   紀錄
-========================= */
-
 function renderRecords(){
 
 const a=
 JSON.parse(
-localStorage.getItem('stockV52')||'[]'
+localStorage.getItem('stockV54')||'[]'
 );
 
 if(!a.length){
@@ -3967,11 +3738,6 @@ ${esc(r.date)}
 
 }
 
-
-/* =========================
-   Enter
-========================= */
-
 $('code').addEventListener(
 'keydown',
 e=>{
@@ -3987,11 +3753,6 @@ queryStock();
 }
 );
 
-
-/* =========================
-   成本即時計算
-========================= */
-
 $('myCost').addEventListener(
 'input',
 calcTrade
@@ -4001,11 +3762,6 @@ $('myShares').addEventListener(
 'input',
 calcTrade
 );
-
-
-/* =========================
-   主查詢
-========================= */
 
 async function queryStock(){
 
@@ -4052,9 +3808,6 @@ return;
 
 }
 
-
-/* 將名稱搜尋轉成正式代號 */
-
 $('code').value=resolved.code;
 
 setStatus(
@@ -4064,14 +3817,12 @@ setStatus(
 'wait'
 );
 
-
 const q=await currentQuote(
 resolved.code,
 resolved.market
 );
 
 if(token!==queryToken)return;
-
 
 if(!q){
 
@@ -4086,7 +3837,6 @@ $('name').textContent='查詢失敗';
 return;
 
 }
-
 
 current={
 code:resolved.code,
@@ -4110,18 +3860,14 @@ ma120:null,
 ma240:null
 };
 
-
 $('name').textContent=
 resolved.name+' '+resolved.code;
-
 
 $('price').textContent=
 fmt(current.price);
 
-
 const ch=current.change;
 const pc=current.pct;
-
 
 $('change').textContent=
 (
@@ -4138,7 +3884,6 @@ fmt(pc)+
 ''
 );
 
-
 $('change').className=
 'change '+
 (
@@ -4147,7 +3892,6 @@ pc<0?'down':
 'neutral'
 );
 
-
 $('pct').textContent=
 pc===null?
 '—':
@@ -4155,13 +3899,10 @@ pc===null?
 fmt(pc)+
 '%';
 
-
 $('changePct2').textContent=
 $('pct').textContent;
 
-
 $('mkt').textContent=q.market;
-
 
 $('date').textContent=
 first(q.r,[
@@ -4171,39 +3912,25 @@ first(q.r,[
 ])||
 localDate();
 
-
 $('vol').textContent=
 intfmt(current.volume);
 
-
 $('sourceChip').textContent=
 '資料來源：'+q.source;
-
-
-/* 基本面 */
 
 await loadBasics(resolved.code);
 
 if(token!==queryToken)return;
 
-
-/* 歷史 */
-
 await loadHistory(resolved.code);
 
 if(token!==queryToken)return;
-
-
-/* 計算 */
 
 judge();
 
 calcLevels();
 
 calcTrade();
-
-
-/* 法人獨立載入 */
 
 loadInstitution(resolved.code)
 .catch(e=>
@@ -4212,7 +3939,6 @@ console.warn(
 e
 )
 );
-
 
 setStatus(
 '🟢 '+resolved.name+' '+
@@ -4248,17 +3974,28 @@ setQueryBusy(false);
 
 }
 
-
-/* =========================
-   啟動
-========================= */
-
 renderRecords();
 
-setTimeout(
-()=>queryStock(),
-400
+window.addEventListener('load',()=>{
+
+setTimeout(()=>{
+
+if($('code')&&$('code').value.trim()){
+
+queryStock();
+
+}else{
+
+setStatus(
+'🟢 系統已啟動｜可輸入股票代號或股票名稱',
+'ok'
 );
+
+}
+
+},300);
+
+});
 
 </script>
 
