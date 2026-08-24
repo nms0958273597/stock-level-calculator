@@ -4,47 +4,109 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3f6fb">
-<title>股票關卡計算機 V48｜法人＋估值＋熱門TOP10</title>
+<title>股票關卡計算機 V50｜法人＋估值＋交易計畫</title>
+
 <style>
 *{box-sizing:border-box}
+
 body{
 margin:0;
 background:#f3f6fb;
 color:#14213d;
 font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif
 }
-.wrap{max-width:1050px;margin:auto;padding:18px}
-.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-.title{font-size:30px;font-weight:900;line-height:1.25}
-.sub{font-size:18px;font-weight:800;margin-top:5px}
-.actions{display:flex;gap:10px}
+
+button,input,select{
+font-family:inherit
+}
+
+.wrap{
+max-width:1050px;
+margin:auto;
+padding:18px
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+gap:12px;
+align-items:flex-start
+}
+
+.title{
+font-size:30px;
+font-weight:950;
+line-height:1.25
+}
+
+.sub{
+font-size:18px;
+font-weight:850;
+margin-top:5px
+}
+
+.actions{
+display:flex;
+gap:10px;
+flex-wrap:wrap
+}
+
 .btn{
 border:0;
 border-radius:18px;
 padding:15px 20px;
 font-size:18px;
-font-weight:900;
+font-weight:950;
 cursor:pointer
 }
-.save{background:#3478dc;color:white}
-.danger{background:#e74c3c;color:white}
+
+.btn:disabled{
+opacity:.55;
+cursor:not-allowed
+}
+
+.save{
+background:#3478dc;
+color:white
+}
+
+.danger{
+background:#e74c3c;
+color:white
+}
+
 .search{
 display:grid;
 grid-template-columns:1fr 180px 150px;
 gap:12px;
 margin:22px 0
 }
-.input,.select{
+
+.input,
+.select,
+.inputbox{
 width:100%;
 border:2px solid #dbe3ef;
 background:white;
 border-radius:20px;
 padding:18px;
 font-size:22px;
-font-weight:700;
+font-weight:800;
 outline:none
 }
-.search .btn{background:#f5a32c;color:white}
+
+.input:focus,
+.select:focus,
+.inputbox:focus{
+border-color:#7ba4ef;
+box-shadow:0 0 0 3px rgba(52,120,220,.12)
+}
+
+.search .btn{
+background:#f5a32c;
+color:white
+}
+
 .card{
 background:white;
 border:2px solid #e0e6ef;
@@ -53,104 +115,197 @@ padding:22px;
 margin:18px 0;
 box-shadow:0 6px 25px rgba(20,33,61,.05)
 }
-h2{margin:0 0 18px;font-size:27px}
+
+h2{
+margin:0 0 18px;
+font-size:27px
+}
+
 .status{
 font-size:18px;
-font-weight:800;
+font-weight:900;
 padding:17px 20px;
 border-radius:18px;
 background:#fff6dd;
 border:1px solid #e5b934
 }
-.ok{background:#eaf9ed;border-color:#58b66a}
-.bad{background:#fff0f0;border-color:#df5a5a}
-.wait{background:#eef4ff;border-color:#7ba4ef}
+
+.ok{
+background:#eaf9ed;
+border-color:#58b66a
+}
+
+.bad{
+background:#fff0f0;
+border-color:#df5a5a
+}
+
+.wait{
+background:#eef4ff;
+border-color:#7ba4ef
+}
+
 .hero{
 display:grid;
 grid-template-columns:1.2fr 1fr;
 gap:18px
 }
-.price{font-size:58px;font-weight:950}
-.change{font-size:24px;font-weight:900;margin-top:4px}
-.up{color:#e52d3b}
-.down{color:#16834a}
-.neutral{color:#7a8498}
-.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+
+.price{
+font-size:58px;
+font-weight:950
+}
+
+.change{
+font-size:24px;
+font-weight:950;
+margin-top:4px
+}
+
+.up{
+color:#e52d3b
+}
+
+.down{
+color:#16834a
+}
+
+.neutral{
+color:#7a8498
+}
+
+.chips{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:15px
+}
+
 .chip{
 padding:10px 15px;
 border-radius:999px;
 background:#eef4ff;
 border:1px solid #c9d9f8;
-font-weight:900
+font-weight:950
 }
+
 .grid2{
 display:grid;
 grid-template-columns:1fr 1fr;
 gap:16px
 }
+
 .grid3{
 display:grid;
 grid-template-columns:repeat(3,1fr);
 gap:14px
 }
+
 .metric{
 background:#f7f9fc;
 border:1px solid #e0e6ef;
 border-radius:18px;
 padding:17px
 }
+
 .metric .lab{
 font-size:16px;
-color:#69758a
+color:#69758a;
+font-weight:800
 }
+
 .metric .val{
 font-size:30px;
 font-weight:950;
-margin-top:7px
+margin-top:7px;
+word-break:break-word
 }
-.tablewrap{overflow:auto}
+
+.bigjudge{
+font-size:34px!important
+}
+
+.tablewrap{
+overflow:auto
+}
+
 table{
 width:100%;
 border-collapse:collapse;
 min-width:650px
 }
-th,td{
+
+th,
+td{
 padding:13px 10px;
 border-bottom:1px solid #e5e9f0;
 text-align:center
 }
+
 th{
 background:#f4f6fa;
-font-weight:900
+font-weight:950
 }
+
 .buy{
 color:#167d43;
-font-weight:900
+font-weight:950
 }
+
 .sell{
 color:#d52d3d;
-font-weight:900
+font-weight:950
 }
+
 .levels{
 display:grid;
 grid-template-columns:repeat(3,1fr);
 gap:12px
 }
+
 .level{
 border-radius:20px;
 padding:18px;
 background:#f7f9fc;
 border:1px solid #dfe6f1
 }
+
 .level b{
-font-size:31px;
+font-size:28px;
 display:block;
 margin-top:8px
 }
-.green{background:#edf9ef}
-.red{background:#fff0f0}
-.yellow{background:#fff8df}
-.blue{background:#edf3ff}
+
+.level .smallvalue{
+font-size:18px;
+font-weight:800;
+margin-top:8px
+}
+
+.green{
+background:#edf9ef
+}
+
+.red{
+background:#fff0f0
+}
+
+.yellow{
+background:#fff8df
+}
+
+.blue{
+background:#edf3ff
+}
+
+.orange{
+background:#fff1df
+}
+
+.purple{
+background:#f5efff
+}
+
 .hotrow{
 display:flex;
 justify-content:space-between;
@@ -159,73 +314,162 @@ align-items:center;
 padding:15px 5px;
 border-bottom:1px solid #e5e9f0
 }
+
 .rank{
 font-size:20px;
 font-weight:950;
 width:40px;
 text-align:center
 }
+
 .stockname{
 flex:1;
-font-weight:900;
+font-weight:950;
 font-size:18px
 }
+
 .mini{
 color:#6e788a;
 font-size:14px;
 margin-top:4px;
 line-height:1.5
 }
+
 .listbtn{
 background:#3478dc;
 color:white;
 border:0;
 border-radius:14px;
 padding:12px 16px;
-font-weight:900;
+font-weight:950;
 font-size:16px;
 cursor:pointer
 }
+
 .note{
 color:#7a8498;
 font-size:14px;
 line-height:1.6
 }
+
 .footer{
 text-align:center;
 color:#8490a4;
 padding:25px
 }
+
 .loading{
 padding:20px;
 text-align:center;
 color:#71809a;
-font-weight:800
+font-weight:850
 }
-.bigjudge{
+
+.prob{
 font-size:34px!important
 }
+
+.profit{
+font-size:22px!important;
+color:#167d43
+}
+
+.loss{
+font-size:22px!important;
+color:#d52d3d
+}
+
+.sectiontag{
+display:inline-block;
+padding:7px 12px;
+border-radius:999px;
+background:#eef4ff;
+color:#3478dc;
+font-weight:900;
+margin-bottom:12px
+}
+
+.alertbox{
+padding:16px;
+border-radius:18px;
+background:#f7f9fc;
+border:1px solid #dfe6f1;
+font-weight:850;
+line-height:1.7
+}
+
+.goodbox{
+background:#edf9ef;
+border-color:#58b66a
+}
+
+.warnbox{
+background:#fff8df;
+border-color:#e5b934
+}
+
+.badbox{
+background:#fff0f0;
+border-color:#df5a5a
+}
+
 @media(max-width:700px){
-.wrap{padding:12px}
-.top{display:block}
-.actions{margin-top:12px}
-.search{grid-template-columns:1fr 1fr}
-.search .input{grid-column:1/-1}
-.hero,.grid2,.grid3{grid-template-columns:1fr}
-.levels{grid-template-columns:1fr}
-.title{font-size:25px}
-.price{font-size:48px}
-.btn{padding:13px 15px}
+
+.wrap{
+padding:12px
+}
+
+.top{
+display:block
+}
+
+.actions{
+margin-top:12px
+}
+
+.search{
+grid-template-columns:1fr 1fr
+}
+
+.search .input{
+grid-column:1/-1
+}
+
+.hero,
+.grid2,
+.grid3{
+grid-template-columns:1fr
+}
+
+.levels{
+grid-template-columns:1fr
+}
+
+.title{
+font-size:25px
+}
+
+.price{
+font-size:48px
+}
+
+.btn{
+padding:13px 15px
+}
+
 .card{
 padding:17px;
 border-radius:22px
 }
+
 .hotrow{
 align-items:center
 }
+
 .stockname{
 font-size:17px
 }
+
 }
 </style>
 </head>
@@ -236,12 +480,12 @@ font-size:17px
 
 <div class="top">
 <div>
-<div class="title">📈 股票關卡計算機 V48</div>
-<div class="sub">法人＋估值＋熱門 TOP 10</div>
+<div class="title">📈 股票關卡計算機 V50</div>
+<div class="sub">法人＋估值＋熱門 TOP 10＋市場狀態＋我的交易計畫</div>
 </div>
 
 <div class="actions">
-<button class="btn save" onclick="saveRecord()">💾 儲存紀錄</button>
+<button class="btn save" id="saveBtn" onclick="saveRecord()">💾 儲存紀錄</button>
 <button class="btn danger" onclick="clearRecords()">🗑️ 清除全部</button>
 </div>
 </div>
@@ -252,7 +496,7 @@ font-size:17px
 id="code"
 class="input"
 value="1326"
-placeholder="輸入股票代號，例如 1326、2330、6770">
+placeholder="輸入股票代號，例如 1326、2330、6770、00631L">
 
 <select id="market" class="select">
 <option value="auto">自動判斷</option>
@@ -260,7 +504,7 @@ placeholder="輸入股票代號，例如 1326、2330、6770">
 <option value="tpex">上櫃</option>
 </select>
 
-<button class="btn" onclick="queryStock()">🔎 查詢</button>
+<button class="btn" id="queryBtn" onclick="queryStock()">🔎 查詢</button>
 
 </div>
 
@@ -310,10 +554,54 @@ placeholder="輸入股票代號，例如 1326、2330、6770">
 </div>
 
 <div class="metric">
-<div class="lab">漲跌幅</div>
+<div class="lab">漲跌幅 %</div>
 <div class="val" id="pct">—</div>
 </div>
 
+</div>
+
+</section>
+
+<section class="card">
+
+<h2>📊 市場狀態＋乖離率</h2>
+
+<div class="grid3">
+
+<div class="metric">
+<div class="lab">漲跌幅 %</div>
+<div class="val" id="changePct2">—</div>
+</div>
+
+<div class="metric">
+<div class="lab">MA5 乖離率 %</div>
+<div class="val" id="bias5">—</div>
+</div>
+
+<div class="metric">
+<div class="lab">MA20 乖離率 %</div>
+<div class="val" id="bias20">—</div>
+</div>
+
+<div class="metric">
+<div class="lab">盤整</div>
+<div class="val" id="sideways">—</div>
+</div>
+
+<div class="metric">
+<div class="lab">觀察</div>
+<div class="val" id="watch">—</div>
+</div>
+
+<div class="metric">
+<div class="lab">趨勢強度</div>
+<div class="val" id="strength">—</div>
+</div>
+
+</div>
+
+<div id="stateReason" class="alertbox warnbox" style="margin-top:15px">
+等待行情與均線資料
 </div>
 
 </section>
@@ -392,7 +680,6 @@ placeholder="輸入股票代號，例如 1326、2330、6770">
 <table>
 
 <thead>
-
 <tr>
 <th>法人</th>
 <th>當日</th>
@@ -400,7 +687,6 @@ placeholder="輸入股票代號，例如 1326、2330、6770">
 <th>20日累計</th>
 <th>60日累計</th>
 </tr>
-
 </thead>
 
 <tbody>
@@ -438,13 +724,12 @@ placeholder="輸入股票代號，例如 1326、2330、6770">
 </tr>
 
 </tbody>
-
 </table>
 
 </div>
 
 <div class="note">
-※ 數字單位為「張」。若官方/API 沒有取得資料，顯示「—」，絕不把錯誤資料當成 0。
+※ 數字單位為「張」。資料取得失敗時顯示「—」，不自行填 0。
 </div>
 
 </section>
@@ -456,7 +741,6 @@ placeholder="輸入股票代號，例如 1326、2330、6770">
 <div class="tablewrap">
 
 <table>
-
 <thead>
 <tr id="peHead"></tr>
 </thead>
@@ -464,7 +748,6 @@ placeholder="輸入股票代號，例如 1326、2330、6770">
 <tbody>
 <tr id="peRow"></tr>
 </tbody>
-
 </table>
 
 </div>
@@ -535,7 +818,7 @@ placeholder="輸入股票代號，例如 1326、2330、6770">
 
 <h2>🐰 關卡／交易計畫</h2>
 
-<div class="grid2">
+<div class="grid3">
 
 <div class="metric">
 <div class="lab">主力／外資成本（模型估算）</div>
@@ -570,7 +853,142 @@ placeholder="輸入股票代號，例如 1326、2330、6770">
 </div>
 
 <div class="note">
-※ 關卡為計算模型，不代表保證價格；主力／外資成本為估算值。
+※ 關卡為模型計算，不代表保證價格；主力／外資成本為估算值。
+</div>
+
+</section>
+
+<section class="card">
+
+<h2>💰 我的持股資料</h2>
+
+<div class="grid2">
+
+<div class="metric">
+<div class="lab">我的成本價位</div>
+<input id="myCost" class="inputbox" type="number" step="0.01" placeholder="例如 56.70">
+</div>
+
+<div class="metric">
+<div class="lab">我的股數</div>
+<input id="myShares" class="inputbox" type="number" step="1" placeholder="例如 2000">
+</div>
+
+</div>
+
+<button
+class="btn"
+style="background:#3478dc;color:white;margin-top:15px"
+onclick="calcTrade()">
+📊 計算我的交易計畫
+</button>
+
+<div class="note" style="margin-top:12px">
+輸入成本價與股數後，系統會自動計算三段止盈、三段止損與預估金額。
+</div>
+
+</section>
+
+<section class="card">
+
+<h2>🟢 我的三段止盈</h2>
+
+<div class="levels">
+
+<div class="level green">
+<b>第一止盈</b>
+<b id="myTP1">—</b>
+<div id="myTP1Pct" class="profit">—</div>
+<div id="myTP1Money" class="mini">—</div>
+</div>
+
+<div class="level green">
+<b>第二止盈</b>
+<b id="myTP2">—</b>
+<div id="myTP2Pct" class="profit">—</div>
+<div id="myTP2Money" class="mini">—</div>
+</div>
+
+<div class="level green">
+<b>第三止盈</b>
+<b id="myTP3">—</b>
+<div id="myTP3Pct" class="profit">—</div>
+<div id="myTP3Money" class="mini">—</div>
+</div>
+
+</div>
+
+</section>
+
+<section class="card">
+
+<h2>🔴 我的三段止損</h2>
+
+<div class="levels">
+
+<div class="level red">
+<b>第一止損</b>
+<b id="mySL1">—</b>
+<div id="mySL1Pct" class="loss">—</div>
+<div id="mySL1Money" class="mini">—</div>
+</div>
+
+<div class="level red">
+<b>第二止損</b>
+<b id="mySL2">—</b>
+<div id="mySL2Pct" class="loss">—</div>
+<div id="mySL2Money" class="mini">—</div>
+</div>
+
+<div class="level red">
+<b>第三止損</b>
+<b id="mySL3">—</b>
+<div id="mySL3Pct" class="loss">—</div>
+<div id="mySL3Money" class="mini">—</div>
+</div>
+
+</div>
+
+</section>
+
+<section class="card">
+
+<h2>🚀 三段突破＋到達機率</h2>
+
+<div class="levels">
+
+<div class="level orange">
+<b>第一突破</b>
+<b id="br1">—</b>
+<div id="br1prob" class="prob">—</div>
+</div>
+
+<div class="level yellow">
+<b>第二突破</b>
+<b id="br2">—</b>
+<div id="br2prob" class="prob">—</div>
+</div>
+
+<div class="level purple">
+<b>第三突破</b>
+<b id="br3">—</b>
+<div id="br3prob" class="prob">—</div>
+</div>
+
+</div>
+
+<div class="note" style="margin-top:15px">
+⚠️ 到達機率是依漲跌幅、均線位置、乖離與距離等資料所做的模型估算，不代表保證。
+</div>
+
+</section>
+
+<section class="card">
+
+<h2>🧭 交易計畫總結</h2>
+
+<div id="tradeSummary" class="alertbox warnbox">
+等待成本與行情資料
 </div>
 
 </section>
@@ -618,120 +1036,321 @@ placeholder="輸入股票代號，例如 1326、2330、6770">
 </section>
 
 <div class="footer">
-V48｜資料僅供研究參考，不構成投資建議。即時行情／歷史行情可能因交易時間、API限制或市場休市而延遲。
+V50｜資料僅供研究參考，不構成投資建議。<br>
+行情與法人資料可能因交易時間、休市、API限制或官方資料更新時間而延遲。
 </div>
 
 </div>
 
 <script>
 
-const $=id=>document.getElementById(id);
+/* =========================================================
+   股票關卡計算機 V50
+   保留 V48 原有主要功能，新增：
+   1. 漲跌幅 %
+   2. MA5 / MA20 乖離率 %
+   3. 盤整
+   4. 觀察
+   5. 我的成本價位
+   6. 我的股數
+   7. 第一／第二／第三止盈
+   8. 第一／第二／第三止損
+   9. 第一／第二／第三突破
+   10. 三段突破到達機率 %
+   11. 交易計畫總結
+   12. API timeout，避免畫面無限等待
+   13. 搜尋期間按鈕鎖定，完成後恢復
+   14. 每次搜尋前完整清空舊資料，避免新股票沿用舊數字
+   ========================================================= */
 
-const num=x=>{
-if(x===null||x===undefined||x==="")return null;
-const n=parseFloat(String(x).replace(/,/g,''));
-return Number.isFinite(n)?n:null
+const $ = id => document.getElementById(id);
+
+const API_TIMEOUT = 12000;
+
+let current = {
+code:'',
+name:'',
+market:'',
+source:'',
+price:null,
+prev:null,
+change:null,
+pct:null,
+volume:null,
+pe:null,
+pbr:null,
+yield:null,
+eps:null,
+bvps:null,
+ma5:null,
+ma20:null,
+ma60:null,
+ma120:null,
+ma240:null
 };
 
-const fmt=(x,d=2)=>{
-const n=num(x);
-return n==null?'—':n.toLocaleString('zh-TW',{
+let queryToken = 0;
+
+
+/* =========================================================
+   基礎數字工具
+   ========================================================= */
+
+function num(x){
+
+if(x===null || x===undefined || x==='') return null;
+
+const n = parseFloat(
+String(x)
+.replace(/,/g,'')
+.replace(/%/g,'')
+.trim()
+);
+
+return Number.isFinite(n) ? n : null;
+
+}
+
+
+function fmt(x,d=2){
+
+const n = num(x);
+
+if(n===null) return '—';
+
+return n.toLocaleString('zh-TW',{
 minimumFractionDigits:d,
 maximumFractionDigits:d
-})
-};
+});
 
-const intfmt=x=>{
-const n=num(x);
-return n==null?'—':Math.round(n).toLocaleString('zh-TW')
-};
+}
 
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({
+
+function intfmt(x){
+
+const n = num(x);
+
+if(n===null) return '—';
+
+return Math.round(n).toLocaleString('zh-TW');
+
+}
+
+
+function signedFmt(x,d=2){
+
+const n = num(x);
+
+if(n===null) return '—';
+
+return (n>=0?'+':'') + fmt(n,d);
+
+}
+
+
+function esc(s){
+
+return String(s ?? '').replace(/[&<>"']/g,m=>({
+
 '&':'&amp;',
 '<':'&lt;',
 '>':'&gt;',
 '"':'&quot;',
 "'":'&#39;'
+
 }[m]));
 
-function localDate(d=new Date()){
-const y=d.getFullYear();
-const m=String(d.getMonth()+1).padStart(2,'0');
-const day=String(d.getDate()).padStart(2,'0');
-return y+'-'+m+'-'+day;
 }
+
+
+/* =========================================================
+   日期工具
+   ========================================================= */
+
+function localDate(d=new Date()){
+
+const y = d.getFullYear();
+
+const m = String(d.getMonth()+1).padStart(2,'0');
+
+const day = String(d.getDate()).padStart(2,'0');
+
+return y+'-'+m+'-'+day;
+
+}
+
 
 function daysAgo(n){
-const d=new Date();
+
+const d = new Date();
+
 d.setDate(d.getDate()-n);
-return localDate(d)
+
+return localDate(d);
+
 }
 
-function setStatus(t,type='bad'){
-$('status').className='status '+type;
-$('status').textContent=t
+
+/* =========================================================
+   狀態顯示
+   ========================================================= */
+
+function setStatus(text,type='bad'){
+
+$('status').className = 'status '+type;
+
+$('status').textContent = text;
+
 }
+
+
+function setQueryBusy(busy){
+
+$('queryBtn').disabled = busy;
+
+$('queryBtn').textContent = busy ? '⏳ 查詢中…' : '🔎 查詢';
+
+}
+
 
 function first(o,keys){
+
 for(const k of keys){
-if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')
-return o[k]
-}
-return null
+
+if(
+o &&
+o[k]!==undefined &&
+o[k]!==null &&
+o[k]!==''
+){
+
+return o[k];
+
 }
 
-async function getJSON(url){
-const r=await fetch(url,{
-cache:'no-store',
-headers:{'Accept':'application/json'}
-});
-if(!r.ok)throw Error('HTTP '+r.status);
-return await r.json()
 }
+
+return null;
+
+}
+
+
+/* =========================================================
+   API 工具
+   ========================================================= */
+
+async function getJSON(url,timeout=API_TIMEOUT){
+
+const controller = new AbortController();
+
+const timer = setTimeout(
+()=>controller.abort(),
+timeout
+);
+
+try{
+
+const response = await fetch(url,{
+cache:'no-store',
+headers:{
+'Accept':'application/json'
+},
+signal:controller.signal
+});
+
+if(!response.ok){
+
+throw new Error('HTTP '+response.status);
+
+}
+
+return await response.json();
+
+}catch(e){
+
+if(e.name==='AbortError'){
+
+throw new Error('API 逾時');
+
+}
+
+throw e;
+
+}finally{
+
+clearTimeout(timer);
+
+}
+
+}
+
 
 async function finmind(dataset,code,start,end){
-const url=
+
+const url =
 'https://api.finmindtrade.com/api/v4/data?dataset='+
 encodeURIComponent(dataset)+
 '&data_id='+encodeURIComponent(code)+
 '&start_date='+start+
 '&end_date='+end;
 
-const j=await getJSON(url);
+const j = await getJSON(url);
 
-if(j && Array.isArray(j.data))return j.data;
+if(j && Array.isArray(j.data)){
 
-return []
+return j.data;
+
 }
+
+return [];
+
+}
+
 
 async function twseAll(){
-const j=await getJSON(
+
+const j = await getJSON(
 'https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL'
 );
-return Array.isArray(j)?j:[]
+
+return Array.isArray(j) ? j : [];
+
 }
+
 
 async function tpexQuotes(){
-const j=await getJSON(
+
+const j = await getJSON(
 'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_quotes'
 );
-return Array.isArray(j)?j:[]
+
+return Array.isArray(j) ? j : [];
+
 }
 
+
 async function t86(date){
-const j=await getJSON(
+
+const j = await getJSON(
 'https://openapi.twse.com.tw/v1/exchangeReport/T86?response=json&date='+
 date+
 '&selectType=ALLBUT0999'
 );
-return Array.isArray(j)?j:[]
+
+return Array.isArray(j) ? j : [];
+
 }
+
+
+/* =========================================================
+   股票尋找
+   ========================================================= */
 
 function findStock(rows,code){
 
 return (rows||[]).find(r=>{
 
-const c=first(r,[
+const c = first(r,[
 '證券代號',
 '股票代號',
 'SecuritiesCompanyCode',
@@ -740,24 +1359,30 @@ const c=first(r,[
 'stock_id'
 ]);
 
-return String(c||'').trim()===String(code).trim()
+return String(c||'').trim()===String(code).trim();
 
-})
+});
 
 }
 
+
+/* =========================================================
+   行情解析
+   ========================================================= */
+
 function parsePriceRow(r){
 
-const price=num(first(r,[
+const price = num(first(r,[
 '收盤價',
 '成交價',
 'Close',
 'close',
+'ClosingPrice',
 'Price',
 'price'
 ]));
 
-const prev=num(first(r,[
+const prev = num(first(r,[
 '昨收',
 '前收盤價',
 'PreviousClose',
@@ -765,7 +1390,7 @@ const prev=num(first(r,[
 'previous'
 ]));
 
-let change=num(first(r,[
+let change = num(first(r,[
 '漲跌價差',
 '漲跌',
 'Change',
@@ -773,113 +1398,307 @@ let change=num(first(r,[
 'spread'
 ]));
 
-let pct=num(first(r,[
+let pct = num(first(r,[
 '漲跌幅',
 'ChangePercent',
-'change_percent'
+'change_percent',
+'Change_Percent'
 ]));
 
-if(pct==null&&price!=null&&prev!=null&&prev!==0)
+if(pct===null && price!==null && prev!==null && prev!==0){
+
 pct=(price-prev)/prev*100;
 
-if(change==null&&price!=null&&prev!=null)
+}
+
+if(change===null && price!==null && prev!==null){
+
 change=price-prev;
 
-const volumeRaw=num(first(r,[
+}
+
+const volumeRaw = num(first(r,[
 '成交股數',
 '成交量',
 'Trading_Volume',
+'TradeVolume',
 'Volume',
 'volume'
 ]));
 
 return {
+
 price,
 prev,
 change,
 pct,
-volume:volumeRaw!=null?volumeRaw/1000:null,
-high:num(first(r,['最高價','High','max'])),
-low:num(first(r,['最低價','Low','min'])),
-open:num(first(r,['開盤價','Open','open']))
-}
+volume:volumeRaw!==null ? volumeRaw/1000 : null,
+
+high:num(first(r,[
+'最高價',
+'High',
+'max'
+])),
+
+low:num(first(r,[
+'最低價',
+'Low',
+'min'
+])),
+
+open:num(first(r,[
+'開盤價',
+'Open',
+'open'
+]))
+
+};
 
 }
 
-let current={};
 
-async function currentQuote(code){
+/* =========================================================
+   行情取得
+   ========================================================= */
 
-let errors=[];
+async function currentTWSE(code){
 
-try{
+const rows = await twseAll();
 
-const rows=await twseAll();
-const r=findStock(rows,code);
+const r = findStock(rows,code);
 
-if(r){
+if(!r) throw new Error('TWSE 找不到');
 
 return {
 r,
 quote:parsePriceRow(r),
 market:'上市',
-source:'TWSE STOCK_DAY_ALL'
-}
+source:'TWSE 官方'
+};
 
 }
 
-}catch(e){
-errors.push('TWSE')
-}
 
-try{
+async function currentTPEX(code){
 
-const rows=await tpexQuotes();
-const r=findStock(rows,code);
+const rows = await tpexQuotes();
 
-if(r){
+const r = findStock(rows,code);
+
+if(!r) throw new Error('TPEX 找不到');
 
 return {
 r,
 quote:parsePriceRow(r),
 market:'上櫃',
-source:'TPEX'
-}
+source:'TPEX 官方'
+};
 
 }
 
-}catch(e){
-errors.push('TPEX')
-}
 
-try{
+async function currentFinMind(code){
 
-const rows=await finmind(
+const rows = await finmind(
 'TaiwanStockPrice',
 code,
 daysAgo(30),
 localDate()
 );
 
-if(rows.length){
+if(!rows.length){
 
-const r=rows[rows.length-1];
+throw new Error('FinMind 找不到');
+
+}
+
+const r = rows[rows.length-1];
 
 return {
 r,
 quote:parsePriceRow(r),
 market:'FinMind',
-source:'FinMind TaiwanStockPrice'
-}
+source:'FinMind'
+};
 
 }
+
+
+async function currentQuote(code){
+
+const market = $('market').value;
+
+const attempts=[];
+
+
+/* 使用者指定上市 */
+
+if(market==='twse'){
+
+try{
+
+return await currentTWSE(code);
 
 }catch(e){
-errors.push('FinMind')
+
+attempts.push('上市');
+
 }
 
-return null
 }
+
+
+/* 使用者指定上櫃 */
+
+if(market==='tpex'){
+
+try{
+
+return await currentTPEX(code);
+
+}catch(e){
+
+attempts.push('上櫃');
+
+}
+
+}
+
+
+/* 自動判斷：上市 */
+
+try{
+
+return await currentTWSE(code);
+
+}catch(e){
+
+attempts.push('TWSE');
+
+}
+
+
+/* 自動判斷：上櫃 */
+
+try{
+
+return await currentTPEX(code);
+
+}catch(e){
+
+attempts.push('TPEX');
+
+}
+
+
+/* 最後使用 FinMind */
+
+try{
+
+return await currentFinMind(code);
+
+}catch(e){
+
+attempts.push('FinMind');
+
+}
+
+return null;
+
+}
+
+
+/* =========================================================
+   清除上一支股票資料
+   防止「搜尋新股票但舊數字還留著」
+   ========================================================= */
+
+function resetDisplay(){
+
+const ids=[
+
+'price',
+'change',
+'mkt',
+'date',
+'vol',
+'pct',
+'changePct2',
+
+'bias5',
+'bias20',
+'sideways',
+'watch',
+'strength',
+
+'eps',
+'pe',
+'bvps',
+'pbr',
+'yield',
+
+'marketJudge',
+'peJudge',
+'pbrJudge',
+'overall',
+
+'ma5',
+'ma20',
+'ma60',
+'ma120',
+'ma240',
+
+'cost',
+'entry',
+'observe',
+'breakout',
+'stop',
+'tp1',
+
+'aggressive',
+'optimistic',
+'conservative',
+
+'br1',
+'br2',
+'br3',
+'br1prob',
+'br2prob',
+'br3prob'
+
+];
+
+ids.forEach(id=>{
+
+if($(id)){
+
+$(id).textContent='—';
+
+}
+
+});
+
+
+$('name').textContent='查詢中…';
+
+$('trendChip').textContent='📊 市場判斷：—';
+
+$('sourceChip').textContent='資料來源：查詢中';
+
+$('stateReason').textContent='等待行情與均線資料';
+
+$('stateReason').className='alertbox warnbox';
+
+resetInstitution();
+
+resetMyTrade();
+
+}
+
+
+/* =========================================================
+   基本資訊
+   ========================================================= */
 
 async function loadBasics(code){
 
@@ -888,12 +1707,15 @@ let pbr=null;
 let yieldRate=null;
 let dataDate=null;
 
+
+/* FinMind */
+
 try{
 
-const rows=await finmind(
+const rows = await finmind(
 'TaiwanStockPER',
 code,
-daysAgo(60),
+daysAgo(90),
 localDate()
 );
 
@@ -919,84 +1741,187 @@ yieldRate=num(first(r,[
 '殖利率'
 ]));
 
-dataDate=first(r,['date','Date']);
+dataDate=first(r,[
+'date',
+'Date'
+]);
 
 }
 
 }catch(e){
-console.warn('FinMind PER/PBR failed',e)
+
+console.warn('FinMind PER failed',e);
+
 }
 
-if(pe==null||pbr==null||yieldRate==null){
+
+/* TWSE 備援 */
+
+if(
+pe===null ||
+pbr===null ||
+yieldRate===null
+){
 
 try{
 
-const url=
-'https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL';
+const rows = await getJSON(
+'https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL'
+);
 
-const rows=await getJSON(url);
-
-const r=findStock(rows,code);
+const r = findStock(rows,code);
 
 if(r){
 
-if(pe==null)
-pe=num(first(r,['本益比','PER','PE']));
+if(pe===null){
 
-if(pbr==null)
-pbr=num(first(r,['股價淨值比','PBR']));
+pe=num(first(r,[
+'本益比',
+'PER',
+'PE'
+]));
 
-if(yieldRate==null)
-yieldRate=num(first(r,['殖利率','DividendYield']));
+}
+
+if(pbr===null){
+
+pbr=num(first(r,[
+'股價淨值比',
+'PBR'
+]));
+
+}
+
+if(yieldRate===null){
+
+yieldRate=num(first(r,[
+'殖利率',
+'DividendYield'
+]));
+
+}
 
 }
 
 }catch(e){
-console.warn('TWSE BWIBBU failed',e)
+
+console.warn('TWSE BWIBBU failed',e);
+
 }
 
 }
+
+
+current.pe=pe;
+current.pbr=pbr;
+current.yield=yieldRate;
 
 $('pe').textContent=fmt(pe);
 
 $('pbr').textContent=fmt(pbr);
 
 $('yield').textContent=
-yieldRate==null?'—':fmt(yieldRate)+'%';
+yieldRate===null ? '—' : fmt(yieldRate)+'%';
 
-if(pe!=null&&current.price!=null&&pe!==0)
-$('eps').textContent=fmt(current.price/pe);
-else
+
+if(
+pe!==null &&
+current.price!==null &&
+pe!==0
+){
+
+current.eps=current.price/pe;
+
+$('eps').textContent=fmt(current.eps);
+
+}else{
+
+current.eps=null;
+
 $('eps').textContent='—';
-
-if(pbr!=null&&current.price!=null&&pbr!==0)
-$('bvps').textContent=fmt(current.price/pbr);
-else
-$('bvps').textContent='—';
-
-if(dataDate)
-$('date').textContent=dataDate;
-
-return {pe,pbr,yieldRate}
 
 }
 
+
+if(
+pbr!==null &&
+current.price!==null &&
+pbr!==0
+){
+
+current.bvps=current.price/pbr;
+
+$('bvps').textContent=fmt(current.bvps);
+
+}else{
+
+current.bvps=null;
+
+$('bvps').textContent='—';
+
+}
+
+
+if(dataDate){
+
+$('date').textContent=dataDate;
+
+}
+
+
+return {
+pe,
+pbr,
+yieldRate
+};
+
+}
+
+
+/* =========================================================
+   歷史資料與均線
+   ========================================================= */
+
 async function loadHistory(code){
+
+let closes=[];
+
 
 try{
 
-const rows=await finmind(
+const rows = await finmind(
 'TaiwanStockPrice',
 code,
 daysAgo(400),
 localDate()
 );
 
-const closes=rows
-.map(r=>num(first(r,['close','Close'])))
-.filter(x=>x!=null);
+closes=rows
+.map(r=>num(first(r,[
+'close',
+'Close',
+'收盤價',
+'ClosingPrice'
+])))
+.filter(x=>x!==null);
 
-if(!closes.length)return;
+}catch(e){
+
+console.warn('FinMind history failed',e);
+
+}
+
+
+/* 如果 FinMind 失敗，至少使用目前價格避免整頁沒有反應 */
+
+if(!closes.length && current.price!==null){
+
+closes=[current.price];
+
+}
+
+
+/* 計算 MA */
 
 for(const n of [5,20,60,120,240]){
 
@@ -1004,22 +1929,776 @@ if(closes.length>=n){
 
 const a=closes.slice(-n);
 
-const avg=
-a.reduce((sum,x)=>sum+x,0)/a.length;
+const avg=a.reduce(
+(sum,x)=>sum+x,
+0
+)/a.length;
+
+current['ma'+n]=avg;
 
 $('ma'+n).textContent=fmt(avg);
 
+}else{
+
+current['ma'+n]=null;
+
+$('ma'+n).textContent='資料不足';
+
+}
+
+}
+
+
+/* 更新乖離 */
+
+updateBias();
+
+}
+
+
+/* =========================================================
+   乖離率＋盤整＋觀察
+   ========================================================= */
+
+function updateBias(){
+
+const p=current.price;
+
+if(p===null) return;
+
+
+const ma5=current.ma5;
+
+const ma20=current.ma20;
+
+
+let b5=null;
+let b20=null;
+
+
+if(ma5!==null && ma5!==0){
+
+b5=(p/ma5-1)*100;
+
+}
+
+
+if(ma20!==null && ma20!==0){
+
+b20=(p/ma20-1)*100;
+
+}
+
+
+$('bias5').textContent=
+b5===null?'—':signedFmt(b5)+'%';
+
+$('bias20').textContent=
+b20===null?'—':signedFmt(b20)+'%';
+
+
+let sideways='資料不足';
+let watch='👀 觀察';
+let strength='資料不足';
+
+let reason='目前資料不足，先觀察。';
+
+
+if(b5!==null && b20!==null){
+
+const spread=Math.abs(b5-b20);
+
+
+if(
+Math.abs(b20)<=2.5 &&
+spread<=3
+){
+
+sideways='🟡 盤整';
+
+watch='👀 觀察';
+
+strength='中性';
+
+reason=
+'股價與 MA5、MA20 距離接近，短中期方向不明，屬盤整觀察區。';
+
+
+}else if(
+p>ma5 &&
+p>ma20
+){
+
+sideways='🟢 非盤整';
+
+watch='🟢 偏多';
+
+strength=
+Math.abs(b20)>=5?'強':'中';
+
+reason=
+'股價同時位於 MA5、MA20 上方，短中期偏多。';
+
+
+}else if(
+p<ma5 &&
+p<ma20
+){
+
+sideways='🔴 非盤整';
+
+watch='🔴 偏空';
+
+strength=
+Math.abs(b20)>=5?'弱':'中';
+
+reason=
+'股價同時位於 MA5、MA20 下方，短中期偏空。';
+
+
+}else{
+
+sideways='🟡 震盪';
+
+watch='👀 觀察';
+
+strength='中性';
+
+reason=
+'MA5 與 MA20 方向尚未一致，建議等待突破或跌破確認。';
+
 }
 
 }
 
-}catch(e){
 
-console.warn('history failed',e)
+$('sideways').textContent=sideways;
+
+$('watch').textContent=watch;
+
+$('strength').textContent=strength;
+
+$('stateReason').textContent=reason;
+
+
+if(
+watch.includes('偏多')
+){
+
+$('stateReason').className='alertbox goodbox';
+
+}else if(
+watch.includes('偏空')
+){
+
+$('stateReason').className='alertbox badbox';
+
+}else{
+
+$('stateReason').className='alertbox warnbox';
 
 }
 
 }
+
+
+/* =========================================================
+   市場判斷與估值判斷
+   ========================================================= */
+
+function judge(){
+
+const p=current.price;
+
+const m5=current.ma5;
+
+const m20=current.ma20;
+
+
+let trend='⚪ 中性';
+let cls='neutral';
+
+
+if(
+p!==null &&
+m5!==null &&
+m20!==null
+){
+
+if(
+p>m5 &&
+p>m20
+){
+
+trend='🟢 偏多';
+cls='up';
+
+}else if(
+p<m5 &&
+p<m20
+){
+
+trend='🔴 偏空';
+cls='down';
+
+}else{
+
+trend='🟡 盤整／觀察';
+
+}
+
+}
+
+
+$('trendChip').textContent=
+'📊 市場判斷：'+trend;
+
+$('trendChip').className=
+'chip '+cls;
+
+$('marketJudge').textContent=trend;
+
+
+const pe=current.pe;
+
+const pbr=current.pbr;
+
+
+$('peJudge').textContent=
+pe===null ?
+'資料不足' :
+pe<15 ?
+'🟢 偏低' :
+pe>25 ?
+'🔴 偏高' :
+'🟡 合理';
+
+
+$('pbrJudge').textContent=
+pbr===null ?
+'資料不足' :
+pbr<1 ?
+'🟢 偏低' :
+pbr>2 ?
+'🔴 偏高' :
+'🟡 合理';
+
+
+if(
+pe===null &&
+pbr===null
+){
+
+$('overall').textContent='🟡 資料不足';
+
+}else if(
+(pe!==null&&pe>25) ||
+(pbr!==null&&pbr>2)
+){
+
+$('overall').textContent='🔴 偏高';
+
+}else if(
+(pe!==null&&pe<15) ||
+(pbr!==null&&pbr<1)
+){
+
+$('overall').textContent='🟢 偏低';
+
+}else{
+
+$('overall').textContent='🟡 合理';
+
+}
+
+}
+
+
+/* =========================================================
+   估值與關卡
+   ========================================================= */
+
+function calcLevels(){
+
+const p=current.price;
+
+if(p===null) return;
+
+
+const ma20=current.ma20;
+
+const modelCost=
+ma20!==null ? ma20 : p;
+
+
+$('cost').textContent=fmt(modelCost);
+
+$('entry').textContent=fmt(p*.98);
+
+$('observe').textContent=
+fmt(p*.97)+' ～ '+fmt(p);
+
+$('breakout').textContent=fmt(p*1.05);
+
+$('stop').textContent=fmt(p*.94);
+
+$('tp1').textContent=fmt(p*1.06);
+
+
+/* PE 區間 */
+
+const eps=current.eps;
+
+const pes=[
+10,12,15,18,20,22,24,26,28,30
+];
+
+
+$('peHead').innerHTML=
+'<th>PE倍數</th>'+
+pes.map(
+x=>'<th>'+x+'倍</th>'
+).join('');
+
+
+$('peRow').innerHTML=
+'<th>估值價格</th>'+
+pes.map(
+x=>'<td>'+
+(eps!==null ? fmt(eps*x) : '—')+
+'</td>'
+).join('');
+
+
+$('aggressive').textContent=
+eps!==null ? fmt(eps*28) : '—';
+
+$('optimistic').textContent=
+eps!==null ? fmt(eps*22) : '—';
+
+$('conservative').textContent=
+eps!==null ? fmt(eps*16) : '—';
+
+
+calcBreakouts();
+
+}
+
+
+/* =========================================================
+   突破到達機率模型
+   ========================================================= */
+
+function probability(target){
+
+const p=current.price;
+
+if(
+p===null ||
+target===null ||
+p<=0
+){
+
+return null;
+
+}
+
+
+const distance=
+(target-p)/p*100;
+
+
+/* 基礎分數：距離越近，理論到達機率越高 */
+
+let score=
+78 -
+distance*8;
+
+
+/* MA20 */
+
+if(current.ma20!==null){
+
+if(p>current.ma20){
+
+score+=8;
+
+}else{
+
+score-=8;
+
+}
+
+}
+
+
+/* MA5 */
+
+if(current.ma5!==null){
+
+if(p>current.ma5){
+
+score+=5;
+
+}else{
+
+score-=5;
+
+}
+
+}
+
+
+/* 當日漲跌 */
+
+if(current.pct!==null){
+
+if(current.pct>0){
+
+score+=Math.min(
+current.pct*1.5,
+8
+);
+
+}else if(current.pct<0){
+
+score+=Math.max(
+current.pct*1.5,
+-8
+);
+
+}
+
+}
+
+
+/* 乖離過大降低機率 */
+
+if(current.ma20!==null){
+
+const bias=
+(p/current.ma20-1)*100;
+
+if(bias>10){
+
+score-=8;
+
+}
+
+if(bias<-10){
+
+score-=5;
+
+}
+
+}
+
+
+return Math.max(
+5,
+Math.min(
+95,
+Math.round(score)
+)
+);
+
+}
+
+
+function calcBreakouts(){
+
+const p=current.price;
+
+if(p===null) return;
+
+
+const b1=p*1.03;
+const b2=p*1.06;
+const b3=p*1.10;
+
+
+$('br1').textContent=fmt(b1);
+
+$('br2').textContent=fmt(b2);
+
+$('br3').textContent=fmt(b3);
+
+
+const q1=probability(b1);
+const q2=probability(b2);
+const q3=probability(b3);
+
+
+$('br1prob').textContent=
+q1===null?'—':q1+'%';
+
+$('br2prob').textContent=
+q2===null?'—':q2+'%';
+
+$('br3prob').textContent=
+q3===null?'—':q3+'%';
+
+}
+
+
+/* =========================================================
+   我的交易計畫
+   ========================================================= */
+
+function resetMyTrade(){
+
+[
+'myTP1',
+'myTP2',
+'myTP3',
+'myTP1Pct',
+'myTP2Pct',
+'myTP3Pct',
+'myTP1Money',
+'myTP2Money',
+'myTP3Money',
+
+'mySL1',
+'mySL2',
+'mySL3',
+'mySL1Pct',
+'mySL2Pct',
+'mySL3Pct',
+'mySL1Money',
+'mySL2Money',
+'mySL3Money'
+
+].forEach(id=>{
+
+if($(id)){
+
+$(id).textContent='—';
+
+}
+
+});
+
+
+$('tradeSummary').textContent=
+'等待成本與行情資料';
+
+$('tradeSummary').className=
+'alertbox warnbox';
+
+}
+
+
+function setTradeValue(id,v){
+
+$(id).textContent=fmt(v);
+
+}
+
+
+function setTradePct(id,v,profit){
+
+$(id).textContent=
+(v>=0?'+':'')+
+fmt(v)+'%';
+
+$(id).className=
+profit?'profit':'loss';
+
+}
+
+
+function calcTrade(){
+
+const cost=num($('myCost').value);
+
+const shares=num($('myShares').value);
+
+
+if(
+cost===null ||
+cost<=0
+){
+
+resetMyTrade();
+
+$('tradeSummary').textContent=
+'請輸入你的成本價位。';
+
+return;
+
+}
+
+
+if(
+shares===null ||
+shares<=0
+){
+
+resetMyTrade();
+
+$('tradeSummary').textContent=
+'請輸入你的股數。';
+
+return;
+
+}
+
+
+/* 三段止盈 */
+
+const tp1=cost*1.05;
+const tp2=cost*1.10;
+const tp3=cost*1.15;
+
+
+/* 三段止損 */
+
+const sl1=cost*.97;
+const sl2=cost*.94;
+const sl3=cost*.90;
+
+
+/* 顯示止盈 */
+
+setTradeValue('myTP1',tp1);
+setTradeValue('myTP2',tp2);
+setTradeValue('myTP3',tp3);
+
+
+setTradePct(
+'myTP1Pct',
+(tp1/cost-1)*100,
+true
+);
+
+setTradePct(
+'myTP2Pct',
+(tp2/cost-1)*100,
+true
+);
+
+setTradePct(
+'myTP3Pct',
+(tp3/cost-1)*100,
+true
+);
+
+
+$('myTP1Money').textContent=
+'預估獲利：$'+
+intfmt((tp1-cost)*shares);
+
+$('myTP2Money').textContent=
+'預估獲利：$'+
+intfmt((tp2-cost)*shares);
+
+$('myTP3Money').textContent=
+'預估獲利：$'+
+intfmt((tp3-cost)*shares);
+
+
+/* 顯示止損 */
+
+setTradeValue('mySL1',sl1);
+setTradeValue('mySL2',sl2);
+setTradeValue('mySL3',sl3);
+
+
+setTradePct(
+'mySL1Pct',
+(sl1/cost-1)*100,
+false
+);
+
+setTradePct(
+'mySL2Pct',
+(sl2/cost-1)*100,
+false
+);
+
+setTradePct(
+'mySL3Pct',
+(sl3/cost-1)*100,
+false
+);
+
+
+$('mySL1Money').textContent=
+'預估損失：$'+
+intfmt((sl1-cost)*shares);
+
+$('mySL2Money').textContent=
+'預估損失：$'+
+intfmt((sl2-cost)*shares);
+
+$('mySL3Money').textContent=
+'預估損失：$'+
+intfmt((sl3-cost)*shares);
+
+
+/* 交易計畫摘要 */
+
+let currentText='尚未取得目前股價';
+
+if(current.price!==null){
+
+const diff=
+(current.price-cost)/cost*100;
+
+currentText=
+'目前股價 '+fmt(current.price)+
+'，相對你的成本 '+
+(diff>=0?'+':'')+
+fmt(diff)+'%。';
+
+}
+
+
+$('tradeSummary').innerHTML=
+'<b>我的交易計畫</b><br>'+
+'成本價：'+fmt(cost)+
+'｜股數：'+intfmt(shares)+
+'<br>'+
+currentText+
+'<br>'+
+'第一止盈 '+fmt(tp1)+
+'／第二止盈 '+fmt(tp2)+
+'／第三止盈 '+fmt(tp3)+
+'<br>'+
+'第一止損 '+fmt(sl1)+
+'／第二止損 '+fmt(sl2)+
+'／第三止損 '+fmt(sl3);
+
+
+if(
+current.price!==null &&
+current.price>=tp1
+){
+
+$('tradeSummary').className=
+'alertbox goodbox';
+
+}else if(
+current.price!==null &&
+current.price<=sl1
+){
+
+$('tradeSummary').className=
+'alertbox badbox';
+
+}else{
+
+$('tradeSummary').className=
+'alertbox warnbox';
+
+}
+
+}
+
+
+/* =========================================================
+   法人
+   ========================================================= */
 
 function resetInstitution(){
 
@@ -1029,91 +2708,119 @@ function resetInstitution(){
 'd1','d5','d20','d60',
 't1','t5','t20','t60'
 ].forEach(id=>{
+
+if($(id)){
+
 $(id).textContent='—';
-$(id).className=''
-})
+
+$(id).className='';
 
 }
+
+});
+
+}
+
 
 function renderInstCell(id,v){
 
-if(v==null){
+if(v===null || v===undefined){
 
 $(id).textContent='—';
+
 $(id).className='';
-return
+
+return;
 
 }
 
-$(id).textContent=(v>=0?'+':'')+fmt(v,0);
+$(id).textContent=
+(v>=0?'+':'')+
+intfmt(v);
 
 $(id).className=
 v>0?'buy':
-v<0?'sell':'';
+v<0?'sell':
+'';
 
 }
 
+
 function t86Value(r,type){
 
-if(!r)return null;
+if(!r) return null;
 
 const keys=Object.keys(r);
+
 
 function get(patterns){
 
 for(const k of keys){
 
-if(patterns.some(p=>p.test(k))){
+if(
+patterns.some(p=>p.test(k))
+){
 
 const v=num(r[k]);
 
-if(v!=null)return v
+if(v!==null) return v;
 
 }
 
 }
 
-return null
+return null;
 
 }
+
 
 if(type==='foreign'){
 
 return get([
 /外陸資.*買賣超股數/,
 /外資.*買賣超股數/,
-/Foreign.*Net/i
-])
+/Foreign.*Net/i,
+/Foreign.*Buy.*Sell/i
+]);
 
 }
+
 
 if(type==='trust'){
 
 return get([
 /投信.*買賣超股數/,
-/Investment.*Trust.*Net/i
-])
+/Investment.*Trust.*Net/i,
+/Investment.*Trust.*Buy.*Sell/i
+]);
 
 }
+
 
 if(type==='dealer'){
 
 return get([
 /自營商.*買賣超股數/,
-/Dealer.*Net/i
-])
+/Dealer.*Net/i,
+/Dealer.*Buy.*Sell/i
+]);
 
 }
 
-return null
+
+return null;
 
 }
+
 
 async function loadInstitution(code){
 
 resetInstitution();
 
 let dailyDone=false;
+
+
+/* 當日 T86 */
 
 try{
 
@@ -1127,18 +2834,44 @@ const f=t86Value(r,'foreign');
 const i=t86Value(r,'trust');
 const d=t86Value(r,'dealer');
 
-renderInstCell('f1',f==null?null:f/1000);
-renderInstCell('i1',i==null?null:i/1000);
-renderInstCell('d1',d==null?null:d/1000);
 
-if(f!=null||i!=null||d!=null){
+if(f!==null){
 
-const total=
-(f||0)+(i||0)+(d||0);
-
-renderInstCell('t1',total/1000);
+renderInstCell('f1',f/1000);
 
 }
+
+if(i!==null){
+
+renderInstCell('i1',i/1000);
+
+}
+
+if(d!==null){
+
+renderInstCell('d1',d/1000);
+
+}
+
+
+if(
+f!==null ||
+i!==null ||
+d!==null
+){
+
+const total=
+(f||0)+
+(i||0)+
+(d||0);
+
+renderInstCell(
+'t1',
+total/1000
+);
+
+}
+
 
 dailyDone=true;
 
@@ -1146,28 +2879,38 @@ dailyDone=true;
 
 }catch(e){
 
-console.warn('T86 failed',e)
+console.warn('T86 failed',e);
 
 }
+
+
+/* 歷史法人 */
 
 try{
 
 const rows=await finmind(
 'TaiwanStockInstitutionalInvestorsBuySell',
 code,
-daysAgo(90),
+daysAgo(100),
 localDate()
 );
 
-if(rows.length){
+
+if(!rows.length) return;
+
 
 const byDate={};
 
+
 for(const r of rows){
 
-const dt=first(r,['date','Date']);
+const dt=first(r,[
+'date',
+'Date'
+]);
 
-if(!dt)continue;
+if(!dt) continue;
+
 
 if(!byDate[dt]){
 
@@ -1175,45 +2918,63 @@ byDate[dt]={
 foreign:0,
 trust:0,
 dealer:0
-}
+};
 
 }
 
-const buy=num(first(r,['buy','Buy']))||0;
 
-const sell=num(first(r,['sell','Sell']))||0;
+const buy=
+num(first(r,[
+'buy',
+'Buy',
+'BuyShares'
+]))||0;
+
+
+const sell=
+num(first(r,[
+'sell',
+'Sell',
+'SellShares'
+]))||0;
+
 
 const net=buy-sell;
 
+
 const name=String(
-first(r,['name','InvestorType','institutional_investor'])||''
+first(r,[
+'name',
+'InvestorType',
+'institutional_investor'
+])||''
 );
 
+
+/* 重要：FinMind 有不同名稱，盡量完整辨識 */
+
 if(
-name==='Foreign_Investor'||
-/外資(?!自營)/i.test(name)||
+name==='Foreign_Investor' ||
+/外資/.test(name) ||
+/外陸資/.test(name) ||
 /Foreign_Investor/i.test(name)
 ){
 
 byDate[dt].foreign+=net;
 
-}
-
-else if(
-name==='Investment_Trust'||
-/投信/i.test(name)||
+}else if(
+name==='Investment_Trust' ||
+/投信/.test(name) ||
 /Investment_Trust/i.test(name)
 ){
 
 byDate[dt].trust+=net;
 
-}
-
-else if(
-/Dealer_self/i.test(name)||
-/Dealer_Hedging/i.test(name)||
-name==='Dealer'||
-/自營商/i.test(name)||
+}else if(
+name==='Dealer_self' ||
+name==='Dealer_Hedging' ||
+name==='Dealer' ||
+/自營商/.test(name) ||
 /Dealer/i.test(name)
 ){
 
@@ -1223,20 +2984,25 @@ byDate[dt].dealer+=net;
 
 }
 
+
 const dates=Object.keys(byDate).sort();
 
-if(dates.length){
+
+if(!dates.length) return;
+
 
 function calc(type,n){
 
 const ds=dates.slice(-n);
 
 return ds.reduce(
-(sum,d)=>sum+byDate[d][type],
+(sum,d)=>
+sum+byDate[d][type],
 0
-)/1000
+)/1000;
 
 }
+
 
 for(const type of [
 'foreign',
@@ -1247,6 +3013,7 @@ for(const type of [
 const prefix=
 type==='foreign'?'f':
 type==='trust'?'i':'d';
+
 
 renderInstCell(
 prefix+'5',
@@ -1265,20 +3032,23 @@ calc(type,60)
 
 }
 
+
 for(const n of [5,20,60]){
 
 const ds=dates.slice(-n);
 
 let total=0;
 
+
 for(const d of ds){
 
 total+=
 byDate[d].foreign+
 byDate[d].trust+
-byDate[d].dealer
+byDate[d].dealer;
 
 }
+
 
 renderInstCell(
 't'+n,
@@ -1287,9 +3057,11 @@ total/1000
 
 }
 
+
 if(!dailyDone){
 
 const last=dates[dates.length-1];
+
 
 renderInstCell(
 'f1',
@@ -1317,364 +3089,152 @@ byDate[last].dealer
 
 }
 
-}
-
-}
-
 }catch(e){
 
-console.warn('FinMind institution failed',e)
-
-}
-
-}
-
-function judge(){
-
-const p=current.price;
-
-const m5=num($('ma5').textContent);
-const m20=num($('ma20').textContent);
-
-let t='⚪ 中性';
-let cls='neutral';
-
-if(p!=null&&m5!=null&&m20!=null){
-
-if(p>m5&&p>m20){
-
-t='🟢 偏多';
-cls='up'
-
-}
-
-else if(p<m5&&p<m20){
-
-t='🔴 偏空';
-cls='down'
-
-}
-
-}
-
-$('trendChip').textContent=
-'📊 市場判斷：'+t;
-
-$('trendChip').className=
-'chip '+cls;
-
-$('marketJudge').textContent=t;
-
-const pe=num($('pe').textContent);
-const pbr=num($('pbr').textContent);
-
-$('peJudge').textContent=
-pe==null?
-'資料不足':
-pe<15?
-'🟢 偏低':
-pe>25?
-'🔴 偏高':
-'🟡 合理';
-
-$('pbrJudge').textContent=
-pbr==null?
-'資料不足':
-pbr<1?
-'🟢 偏低':
-pbr>2?
-'🔴 偏高':
-'🟡 合理';
-
-if(pe==null&&pbr==null){
-
-$('overall').textContent='🟡 資料不足'
-
-}
-
-else if(
-(pe!=null&&pe>25)||
-(pbr!=null&&pbr>2)
-){
-
-$('overall').textContent='🔴 偏高'
-
-}
-
-else if(
-(pe!=null&&pe<15)||
-(pbr!=null&&pbr<1)
-){
-
-$('overall').textContent='🟢 偏低'
-
-}
-
-else{
-
-$('overall').textContent='🟡 合理'
-
-}
-
-}
-
-function calcLevels(){
-
-const p=current.price;
-
-if(p==null)return;
-
-const ma20=num($('ma20').textContent);
-
-const cost=
-ma20!=null?ma20:p;
-
-$('cost').textContent=fmt(cost);
-
-$('entry').textContent=fmt(p*.98);
-
-$('observe').textContent=
-fmt(p*.97)+' ～ '+fmt(p);
-
-$('breakout').textContent=fmt(p*1.05);
-
-$('stop').textContent=fmt(p*.94);
-
-$('tp1').textContent=fmt(p*1.06);
-
-const eps=num($('eps').textContent);
-
-const pes=[
-10,12,15,18,20,22,24,26,30
-];
-
-$('peHead').innerHTML=
-'<th>PE倍數</th>'+
-pes.map(x=>'<th>'+x+'倍</th>').join('');
-
-$('peRow').innerHTML=
-'<th>估值價格</th>'+
-pes.map(x=>
-'<td>'+
-(eps!=null?fmt(eps*x):'—')+
-'</td>'
-).join('');
-
-$('aggressive').textContent=
-eps!=null?fmt(eps*28):'—';
-
-$('optimistic').textContent=
-eps!=null?fmt(eps*22):'—';
-
-$('conservative').textContent=
-eps!=null?fmt(eps*16):'—';
-
-}
-
-async function queryStock(){
-
-const code=$('code').value.trim();
-
-if(!code)return;
-
-setStatus(
-'🔄 正在取得 '+code+' 最新資料……',
-'wait'
-);
-
-$('name').textContent='查詢中…';
-
-$('price').textContent='—';
-
-$('change').textContent='—';
-
-$('mkt').textContent='—';
-
-$('date').textContent='—';
-
-$('vol').textContent='—';
-
-$('pct').textContent='—';
-
-$('sourceChip').textContent='資料來源：查詢中';
-
-try{
-
-const q=await currentQuote(code);
-
-if(!q){
-
-setStatus(
-'🔴 找不到 '+code+'，或目前官方資料暫時無法取得',
-'bad'
-);
-
-$('name').textContent='查詢失敗';
-
-return
-
-}
-
-current=q.quote||{};
-
-current.code=code;
-current.market=q.market;
-current.source=q.source;
-
-const r=q.r;
-
-const name=
-first(r,[
-'證券名稱',
-'股票名稱',
-'Name',
-'name'
-])||code;
-
-$('name').textContent=
-name+' '+code;
-
-$('price').textContent=
-fmt(current.price);
-
-const ch=current.change;
-const pc=current.pct;
-
-$('change').textContent=
-(ch!=null?
-(ch>=0?'▲ ':'▼ ')+fmt(Math.abs(ch)):
-'—')
-+
-(pc!=null?
-' ('+(pc>=0?'+':'')+fmt(pc)+'%)':
-'');
-
-$('change').className=
-'change '+
-(pc>0?'up':
-pc<0?'down':
-'neutral');
-
-$('pct').textContent=
-pc==null?
-'—':
-(pc>=0?'+':'')+fmt(pc)+'%';
-
-$('mkt').textContent=q.market;
-
-$('date').textContent=
-first(r,['日期','Date','date'])||
-localDate();
-
-$('vol').textContent=
-intfmt(current.volume);
-
-$('sourceChip').textContent=
-'資料來源：'+q.source;
-
-await loadBasics(code);
-
-await loadHistory(code);
-
-await loadInstitution(code);
-
-calcLevels();
-
-judge();
-
-setStatus(
-'🟢 '+name+' '+code+
-' 資料取得完成｜'+q.market,
-'ok'
-);
-
-}catch(e){
-
-console.error(e);
-
-setStatus(
-'🔴 查詢發生錯誤：'+e.message,
-'bad'
+console.warn(
+'FinMind institution failed',
+e
 );
 
 }
 
 }
+
+
+/* =========================================================
+   熱門 TOP 10
+   ========================================================= */
 
 async function loadHot(){
 
 $('hot').innerHTML=
-'<div class="loading">🔄 正在取得上市＋上櫃成交量資料……</div>';
+'<div class="loading">🔄 正在取得上市＋上櫃成交量資料…</div>';
+
 
 try{
 
 let all=[];
 
+
+/* 上市 */
+
 try{
 
 const twse=await twseAll();
+
 
 all=all.concat(
 twse.map(r=>{
 
 const q=parsePriceRow(r);
 
+
 return {
-code:first(r,['證券代號','股票代號']),
-name:first(r,['證券名稱','股票名稱']),
+
+code:first(r,[
+'證券代號',
+'股票代號'
+]),
+
+name:first(r,[
+'證券名稱',
+'股票名稱'
+]),
+
 volume:q.volume,
+
+price:q.price,
+
 market:'上市'
-}
+
+};
 
 })
+
 );
+
 
 }catch(e){
 
-console.warn('TWSE hot failed',e)
+console.warn(
+'TWSE hot failed',
+e
+);
 
 }
+
+
+/* 上櫃 */
 
 try{
 
 const tpex=await tpexQuotes();
+
 
 all=all.concat(
 tpex.map(r=>{
 
 const q=parsePriceRow(r);
 
+
 return {
-code:first(r,['證券代號','股票代號']),
-name:first(r,['證券名稱','股票名稱']),
+
+code:first(r,[
+'證券代號',
+'股票代號'
+]),
+
+name:first(r,[
+'證券名稱',
+'股票名稱'
+]),
+
 volume:q.volume,
+
+price:q.price,
+
 market:'上櫃'
-}
+
+};
 
 })
+
 );
+
 
 }catch(e){
 
-console.warn('TPEX hot failed',e)
+console.warn(
+'TPEX hot failed',
+e
+);
 
 }
 
+
 all=all.filter(x=>
-x.code&&
-x.volume!=null&&
+x.code &&
+x.volume!==null &&
 x.volume>0
 );
 
-all.sort((a,b)=>b.volume-a.volume);
+
+all.sort(
+(a,b)=>b.volume-a.volume
+);
+
 
 const top=all.slice(0,10);
 
+
 if(!top.length){
 
-throw Error('目前沒有取得成交量資料')
+throw new Error(
+'目前沒有取得成交量資料'
+);
 
 }
+
 
 $('hot').innerHTML=
 top.map((r,i)=>{
@@ -1692,6 +3252,7 @@ ${esc(r.code)} ${esc(r.name)}
 
 ${esc(r.market)}
 ｜成交量 ${esc(intfmt(r.volume))} 張
+｜股價 ${esc(fmt(r.price))}
 
 </div>
 
@@ -1704,9 +3265,10 @@ onclick="loadCode('${esc(r.code)}')">
 </button>
 
 </div>
-`
+`;
 
 }).join('');
+
 
 }catch(e){
 
@@ -1718,28 +3280,34 @@ $('hot').innerHTML=
 
 <br>
 
-系統已改用「上市＋上櫃成交量」排序，
-請稍後再按一次。
+系統已嘗試上市＋上櫃成交量排序。
 
 <br>
 
 錯誤：${esc(e.message)}
 
 </div>
-`
+`;
 
 }
 
 }
+
+
+/* =========================================================
+   法人 TOP 10
+   ========================================================= */
 
 async function loadInstTop(){
 
 $('instTop').innerHTML=
-'<div class="loading">🔄 正在掃描法人買超 TOP 10……</div>';
+'<div class="loading">🔄 正在掃描法人買超 TOP 10…</div>';
+
 
 try{
 
 const rows=await t86(localDate());
+
 
 let a=(rows||[])
 .map(r=>{
@@ -1750,11 +3318,18 @@ const i=t86Value(r,'trust')||0;
 
 const d=t86Value(r,'dealer')||0;
 
+
 return {
 
-code:first(r,['證券代號','股票代號']),
+code:first(r,[
+'證券代號',
+'股票代號'
+]),
 
-name:first(r,['證券名稱','股票名稱']),
+name:first(r,[
+'證券名稱',
+'股票名稱'
+]),
 
 foreign:f,
 
@@ -1764,17 +3339,28 @@ dealer:d,
 
 net:f+i+d
 
-}
+};
 
 })
 .filter(x=>x.code);
 
-a.sort((x,y)=>y.net-x.net);
+
+a.sort(
+(x,y)=>y.net-x.net
+);
+
 
 a=a.slice(0,10);
 
-if(!a.length)
-throw Error('目前沒有法人資料');
+
+if(!a.length){
+
+throw new Error(
+'目前沒有法人資料'
+);
+
+}
+
 
 $('instTop').innerHTML=
 a.map((r,i)=>{
@@ -1792,6 +3378,10 @@ ${esc(r.code)} ${esc(r.name)}
 
 外資淨買 ${esc(intfmt(r.foreign/1000))} 張
 
+｜投信 ${esc(intfmt(r.trust/1000))} 張
+
+｜自營 ${esc(intfmt(r.dealer/1000))} 張
+
 ｜三大法人 ${esc(intfmt(r.net/1000))} 張
 
 </div>
@@ -1805,9 +3395,10 @@ onclick="loadCode('${esc(r.code)}')">
 </button>
 
 </div>
-`
+`;
 
 }).join('');
+
 
 }catch(e){
 
@@ -1818,83 +3409,154 @@ $('instTop').innerHTML=
 ⚠️ 目前無法取得法人 TOP 10。
 
 <br>
+
 請稍後再按一次。
 
 <br>
+
 錯誤：${esc(e.message)}
 
 </div>
-`
+`;
 
 }
 
 }
 
-function loadCode(c){
 
-$('code').value=c;
+/* =========================================================
+   從 TOP 10 點擊股票
+   ========================================================= */
+
+function loadCode(code){
+
+$('code').value=code;
 
 window.scrollTo({
 top:0,
 behavior:'smooth'
 });
 
-setTimeout(()=>{
-queryStock()
-},150);
+
+setTimeout(
+()=>queryStock(),
+150
+);
 
 }
+
+
+/* =========================================================
+   儲存紀錄
+   ========================================================= */
 
 function saveRecord(){
 
 const rec={
+
 code:$('code').value,
+
 name:$('name').textContent,
+
 price:$('price').textContent,
+
 pe:$('pe').textContent,
+
 pbr:$('pbr').textContent,
+
+cost:$('myCost').value,
+
+shares:$('myShares').value,
+
+tp1:$('myTP1').textContent,
+
+tp2:$('myTP2').textContent,
+
+tp3:$('myTP3').textContent,
+
+sl1:$('mySL1').textContent,
+
+sl2:$('mySL2').textContent,
+
+sl3:$('mySL3').textContent,
+
 date:new Date().toLocaleString('zh-TW')
+
 };
+
 
 const a=
 JSON.parse(
-localStorage.getItem('stockV48')||'[]'
+localStorage.getItem('stockV50')||'[]'
 );
+
 
 a.unshift(rec);
 
+
 localStorage.setItem(
-'stockV48',
-JSON.stringify(a.slice(0,30))
+'stockV50',
+JSON.stringify(
+a.slice(0,30)
+)
 );
+
 
 renderRecords();
 
+
+setStatus(
+'💾 已儲存目前交易紀錄',
+'ok'
+);
+
 }
+
+
+/* =========================================================
+   清除紀錄
+   ========================================================= */
 
 function clearRecords(){
 
-localStorage.removeItem('stockV48');
+if(!confirm('確定要清除全部儲存紀錄嗎？')){
+
+return;
+
+}
+
+
+localStorage.removeItem(
+'stockV50'
+);
+
 
 renderRecords();
 
 }
+
+
+/* =========================================================
+   顯示紀錄
+   ========================================================= */
 
 function renderRecords(){
 
 const a=
 JSON.parse(
-localStorage.getItem('stockV48')||'[]'
+localStorage.getItem('stockV50')||'[]'
 );
+
 
 if(!a.length){
 
 $('records').innerHTML=
 '目前沒有儲存紀錄';
 
-return
+return;
 
 }
+
 
 $('records').innerHTML=
 a.map((r,i)=>`
@@ -1910,9 +3572,16 @@ ${esc(r.name)}
 <div class="mini">
 
 ${esc(r.date)}
+
 ｜股價 ${esc(r.price)}
-｜PE ${esc(r.pe)}
-｜PBR ${esc(r.pbr)}
+
+｜成本 ${esc(r.cost||'—')}
+
+｜股數 ${esc(r.shares||'—')}
+
+｜第一止盈 ${esc(r.tp1||'—')}
+
+｜第一止損 ${esc(r.sl1||'—')}
 
 </div>
 
@@ -1924,9 +3593,277 @@ ${esc(r.date)}
 
 }
 
-renderRecords();
+
+/* =========================================================
+   Enter 搜尋
+   ========================================================= */
+
+$('code').addEventListener(
+'keydown',
+e=>{
+
+if(e.key==='Enter'){
+
+e.preventDefault();
 
 queryStock();
+
+}
+
+}
+);
+
+
+/* =========================================================
+   成本／股數輸入即時計算
+   ========================================================= */
+
+$('myCost').addEventListener(
+'input',
+calcTrade
+);
+
+
+$('myShares').addEventListener(
+'input',
+calcTrade
+);
+
+
+/* =========================================================
+   主查詢
+   ========================================================= */
+
+async function queryStock(){
+
+const token=++queryToken;
+
+const code=$('code').value.trim();
+
+
+if(!code){
+
+setStatus(
+'🟡 請先輸入股票代號',
+'wait'
+);
+
+return;
+
+}
+
+
+setQueryBusy(true);
+
+resetDisplay();
+
+
+setStatus(
+'🔄 正在取得 '+code+' 最新資料……',
+'wait'
+);
+
+
+try{
+
+const q=await currentQuote(code);
+
+
+/* 如果期間又查了另一支股票，丟棄舊結果 */
+
+if(token!==queryToken){
+
+return;
+
+}
+
+
+if(!q){
+
+setStatus(
+'🔴 找不到 '+code+'，或官方資料暫時無法取得',
+'bad'
+);
+
+$('name').textContent='查詢失敗';
+
+return;
+
+}
+
+
+current={
+...current,
+...(q.quote||{}),
+code,
+market:q.market,
+source:q.source
+};
+
+
+const r=q.r;
+
+
+const name=
+first(r,[
+'證券名稱',
+'股票名稱',
+'Name',
+'name'
+]) || code;
+
+
+current.name=name;
+
+
+$('name').textContent=
+name+' '+code;
+
+
+$('price').textContent=
+fmt(current.price);
+
+
+const ch=current.change;
+
+const pc=current.pct;
+
+
+$('change').textContent=
+(
+ch!==null ?
+(ch>=0?'▲ ':'▼ ')+fmt(Math.abs(ch)) :
+'—'
+)
++
+(
+pc!==null ?
+' ('+
+(pc>=0?'+':'')+
+fmt(pc)+
+'%)' :
+''
+);
+
+
+$('change').className=
+'change '+
+(
+pc>0 ?
+'up' :
+pc<0 ?
+'down' :
+'neutral'
+);
+
+
+$('pct').textContent=
+pc===null ?
+'—' :
+(pc>=0?'+':'')+
+fmt(pc)+
+'%';
+
+
+$('changePct2').textContent=
+$('pct').textContent;
+
+
+$('mkt').textContent=q.market;
+
+
+$('date').textContent=
+first(r,[
+'日期',
+'Date',
+'date'
+]) ||
+localDate();
+
+
+$('vol').textContent=
+intfmt(current.volume);
+
+
+$('sourceChip').textContent=
+'資料來源：'+q.source;
+
+
+/* 依序載入資料 */
+
+await loadBasics(code);
+
+if(token!==queryToken) return;
+
+
+await loadHistory(code);
+
+if(token!==queryToken) return;
+
+
+judge();
+
+calcLevels();
+
+calcTrade();
+
+
+/* 法人資料獨立處理。
+   即使法人 API 失敗，也不讓整個股票查詢失敗。 */
+
+loadInstitution(code)
+.then(()=>{})
+.catch(e=>console.warn('institution isolated error',e));
+
+
+setStatus(
+'🟢 '+name+' '+code+
+' 資料取得完成｜'+q.market,
+'ok'
+);
+
+
+}catch(e){
+
+console.error(e);
+
+
+if(token===queryToken){
+
+setStatus(
+'🔴 查詢發生錯誤：'+e.message,
+'bad'
+);
+
+$('name').textContent=
+'查詢失敗';
+
+}
+
+}finally{
+
+if(token===queryToken){
+
+setQueryBusy(false);
+
+}
+
+}
+
+}
+
+
+/* =========================================================
+   初始載入
+   ========================================================= */
+
+renderRecords();
+
+
+setTimeout(
+()=>queryStock(),
+300
+);
 
 </script>
 
