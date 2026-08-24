@@ -492,7 +492,6 @@ spellcheck="false">
 <div id="status" class="status"></div>
 
 <div id="result">
-
 <div class="card">
 <h2>📊 台股 AI 法人籌碼分析</h2>
 <div class="notice">
@@ -503,13 +502,10 @@ spellcheck="false">
 <b>0050</b>／<b>00631L</b>
 </div>
 </div>
-
 </div>
 
 <div id="quick" class="card">
-
 <h2>📌 快速查詢</h2>
-
 <div class="actionGrid">
 
 <button class="action" data-code="1326">
@@ -553,11 +549,9 @@ spellcheck="false">
 </button>
 
 </div>
-
 </div>
 
 <div class="card">
-
 <h2 class="yellowText">🔥 股票推薦掃描</h2>
 
 <div class="recommendGrid">
@@ -603,23 +597,12 @@ spellcheck="false">
 <script>
 "use strict";
 
-/* ============================================================
-   API
-============================================================ */
-
 const FINMIND_API="https://api.finmindtrade.com/api/v4/data";
 const MIS_API="https://mis.twse.com.tw/stock/api/getStockInfo.jsp";
 
 let searchToken=0;
 
-
-/* ============================================================
-   常用股票資料
-   不依賴 TaiwanStockInfo 整包下載
-============================================================ */
-
 const STOCKS={
-
 "1326":{name:"台化",industry:"塑膠工業",market:"tse"},
 "2891":{name:"中信金",industry:"金融保險",market:"tse"},
 "2330":{name:"台積電",industry:"半導體業",market:"tse"},
@@ -647,7 +630,6 @@ const STOCKS={
 "00891":{name:"中信關鍵半導體",industry:"ETF",market:"tse"},
 "00981A":{name:"主動統一台股增長",industry:"ETF",market:"tse"},
 "5314":{name:"世紀",industry:"其他電子業",market:"otc"}
-
 };
 
 const ALIASES={};
@@ -670,14 +652,7 @@ Object.assign(ALIASES,{
 "世紀":"5314"
 });
 
-
-/* ============================================================
-   工具
-============================================================ */
-
-function $(id){
-return document.getElementById(id);
-}
+function $(id){return document.getElementById(id)}
 
 function esc(v){
 return String(v??"")
@@ -730,7 +705,9 @@ month:"2-digit",
 day:"2-digit"
 }).formatToParts(new Date());
 const o={};
-p.forEach(x=>{if(x.type!=="literal")o[x.type]=x.value});
+p.forEach(x=>{
+if(x.type!=="literal")o[x.type]=x.value
+});
 return `${o.year}-${o.month}-${o.day}`;
 }
 
@@ -742,11 +719,6 @@ const m=String(d.getMonth()+1).padStart(2,"0");
 const day=String(d.getDate()).padStart(2,"0");
 return `${y}-${m}-${day}`;
 }
-
-
-/* ============================================================
-   API
-============================================================ */
 
 async function fetchJSON(url,timeout=18000){
 
@@ -786,24 +758,14 @@ u.searchParams.set(k,v);
 }
 });
 
-const json=await fetchJSON(
-u.toString(),
-timeout
-);
+const json=await fetchJSON(u.toString(),timeout);
 
 if(Array.isArray(json.data)){
 return json.data;
 }
 
 return [];
-
 }
-
-
-/* ============================================================
-   找股票
-   數字直接走本地／MIS，不再等待整份 StockInfo
-============================================================ */
 
 async function findStock(q){
 
@@ -814,7 +776,6 @@ if(!key){
 throw new Error("請輸入股票代號或名稱");
 }
 
-/* 本地代號 */
 if(STOCKS[key]){
 return {
 stock_id:key,
@@ -824,7 +785,6 @@ market:STOCKS[key].market
 };
 }
 
-/* 本地名稱 */
 for(const [name,code] of Object.entries(ALIASES)){
 if(clean(name)===key){
 const x=STOCKS[code];
@@ -837,7 +797,6 @@ market:x.market
 }
 }
 
-/* 純數字／ETF代號 */
 if(/^[0-9A-Z]+$/i.test(raw)){
 
 const code=raw.toUpperCase();
@@ -852,7 +811,6 @@ market:x.market
 };
 }
 
-/* 未知代號也允許查，先嘗試上市 */
 return {
 stock_id:code,
 stock_name:code,
@@ -862,7 +820,6 @@ market:"tse"
 
 }
 
-/* FinMind 清單只作名稱搜尋備援 */
 try{
 
 const rows=await finmind({
@@ -906,12 +863,6 @@ console.warn("StockInfo fallback failed",e);
 throw new Error("找不到「"+raw+"」，請輸入股票代號試試。");
 
 }
-
-
-/* ============================================================
-   TWSE MIS 即時行情
-   同時詢問 tse / otc
-============================================================ */
 
 async function getRealtime(stock){
 
@@ -999,11 +950,6 @@ return null;
 
 }
 
-
-/* ============================================================
-   FinMind 最新收盤
-============================================================ */
-
 async function getPrices(id){
 
 try{
@@ -1041,11 +987,6 @@ return sorted(rows)
 .filter(x=>x!==null);
 }
 
-
-/* ============================================================
-   FinMind Tick 備援
-============================================================ */
-
 async function getTick(id){
 
 try{
@@ -1077,11 +1018,6 @@ return null;
 }
 
 }
-
-
-/* ============================================================
-   均線
-============================================================ */
 
 function sma(a,p){
 if(a.length<p)return null;
@@ -1118,7 +1054,7 @@ bi[p]=bias(price,ma[p]);
 
 let above=0;
 
-[5,14,20,27,60,62,120,131,240,272].forEach(p=>{
+periods.forEach(p=>{
 if(ma[p]!==null&&price!==null&&price>ma[p])above++;
 });
 
@@ -1140,6 +1076,7 @@ sl[120]>0;
 const last21=c.slice(-21);
 const before=last21.slice(0,-1);
 const high=before.length?Math.max(...before):null;
+
 const breakout=
 price!==null&&
 high!==null&&
@@ -1150,11 +1087,6 @@ ma,sl,bi,trend,longBull,breakout
 };
 
 }
-
-
-/* ============================================================
-   PER
-============================================================ */
 
 async function getPER(id){
 
@@ -1181,11 +1113,6 @@ return null;
 }
 
 }
-
-
-/* ============================================================
-   財報 EPS
-============================================================ */
 
 async function getFinancial(id){
 
@@ -1247,11 +1174,6 @@ ttm:recent.length===4
 };
 
 }
-
-
-/* ============================================================
-   法人
-============================================================ */
 
 function blankLaw(){
 return {buy:0,sell:0,net:0};
@@ -1434,11 +1356,6 @@ return null;
 
 }
 
-
-/* ============================================================
-   估值
-============================================================ */
-
 function valuation(price,eps,pbr,per){
 
 let score=50;
@@ -1501,11 +1418,6 @@ return {pe,score,state,cls,reasons};
 
 }
 
-
-/* ============================================================
-   EPS目標區
-============================================================ */
-
 function targetRange(eps,industry){
 
 if(eps===null||eps<=0)return null;
@@ -1536,11 +1448,6 @@ highPE:high
 };
 
 }
-
-
-/* ============================================================
-   有沒有戲
-============================================================ */
 
 function signal(tech,inst20,val,price,target){
 
@@ -1643,11 +1550,6 @@ return {score,state,cls,reasons};
 
 }
 
-
-/* ============================================================
-   資金
-============================================================ */
-
 function moneyPlan(price,tech){
 
 let stop=price?price*.94:null;
@@ -1676,11 +1578,6 @@ else position=10;
 return {stop,position};
 
 }
-
-
-/* ============================================================
-   法人表格
-============================================================ */
 
 function lawRow(label,x){
 
@@ -1734,11 +1631,6 @@ return `
 }).join("");
 
 }
-
-
-/* ============================================================
-   render
-============================================================ */
 
 function render(data){
 
@@ -1956,7 +1848,6 @@ ${realtime?.volume!==null&&realtime?.volume!==undefined
 
 </div>
 
-
 <div class="card">
 
 <h2 class="yellowText">🤖 這檔股票有沒有戲？</h2>
@@ -1988,7 +1879,6 @@ ${signalData.reasons.map(x=>"• "+esc(x)).join("<br>")}
 </div>
 
 </div>
-
 
 <div class="card">
 
@@ -2103,7 +1993,6 @@ target
 
 </div>
 
-
 <div class="card">
 
 <h2 class="greenText">🏦 最新交易日法人戰況</h2>
@@ -2140,7 +2029,6 @@ ${lawRow("🟢 三大法人",inst.total)}
 }
 
 </div>
-
 
 <div class="card">
 
@@ -2198,7 +2086,6 @@ ${periodRows(inst20)}
 
 </div>
 
-
 <div class="card">
 
 <h2 class="purpleText">🔍 法人有沒有持續買？</h2>
@@ -2230,7 +2117,6 @@ ${v>0?"+":""}${integer(v)} 張
 </div>
 </div>
 
-
 <div class="lawBox">
 
 <div class="lawTitle">🟡 投信</div>
@@ -2254,7 +2140,6 @@ ${v>0?"+":""}${integer(v)} 張
 
 </div>
 </div>
-
 
 <div class="lawBox">
 
@@ -2286,7 +2171,6 @@ ${v>0?"+":""}${integer(v)} 張
 }
 
 </div>
-
 
 <div class="card">
 
@@ -2333,7 +2217,6 @@ ${s===null?"—":(s>=0?"+":"")+money(s)+"%"}
 </div>
 
 </div>
-
 
 <div class="card">
 
@@ -2389,7 +2272,6 @@ ${s===null?"—":(s>=0?"+":"")+money(s)+"%"}
 
 </div>
 
-
 <div class="card">
 
 <h2 class="purpleText">💰 資金管理</h2>
@@ -2415,7 +2297,6 @@ ${s===null?"—":(s>=0?"+":"")+money(s)+"%"}
 </div>
 
 </div>
-
 
 <div class="card">
 
@@ -2443,11 +2324,6 @@ ${signalData.reasons.map(x=>"• "+esc(x)).join("<br>")}
 `;
 
 }
-
-
-/* ============================================================
-   搜尋主程式
-============================================================ */
 
 async function searchStock(query){
 
@@ -2478,8 +2354,6 @@ setStatus(
 "loading"
 );
 
-/* 現價與歷史資料平行 */
-
 const [realtime,prices]=await Promise.all([
 getRealtime(stock),
 getPrices(stock.stock_id)
@@ -2488,8 +2362,6 @@ getPrices(stock.stock_id)
 if(myToken!==searchToken)return;
 
 let realtimeFinal=realtime;
-
-/* 即時失敗 → Tick */
 
 if(!realtimeFinal){
 
@@ -2517,8 +2389,6 @@ askVol:null
 
 }
 
-/* 完全沒有歷史資料也不能讓搜尋卡死 */
-
 if(!prices.length&&(!realtimeFinal||realtimeFinal.price===null)){
 
 throw new Error(
@@ -2526,8 +2396,6 @@ throw new Error(
 );
 
 }
-
-/* 即使歷史資料失敗，仍然顯示現價 */
 
 const safePrices=prices.length
 ?prices
@@ -2627,11 +2495,6 @@ setStatus(
 
 }
 
-
-/* ============================================================
-   快速查詢
-============================================================ */
-
 document.querySelectorAll(".action").forEach(btn=>{
 
 btn.addEventListener("click",function(){
@@ -2645,11 +2508,6 @@ searchStock(code);
 });
 
 });
-
-
-/* ============================================================
-   搜尋按鈕
-============================================================ */
 
 $("searchBtn").addEventListener("click",()=>{
 
@@ -2672,11 +2530,6 @@ $("searchInput").value.trim()
 }
 
 });
-
-
-/* ============================================================
-   推薦掃描
-============================================================ */
 
 const SCAN_LISTS={
 
@@ -2849,17 +2702,11 @@ scanStocks(btn.dataset.scan);
 
 });
 
-
-/* ============================================================
-   初始
-============================================================ */
-
 setStatus(
-"🟢 系統已啟動｜輸入 1326 測試台化目前行情。",
+"🟢 修正版已啟動｜輸入 1326 測試台化。",
 "ok"
 );
 
 </script>
-
 </body>
 </html>
