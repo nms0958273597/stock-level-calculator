@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>台股 AI 法人籌碼分析完整版</title>
+<style>
+*{box-sizing:border-box}
+:root{
+ --bg:#101214;--panel:#252525;--panel2:#1b1b1b;--border:#444;
+ --text:#f5f5f5;--muted:#999;--orange:#ff9d22;--red:#ff4d60;
+ --green:#43df6b;--blue:#3bb9ff;--yellow:#ffd34d;--purple:#bd8cff;
+}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",Arial,sans-serif}
+.wrap{max-width:1000px;margin:auto;padding:12px 14px 70px}
+.search{display:flex;gap:9px;position:sticky;top:0;z-index:100;padding:8px 0 12px;background:rgba(16,18,20,.96);backdrop-filter:blur(12px)}
+.search input{flex:1;min-width:0;height:58px;border:2px solid #555;border-radius:20px;background:#1b1b1b;color:#fff;padding:0 17px;font-size:20px;outline:none}
+.search input:focus{border-color:var(--orange)}
+.search button{width:110px;border:0;border-radius:20px;background:var(--orange);color:#111;font-size:21px;font-weight:900}
+.hint,.notice{color:#999;font-size:15px;line-height:1.7}
+.hint{margin-bottom:10px}
+.status{display:none;padding:13px 15px;border-radius:15px;background:#1b1b1b;border:1px solid #444;margin:10px 0;line-height:1.7}
+.status.show{display:block}.status.loading{color:var(--yellow);border-color:#66511e}.status.ok{color:#8cffaa;border-color:#2b6b3d}.status.error{color:#ff9ca6;border-color:#76323c}
+.card,.hero{background:var(--panel);border:1px solid var(--border);border-radius:23px;padding:21px;margin-top:16px}
+.card h2{margin:0 0 17px;font-size:28px}.hero{background:#2a2a2a}
+.titleRow{display:flex;justify-content:space-between;gap:18px}.stockName{font-size:38px;font-weight:900}.stockCode{color:#aaa;margin-top:5px;font-size:18px}
+.priceBox{text-align:right}.price{font-size:55px;line-height:1;font-weight:900}.change{font-size:19px;margin-top:9px}
+.up{color:var(--red)}.down{color:var(--green)}.neutral{color:#ddd}
+.tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:19px}.tag{border:1px solid #666;border-radius:999px;padding:8px 13px;font-size:16px}
+.tag.green{color:var(--green);border-color:#2c8c48}.tag.red{color:var(--red);border-color:#a3323d}.tag.orange{color:var(--orange);border-color:#9e6a1c}.tag.blue{color:var(--blue);border-color:#287fa9}
+.dateBox{background:#171717;border-radius:14px;padding:12px 14px;margin-top:16px;color:#ccc;font-size:15px;line-height:1.8}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.metric{background:var(--panel2);border-radius:18px;padding:17px;min-height:100px}.metric .label{color:#999;font-size:16px}.metric .value{font-size:29px;font-weight:900;margin-top:7px}.metric .sub{color:#888;font-size:14px;margin-top:5px}
+.greenText{color:var(--green)}.redText{color:var(--red)}.blueText{color:var(--blue)}.orangeText{color:var(--orange)}.yellowText{color:var(--yellow)}.purpleText{color:var(--purple)}
+.valuation,.signal,.lawBox{margin-top:14px;padding:20px;border-radius:20px;background:#191919;border:1px solid #444}
+.valuationTitle,.signalTitle,.lawTitle{font-size:22px;font-weight:900}.valuationState,.signalState{font-size:38px;font-weight:900;margin-top:8px}.valuationText{color:#aaa;line-height:1.8;margin-top:9px}
+.bar{height:12px;background:#333;border-radius:999px;overflow:hidden;margin-top:13px}.bar span{display:block;height:100%;background:var(--orange)}
+.table,.periodTable{width:100%;border-collapse:collapse}.table th,.table td,.periodTable th,.periodTable td{padding:11px 5px;border-bottom:1px solid #393939;text-align:center}.table th,.periodTable th{color:#aaa;font-weight:500}
+.positive{color:var(--green)}.negative{color:var(--red)}.zero{color:#aaa}.periodBox{margin-top:14px;overflow:auto}.periodTable{min-width:650px}
+.targetGrid,.actionGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.target{background:#1a1a1a;border-radius:17px;padding:17px}.targetLabel{color:#999}.targetValue{color:var(--orange);font-size:30px;font-weight:900;margin-top:5px}
+.lawGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.lawItem{background:#151515;border-radius:15px;padding:14px}.lawLabel{color:#999;font-size:15px}.lawValue{font-size:24px;font-weight:900;margin-top:6px}
+.rank{background:#1b1b1b;border:1px solid #3d3d3d;border-radius:17px;padding:15px;margin-top:9px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rankName{font-size:18px;font-weight:800}.rankCode{color:#888;margin-left:5px}.rankValue{font-size:19px;font-weight:900;white-space:nowrap}
+.action{background:#1b1b1b;border:1px solid #444;color:#fff;border-radius:17px;padding:17px;text-align:left;cursor:pointer}.action strong{display:block;font-size:19px}.action span{display:block;color:#999;margin-top:5px}
+.quoteGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.quote{background:#151515;border-radius:15px;padding:14px}.quote .qLabel{color:#999}.quote .qValue{font-size:25px;font-weight:900;margin-top:6px}
+.bigConclusion{padding:20px;border-radius:20px;background:#191919;border:1px solid #444}.bigConclusion .headline{font-size:28px;font-weight:900}.small{font-size:13px;color:#777}.footer{text-align:center;color:#666;font-size:13px;line-height:1.7;margin-top:30px}
+@media(max-width:650px){
+ .wrap{padding:10px 11px 60px}.search input{font-size:18px}.search button{width:95px;font-size:19px}
+ .titleRow{display:block}.stockName{font-size:31px}.priceBox{text-align:left;margin-top:15px}.price{font-size:49px}
+ .grid,.targetGrid,.actionGrid,.quoteGrid{grid-template-columns:1fr}.lawGrid{grid-template-columns:1fr}
+ .card,.hero{padding:17px}.card h2{font-size:24px}.table{font-size:14px}.table th,.table td{padding:9px 3px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="search">
+<input id="searchInput" placeholder="搜尋股票／ETF／代號／中文／英文，例如：台化、1326、TSMC、2891" autocomplete="off" autocapitalize="off" spellcheck="false">
+<button id="searchBtn" type="button">查詢</button>
+</div>
+<div class="hint">🔴 <b>目前現價會自動抓取，不會寫死。</b>交易時間內約每20秒重新更新一次；若即時行情暫時無法取得，會退回最新可取得的成交／收盤資料。<br><br>搜尋後自動分析：<b>現價＋EPS＋PE/PBR＋外資＋投信＋自營商＋三大法人＋1／5／20日籌碼＋連買天數＋均線＋突破＋買點＋防守＋合理價＋AI有沒有戲</b>。</div>
+<div id="status" class="status"></div>
+<div id="result"><div class="card"><h2>📊 台股 AI 法人籌碼分析</h2><div class="notice">請搜尋股票或 ETF。<br><br>例如：<b>台化</b>／<b>1326</b>、<b>中信金</b>／<b>2891</b>、<b>台積電</b>／<b>2330</b>、<b>0050</b>、<b>00631L</b>。</div></div></div>
+
+
+<div id="recommendCard" class="card">
+<h2 class="greenText">🔥 近期有戲股票推薦</h2>
+<div class="notice">
+系統會從預設的台股熱門／權值／法人關注清單中，依
+<b>20日法人籌碼＋5日籌碼＋均線趨勢＋突破＋估值</b>
+計算「近期有戲分數」。
+<br>
+⚠️ 這不是保證上漲；推薦結果會隨最新市場資料變化。
+</div>
+<button id="recommendBtn" class="action" type="button" style="width:100%;margin-top:12px;text-align:center">
+<strong>🔎 掃描近期有戲股票</strong>
+<span>抓取最新資料後自動排名</span>
+</button>
+<div id="recommendStatus" class="notice"></div>
+<div id="recommendList" style="margin-top:10px"></div>
+</div>
+
+
+<div id="mediumCard" class="card">
+<h2 class="blueText">💎 中長期看好股票</h2>
+<div class="notice">依 AI／半導體／伺服器／金融等產業主軸建立觀察池，再用法人、均線與估值動態評分。不是固定推薦，實際排名會隨最新資料變化。</div>
+<button id="mediumBtn" class="action" type="button" style="width:100%;margin-top:12px;text-align:center"><strong>💎 掃描中長期看好</strong><span>EPS＋法人＋長期均線＋估值</span></button>
+<div id="mediumStatus" class="notice"></div><div id="mediumList" style="margin-top:10px"></div>
+</div>
+
+<div id="popularCard" class="card">
+<h2 class="orangeText">🔥 超人氣股票</h2>
+<div class="notice">依成交量／法人關注／近期漲勢／突破／熱門族群建立人氣分數。人氣高不等於適合追價。</div>
+<button id="popularBtn" class="action" type="button" style="width:100%;margin-top:12px;text-align:center"><strong>🔥 掃描超人氣股票</strong><span>量價＋法人＋突破自動排名</span></button>
+<div id="popularStatus" class="notice"></div><div id="popularList" style="margin-top:10px"></div>
+</div>
+
+<div id="quick" class="card">
+<h2>📌 快速查詢</h2>
+<div class="actionGrid">
+<button class="action" data-code="1326"><strong>🏭 台化 1326</strong><span>法人／20日籌碼</span></button>
+<button class="action" data-code="2891"><strong>🏦 中信金 2891</strong><span>法人／EPS／估值</span></button>
+<button class="action" data-code="2330"><strong>💻 台積電 2330</strong><span>科技權值</span></button>
+<button class="action" data-code="5314"><strong>🚀 世紀 5314</strong><span>個股分析</span></button>
+<button class="action" data-code="0050"><strong>📈 0050</strong><span>ETF</span></button>
+<button class="action" data-code="00631L"><strong>⚡ 00631L</strong><span>台灣50正2</span></button>
+</div></div>
+<div class="footer">資料：FinMind 公開市場資料＋台灣證券交易所 MIS 即時行情。即時行情端點是否可用，取決於交易所與瀏覽器網路環境；若即時端點失敗，會自動退回最新可取得收盤價。法人、EPS、估值與技術分析為模型計算，僅供研究參考。</div>
+</div>
+
+<script>
+"use strict";
+const API="https://api.finmindtrade.com/api/v4/data";
+const MIS="https://mis.twse.com.tw/stock/api/getStockInfo.jsp";
+let stockInfoCache=null,currentStock=null,currentTimer=null;
+
+const aliases={
+ "2330":["台積電","台灣積體電路","tsmc","taiwan semiconductor"],
+ "2317":["鴻海","foxconn","hon hai"],
+ "1326":["台化","台灣化學纖維","formosa chemicals"],
+ "2891":["中信金","中國信託","中國信託金控","ctbc","ctbc holding"],
+ "5314":["世紀","century"],
+ "0050":["元大台灣50","yuanta taiwan 50"],
+ "00631L":["元大台灣50正2","台灣50正2","taiwan 50 2x"]
+};
+
+function $(id){return document.getElementById(id)}
+function esc(v){return String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;")}
+function num(v){const x=Number(v);return Number.isFinite(x)?x:null}
+function money(v,d=2){const x=num(v);return x===null?"—":x.toLocaleString("zh-TW",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function integer(v){const x=num(v);return x===null?"—":Math.round(x).toLocaleString("zh-TW")}
+function clean(v){return String(v||"").toLowerCase().replace(/\s+/g,"").replace(/-/g,"").replace(/_/g,"")}
+function isoDate(d=new Date()){return d.toISOString().slice(0,10)}
+function ago(days){const d=new Date();d.setDate(d.getDate()-days);return isoDate(d)}
+function setStatus(text,type=""){ $("status").textContent=text;$("status").className="status show "+type }
+
+async function apiGet(params,timeout=20000){
+ const url=new URL(API);Object.entries(params).forEach(([k,v])=>{if(v!==undefined&&v!==null&&v!=="")url.searchParams.set(k,v)});
+ const c=new AbortController(),timer=setTimeout(()=>c.abort(),timeout);
+ try{
+  const r=await fetch(url.toString(),{cache:"no-store",signal:c.signal});
+  if(!r.ok)throw new Error("FinMind HTTP "+r.status);
+  const j=await r.json();
+  if(j.status!==undefined&&j.status!==200&&j.status!==0)throw new Error(j.msg||"FinMind 回傳錯誤");
+  return Array.isArray(j.data)?j.data:[];
+ }finally{clearTimeout(timer)}
+}
+
+async function getStockInfo(){
+ if(stockInfoCache)return stockInfoCache;
+ const rows=await apiGet({dataset:"TaiwanStockInfo"},25000);
+ stockInfoCache=rows.filter(x=>x.stock_id);
+ return stockInfoCache;
+}
+async function findStock(q){
+ q=clean(q);if(!q)throw new Error("請輸入股票代號或名稱");
+ const info=await getStockInfo();
+ let f=info.find(x=>clean(x.stock_id)===q)||info.find(x=>clean(x.stock_name)===q);
+ if(f)return f;
+ for(const [code,list] of Object.entries(aliases))if(list.some(x=>clean(x)===q)){f=info.find(x=>String(x.stock_id)===code);return f||{stock_id:code,stock_name:list[0]}}
+ f=info.find(x=>clean(x.stock_id).includes(q)||clean(x.stock_name).includes(q)||(aliases[x.stock_id]||[]).some(a=>clean(a).includes(q)));
+ if(!f)throw new Error("找不到「"+q+"」");
+ return f;
+}
+function sorted(rows){return [...rows].sort((a,b)=>String(a.date).localeCompare(String(b.date)))}
+function latest(rows){const a=sorted(rows);return a.length?a[a.length-1]:null}
+function closes(rows){return sorted(rows).map(r=>num(r.close)).filter(x=>x!==null)}
+
+async function getPrices(id){
+ return apiGet({dataset:"TaiwanStockPrice",data_id:id,start_date:ago(420),end_date:isoDate()},22000);
+}
+
+/* 台灣證交所 MIS：即時行情。若瀏覽器被 CORS 阻擋，會自動退回 FinMind 最新收盤。 */
+async function getMIS(id){
+ const qs=encodeURIComponent("tse_"+id+".tw")+"|"+encodeURIComponent("otc_"+id+".tw");
+ const urls=[
+  MIS+"?ex_ch="+qs+"&json=1&delay=0&_="+Date.now(),
+  MIS+"?ex_ch="+encodeURIComponent("tse_"+id+".tw")+"|"+encodeURIComponent("otc_"+id+".tw")+"&json=1&delay=0"
+ ];
+ for(const u of urls){
+  try{
+   const r=await fetch(u,{cache:"no-store"});
+   if(!r.ok)continue;
+   const j=await r.json();
+   const a=(j.msgArray||[]).find(x=>String(x.c||"")===String(id));
+   if(!a)continue;
+   const price=num(a.z)&&num(a.z)>0?num(a.z):num(a.y);
+   return {price,date:a.d||"",time:a.t||"",open:num(a.o),high:num(a.h),low:num(a.l),yesterday:num(a.y),limitUp:num(a.u),limitDown:num(a.w),volume:num(a.v),bid:(String(a.b||"").split("_")[0]||null),ask:(String(a.a||"").split("_")[0]||null),exchange:a.ex||"",name:a.n||""};
+  }catch(e){}
+ }
+ return null;
+}
+async function getTick(id){
+ try{
+  const rows=await apiGet({dataset:"TaiwanStockPriceTick",data_id:id,start_date:isoDate()},10000);
+  if(!rows.length)return null;
+  const r=rows[rows.length-1];
+  return {price:num(r.deal_price),date:r.date||isoDate(),time:r.Time||""};
+ }catch(e){return null}
+}
+async function getLiveQuote(id){
+ const mis=await getMIS(id);
+ if(mis)return {...mis,source:"TWSE/TPEx MIS"};
+ const tick=await getTick(id);
+ if(tick)return {...tick,source:"FinMind Tick"};
+ return null;
+}
+
+function SMA(v,p){return v.length<p?null:v.slice(-p).reduce((a,b)=>a+b,0)/p}
+function slope(v,p){if(v.length<p)return null;const a=v.slice(-p),f=a[0],l=a[a.length-1];return !f?null:(l-f)/f*100}
+function bias(p,m){return p===null||m===null||m===0?null:(p-m)/m*100}
+function getTechnical(rows,price){
+ const c=closes(rows),ps=[5,14,27,62,131,272],ma={},sl={},bi={};ps.forEach(p=>{ma[p]=SMA(c,p);sl[p]=slope(c,p);bi[p]=bias(price,ma[p])});
+ let above=ps.filter(p=>ma[p]!==null&&price>ma[p]).length;
+ let trend=above>=5?"強勢多頭":above>=4?"偏多":above<=2?"偏空":"中性";
+ const longBull=ma[62]!==null&&ma[131]!==null&&ma[272]!==null&&ma[62]>ma[131]&&ma[131]>ma[272]&&sl[62]>0&&sl[131]>0;
+ const recent=c.slice(-21),old=recent.slice(0,-1),oldHigh=old.length?Math.max(...old):null;
+ const breakout=price!==null&&oldHigh!==null&&price>oldHigh;
+ return {ma,sl,bi,trend,longBull,breakout};
+}
+async function getPER(id){
+ try{return latest(await apiGet({dataset:"TaiwanStockPER",data_id:id,start_date:ago(120),end_date:isoDate()},15000))}catch(e){return null}
+}
+async function getFinancial(id){
+ try{return await apiGet({dataset:"TaiwanStockFinancialStatements",data_id:id,start_date:ago(1100),end_date:isoDate()},20000)}catch(e){return []}
+}
+function getEPS(rows){
+ const list=rows.filter(r=>String(r.type||"").toUpperCase()==="EPS").sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+ if(!list.length)return null;
+ const last=list[list.length-1],recent=list.slice(-4).map(r=>num(r.value)).filter(x=>x!==null);
+ return {latest:num(last.value),date:last.date,ttm:recent.length===4?recent.reduce((a,b)=>a+b,0):null};
+}
+function emptyInst(){return {foreignBuy:0,foreignSell:0,foreignNet:0,trustBuy:0,trustSell:0,trustNet:0,dealerBuy:0,dealerSell:0,dealerNet:0,totalBuy:0,totalSell:0,totalNet:0}}
+function addInstRow(o,r){
+ const buy=num(r.buy)||0,sell=num(r.sell)||0,n=String(r.name||"");
+ if(n==="Foreign_Investor"){o.foreignBuy+=buy;o.foreignSell+=sell}
+ else if(n==="Investment_Trust"){o.trustBuy+=buy;o.trustSell+=sell}
+ else if(["Dealer_Self","Dealer_self","Dealer_Hedging","Dealer"].includes(n)){o.dealerBuy+=buy;o.dealerSell+=sell}
+}
+function finishInst(o){o.foreignNet=o.foreignBuy-o.foreignSell;o.trustNet=o.trustBuy-o.trustSell;o.dealerNet=o.dealerBuy-o.dealerSell;o.totalBuy=o.foreignBuy+o.trustBuy+o.dealerBuy;o.totalSell=o.foreignSell+o.trustSell+o.dealerSell;o.totalNet=o.totalBuy-o.totalSell;Object.keys(o).forEach(k=>o[k]/=1000);return o}
+async function getInstitution20(id){
+ try{
+  const rows=await apiGet({dataset:"TaiwanStockInstitutionalInvestorsBuySell",data_id:id,start_date:ago(55),end_date:isoDate()},22000);
+  if(!rows.length)return null;
+  const dates=[...new Set(rows.map(r=>r.date))].sort().slice(-20),map={};
+  dates.forEach(d=>map[d]=emptyInst());
+  rows.forEach(r=>{if(map[r.date])addInstRow(map[r.date],r)});
+  dates.forEach(d=>finishInst(map[d]));
+  const calc=n=>{const o=emptyInst();dates.slice(-n).forEach(d=>{const x=map[d];Object.keys(o).forEach(k=>o[k]+=x[k])});return o};
+  const periods={1:calc(1),5:calc(5),20:calc(20)};
+  const latestDate=dates.at(-1);
+  return {latestDate,periods,dates,map};
+ }catch(e){console.error(e);return null}
+}
+async function getInstitution(id){
+ const x=await getInstitution20(id);if(!x)return null;
+ return {date:x.latestDate,...x.periods[1]};
+}
+
+function consecutive(inst20,key){
+ if(!inst20||!inst20.dates.length)return 0;
+ let count=0;
+ for(let i=inst20.dates.length-1;i>=0;i--){
+  const x=inst20.map[inst20.dates[i]];
+  if((x[key]||0)>0)count++;else break;
+ }
+ return count;
+}
+function institutionalLead(x){
+ if(!x)return {state:"資料不足",cls:"yellowText",text:"法人資料不足"};
+ const f=x.periods[20].foreignNet,t=x.periods[20].trustNet,d=x.periods[20].dealerNet;
+ const arr=[["外資",f],["投信",t],["自營商",d]].sort((a,b)=>Math.abs(b[1])-Math.abs(a[1]));
+ const top=arr[0];
+ if(top[1]>0)return {state:top[0]+"主導買盤",cls:"greenText",text:`20日最大淨流入來自${top[0]}，籌碼偏多。`};
+ return {state:top[0]+"主導賣壓",cls:"redText",text:`20日最大淨流出來自${top[0]}，籌碼偏空。`};
+}
+function valuation(price,eps,pbr,per){
+ let score=50,reasons=[];
+ let pe=per!==null?per:(eps!==null&&eps>0?price/eps:null);
+ if(pe!==null){if(pe<=10){score+=22;reasons.push("PE 偏低")}else if(pe<=15){score+=12;reasons.push("PE 合理偏低")}else if(pe<=20){score+=3;reasons.push("PE 位於中性區")}else if(pe<=25){score-=12;reasons.push("PE 偏高")}else{score-=22;reasons.push("PE 明顯偏高")}}
+ if(pbr!==null){if(pbr<1){score+=18;reasons.push("PBR 低於1倍")}else if(pbr<1.5){score+=10;reasons.push("PBR 尚合理")}else if(pbr>3){score-=15;reasons.push("PBR 偏高")}}
+ score=Math.max(0,Math.min(100,score));
+ const state=score>=70?"偏便宜":score<40?"偏貴":"合理",cls=score>=70?"greenText":score<40?"redText":"yellowText";
+ return {pe,score,state,cls,reasons};
+}
+function fairValue(eps,industry){
+ if(eps===null||eps<=0)return null;
+ const t=String(industry||"");let m=15;
+ if(t.includes("金融")||t.includes("銀行"))m=13;else if(t.includes("半導體"))m=18;else if(t.includes("電子"))m=16;
+ return eps*m;
+}
+function moneyPlan(price,tech){
+ let stop=price*.94;
+ if(tech.ma[27]!==null&&tech.ma[27]<price)stop=tech.ma[27]*.985;else if(tech.ma[62]!==null&&tech.ma[62]<price)stop=tech.ma[62]*.985;
+ const position=tech.trend==="強勢多頭"?50:tech.trend==="偏多"?40:tech.trend==="中性"?25:10;
+ const ma27=tech.ma[27],ma62=tech.ma[62],support=Math.max(ma27||0,ma62||0)||price*.94;
+ const buyLow=Math.max(0,support*.995),buyHigh=Math.max(buyLow,support*1.015),breakout=price;
+ return {stop,position,buyLow,buyHigh,breakout};
+}
+function stockSignal(tech,inst20,val,price,fair){
+ let score=0,reasons=[];
+ if(inst20){
+  const p20=inst20.periods[20],p5=inst20.periods[5];
+  if(p20.totalNet>0){score+=20;reasons.push("20日三大法人淨買超")}else{score-=15;reasons.push("20日三大法人淨賣超")}
+  if(p5.totalNet>0){score+=10;reasons.push("5日三大法人仍偏買")}else{score-=7;reasons.push("5日三大法人轉賣")}
+  if(p20.foreignNet>0){score+=7;reasons.push("外資20日淨買超")}else{score-=5;reasons.push("外資20日淨賣超")}
+  if(p20.trustNet>0){score+=3;reasons.push("投信20日淨買超")}
+ }
+ if(tech.trend==="強勢多頭"){score+=18;reasons.push("多條均線呈多頭結構")}else if(tech.trend==="偏多"){score+=12;reasons.push("均線結構偏多")}else if(tech.trend==="偏空"){score-=15;reasons.push("均線結構偏空")}
+ if(tech.longBull){score+=10;reasons.push("62／131／272長期均線多頭排列")}
+ if(tech.breakout){score+=7;reasons.push("價格突破近期20日高點")}
+ if(val.state==="偏便宜"){score+=15;reasons.push("估值偏便宜")}else if(val.state==="偏貴"){score-=12;reasons.push("估值偏貴")}else{score+=5;reasons.push("估值位於合理區")}
+ if(fair!==null&&price<fair){score+=10;reasons.push("現價低於系統合理價")}
+ score=Math.max(0,Math.min(100,score));
+ const state=score>=65?"🟢 有戲":score>=45?"🟡 觀察":score>=25?"🟠 偏弱":"🔴 暫時沒戲";
+ const cls=score>=65?"greenText":score>=45?"yellowText":score>=25?"orangeText":"redText";
+ return {score,state,cls,reasons};
+}
+function colorNet(x){return x>0?"positive":x<0?"negative":"zero"}
+function lawRow(label,buy,sell,net){return `<tr><td>${label}</td><td>${integer(buy)}</td><td>${integer(sell)}</td><td class="${colorNet(net)}">${net>0?"+":""}${integer(net)}</td></tr>`}
+function periodRows(x){
+ if(!x)return `<tr><td colspan="5">目前無法取得20日法人資料</td></tr>`;
+ return [1,5,20].map(d=>{const p=x.periods[d];return `<tr><td>${d}日</td><td class="${colorNet(p.foreignNet)}">${p.foreignNet>0?"+":""}${integer(p.foreignNet)}</td><td class="${colorNet(p.trustNet)}">${p.trustNet>0?"+":""}${integer(p.trustNet)}</td><td class="${colorNet(p.dealerNet)}">${p.dealerNet>0?"+":""}${integer(p.dealerNet)}</td><td class="${colorNet(p.totalNet)}">${p.totalNet>0?"+":""}${integer(p.totalNet)}</td></tr>`}).join("");
+}
+function nbox(label,v,cls=""){return `<div class="metric"><div class="label">${label}</div><div class="value ${cls}">${v}</div></div>`}
+function lawCard(title,periods,key){
+ return `<div class="lawBox"><div class="lawTitle">${title}</div><div class="lawGrid">${[1,5,20].map(d=>{const v=periods[d][key];return `<div class="lawItem"><div class="lawLabel">${d}日</div><div class="lawValue ${v>0?"greenText":v<0?"redText":"yellowText"}">${v>0?"+":""}${integer(v)} 張</div></div>`}).join("")}</div></div>`;
+}
+
+function render(data){
+ const {stock,rows,live,perRow,epsData,inst,inst20}=data;
+ const last=latest(rows),price=live?.price??num(last?.close),tech=getTechnical(rows,price);
+ const prev=rows.length>1?num(sorted(rows).at(-2)?.close):null;
+ const ch=live?.price!==undefined&&live?.price!==null&&prev!==null?live.price-prev:num(last?.spread);
+ const rate=prev&&ch!==null?ch/prev*100:null;
+ const per=perRow?num(perRow.PER):null,pbr=perRow?num(perRow.PBR):null,div=perRow?num(perRow.dividend_yield):null;
+ const eps=epsData?.ttm??epsData?.latest??null,val=valuation(price,eps,pbr,per),fair=fairValue(eps,stock.industry_category),moneyData=moneyPlan(price,tech),signal=stockSignal(tech,inst20,val,price,fair);
+ const lead=institutionalLead(inst20),foreign5=inst20?consecutive(inst20,"foreignNet"):0,trust5=inst20?consecutive(inst20,"trustNet"):0,total5=inst20?consecutive(inst20,"totalNet"):0;
+ const source=live?.source||"最新收盤";
+ const changeClass=ch>0?"up":ch<0?"down":"neutral";
+ const trendClass=tech.trend.includes("多")?"greenText":tech.trend.includes("空")?"redText":"yellowText";
+ const opState=price<fair&&fair?"🟢 現價低於合理價":"🟡 觀察位置";
+ $("result").innerHTML=`
+ <div class="hero">
+  <div class="titleRow"><div><div class="stockName">${esc(stock.stock_name)}</div><div class="stockCode">${esc(stock.stock_id)}${stock.industry_category?" · "+esc(stock.industry_category):""}</div></div>
+  <div class="priceBox"><div style="color:#ffd34d;font-size:15px;font-weight:800;margin-bottom:5px">🔴 目前現價</div><div class="price ${changeClass}">${money(price)}</div><div class="change ${changeClass}">${ch===null?"—":(ch>0?"▲ ":ch<0?"▼ ":"")+money(Math.abs(ch))}${rate===null?"":" ("+(rate>=0?"+":"")+money(rate)+"%)"}</div></div></div>
+  <div class="tags"><span class="tag ${trendClass==="greenText"?"green":trendClass==="redText"?"red":"orange"}">趨勢：${esc(tech.trend)}</span><span class="tag ${tech.breakout?"green":"orange"}">${tech.breakout?"🚀 突破向上":"⏳ 等待突破"}</span><span class="tag ${tech.longBull?"green":"orange"}">${tech.longBull?"長期多頭排列":"長期均線觀察"}</span><span class="tag blue">API：${esc(source)}</span></div>
+  <div class="dateBox"><b>行情日期：</b>${esc(live?.date||last?.date||"—")}　 <b>更新：</b>${esc(live?.time||"—")}<br><b>目前價位：</b>${money(price)}　 <b>昨收：</b>${money(live?.yesterday??prev)}<br><b>開盤：</b>${money(live?.open)}　 <b>最高：</b>${money(live?.high)}　 <b>最低：</b>${money(live?.low)}<br><b>買一：</b>${money(live?.bid)}　 <b>賣一：</b>${money(live?.ask)}　 <b>成交量：</b>${integer(live?.volume)}</div>
+ </div>
+
+ <div class="card"><h2 class="yellowText">🤖 這檔股票有沒有戲？</h2><div class="bigConclusion"><div class="headline ${signal.cls}">${signal.state}</div><div class="valuationText">AI綜合分數：<b>${signal.score}/100</b></div><div class="bar"><span style="width:${signal.score}%"></span></div><div class="signalReasons">${signal.reasons.map(x=>"• "+esc(x)).join("<br>")}</div></div></div>
+
+ <div class="card"><h2 class="blueText">📋 基本資料／估值</h2><div class="grid">
+ ${nbox("💰 現價",money(price),"")}
+ ${nbox("📊 EPS",money(eps),"blueText")}
+ ${nbox("📈 PE",money(val.pe),"")}
+ ${nbox("📊 PBR",money(pbr),"")}
+ ${nbox("💵 殖利率",div===null?"—":money(div)+"%","")}
+ ${nbox("🧮 系統合理價",fair===null?"—":money(fair),"orangeText")}
+ </div>
+ <div class="valuation"><div class="valuationTitle">⭐ 估值判斷</div><div class="valuationState ${val.cls}">${val.state}</div><div class="bar"><span style="width:${val.score}%"></span></div><div class="valuationText">${val.reasons.length?val.reasons.map(x=>"• "+esc(x)).join("<br>"):"估值資料不足"}<br><br><b>提醒：</b>系統合理價是 EPS × 產業模型倍數，不是券商實際目標價。</div></div></div>
+
+ <div class="card"><h2 class="greenText">🏦 最新交易日法人戰況</h2><div class="notice">資料日期：<b>${esc(inst?.date||"—")}</b></div>${inst?`<div class="periodBox"><table class="table"><thead><tr><th>法人</th><th>買進</th><th>賣出</th><th>買賣超</th></tr></thead><tbody>${lawRow("🟠 外資",inst.foreignBuy,inst.foreignSell,inst.foreignNet)}${lawRow("🟡 投信",inst.trustBuy,inst.trustSell,inst.trustNet)}${lawRow("🔵 自營商",inst.dealerBuy,inst.dealerSell,inst.dealerNet)}${lawRow("🟢 三大法人",inst.totalBuy,inst.totalSell,inst.totalNet)}</tbody></table></div>`:"<div class='notice'>目前沒有取得法人資料。</div>"}</div>
+
+ <div class="card"><h2 class="orangeText">📅 近期法人籌碼：1／5／20日</h2><div class="notice">正數＝淨買超；負數＝淨賣超；單位：張。</div>${inst20?`<div class="periodBox"><table class="periodTable"><thead><tr><th>期間</th><th>外資</th><th>投信</th><th>自營商</th><th>三大法人</th></tr></thead><tbody>${periodRows(inst20)}</tbody></table></div><div class="dateBox"><b>最新法人交易日：</b>${esc(inst20.latestDate)}</div>`:"<div class='notice'>目前無法取得近期法人資料。</div>"}</div>
+
+ <div class="card"><h2 class="purpleText">🔍 法人有沒有持續買？</h2>${inst20?`
+ ${lawCard("外資",inst20.periods,"foreignNet")}
+ ${lawCard("投信",inst20.periods,"trustNet")}
+ ${lawCard("三大法人",inst20.periods,"totalNet")}
+ <div class="lawBox"><div class="lawTitle">🏆 法人主導權</div><div class="valuationState ${lead.cls}">${lead.state}</div><div class="valuationText">${lead.text}</div></div>
+ <div class="grid">${nbox("外資連買",foreign5+" 日",foreign5>0?"greenText":"redText")}${nbox("投信連買",trust5+" 日",trust5>0?"greenText":"redText")}${nbox("三大法人連買",total5+" 日",total5>0?"greenText":"redText")}${nbox("20日三大法人",integer(inst20.periods[20].totalNet)+" 張",inst20.periods[20].totalNet>0?"greenText":"redText")}</div>`:"<div class='notice'>法人趨勢資料不足。</div>"}</div>
+
+ <div class="card"><h2 class="blueText">📈 5／14／27／62／131／272 日均線</h2><div class="periodBox"><table class="table"><thead><tr><th>均線</th><th>均線價格</th><th>乖離</th><th>斜率</th></tr></thead><tbody>${[5,14,27,62,131,272].map(p=>{const b=tech.bi[p],s=tech.sl[p];return `<tr><td>${p}日</td><td>${money(tech.ma[p])}</td><td class="${b!==null&&b>=0?"positive":"negative"}">${b===null?"—":(b>=0?"+":"")+money(b)+"%"}</td><td class="${s!==null&&s>=0?"positive":"negative"}">${s===null?"—":(s>=0?"+":"")+money(s)+"%"}</td></tr>`}).join("")}</tbody></table></div></div>
+
+ <div class="card"><h2 class="orangeText">🎯 買點／追價／防守／合理價</h2><div class="targetGrid">
+ <div class="target"><div class="targetLabel">🟢 舒服觀察區下緣</div><div class="targetValue">${money(moneyData.buyLow)}</div></div>
+ <div class="target"><div class="targetLabel">🟢 舒服觀察區上緣</div><div class="targetValue">${money(moneyData.buyHigh)}</div></div>
+ <div class="target"><div class="targetLabel">🚀 突破觀察</div><div class="targetValue">${money(moneyData.breakout)}</div></div>
+ <div class="target"><div class="targetLabel">🛑 防守參考</div><div class="targetValue">${money(moneyData.stop)}</div></div>
+ <div class="target"><div class="targetLabel">⭐ 系統合理價</div><div class="targetValue">${fair===null?"—":money(fair)}</div></div>
+ <div class="target"><div class="targetLabel">📌 目前位置</div><div class="targetValue">${opState}</div></div>
+ </div><div class="notice">這些區間是依均線、估值與目前價格模型計算的參考，不是保證買賣點；若價格已大幅高於合理價，即使法人很強也不代表適合追高。</div></div>
+
+ <div class="card"><h2 class="yellowText">📊 五大面向評分</h2><div class="quoteGrid">
+ ${nbox("🏦 法人籌碼",inst20?(inst20.periods[20].totalNet>0?80:35):"—",inst20?(inst20.periods[20].totalNet>0?"greenText":"redText"):"")}
+ ${nbox("📈 技術面",tech.trend==="強勢多頭"?90:tech.trend==="偏多"?75:tech.trend==="中性"?55:30,trendClass)}
+ ${nbox("💰 估值",val.score,val.cls)}
+ ${nbox("🚀 突破",tech.breakout?"確認":"未確認",tech.breakout?"greenText":"yellowText")}
+ ${nbox("🧠 綜合",signal.score+"/100",signal.cls)}
+ ${nbox("💵 合理價",fair===null?"—":money(fair),"orangeText")}
+ </div></div>
+
+ <div class="card"><h2 class="purpleText">💰 資金管理</h2><div class="grid">${nbox("建議最大持倉",moneyData.position+"%","purpleText")}${nbox("防守參考價",money(moneyData.stop),"redText")}</div><div class="notice">建議分批操作，不把全部資金壓在單一股票。防守價為模型參考。</div></div>
+
+ <div class="card"><h2 class="yellowText">⭐ AI一句話結論</h2><div class="bigConclusion"><div class="headline ${signal.cls}">${signal.state}</div><div class="valuationText">${esc(stock.stock_name)}目前<strong>${tech.trend}</strong>，${lead.text}${fair!==null?` 系統合理價約 ${money(fair)}。`:""} ${tech.breakout?"目前有突破訊號，但仍要看量價與法人是否同步。":"目前尚未完成突破確認，較適合等待支撐或突破再決定。"}</div><div class="signalReasons">${signal.reasons.slice(0,6).map(x=>"• "+esc(x)).join("<br>")}</div></div></div>
+ `;
+}
+
+
+/* ============================================================
+   近期有戲股票推薦
+   - 不把價格寫死
+   - 每次掃描都重新抓最新可取得資料
+   - 以 20 日法人、5 日法人、均線、突破、估值組合評分
+============================================================ */
+
+const RECOMMEND_CODES = [
+ "2330","2317","2454","2308","2382","2357","3231","2376","2345","3037",
+ "3711","2379","2408","2303","2881","2882","2884","2891","2886","2892",
+ "1326","1301","1303","2002","1101","2603","2615","2618","2367","2313",
+ "3491","5314","0050","00631L"
+];
+
+async function scanOneRecommendation(code){
+ try{
+  const stock = await findStock(code);
+  const rows = await getPrices(code);
+  if(!rows.length) return null;
+
+  const live = await getLiveQuote(code);
+  const price = live?.price ?? num(latest(rows)?.close);
+  if(price===null) return null;
+
+  const tech = getTechnical(rows,price);
+  const inst20 = await getInstitution20(code);
+  if(!inst20) return null;
+
+  const perRow = await getPER(code);
+  const financial = await getFinancial(code);
+  const epsData = getEPS(financial);
+  const eps = epsData?.ttm ?? epsData?.latest ?? null;
+  const per = perRow ? num(perRow.PER) : null;
+  const pbr = perRow ? num(perRow.PBR) : null;
+  const val = valuation(price,eps,pbr,per);
+  const fair = fairValue(eps,stock.industry_category);
+
+  let score = 0;
+  const reasons = [];
+
+  const p20 = inst20.periods[20];
+  const p5 = inst20.periods[5];
+
+  if(p20.totalNet>0){score+=25;reasons.push("20日三大法人買超")}
+  else score-=18;
+
+  if(p5.totalNet>0){score+=12;reasons.push("5日三大法人買超")}
+  else score-=8;
+
+  if(p20.foreignNet>0){score+=10;reasons.push("外資20日買超")}
+  if(p20.trustNet>0){score+=8;reasons.push("投信20日買超")}
+
+  if(tech.trend==="強勢多頭"){score+=18;reasons.push("均線強勢多頭")}
+  else if(tech.trend==="偏多"){score+=12;reasons.push("均線偏多")}
+  else if(tech.trend==="偏空")score-=15;
+
+  if(tech.breakout){score+=15;reasons.push("突破20日高點")}
+
+  if(val.state==="偏便宜"){score+=12;reasons.push("估值偏便宜")}
+  else if(val.state==="合理")score+=5;
+  else score-=8;
+
+  if(fair!==null && price<fair){score+=8;reasons.push("現價低於模型合理價")}
+
+  score=Math.max(0,Math.min(100,score));
+
+  return {
+   stock,price,live,inst20,tech,val,fair,score,reasons
+  };
+ }catch(e){
+  console.warn("推薦掃描失敗",code,e);
+  return null;
+}
+
+function renderRecommendations(list){
+ const box=document.getElementById("recommendList");
+ if(!list.length){
+  box.innerHTML='<div class="notice">目前沒有足夠資料產生推薦，請稍後再掃描。</div>';
+  return;
+ }
+
+ box.innerHTML=list.slice(0,10).map((x,i)=>{
+  const p20=x.inst20.periods[20];
+  const cls=x.score>=70?"greenText":x.score>=55?"yellowText":"orangeText";
+  const signal=x.score>=70?"🟢 有戲":x.score>=55?"🟡 觀察":"🟠 等待";
+  return `
+  <div class="rank" data-reccode="${esc(x.stock.stock_id)}">
+   <div>
+    <div class="rankName">${i+1}. ${esc(x.stock.stock_name)} <span class="rankCode">${esc(x.stock.stock_id)}</span></div>
+    <div class="small">
+     現價 ${money(x.price)}
+    　20日三大法人
+     <span class="${colorNet(p20.totalNet)}">${p20.totalNet>0?"+":""}${integer(p20.totalNet)}張</span>
+    　${x.tech.breakout?"🚀突破":"⏳未突破"}
+    </div>
+    <div class="small">${x.reasons.slice(0,4).map(esc).join("　·　")}</div>
+   </div>
+   <div class="rankValue ${cls}">${signal}<br>${x.score}分</div>
+  </div>`;
+ }).join("");
+
+ box.querySelectorAll("[data-reccode]").forEach(el=>{
+  el.addEventListener("click",()=>{
+   const code=el.dataset.reccode;
+   document.getElementById("searchInput").value=code;
+   searchStock(code);
+  });
+ });
+}
+
+async function scanRecommendations(){
+ const btn=document.getElementById("recommendBtn");
+ const status=document.getElementById("recommendStatus");
+ btn.disabled=true;
+ btn.style.opacity=".65";
+ status.textContent="🔎 正在掃描近期有戲股票……這會依最新 API 資料重新計算。";
+
+ try{
+  // 控制並發，避免一次對 API 發出過多請求
+  const results=[];
+  const batchSize=4;
+  for(let i=0;i<RECOMMEND_CODES.length;i+=batchSize){
+   const batch=RECOMMEND_CODES.slice(i,i+batchSize);
+   status.textContent=`🔎 掃描中 ${Math.min(i+batchSize,RECOMMEND_CODES.length)}/${RECOMMEND_CODES.length} ……`;
+   const r=await Promise.all(batch.map(scanOneRecommendation));
+   results.push(...r.filter(Boolean));
+  }
+
+  results.sort((a,b)=>b.score-a.score);
+  renderRecommendations(results);
+  status.textContent=`✅ 掃描完成，共取得 ${results.length} 檔有效資料。排名會隨市場資料變化。`;
+ }catch(e){
+  console.error(e);
+  status.textContent="❌ 推薦掃描失敗："+(e?.message||"請稍後再試");
+ }finally{
+  btn.disabled=false;
+  btn.style.opacity="1";
+ }
+}
+
+
+const MEDIUM_CODES=["2330","2454","2308","2382","2357","3231","2379","2345","3711","2317","3037","2383","3017","6488","1303","1326","2891","2886","2880","2884","2892","2890","2408","2344","6770","2303","0050"];
+const POPULAR_CODES=["6770","2408","2344","2303","3017","2383","2357","2454","2308","2330","2317","2382","3231","2887","2883","2880","2886","2884","2892","2890","1326","2367","2313","3491","5314","0050","00631L"];
+
+async function scoreCandidate(code,mode){
+ try{
+  const stock=await findStock(code),rows=await getPrices(code);
+  if(!rows.length)return null;
+  const live=await getLiveQuote(code),price=live?.price??num(latest(rows)?.close);
+  if(price===null)return null;
+  const tech=getTechnical(rows,price),inst20=await getInstitution20(code);
+  const perRow=await getPER(code),financial=await getFinancial(code),epsData=getEPS(financial);
+  const eps=epsData?.ttm??epsData?.latest??null,per=perRow?num(perRow.PER):null,pbr=perRow?num(perRow.PBR):null;
+  const val=valuation(price,eps,pbr,per),fair=fairValue(eps,stock.industry_category);
+  const c=closes(rows),recent=c.slice(-20),prev=c.slice(-21,-1);
+  const avgVol=recent.length?recent.reduce((a,b)=>a+b,0)/recent.length:null;
+  const ret20=recent.length&&recent[0]?((recent.at(-1)-recent[0])/recent[0])*100:0;
+  let score=0,reasons=[];
+  if(inst20){
+   const p20=inst20.periods[20],p5=inst20.periods[5];
+   if(p20.totalNet>0){score+=18;reasons.push("20日三大法人買超")}else score-=8;
+   if(p5.totalNet>0){score+=10;reasons.push("5日三大法人買超")}
+   if(p20.foreignNet>0){score+=7;reasons.push("外資20日買超")}
+   if(p20.trustNet>0){score+=7;reasons.push("投信20日買超")}
+  }
+  if(mode==="medium"){
+   if(tech.longBull){score+=22;reasons.push("長期均線多頭排列")}
+   else if(tech.trend==="偏多"){score+=12;reasons.push("長期趨勢偏多")}
+   if(eps!==null&&eps>0){score+=12;reasons.push("EPS為正")}
+   if(val.state==="偏便宜"){score+=15;reasons.push("估值偏便宜")}else if(val.state==="合理")score+=7;
+   if(fair!==null&&price<fair){score+=9;reasons.push("現價低於模型合理價")}
+  }else{
+   if(tech.breakout){score+=20;reasons.push("突破20日高點")}
+   if(ret20>8){score+=12;reasons.push("20日漲幅強")}else if(ret20>3)score+=6;
+   if(inst20?.periods[5].totalNet>0){score+=8;reasons.push("近期法人轉強")}
+   if(tech.trend==="強勢多頭"){score+=15;reasons.push("短中期強勢多頭")}else if(tech.trend==="偏多")score+=9;
+  }
+  score=Math.max(0,Math.min(100,score));
+  return {stock,price,live,inst20,tech,val,fair,score,reasons,ret20};
+ }catch(e){console.warn(mode,code,e);return null}
+}
+function renderBoard(list,target){
+ const box=document.getElementById(target);if(!list.length){box.innerHTML='<div class="notice">目前資料不足，請稍後再掃描。</div>';return}
+ box.innerHTML=list.slice(0,10).map((x,i)=>{
+  const cls=x.score>=70?"greenText":x.score>=55?"yellowText":"orangeText";
+  const state=x.score>=70?"🟢 強":x.score>=55?"🟡 觀察":"🟠 普通";
+  return `<div class="rank" data-boardcode="${esc(x.stock.stock_id)}"><div><div class="rankName">${i+1}. ${esc(x.stock.stock_name)} <span class="rankCode">${esc(x.stock.stock_id)}</span></div><div class="small">現價 ${money(x.price)}　20日三大法人 ${x.inst20?(x.inst20.periods[20].totalNet>0?"+":"")+integer(x.inst20.periods[20].totalNet):"—"}張　20日報酬 ${money(x.ret20)}%</div><div class="small">${x.reasons.slice(0,4).map(esc).join("　·　")}</div></div><div class="rankValue ${cls}">${state}<br>${x.score}分</div></div>`;
+ }).join("");
+ box.querySelectorAll("[data-boardcode]").forEach(el=>el.addEventListener("click",()=>{const c=el.dataset.boardcode;$("searchInput").value=c;searchStock(c)}));
+}
+async function runBoard(codes,mode,statusId,listId){
+ const st=document.getElementById(statusId);st.textContent="🔎 掃描中……";
+ const out=[],batch=4;
+ for(let i=0;i<codes.length;i+=batch){
+  st.textContent=`🔎 掃描中 ${Math.min(i+batch,codes.length)}/${codes.length} ……`;
+  const r=await Promise.all(codes.slice(i,i+batch).map(c=>scoreCandidate(c,mode)));
+  out.push(...r.filter(Boolean));
+ }
+ out.sort((a,b)=>b.score-a.score);renderBoard(out,listId);
+ st.textContent=`✅ 掃描完成，共 ${out.length} 檔有效資料。`;
+}
+document.getElementById("mediumBtn")?.addEventListener("click",()=>runBoard(MEDIUM_CODES,"medium","mediumStatus","mediumList"));
+document.getElementById("popularBtn")?.addEventListener("click",()=>runBoard(POPULAR_CODES,"popular","popularStatus","popularList"));
+
+async function searchStock(query){
+ if(!query){setStatus("請輸入股票代號或名稱。","error");return}
+ try{
+  if(currentTimer){clearInterval(currentTimer);currentTimer=null}
+  setStatus("🔎 正在搜尋 "+query+" ……","loading");
+  const stock=await findStock(query);currentStock=stock;
+  setStatus("📊 找到 "+stock.stock_name+"（"+stock.stock_id+"），正在取得歷史價格與法人……","loading");
+  const prices=await getPrices(String(stock.stock_id));
+  if(!prices.length)throw new Error("找到股票，但目前沒有取得價格資料。");
+  const [live,perRow,financial,inst20]=await Promise.all([
+   getLiveQuote(String(stock.stock_id)),getPER(String(stock.stock_id)),getFinancial(String(stock.stock_id)),getInstitution20(String(stock.stock_id))
+  ]);
+  const epsData=getEPS(financial),inst=inst20?{date:inst20.latestDate,...inst20.periods[1]}:null;
+  render({stock,rows:prices,live,perRow,epsData,inst,inst20});
+  $("quick").style.display="none";
+  setStatus("✅ "+stock.stock_name+" 分析完成；目前價位 "+money(live?.price??latest(prices)?.close)+"，行情："+(live?"已連線":"未取得即時端點，使用最新收盤"),live?"ok":"loading");
+  window.scrollTo({top:0,behavior:"smooth"});
+  /* 交易時間內每 20 秒更新一次目前價位；失敗就保持原資料。 */
+  currentTimer=setInterval(async()=>{
+   if(!currentStock)return;
+   const q=await getLiveQuote(String(currentStock.stock_id));
+   if(q){
+    const pricesNow=await getPrices(String(currentStock.stock_id)).catch(()=>prices);
+    const [perNow,finNow,instNow]=await Promise.all([getPER(String(currentStock.stock_id)),getFinancial(String(currentStock.stock_id)),getInstitution20(String(currentStock.stock_id))]);
+    render({stock:currentStock,rows:pricesNow,live:q,perRow:perNow,epsData:getEPS(finNow),inst:instNow?{date:instNow.latestDate,...instNow.periods[1]}:null,inst20:instNow});
+    setStatus("🔄 "+currentStock.stock_name+" 目前現價已更新："+money(q.price)+"　"+(q.time||"")+"　來源："+(q.source||"即時行情"),"ok");
+   }
+  },20000);
+ }catch(e){console.error(e);setStatus("❌ "+(e?.message||"資料取得失敗，請稍後再試。"),"error")}
+}
+$("searchBtn").addEventListener("click",()=>searchStock($("searchInput").value.trim()));
+$("searchInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchStock($("searchInput").value.trim())}});
+document.querySelectorAll(".action").forEach(btn=>btn.addEventListener("click",()=>{$("searchInput").value=btn.dataset.code;searchStock(btn.dataset.code)}));
+
+document.getElementById("recommendBtn")?.addEventListener("click",scanRecommendations);
+setStatus("請搜尋一檔股票或 ETF。","ok");
+</script>
+</body>
+</html>
