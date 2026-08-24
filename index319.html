@@ -105,7 +105,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 <button class="action" data-code="0050"><strong>📈 0050</strong><span>ETF</span></button>
 <button class="action" data-code="00631L"><strong>⚡ 00631L</strong><span>台灣50正2</span></button>
 </div></div>
-<div class="footer">資料：FinMind 公開市場資料＋台灣證券交易所 MIS 即時行情。即時行情端點是否可用，取決於交易所與瀏覽器網路環境；若即時端點失敗，會自動退回最新可取得收盤價。法人、EPS、估值與技術分析為模型計算，僅供研究參考。</div>
+<div class="footer">資料：FinMind 公開市場資料＋台灣證券交易所 MIS 即時行情。即時行情端點是否可用，取決於交易所與瀏覽器網路環境；若即時端點失敗，會自動退回最新可取得收盤價。法人、EPS、估值與技術分析為模型計算；「模型目標價」不是券商目標價，僅供研究參考。</div>
 </div>
 
 <script>
@@ -323,6 +323,11 @@ function periodRows(x){
  return [1,5,20].map(d=>{const p=x.periods[d];return `<tr><td>${d}日</td><td class="${colorNet(p.foreignNet)}">${p.foreignNet>0?"+":""}${integer(p.foreignNet)}</td><td class="${colorNet(p.trustNet)}">${p.trustNet>0?"+":""}${integer(p.trustNet)}</td><td class="${colorNet(p.dealerNet)}">${p.dealerNet>0?"+":""}${integer(p.dealerNet)}</td><td class="${colorNet(p.totalNet)}">${p.totalNet>0?"+":""}${integer(p.totalNet)}</td></tr>`}).join("");
 }
 function nbox(label,v,cls=""){return `<div class="metric"><div class="label">${label}</div><div class="value ${cls}">${v}</div></div>`}
+function periodBuySellRows(x){
+ if(!x)return `<tr><td colspan="8">目前無法取得近期法人買賣量資料</td></tr>`;
+ return [1,5,20].map(d=>{const p=x.periods[d];return `<tr><td>${d}日</td><td>${integer(p.foreignBuy)}</td><td>${integer(p.foreignSell)}</td><td class="${colorNet(p.foreignNet)}">${p.foreignNet>0?"+":""}${integer(p.foreignNet)}</td><td>${integer(p.trustBuy)}</td><td>${integer(p.trustSell)}</td><td>${integer(p.dealerBuy+p.dealerSell)}</td><td class="${colorNet(p.totalNet)}">${p.totalNet>0?"+":""}${integer(p.totalNet)}</td></tr>`}).join("");
+}
+
 function lawCard(title,periods,key){
  return `<div class="lawBox"><div class="lawTitle">${title}</div><div class="lawGrid">${[1,5,20].map(d=>{const v=periods[d][key];return `<div class="lawItem"><div class="lawLabel">${d}日</div><div class="lawValue ${v>0?"greenText":v<0?"redText":"yellowText"}">${v>0?"+":""}${integer(v)} 張</div></div>`}).join("")}</div></div>`;
 }
@@ -363,6 +368,7 @@ function render(data){
  <div class="card"><h2 class="greenText">🏦 最新交易日法人戰況</h2><div class="notice">資料日期：<b>${esc(inst?.date||"—")}</b></div>${inst?`<div class="periodBox"><table class="table"><thead><tr><th>法人</th><th>買進</th><th>賣出</th><th>買賣超</th></tr></thead><tbody>${lawRow("🟠 外資",inst.foreignBuy,inst.foreignSell,inst.foreignNet)}${lawRow("🟡 投信",inst.trustBuy,inst.trustSell,inst.trustNet)}${lawRow("🔵 自營商",inst.dealerBuy,inst.dealerSell,inst.dealerNet)}${lawRow("🟢 三大法人",inst.totalBuy,inst.totalSell,inst.totalNet)}</tbody></table></div>`:"<div class='notice'>目前沒有取得法人資料。</div>"}</div>
 
  <div class="card"><h2 class="orangeText">📅 近期法人籌碼：1／5／20日</h2><div class="notice">正數＝淨買超；負數＝淨賣超；單位：張。</div>${inst20?`<div class="periodBox"><table class="periodTable"><thead><tr><th>期間</th><th>外資</th><th>投信</th><th>自營商</th><th>三大法人</th></tr></thead><tbody>${periodRows(inst20)}</tbody></table></div><div class="dateBox"><b>最新法人交易日：</b>${esc(inst20.latestDate)}</div>`:"<div class='notice'>目前無法取得近期法人資料。</div>"}</div>
+ <div class="card"><h2 class="greenText">📦 近期法人「買進／賣出／淨買賣」</h2><div class="notice">這裡把你關心的「外資到底買多少、賣多少」直接列出；單位：張。三大法人最後一欄為合計淨買賣。</div>${inst20?`<div class="periodBox"><table class="periodTable" style="min-width:900px"><thead><tr><th>期間</th><th>外資買</th><th>外資賣</th><th>外資淨</th><th>投信買</th><th>投信賣</th><th>自營商買+賣</th><th>三大淨</th></tr></thead><tbody>${periodBuySellRows(inst20)}</tbody></table></div>`:"<div class='notice'>目前無法取得近期法人買賣量。</div>"}</div>
 
  <div class="card"><h2 class="purpleText">🔍 法人有沒有持續買？</h2>${inst20?`
  ${lawCard("外資",inst20.periods,"foreignNet")}
@@ -379,6 +385,7 @@ function render(data){
  <div class="target"><div class="targetLabel">🚀 突破觀察</div><div class="targetValue">${money(moneyData.breakout)}</div></div>
  <div class="target"><div class="targetLabel">🛑 防守參考</div><div class="targetValue">${money(moneyData.stop)}</div></div>
  <div class="target"><div class="targetLabel">⭐ 系統合理價</div><div class="targetValue">${fair===null?"—":money(fair)}</div></div>
+ <div class="target"><div class="targetLabel">🎯 模型目標價（+15%）</div><div class="targetValue">${fair===null?"—":money(fair*1.15)}</div></div>
  <div class="target"><div class="targetLabel">📌 目前位置</div><div class="targetValue">${opState}</div></div>
  </div><div class="notice">這些區間是依均線、估值與目前價格模型計算的參考，不是保證買賣點；若價格已大幅高於合理價，即使法人很強也不代表適合追高。</div></div>
 
@@ -470,6 +477,8 @@ async function scanOneRecommendation(code){
  }catch(e){
   console.warn("推薦掃描失敗",code,e);
   return null;
+}
+
 }
 
 function renderRecommendations(list){
@@ -634,7 +643,7 @@ async function searchStock(query){
 }
 $("searchBtn").addEventListener("click",()=>searchStock($("searchInput").value.trim()));
 $("searchInput").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();searchStock($("searchInput").value.trim())}});
-document.querySelectorAll(".action").forEach(btn=>btn.addEventListener("click",()=>{$("searchInput").value=btn.dataset.code;searchStock(btn.dataset.code)}));
+document.querySelectorAll(".action[data-code]").forEach(btn=>btn.addEventListener("click",()=>{$("searchInput").value=btn.dataset.code;searchStock(btn.dataset.code)}));
 
 document.getElementById("recommendBtn")?.addEventListener("click",scanRecommendations);
 setStatus("請搜尋一檔股票或 ETF。","ok");
