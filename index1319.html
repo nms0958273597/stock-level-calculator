@@ -1,12 +1,1937 @@
-from pathlib import Path
-import shutil
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="theme-color" content="#fff7ed">
+<title>每日收入・盈餘記帳</title>
 
-src=Path("/mnt/data/daily_income_surplus.html")
-dst=Path("/mnt/data/index1319.html")
-shutil.copy2(src,dst)
+<style>
+*{box-sizing:border-box}
 
-# Verify it is actual HTML, not Python source.
-text=dst.read_text(encoding="utf-8")
-assert text.lstrip().lower().startswith("<!doctype html>")
-assert "</html>" in text.lower()
-print(f"[下載正確的 index1319.html](sandbox:{dst})")
+body{
+  margin:0;
+  background:#fff7ed;
+  color:#3b2f2f;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",Arial,sans-serif;
+}
+
+.container{
+  width:100%;
+  max-width:720px;
+  margin:auto;
+  padding:14px;
+}
+
+h1{
+  text-align:center;
+  font-size:28px;
+  margin:10px 0 18px;
+}
+
+.card{
+  background:#fff;
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:15px;
+  box-shadow:0 4px 16px rgba(80,50,20,.08);
+}
+
+.title{
+  font-size:22px;
+  font-weight:900;
+  margin-bottom:15px;
+}
+
+label{
+  display:block;
+  font-size:19px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+input,textarea{
+  font-family:inherit;
+}
+
+input[type="date"],
+.text-input,
+.amount-input,
+.taken-input{
+  width:100%;
+  border:2px solid #eadfd5;
+  border-radius:13px;
+  padding:13px;
+  font-size:19px;
+  background:#fffdfb;
+}
+
+input:focus,textarea:focus{
+  outline:none;
+  border-color:#e59a52;
+}
+
+.date-display{
+  margin-top:10px;
+  padding:12px;
+  text-align:center;
+  border-radius:13px;
+  background:#fff5dc;
+  color:#7d5315;
+  font-size:20px;
+  font-weight:900;
+}
+
+.save-status{
+  text-align:center;
+  margin-top:7px;
+  color:#8b7c75;
+  font-size:13px;
+}
+
+.income-row{
+  display:grid;
+  grid-template-columns:1fr 120px 42px;
+  gap:8px;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.income-row input{
+  width:100%;
+  border:2px solid #eadfd5;
+  border-radius:12px;
+  padding:11px;
+  font-size:17px;
+}
+
+.delete-btn{
+  width:42px;
+  height:42px;
+  border:0;
+  border-radius:11px;
+  background:#ffe2df;
+  color:#c43b31;
+  font-size:23px;
+  font-weight:900;
+}
+
+.qty-row{
+  display:grid;
+  grid-template-columns:1fr auto 42px 42px 42px auto;
+  gap:7px;
+  align-items:center;
+  padding:9px 0;
+  margin-bottom:8px;
+}
+
+.qty-name{
+  font-size:18px;
+  font-weight:900;
+}
+
+.qty-unit{
+  font-size:14px;
+  color:#8b7c75;
+  white-space:nowrap;
+}
+
+.qty-btn{
+  width:42px;
+  height:42px;
+  padding:0;
+  border:0;
+  border-radius:11px;
+  background:#fff0d9;
+  color:#9a5a12;
+  font-size:26px;
+  font-weight:900;
+}
+
+.qty-value{
+  text-align:center;
+  font-size:20px;
+  font-weight:900;
+}
+
+.qty-total{
+  min-width:70px;
+  text-align:right;
+  font-size:18px;
+  font-weight:900;
+  color:#7d5315;
+}
+
+.add-btn,
+.primary-btn,
+.copy-btn,
+.line-btn,
+.save-btn{
+  width:100%;
+  border:0;
+  border-radius:13px;
+  padding:14px;
+  font-size:18px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.add-btn{
+  background:#fff0d9;
+  color:#9a5a12;
+  margin-top:4px;
+}
+
+.save-btn,
+.primary-btn{
+  background:#e58f49;
+  color:#fff;
+}
+
+.copy-btn{
+  background:#fff0d9;
+  color:#8a5917;
+}
+
+.line-btn{
+  background:#dff5df;
+  color:#217a2d;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.box{
+  border-radius:17px;
+  padding:17px 12px;
+  text-align:center;
+}
+
+.box-title{
+  font-size:17px;
+  font-weight:900;
+}
+
+.box-number{
+  font-size:30px;
+  font-weight:900;
+  margin-top:7px;
+}
+
+.total-box{
+  background:#fff5dc;
+  color:#8a5a00;
+}
+
+.taken-box{
+  background:#fff;
+}
+
+.profit-box{
+  background:#eaf8ed;
+  color:#19733a;
+}
+
+.diff-box{
+  background:#fff0ef;
+  color:#c7372d;
+}
+
+.taken-input{
+  margin-top:8px;
+  text-align:center;
+}
+
+.detail-text{
+  width:100%;
+  min-height:240px;
+  resize:vertical;
+  border:2px solid #eadfd5;
+  border-radius:13px;
+  padding:13px;
+  font-size:16px;
+  line-height:1.65;
+  background:#fffdfb;
+}
+
+.two-buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.history-item{
+  border-top:1px solid #eee2d8;
+  padding:14px 0;
+}
+
+.history-item:first-child{
+  border-top:0;
+}
+
+.history-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-size:17px;
+  font-weight:900;
+}
+
+.history-detail{
+  margin-top:7px;
+  color:#756866;
+  font-size:14px;
+  line-height:1.65;
+}
+
+.history-buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:9px;
+}
+
+.small-btn{
+  border:0;
+  border-radius:10px;
+  padding:9px;
+  font-size:14px;
+  font-weight:900;
+  background:#fff0d9;
+  color:#8a5917;
+}
+
+.small-danger{
+  background:#ffe4e1;
+  color:#b9362c;
+}
+
+.empty{
+  text-align:center;
+  color:#9b8d87;
+  padding:20px 5px;
+}
+
+.note{
+  font-size:13px;
+  color:#8b7c75;
+  line-height:1.5;
+  margin:7px 0 10px;
+}
+
+.clear-btn{
+  width:100%;
+  margin-top:12px;
+  border:0;
+  border-radius:12px;
+  padding:12px;
+  background:#ffe4e1;
+  color:#b9362c;
+  font-size:16px;
+  font-weight:900;
+}
+
+@media(max-width:480px){
+
+  h1{
+    font-size:25px;
+  }
+
+  .summary{
+    gap:9px;
+  }
+
+  .income-row{
+    grid-template-columns:1fr 105px 40px;
+  }
+
+  .qty-row{
+    grid-template-columns:1fr auto 38px 38px 38px auto;
+    gap:5px;
+  }
+
+  .qty-btn{
+    width:38px;
+    height:38px;
+  }
+
+  .qty-name{
+    font-size:16px;
+  }
+
+  .qty-total{
+    min-width:62px;
+    font-size:16px;
+  }
+
+  .two-buttons{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>💰 每日收入・盈餘記帳</h1>
+
+<!-- 日期 -->
+<div class="card">
+
+<label>📅 日期</label>
+
+<input
+  id="date"
+  type="date"
+  onchange="dateChanged()"
+>
+
+<div id="dateDisplay" class="date-display"></div>
+
+<div id="saveStatus" class="save-status">
+💾 自動儲存已開啟
+</div>
+
+</div>
+
+
+<!-- 收入 -->
+<div class="card">
+
+<div class="title">💰 收入項目</div>
+
+<!-- 🍜 -->
+<div class="income-row">
+
+<input
+  id="noodleName"
+  class="text-input"
+  type="text"
+  value="🍜"
+  oninput="calculate()"
+>
+
+<input
+  id="noodleAmount"
+  class="amount-input"
+  type="number"
+  min="0"
+  value="850"
+  oninput="calculate()"
+>
+
+<div></div>
+
+</div>
+
+
+<!-- 🍋 -->
+<div class="qty-row">
+
+<div class="qty-name">🍋 檸檬</div>
+
+<div class="qty-unit">1,200／個</div>
+
+<button class="qty-btn" onclick="changeQty('lemon',-1)">−</button>
+
+<div id="lemonQty" class="qty-value">1</div>
+
+<button class="qty-btn" onclick="changeQty('lemon',1)">＋</button>
+
+<div id="lemonTotal" class="qty-total">1,200</div>
+
+</div>
+
+
+<!-- 蚵仔 -->
+<div class="qty-row">
+
+<div class="qty-name">蚵仔一包</div>
+
+<div class="qty-unit">150／包</div>
+
+<button class="qty-btn" onclick="changeQty('oyster',-1)">−</button>
+
+<div id="oysterQty" class="qty-value">1</div>
+
+<button class="qty-btn" onclick="changeQty('oyster',1)">＋</button>
+
+<div id="oysterTotal" class="qty-total">150</div>
+
+</div>
+
+
+<!-- 大腸 -->
+<div class="qty-row">
+
+<div class="qty-name">大腸一包</div>
+
+<div class="qty-unit">150／包</div>
+
+<button class="qty-btn" onclick="changeQty('intestine',-1)">−</button>
+
+<div id="intestineQty" class="qty-value">1</div>
+
+<button class="qty-btn" onclick="changeQty('intestine',1)">＋</button>
+
+<div id="intestineTotal" class="qty-total">150</div>
+
+</div>
+
+
+<div id="otherIncomeList"></div>
+
+<div class="note">
+其他收入可以自行新增。
+</div>
+
+<button class="add-btn" onclick="addOtherIncome()">
+＋ 新增收入項目
+</button>
+
+</div>
+
+
+<!-- 收入合計／已拿 -->
+<div class="card">
+
+<div class="summary">
+
+<div class="box total-box">
+
+<div class="box-title">
+💰 收入合計
+</div>
+
+<div id="incomeTotal" class="box-number">
+0
+</div>
+
+</div>
+
+
+<div class="box taken-box">
+
+<div class="box-title">
+💵 已拿
+</div>
+
+<input
+  id="taken"
+  class="taken-input"
+  type="number"
+  min="0"
+  value="0"
+  oninput="calculate()"
+>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- 盈餘／差額 -->
+<div class="card">
+
+<div class="summary">
+
+<div class="box profit-box">
+
+<div class="box-title">
+🟢 盈餘
+</div>
+
+<div id="profit" class="box-number">
+0
+</div>
+
+</div>
+
+
+<div class="box diff-box">
+
+<div class="box-title">
+🔴 差額
+</div>
+
+<div id="difference" class="box-number">
+0
+</div>
+
+</div>
+
+</div>
+
+
+<button
+  class="save-btn"
+  onclick="saveRecord()"
+  style="margin-top:12px"
+>
+💾 儲存今天紀錄
+</button>
+
+</div>
+
+
+<!-- 累加 -->
+<div class="card">
+
+<div class="title">
+📊 累加統計
+</div>
+
+<div class="summary">
+
+<div class="box profit-box">
+
+<div class="box-title">
+📈 盈餘累加
+</div>
+
+<div id="profitAccum" class="box-number">
+0
+</div>
+
+</div>
+
+
+<div class="box diff-box">
+
+<div class="box-title">
+📉 差額累加
+</div>
+
+<div id="differenceAccum" class="box-number">
+0
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- 明細 -->
+<div class="card">
+
+<div class="title">
+📋 詳細明細
+</div>
+
+<textarea
+  id="detailText"
+  class="detail-text"
+  readonly
+></textarea>
+
+
+<div class="two-buttons">
+
+<button
+  class="copy-btn"
+  onclick="copyDetail()"
+>
+📋 複製明細
+</button>
+
+
+<button
+  class="line-btn"
+  onclick="sendLine()"
+>
+💬 傳送 LINE
+</button>
+
+</div>
+
+</div>
+
+
+<!-- 歷史 -->
+<div class="card">
+
+<div class="title">
+📚 歷史紀錄
+</div>
+
+<div id="history"></div>
+
+<button
+  class="clear-btn"
+  onclick="clearAll()"
+>
+🗑️ 清除全部紀錄
+</button>
+
+</div>
+
+</div>
+
+
+<script>
+
+const STORAGE_RECORDS="income1319_records";
+
+const STORAGE_DRAFT="income1319_draft";
+
+
+const unitPrices={
+  lemon:1200,
+  oyster:150,
+  intestine:150
+};
+
+
+let quantities={
+  lemon:1,
+  oyster:1,
+  intestine:1
+};
+
+
+let records=[];
+
+try{
+  records=JSON.parse(
+    localStorage.getItem(STORAGE_RECORDS)||"[]"
+  );
+}catch(e){
+  records=[];
+}
+
+
+/* 今天日期 */
+
+function getToday(){
+
+  const d=new Date();
+
+  const y=d.getFullYear();
+
+  const m=String(d.getMonth()+1).padStart(2,"0");
+
+  const day=String(d.getDate()).padStart(2,"0");
+
+  return y+"-"+m+"-"+day;
+
+}
+
+
+/* 金額格式 */
+
+function money(value){
+
+  return Math.round(
+    Number(value)||0
+  ).toLocaleString("zh-TW");
+
+}
+
+
+/* 日期顯示 */
+
+function updateDateDisplay(){
+
+  const value=
+    document.getElementById("date").value||
+    getToday();
+
+  const d=
+    new Date(value+"T00:00:00");
+
+  const week=[
+    "星期日",
+    "星期一",
+    "星期二",
+    "星期三",
+    "星期四",
+    "星期五",
+    "星期六"
+  ];
+
+  document.getElementById("dateDisplay").textContent=
+    d.getFullYear()+"年"+
+    (d.getMonth()+1)+"月"+
+    d.getDate()+"日 "+
+    week[d.getDay()];
+
+}
+
+
+/* 日期變更 */
+
+function dateChanged(){
+
+  updateDateDisplay();
+
+  loadDateRecord();
+
+  calculate();
+
+}
+
+
+/* 數量＋／− */
+
+function changeQty(type,delta){
+
+  quantities[type]=
+    Math.max(
+      0,
+      (quantities[type]||0)+delta
+    );
+
+  document.getElementById(type+"Qty")
+    .textContent=quantities[type];
+
+  document.getElementById(type+"Total")
+    .textContent=
+      money(
+        quantities[type]*
+        unitPrices[type]
+      );
+
+  calculate();
+
+}
+
+
+/* 取得其他收入 */
+
+function getOtherIncome(){
+
+  return [
+    ...document.querySelectorAll(
+      "#otherIncomeList .income-row"
+    )
+  ].map(row=>{
+
+    return{
+
+      name:
+        row.querySelector(".other-name")
+          .value.trim(),
+
+      amount:
+        Number(
+          row.querySelector(".other-amount")
+            .value
+        )||0
+
+    };
+
+  }).filter(
+    x=>x.name!==""||x.amount!==0
+  );
+
+}
+
+
+/* 新增其他收入 */
+
+function addOtherIncome(
+  name="",
+  amount=0
+){
+
+  const box=
+    document.getElementById(
+      "otherIncomeList"
+    );
+
+  const row=
+    document.createElement("div");
+
+  row.className="income-row";
+
+  row.innerHTML=`
+
+    <input
+      class="other-name"
+      type="text"
+      placeholder="其他收入"
+      value="${escapeHtml(name)}"
+      oninput="calculate()"
+    >
+
+    <input
+      class="other-amount"
+      type="number"
+      min="0"
+      value="${Number(amount)||0}"
+      oninput="calculate()"
+    >
+
+    <button
+      class="delete-btn"
+      onclick="this.parentElement.remove();calculate()"
+    >×</button>
+
+  `;
+
+  box.appendChild(row);
+
+}
+
+
+/* 收入項目 */
+
+function getItems(){
+
+  const items=[];
+
+
+  const noodleName=
+    document.getElementById(
+      "noodleName"
+    ).value.trim();
+
+  const noodleAmount=
+    Number(
+      document.getElementById(
+        "noodleAmount"
+      ).value
+    )||0;
+
+
+  if(
+    noodleName!==""||
+    noodleAmount!==0
+  ){
+
+    items.push({
+
+      name:noodleName,
+
+      amount:noodleAmount
+
+    });
+
+  }
+
+
+  if(quantities.lemon>0){
+
+    items.push({
+
+      name:"🍋",
+
+      amount:
+        quantities.lemon*
+        unitPrices.lemon,
+
+      qty:quantities.lemon
+
+    });
+
+  }
+
+
+  if(quantities.oyster>0){
+
+    items.push({
+
+      name:"蚵仔一包",
+
+      amount:
+        quantities.oyster*
+        unitPrices.oyster,
+
+      qty:quantities.oyster
+
+    });
+
+  }
+
+
+  if(quantities.intestine>0){
+
+    items.push({
+
+      name:"大腸一包",
+
+      amount:
+        quantities.intestine*
+        unitPrices.intestine,
+
+      qty:quantities.intestine
+
+    });
+
+  }
+
+
+  return items.concat(
+    getOtherIncome()
+  );
+
+}
+
+
+/* 計算 */
+
+function calculate(){
+
+  const items=getItems();
+
+  const total=
+    items.reduce(
+      (sum,item)=>
+        sum+Number(item.amount||0),
+      0
+    );
+
+
+  const taken=
+    Number(
+      document.getElementById(
+        "taken"
+      ).value
+    )||0;
+
+
+  const profit=
+    Math.max(
+      total-taken,
+      0
+    );
+
+
+  const difference=
+    Math.max(
+      taken-total,
+      0
+    );
+
+
+  document.getElementById(
+    "incomeTotal"
+  ).textContent=money(total);
+
+
+  document.getElementById(
+    "profit"
+  ).textContent=money(profit);
+
+
+  document.getElementById(
+    "difference"
+  ).textContent=money(difference);
+
+
+  updateDetail();
+
+  autoSaveDraft();
+
+}
+
+
+/* 明細 */
+
+function buildDetail(){
+
+  const value=
+    document.getElementById(
+      "date"
+    ).value||getToday();
+
+
+  const d=
+    new Date(
+      value+"T00:00:00"
+    );
+
+
+  const week=[
+    "星期日",
+    "星期一",
+    "星期二",
+    "星期三",
+    "星期四",
+    "星期五",
+    "星期六"
+  ];
+
+
+  const dateText=
+    d.getFullYear()+"年"+
+    (d.getMonth()+1)+"月"+
+    d.getDate()+"日 "+
+    week[d.getDay()];
+
+
+  const items=getItems();
+
+
+  const total=
+    items.reduce(
+      (s,x)=>
+        s+Number(x.amount||0),
+      0
+    );
+
+
+  const taken=
+    Number(
+      document.getElementById(
+        "taken"
+      ).value
+    )||0;
+
+
+  const profit=
+    Math.max(
+      total-taken,
+      0
+    );
+
+
+  const difference=
+    Math.max(
+      taken-total,
+      0
+    );
+
+
+  let text=
+    "📅 日期："+dateText+
+    "\n\n"+
+    "💰 收入明細\n";
+
+
+  if(items.length===0){
+
+    text+="目前沒有收入\n";
+
+  }else{
+
+    items.forEach(item=>{
+
+      if(
+        item.qty!==undefined
+      ){
+
+        text+=
+          item.name+
+          " × "+
+          item.qty+
+          "　"+
+          money(item.amount)+
+          "\n";
+
+      }else{
+
+        text+=
+          item.name+
+          "　"+
+          money(item.amount)+
+          "\n";
+
+      }
+
+    });
+
+  }
+
+
+  text+=
+    "\n💰 收入合計："+money(total)+
+    "\n💵 已拿："+money(taken)+
+    "\n\n🟢 盈餘："+money(profit)+
+    "\n🔴 差額："+money(difference);
+
+
+  return text;
+
+}
+
+
+/* 更新明細 */
+
+function updateDetail(){
+
+  document.getElementById(
+    "detailText"
+  ).value=buildDetail();
+
+}
+
+
+/* 複製 */
+
+async function copyDetail(){
+
+  const text=buildDetail();
+
+  try{
+
+    await navigator.clipboard.writeText(
+      text
+    );
+
+  }catch(e){
+
+    const area=
+      document.createElement(
+        "textarea"
+      );
+
+    area.value=text;
+
+    document.body.appendChild(
+      area
+    );
+
+    area.select();
+
+    document.execCommand(
+      "copy"
+    );
+
+    area.remove();
+
+  }
+
+  alert("✅ 詳細明細已複製！");
+
+}
+
+
+/* LINE */
+
+function sendLine(){
+
+  const text=
+    encodeURIComponent(
+      buildDetail()
+    );
+
+  window.location.href=
+    "https://line.me/R/msg/text/?"+
+    text;
+
+}
+
+
+/* 儲存今天 */
+
+function saveRecord(){
+
+  const date=
+    document.getElementById(
+      "date"
+    ).value||getToday();
+
+
+  const items=getItems();
+
+
+  const total=
+    items.reduce(
+      (s,x)=>
+        s+Number(x.amount||0),
+      0
+    );
+
+
+  const taken=
+    Number(
+      document.getElementById(
+        "taken"
+      ).value
+    )||0;
+
+
+  const profit=
+    Math.max(
+      total-taken,
+      0
+    );
+
+
+  const difference=
+    Math.max(
+      taken-total,
+      0
+    );
+
+
+  const record={
+
+    date:date,
+
+    items:items,
+
+    total:total,
+
+    taken:taken,
+
+    profit:profit,
+
+    difference:difference
+
+  };
+
+
+  const index=
+    records.findIndex(
+      r=>r.date===date
+    );
+
+
+  if(index>=0){
+
+    records[index]=record;
+
+  }else{
+
+    records.push(record);
+
+  }
+
+
+  records.sort(
+    (a,b)=>
+      b.date.localeCompare(a.date)
+  );
+
+
+  localStorage.setItem(
+    STORAGE_RECORDS,
+    JSON.stringify(records)
+  );
+
+
+  updateAccum();
+
+  renderHistory();
+
+  document.getElementById(
+    "saveStatus"
+  ).textContent=
+    "✅ 已儲存";
+
+
+  alert(
+    "✅ 今天紀錄已儲存！"
+  );
+
+}
+
+
+/* 自動儲存目前輸入 */
+
+function autoSaveDraft(){
+
+  const draft={
+
+    date:
+      document.getElementById(
+        "date"
+      ).value||getToday(),
+
+    noodleName:
+      document.getElementById(
+        "noodleName"
+      ).value,
+
+    noodleAmount:
+      Number(
+        document.getElementById(
+          "noodleAmount"
+        ).value
+      )||0,
+
+    taken:
+      Number(
+        document.getElementById(
+          "taken"
+        ).value
+      )||0,
+
+    quantities:{
+      lemon:quantities.lemon,
+      oyster:quantities.oyster,
+      intestine:quantities.intestine
+    },
+
+    other:getOtherIncome()
+
+  };
+
+
+  localStorage.setItem(
+    STORAGE_DRAFT,
+    JSON.stringify(draft)
+  );
+
+
+  document.getElementById(
+    "saveStatus"
+  ).textContent=
+    "💾 自動儲存中・已保存";
+
+}
+
+
+/* 載入自動儲存 */
+
+function loadDraft(){
+
+  const raw=
+    localStorage.getItem(
+      STORAGE_DRAFT
+    );
+
+
+  if(!raw){
+
+    return false;
+
+  }
+
+
+  try{
+
+    const draft=
+      JSON.parse(raw);
+
+
+    if(draft.date){
+
+      document.getElementById(
+        "date"
+      ).value=draft.date;
+
+    }
+
+
+    document.getElementById(
+      "noodleName"
+    ).value=
+      draft.noodleName||"🍜";
+
+
+    document.getElementById(
+      "noodleAmount"
+    ).value=
+      draft.noodleAmount??850;
+
+
+    document.getElementById(
+      "taken"
+    ).value=
+      draft.taken||0;
+
+
+    if(draft.quantities){
+
+      quantities.lemon=
+        Number(
+          draft.quantities.lemon
+        )||0;
+
+      quantities.oyster=
+        Number(
+          draft.quantities.oyster
+        )||0;
+
+      quantities.intestine=
+        Number(
+          draft.quantities.intestine
+        )||0;
+
+    }
+
+
+    updateQtyDisplay();
+
+
+    document.getElementById(
+      "otherIncomeList"
+    ).innerHTML="";
+
+
+    if(
+      Array.isArray(
+        draft.other
+      )
+    ){
+
+      draft.other.forEach(
+        item=>
+          addOtherIncome(
+            item.name,
+            item.amount
+          )
+      );
+
+    }
+
+
+    return true;
+
+  }catch(e){
+
+    return false;
+
+  }
+
+}
+
+
+/* 載入某一天紀錄 */
+
+function loadDateRecord(){
+
+  const date=
+    document.getElementById(
+      "date"
+    ).value;
+
+
+  const record=
+    records.find(
+      r=>r.date===date
+    );
+
+
+  if(!record){
+
+    return;
+
+  }
+
+
+  const normal=
+    (record.items||[])
+      .filter(
+        item=>
+          ![
+            "🍋",
+            "蚵仔一包",
+            "大腸一包"
+          ].includes(item.name)
+      );
+
+
+  const noodle=
+    normal.find(
+      x=>x.name==="🍜"
+    );
+
+
+  document.getElementById(
+    "noodleName"
+  ).value=
+    noodle?.name||"🍜";
+
+
+  document.getElementById(
+    "noodleAmount"
+  ).value=
+    noodle?.amount??850;
+
+
+  const other=
+    normal.filter(
+      x=>x!==noodle
+    );
+
+
+  document.getElementById(
+    "otherIncomeList"
+  ).innerHTML="";
+
+
+  other.forEach(
+    item=>
+      addOtherIncome(
+        item.name,
+        item.amount
+      )
+  );
+
+
+  quantities.lemon=
+    Number(
+      (record.items||[])
+        .find(
+          x=>x.name==="🍋"
+        )?.qty
+    )||0;
+
+
+  quantities.oyster=
+    Number(
+      (record.items||[])
+        .find(
+          x=>x.name==="蚵仔一包"
+        )?.qty
+    )||0;
+
+
+  quantities.intestine=
+    Number(
+      (record.items||[])
+        .find(
+          x=>x.name==="大腸一包"
+        )?.qty
+    )||0;
+
+
+  document.getElementById(
+    "taken"
+  ).value=
+    record.taken||0;
+
+
+  updateQtyDisplay();
+
+}
+
+
+/* 數量顯示 */
+
+function updateQtyDisplay(){
+
+  [
+    "lemon",
+    "oyster",
+    "intestine"
+  ].forEach(type=>{
+
+    document.getElementById(
+      type+"Qty"
+    ).textContent=
+      quantities[type];
+
+
+    document.getElementById(
+      type+"Total"
+    ).textContent=
+      money(
+        quantities[type]*
+        unitPrices[type]
+      );
+
+  });
+
+}
+
+
+/* 累加 */
+
+function updateAccum(){
+
+  const profit=
+    records.reduce(
+      (s,r)=>
+        s+Number(r.profit||0),
+      0
+    );
+
+
+  const difference=
+    records.reduce(
+      (s,r)=>
+        s+Number(r.difference||0),
+      0
+    );
+
+
+  document.getElementById(
+    "profitAccum"
+  ).textContent=
+    money(profit);
+
+
+  document.getElementById(
+    "differenceAccum"
+  ).textContent=
+    money(difference);
+
+}
+
+
+/* 歷史 */
+
+function renderHistory(){
+
+  const box=
+    document.getElementById(
+      "history"
+    );
+
+
+  if(!records.length){
+
+    box.innerHTML=
+      '<div class="empty">目前還沒有歷史紀錄</div>';
+
+    updateAccum();
+
+    return;
+
+  }
+
+
+  box.innerHTML=
+    records.map(
+      (r,i)=>{
+
+        const detail=
+          (r.items||[])
+            .map(
+              item=>
+                item.qty!==undefined
+                ?
+                item.name+
+                " × "+
+                item.qty+
+                "　"+
+                money(item.amount)
+                :
+                item.name+
+                "　"+
+                money(item.amount)
+            )
+            .join("、");
+
+
+        return`
+
+          <div class="history-item">
+
+            <div class="history-head">
+
+              <span>
+                📅 ${escapeHtml(r.date)}
+              </span>
+
+              <span>
+                ${
+                  r.profit>0
+                  ?
+                  "🟢 盈餘 "+money(r.profit)
+                  :
+                  "🔴 差額 "+money(r.difference)
+                }
+              </span>
+
+            </div>
+
+
+            <div class="history-detail">
+
+              💰 收入：${money(r.total)}
+             　
+              💵 已拿：${money(r.taken)}
+
+              <br>
+
+              ${escapeHtml(detail)}
+
+            </div>
+
+
+            <div class="history-buttons">
+
+              <button
+                class="small-btn"
+                onclick="editRecord(${i})"
+              >
+                ✏️ 載入修改
+              </button>
+
+
+              <button
+                class="small-btn small-danger"
+                onclick="deleteRecord(${i})"
+              >
+                🗑️ 刪除
+              </button>
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+
+  updateAccum();
+
+}
+
+
+/* 修改紀錄 */
+
+function editRecord(index){
+
+  const record=
+    records[index];
+
+
+  document.getElementById(
+    "date"
+  ).value=
+    record.date;
+
+
+  loadDateRecord();
+
+  calculate();
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* 刪除 */
+
+function deleteRecord(index){
+
+  if(
+    !confirm(
+      "確定要刪除這筆紀錄嗎？"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  records.splice(
+    index,
+    1
+  );
+
+
+  localStorage.setItem(
+    STORAGE_RECORDS,
+    JSON.stringify(records)
+  );
+
+
+  renderHistory();
+
+}
+
+
+/* 清除全部 */
+
+function clearAll(){
+
+  if(!records.length){
+
+    alert(
+      "目前沒有歷史紀錄。"
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !confirm(
+      "確定要清除全部歷史紀錄嗎？"
+    )
+  ){
+
+    return;
+
+  }
+
+
+  records=[];
+
+
+  localStorage.removeItem(
+    STORAGE_RECORDS
+  );
+
+
+  renderHistory();
+
+}
+
+
+/* HTML 安全 */
+
+function escapeHtml(value){
+
+  return String(
+    value??""
+  ).replace(
+    /[&<>"']/g,
+    function(char){
+
+      return{
+
+        "&":"&amp;",
+
+        "<":"&lt;",
+
+        ">":"&gt;",
+
+        '"':"&quot;",
+
+        "'":"&#039;"
+
+      }[char];
+
+    }
+  );
+
+}
+
+
+/* 啟動 */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function(){
+
+    document.getElementById(
+      "date"
+    ).value=getToday();
+
+
+    loadDraft();
+
+
+    updateDateDisplay();
+
+    updateQtyDisplay();
+
+    calculate();
+
+    renderHistory();
+
+    updateAccum();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
