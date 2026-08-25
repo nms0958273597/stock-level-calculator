@@ -4,100 +4,113 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="theme-color" content="#fff7ed">
-<title>每日收入盈餘記帳</title>
+<title>每日收入・盈餘記帳</title>
 
 <style>
 *{
-box-sizing:border-box
+box-sizing:border-box;
 }
 
 body{
 margin:0;
 background:#fff7ed;
 color:#3b2f2f;
-font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",Arial,sans-serif
+font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",Arial,sans-serif;
 }
 
 .container{
 max-width:720px;
-margin:0 auto;
-padding:14px
+margin:auto;
+padding:14px;
 }
 
 h1{
-margin:8px 0 16px;
 text-align:center;
-font-size:28px
+font-size:28px;
+margin:8px 0 16px;
 }
 
 .card{
 background:#fff;
-border-radius:18px;
+border-radius:20px;
 padding:16px;
 margin-bottom:14px;
-box-shadow:0 3px 14px rgba(80,50,20,.08)
-}
-
-label{
-display:block;
-font-weight:700;
-font-size:17px;
-margin-bottom:7px
-}
-
-input{
-width:100%;
-border:2px solid #eadfd5;
-border-radius:12px;
-padding:12px;
-font-size:19px;
-background:#fffdfb
-}
-
-input:focus{
-outline:none;
-border-color:#e89b57
-}
-
-.row{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px
+box-shadow:0 3px 14px rgba(80,50,20,.08);
 }
 
 .title{
+font-size:22px;
+font-weight:900;
+margin-bottom:12px;
+}
+
+input,
+textarea{
+font-family:inherit;
+}
+
+.dateInput{
+width:100%;
+padding:14px;
+border:2px solid #eadfd5;
+border-radius:14px;
 font-size:20px;
-font-weight:800;
-margin-bottom:12px
+text-align:center;
+background:#fffdfb;
+}
+
+.dateText{
+text-align:center;
+margin-top:10px;
+padding:12px;
+border-radius:14px;
+background:#fff5dc;
+color:#7d5315;
+font-size:22px;
+font-weight:900;
+}
+
+.status{
+text-align:center;
+color:#8b7c75;
+margin-top:8px;
 }
 
 .income-row{
 display:grid;
 grid-template-columns:1fr 120px 42px;
 gap:8px;
-margin-bottom:9px;
-align-items:center
+align-items:center;
+margin-bottom:10px;
 }
 
-.income-row input{
-font-size:17px
+.income-name,
+.income-amount{
+width:100%;
+padding:12px;
+border:2px solid #eadfd5;
+border-radius:13px;
+background:#fffdfb;
+font-size:20px;
 }
 
-.income-row .amount{
-text-align:right
+.income-name[readonly]{
+background:#fffdfb;
 }
 
-.fixed-noodle .income-name{
-font-size:22px;
-font-weight:900
+.income-amount{
+font-weight:700;
+text-align:right;
 }
 
-.fixed-noodle .income-amount{
+.delete{
+height:48px;
+border:0;
+border-radius:12px;
+background:#ffe2df;
+color:#c43b31;
 font-size:22px;
 font-weight:900;
-text-align:right;
-background:#fffdfb;
-color:#3b2f2f
 }
 
 .qty-row{
@@ -105,250 +118,238 @@ display:grid;
 grid-template-columns:1fr auto 42px 58px 42px auto;
 gap:7px;
 align-items:center;
-margin-bottom:9px;
-padding:9px 0
+margin:8px 0;
+padding:10px 0;
 }
 
 .qty-name{
-font-size:17px;
-font-weight:800
+font-size:18px;
+font-weight:900;
 }
 
 .qty-unit{
-font-size:14px;
+font-size:15px;
 color:#8b7c75;
-white-space:nowrap
+white-space:nowrap;
 }
 
 .qty-btn{
 width:42px;
 height:42px;
-padding:0;
 border:0;
 border-radius:11px;
 background:#fff0d9;
 color:#9a5a12;
-font-size:25px;
-font-weight:900
-}
-
-.qty-value{
-text-align:center;
-font-size:20px;
-font-weight:900
+font-size:27px;
+font-weight:900;
 }
 
 .qty-input{
 width:58px;
 height:42px;
-padding:4px;
 border:2px solid transparent;
+border-radius:10px;
 background:#fffdfb;
-color:#3b2f2f
+text-align:center;
+font-size:20px;
+font-weight:900;
 }
 
 .qty-input:focus{
 outline:2px solid #e89b57;
-border-radius:10px
 }
 
 .qty-total{
 text-align:right;
-min-width:70px;
-font-size:18px;
+min-width:65px;
+font-size:19px;
 font-weight:900;
-color:#7d5315
+color:#7d5315;
 }
 
-@media(max-width:480px){
-
-.qty-row{
-grid-template-columns:1fr auto 38px 52px 38px auto;
-gap:5px
-}
-
-.qty-btn{
-width:38px;
-height:38px
-}
-
-.qty-input{
-width:52px
-}
-
-.qty-name{
-font-size:16px
-}
-
-.qty-total{
-min-width:62px
-}
-
-}
-
-.delete{
-border:0;
-background:#ffe2df;
-color:#c43b31;
-border-radius:10px;
-font-size:20px;
-height:46px
+.note{
+font-size:14px;
+color:#8b7c75;
+line-height:1.5;
+margin:8px 0 12px;
 }
 
 button{
+font-family:inherit;
+cursor:pointer;
+}
+
+.add,
+.save,
+.line{
+width:100%;
 border:0;
-border-radius:12px;
-padding:12px 16px;
-font-size:17px;
-font-weight:800;
-cursor:pointer
+border-radius:14px;
+padding:14px;
+font-size:19px;
+font-weight:900;
 }
 
 .add{
-width:100%;
 background:#fff0d9;
 color:#9a5a12;
-margin-top:4px
 }
 
-.primary{
-width:100%;
+.save{
 background:#e88c43;
 color:white;
-margin-top:10px
+margin-top:10px;
 }
 
-.danger{
-background:#ffe4e1;
-color:#b9362c
+.line{
+background:#ddf3df;
+color:#237b2d;
+margin-top:10px;
 }
 
 .summary{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:10px
+gap:10px;
 }
 
 .box{
-padding:14px;
-border-radius:15px;
-text-align:center
-}
-
-.box .small{
-font-size:15px;
-font-weight:700
-}
-
-.box .num{
-font-size:28px;
-font-weight:900;
-margin-top:5px
-}
-
-.net-button{
-width:100%;
-border:0;
-border-radius:15px;
-padding:14px 10px;
+border-radius:17px;
+padding:15px;
 text-align:center;
-font-family:inherit;
-font-weight:900;
-cursor:pointer;
-background:#e8f1ff;
-color:#245b9a
-}
-
-.net-button .num{
-font-size:28px;
-font-weight:900;
-margin-top:5px
-}
-
-.net-note{
-font-size:13px;
-font-weight:700;
-margin-top:5px
-}
-
-.net-button:active{
-transform:scale(.99)
-}
-
-.green{
-background:#eaf8ed;
-color:#19733a
-}
-
-.red{
-background:#fff0ef;
-color:#c7372d
 }
 
 .total{
 background:#fff5dc;
-color:#8a5a00
+color:#8a5a00;
+}
+
+.green{
+background:#eaf8ed;
+color:#19733a;
+}
+
+.red{
+background:#fff0ef;
+color:#c7372d;
+}
+
+.small{
+font-size:17px;
+font-weight:800;
+}
+
+.num{
+font-size:34px;
+font-weight:900;
+margin-top:5px;
+}
+
+.taken{
+width:100%;
+padding:10px;
+border:2px solid #eadfd5;
+border-radius:12px;
+background:#fffdfb;
+font-size:25px;
+text-align:center;
+}
+
+.net{
+width:100%;
+border:0;
+border-radius:16px;
+padding:15px;
+background:#eaf8ed;
+color:#19733a;
+margin-top:12px;
+}
+
+.net .num{
+font-size:30px;
+}
+
+textarea{
+width:100%;
+min-height:240px;
+border:2px solid #eadfd5;
+border-radius:14px;
+padding:13px;
+background:#fffdfb;
+font-size:17px;
+line-height:1.6;
 }
 
 .history-item{
 border-top:1px solid #eee2d8;
-padding:13px 0
+padding:14px 0;
 }
 
 .history-item:first-child{
-border-top:0
+border-top:0;
 }
 
 .history-head{
 display:flex;
 justify-content:space-between;
-font-weight:800;
+gap:8px;
+font-weight:900;
 font-size:17px;
-gap:8px
 }
 
 .detail{
-font-size:14px;
 color:#756866;
+line-height:1.7;
 margin-top:6px;
-line-height:1.6
 }
 
 .history-actions{
 display:flex;
 gap:8px;
-margin-top:8px
+margin-top:9px;
 }
 
 .history-actions button{
-padding:8px 12px;
-font-size:14px
+flex:1;
+padding:9px;
+border:0;
+border-radius:10px;
+background:#fff0d9;
+color:#9a5a12;
+font-weight:800;
 }
 
-.empty{
-text-align:center;
-color:#9b8d87;
-padding:20px
-}
-
-.note{
-font-size:13px;
-color:#8b7c75;
-line-height:1.5
+.history-actions .danger{
+background:#ffe2df;
+color:#c43b31;
 }
 
 @media(max-width:480px){
 
 .income-row{
-grid-template-columns:1fr 105px 40px
+grid-template-columns:1fr 108px 40px;
 }
 
-h1{
-font-size:25px
+.qty-row{
+grid-template-columns:1fr auto 38px 56px 38px auto;
+gap:5px;
 }
 
-.row{
-grid-template-columns:1fr
+.qty-btn{
+width:38px;
+height:38px;
+}
+
+.qty-input{
+width:56px;
+}
+
+.qty-name{
+font-size:16px;
+}
+
+.qty-total{
+min-width:60px;
 }
 
 }
@@ -364,39 +365,25 @@ grid-template-columns:1fr
 
 <div class="card">
 
-<label for="date">
+<div class="title">
 📅 日期
-</label>
+</div>
 
 <input
 id="date"
+class="dateInput"
 type="date"
-value=""
 >
 
 <div
 id="dateText"
-style="
-font-size:20px;
-font-weight:900;
-text-align:center;
-margin-top:10px;
-padding:10px;
-border-radius:12px;
-background:#fff5dc;
-color:#7d5315
-">
+class="dateText">
 </div>
 
 <div
-id="saveStatus"
-style="
-font-size:13px;
-color:#8b7c75;
-text-align:center;
-margin-top:7px
-">
-💾 自動儲存已開啟
+id="status"
+class="status">
+💾 自動儲存
 </div>
 
 </div>
@@ -409,10 +396,8 @@ margin-top:7px
 </div>
 
 
-<div id="incomeList">
-
-<!-- 🍜 850：現在可以手動修改 -->
-<div class="income-row fixed-noodle">
+<!-- 🍜 850：可以直接手動修改 -->
+<div class="income-row">
 
 <input
 class="income-name"
@@ -422,29 +407,29 @@ readonly
 >
 
 <input
-class="income-amount amount"
+id="noodleAmount"
+class="income-amount"
 type="number"
 min="0"
 step="1"
 value="850"
 placeholder="850"
-oninput="calculate()"
 >
 
-<div></div>
+<button
+class="delete"
+type="button"
+onclick="resetNoodle()">
+×
+</button>
 
 </div>
 
 
-<div id="customIncomeList"></div>
-
-</div>
+<div id="customIncome"></div>
 
 
-<div id="controlledList">
-
-
-<!-- 檸檬 -->
+<!-- 🍋 檸檬 -->
 
 <div class="qty-row">
 
@@ -457,36 +442,32 @@ oninput="calculate()"
 </div>
 
 <button
-type="button"
 class="qty-btn"
-onclick="changeQty('lemon',-1)"
->
+type="button"
+onclick="changeQty('lemon',-1)">
 −
 </button>
 
 <input
-class="qty-value qty-input"
 id="lemonQty"
+class="qty-input"
 type="number"
 min="0"
 inputmode="numeric"
-value=""
 placeholder=""
 oninput="manualQty('lemon')"
 >
 
 <button
-type="button"
 class="qty-btn"
-onclick="changeQty('lemon',1)"
->
+type="button"
+onclick="changeQty('lemon',1)">
 ＋
 </button>
 
 <div
-class="qty-total"
 id="lemonTotal"
->
+class="qty-total">
 0
 </div>
 
@@ -506,36 +487,32 @@ id="lemonTotal"
 </div>
 
 <button
-type="button"
 class="qty-btn"
-onclick="changeQty('oyster',-1)"
->
+type="button"
+onclick="changeQty('oyster',-1)">
 −
 </button>
 
 <input
-class="qty-value qty-input"
 id="oysterQty"
+class="qty-input"
 type="number"
 min="0"
 inputmode="numeric"
-value=""
 placeholder=""
 oninput="manualQty('oyster')"
 >
 
 <button
-type="button"
 class="qty-btn"
-onclick="changeQty('oyster',1)"
->
+type="button"
+onclick="changeQty('oyster',1)">
 ＋
 </button>
 
 <div
-class="qty-total"
 id="oysterTotal"
->
+class="qty-total">
 0
 </div>
 
@@ -555,57 +532,50 @@ id="oysterTotal"
 </div>
 
 <button
-type="button"
 class="qty-btn"
-onclick="changeQty('intestine',-1)"
->
+type="button"
+onclick="changeQty('intestine',-1)">
 −
 </button>
 
 <input
-class="qty-value qty-input"
 id="intestineQty"
+class="qty-input"
 type="number"
 min="0"
 inputmode="numeric"
-value=""
 placeholder=""
 oninput="manualQty('intestine')"
 >
 
 <button
-type="button"
 class="qty-btn"
-onclick="changeQty('intestine',1)"
->
+type="button"
+onclick="changeQty('intestine',1)">
 ＋
 </button>
 
 <div
-class="qty-total"
 id="intestineTotal"
->
+class="qty-total">
 0
 </div>
 
 </div>
 
-</div>
 
+<div class="note">
 
-<div
-class="note"
-style="margin:8px 0 10px"
->
-🍜 850 可直接手動修改金額；檸檬、蚵仔、大腸可用 −／＋ 或中間空白欄位手動輸入。
+🍜 850 可以直接點選修改，不鎖定。<br>
+🍋 檸檬、蚵仔、大腸中間數字可以直接手動填寫，也可以使用 −／＋。
+
 </div>
 
 
 <button
 class="add"
 type="button"
-onclick="addIncome()"
->
+onclick="addIncome()">
 ＋ 新增收入項目
 </button>
 
@@ -616,7 +586,6 @@ onclick="addIncome()"
 
 <div class="summary">
 
-
 <div class="box total">
 
 <div class="small">
@@ -624,9 +593,8 @@ onclick="addIncome()"
 </div>
 
 <div
-class="num"
 id="incomeTotal"
->
+class="num">
 0
 </div>
 
@@ -639,18 +607,14 @@ id="incomeTotal"
 💵 已拿
 </div>
 
-<div class="num">
-
 <input
 id="taken"
+class="taken"
 type="number"
 min="0"
 step="1"
 value="0"
-oninput="calculate()"
 >
-
-</div>
 
 </div>
 
@@ -663,7 +627,6 @@ oninput="calculate()"
 
 <div class="summary">
 
-
 <div class="box green">
 
 <div class="small">
@@ -671,9 +634,8 @@ oninput="calculate()"
 </div>
 
 <div
-class="num"
 id="profit"
->
+class="num">
 0
 </div>
 
@@ -687,9 +649,8 @@ id="profit"
 </div>
 
 <div
-class="num"
 id="difference"
->
+class="num">
 0
 </div>
 
@@ -699,65 +660,11 @@ id="difference"
 
 
 <button
-class="primary"
+class="save"
 type="button"
-onclick="saveRecord()"
->
+onclick="saveRecord()">
 💾 儲存今天紀錄
 </button>
-
-</div>
-
-
-<div class="card">
-
-<div class="title">
-📋 詳細明細
-</div>
-
-
-<textarea
-id="detailText"
-readonly
-style="
-width:100%;
-min-height:220px;
-border:2px solid #eadfd5;
-border-radius:12px;
-padding:12px;
-font-size:16px;
-line-height:1.6;
-background:#fffdfb;
-resize:vertical
-"></textarea>
-
-
-<div
-style="
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-top:10px
-">
-
-<button
-type="button"
-class="add"
-onclick="copyDetail()"
->
-📋 複製明細
-</button>
-
-
-<button
-type="button"
-class="primary"
-onclick="sendLine()"
->
-💬 傳送 LINE
-</button>
-
-</div>
 
 </div>
 
@@ -771,17 +678,15 @@ onclick="sendLine()"
 
 <div class="summary">
 
-
 <div class="box green">
 
 <div class="small">
-盈餘累加
+📈 盈餘累加
 </div>
 
 <div
-class="num"
 id="profitAccum"
->
+class="num">
 0
 </div>
 
@@ -791,13 +696,12 @@ id="profitAccum"
 <div class="box red">
 
 <div class="small">
-差額累加
+📉 差額累加
 </div>
 
 <div
-class="num"
 id="differenceAccum"
->
+class="num">
 0
 </div>
 
@@ -807,26 +711,22 @@ id="differenceAccum"
 
 
 <button
+class="net"
 type="button"
-id="netAccumBox"
-class="net-button"
-onclick="showNetAccum()"
-style="margin-top:12px"
->
+onclick="showNet()">
 
 <div class="small">
-💰 盈餘累加－差額累加
+💰 差額累加－盈餘累加
 </div>
 
 <div
-class="num"
 id="netAccum"
->
+class="num">
 0
 </div>
 
-<div class="net-note">
-目前實際剩餘金額
+<div>
+目前還有多少金額
 </div>
 
 </button>
@@ -837,22 +737,54 @@ id="netAccum"
 <div class="card">
 
 <div class="title">
-📋 歷史紀錄
+📋 詳細明細
 </div>
 
-<div id="history"></div>
 
-<div class="note">
-資料會儲存在這台手機的瀏覽器中。
-</div>
+<textarea
+id="detail"
+readonly>
+</textarea>
+
+
+<div class="summary"
+style="margin-top:10px">
+
+<button
+class="add"
+type="button"
+onclick="copyDetail()">
+📋 複製明細
+</button>
 
 
 <button
-class="danger"
+class="line"
 type="button"
-onclick="clearAll()"
-style="width:100%;margin-top:12px"
->
+onclick="sendLine()">
+💬 傳送 LINE
+</button>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="title">
+📚 歷史紀錄
+</div>
+
+
+<div id="history"></div>
+
+
+<button
+class="delete"
+type="button"
+style="width:100%;margin-top:10px"
+onclick="clearAll()">
 🗑️ 清除全部紀錄
 </button>
 
@@ -863,81 +795,49 @@ style="width:100%;margin-top:12px"
 
 <script>
 
+const PRICE={
+lemon:1200,
+oyster:150,
+intestine:150
+};
+
+
+let qty={
+lemon:0,
+oyster:0,
+intestine:0
+};
+
+
 let records=
 JSON.parse(
 localStorage.getItem(
-"dailyIncomeRecords"
+"dailyIncomeRecords1319"
 )||"[]"
 );
 
+
+/* 今天日期 */
 
 function today(){
 
 const d=
 new Date();
 
-const y=
-d.getFullYear();
-
-const m=
-String(
+return d.getFullYear()
++"-"
++String(
 d.getMonth()+1
-).padStart(2,"0");
-
-const day=
-String(
+).padStart(2,"0")
++"-"
++String(
 d.getDate()
 ).padStart(2,"0");
 
-return `${y}-${m}-${day}`;
-
 }
 
 
-function updateDateText(){
-
-const value=
-document.getElementById(
-"date"
-).value||today();
-
-const d=
-new Date(
-value+"T00:00:00"
-);
-
-const weekdays=[
-"星期日",
-"星期一",
-"星期二",
-"星期三",
-"星期四",
-"星期五",
-"星期六"
-];
-
-document.getElementById(
-"dateText"
-).textContent=
-`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${weekdays[d.getDay()]}`;
-
-}
-
-
-function setSaveStatus(
-text="💾 已自動儲存"
-){
-
-const el=
-document.getElementById(
-"saveStatus"
-);
-
-if(el)
-el.textContent=text;
-
-}
-
+/* 金額格式 */
 
 function money(n){
 
@@ -949,6 +849,8 @@ Number(n)||0
 
 }
 
+
+/* HTML 防注入 */
 
 function esc(s){
 
@@ -970,215 +872,21 @@ m=>({
 }
 
 
-function renderIncome(items=[]){
+/* 日期 */
 
-const list=
-document.getElementById(
-"customIncomeList"
-);
+function updateDate(){
 
-list.innerHTML="";
-
-const arr=
-Array.isArray(items)
-?
-items
-:
-[];
-
-
-arr
-.filter(
-item=>
-item.name!=="🍜"
-)
-.forEach(
-item=>{
-
-const row=
-document.createElement(
-"div"
-);
-
-row.className=
-"income-row";
-
-
-row.innerHTML=`
-
-<input
-class="income-name"
-type="text"
-value="${esc(item.name)}"
-placeholder="收入名稱"
->
-
-<input
-class="income-amount amount"
-type="number"
-min="0"
-step="1"
-value="${Number(item.amount)||0}"
-placeholder="金額"
-oninput="calculate()"
->
-
-<button
-class="delete"
-type="button"
-onclick="this.parentElement.remove();calculate()"
->
-×
-</button>
-
-`;
-
-list.appendChild(row);
-
-});
-
-
-calculate();
-
-}
-
-
-function addIncome(){
-
-const list=
-document.getElementById(
-"customIncomeList"
-);
-
-const row=
-document.createElement(
-"div"
-);
-
-row.className=
-"income-row";
-
-
-row.innerHTML=`
-
-<input
-class="income-name"
-type="text"
-placeholder="其他收入"
->
-
-<input
-class="income-amount amount"
-type="number"
-min="0"
-step="1"
-value="0"
-placeholder="金額"
-oninput="calculate()"
->
-
-<button
-class="delete"
-type="button"
-onclick="this.parentElement.remove();calculate()"
->
-×
-</button>
-
-`;
-
-
-list.appendChild(row);
-
-row.querySelector(
-".income-name"
-).focus();
-
-}
-
-
-function getCurrentItems(){
-
-/* 🍜 金額現在讀取畫面，
-   所以可以手動修改 */
-
-const noodleAmount=
-Number(
-document.querySelector(
-".fixed-noodle .income-amount"
-)?.value
-)||0;
-
-
-const items=[
-
-{
-name:"🍜",
-amount:noodleAmount
-}
-
-];
-
-
-const custom=
-[
-...document.querySelectorAll(
-"#customIncomeList .income-row"
-)
-]
-.map(
-row=>({
-
-name:
-row.querySelector(
-".income-name"
-).value.trim(),
-
-amount:
-Number(
-row.querySelector(
-".income-amount"
-).value
-)||0
-
-})
-)
-.filter(
-x=>
-x.name!==""
-||
-x.amount!==0
-);
-
-
-return items
-.concat(custom)
-.concat(
-getControlledItems()
-.filter(
-x=>
-x.amount>0
-)
-);
-
-}
-
-
-function buildDetail(){
-
-const date=
+const v=
 document.getElementById(
 "date"
 ).value||today();
 
-
 const d=
 new Date(
-date+"T00:00:00"
+v+"T00:00:00"
 );
 
-
-const weekdays=[
+const w=[
 "星期日",
 "星期一",
 "星期二",
@@ -1188,246 +896,284 @@ const weekdays=[
 "星期六"
 ];
 
+document.getElementById(
+"dateText"
+).textContent=
+`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${w[d.getDay()]}`;
 
-const dateText=
-`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${weekdays[d.getDay()]}`;
-
-
-const items=
-getCurrentItems();
-
-
-const total=
-items.reduce(
-(sum,x)=>
-sum+x.amount,
-0
-);
+}
 
 
-const taken=
+/* 取得所有收入 */
+
+function getItems(){
+
+const items=[];
+
+
+/* 🍜 850 */
+
+const noodle=
 Number(
 document.getElementById(
-"taken"
+"noodleAmount"
 ).value
 )||0;
 
 
-const profit=
-Math.max(
-total-taken,
-0
+items.push({
+name:"🍜",
+amount:noodle
+});
+
+
+/* 其他收入 */
+
+document
+.querySelectorAll(
+"#customIncome .income-row"
+)
+.forEach(
+r=>{
+
+const name=
+r.querySelector(
+".income-name"
+).value.trim();
+
+const amount=
+Number(
+r.querySelector(
+".income-amount"
+).value
+)||0;
+
+if(
+name||
+amount
+){
+
+items.push({
+name,
+amount
+});
+
+}
+
+});
+
+
+/* 🍋 */
+
+if(
+qty.lemon>0
+){
+
+items.push({
+name:"🍋",
+amount:
+qty.lemon*
+PRICE.lemon,
+qty:qty.lemon
+});
+
+}
+
+
+/* 蚵仔 */
+
+if(
+qty.oyster>0
+){
+
+items.push({
+name:"蚵仔一包",
+amount:
+qty.oyster*
+PRICE.oyster,
+qty:qty.oyster
+});
+
+}
+
+
+/* 大腸 */
+
+if(
+qty.intestine>0
+){
+
+items.push({
+name:"大腸一包",
+amount:
+qty.intestine*
+PRICE.intestine,
+qty:qty.intestine
+});
+
+}
+
+
+return items;
+
+}
+
+
+/* 新增收入 */
+
+function addIncome(){
+
+const box=
+document.getElementById(
+"customIncome"
 );
 
-
-const difference=
-Math.max(
-taken-total,
-0
+const r=
+document.createElement(
+"div"
 );
 
-
-const lines=
-items.map(
-x=>
-`${x.name} ${money(x.amount)}`
-).join("\n");
+r.className=
+"income-row";
 
 
-return`
-📅 日期：${dateText}
+r.innerHTML=`
 
-💰 收入明細
-${lines||"無收入項目"}
+<input
+class="income-name"
+placeholder="其他收入">
 
-💰 收入合計：${money(total)}
-💵 已拿：${money(taken)}
+<input
+class="income-amount"
+type="number"
+min="0"
+step="1"
+value="0"
+placeholder="金額">
 
-🟢 盈餘：${money(profit)}
-🔴 差額：${money(difference)}
+<button
+class="delete"
+type="button"
+onclick="this.parentElement.remove();calculate()">
+×
+</button>
+
 `;
 
+
+box.appendChild(r);
+
+r.querySelector(
+".income-name"
+).focus();
+
 }
 
 
-function updateDetail(){
+/* 🍜 清空按鈕 */
 
+function resetNoodle(){
+
+const input=
 document.getElementById(
-"detailText"
-).value=
-buildDetail();
+"noodleAmount"
+);
+
+input.value="";
+
+calculate();
+
+input.focus();
 
 }
 
 
-const quantities={
-
-lemon:0,
-
-oyster:0,
-
-intestine:0
-
-};
-
-
-const unitPrices={
-
-lemon:1200,
-
-oyster:150,
-
-intestine:150
-
-};
-
+/* 數量 +/- */
 
 function changeQty(
 type,
 delta
 ){
 
-const current=
-Number(
-quantities[type]
-)||0;
-
-
-quantities[type]=
+qty[type]=
 Math.max(
 0,
-current+delta
+(Number(qty[type])||0)+delta
 );
 
-
-const q=
-document.getElementById(
-type+"Qty"
-);
-
-
-const total=
-document.getElementById(
-type+"Total"
-);
-
-
-if(q){
-
-q.value=
-quantities[type]===0
-?
-""
-:
-quantities[type];
-
-}
-
-
-if(total){
-
-total.textContent=
-money(
-quantities[type]*
-unitPrices[type]
-);
-
-}
-
+syncQty(type);
 
 calculate();
 
 }
 
+
+/* 手動輸入數量 */
 
 function manualQty(type){
 
-const q=
-document.getElementById(
-type+"Qty"
-);
-
-
-const value=
-q.value.trim();
-
-
-quantities[type]=
-value===""
-?
-0
-:
+qty[type]=
 Math.max(
 0,
-Number(value)||0
-);
-
-
-const total=
+Number(
 document.getElementById(
-type+"Total"
+type+"Qty"
+).value
+)||0
 );
 
-
-if(total){
-
-total.textContent=
-money(
-quantities[type]*
-unitPrices[type]
-);
-
-}
-
+syncQty(type);
 
 calculate();
 
 }
 
 
-function getControlledItems(){
+/* 同步數量 */
 
-return[
+function syncQty(type){
 
-{
-name:"🍋",
-amount:
-quantities.lemon*
-unitPrices.lemon,
-qty:quantities.lemon
-},
+const q=
+document.getElementById(
+type+"Qty"
+);
 
-{
-name:"蚵仔一包",
-amount:
-quantities.oyster*
-unitPrices.oyster,
-qty:quantities.oyster
-},
+const t=
+document.getElementById(
+type+"Total"
+);
 
-{
-name:"大腸一包",
-amount:
-quantities.intestine*
-unitPrices.intestine,
-qty:quantities.intestine
+
+q.value=
+qty[type]===0
+?
+""
+:
+qty[type];
+
+
+t.textContent=
+money(
+qty[type]*
+PRICE[type]
+);
+
 }
 
-];
 
-}
-
+/* 計算 */
 
 function calculate(){
 
+const items=
+getItems();
+
 const total=
-getCurrentItems()
-.reduce(
-(sum,x)=>
-sum+x.amount,
+items.reduce(
+(s,x)=>
+s+x.amount,
 0
 );
-
 
 const taken=
 Number(
@@ -1437,6 +1183,10 @@ document.getElementById(
 )||0;
 
 
+/*
+收入－已拿＝盈餘
+*/
+
 const profit=
 Math.max(
 total-taken,
@@ -1444,7 +1194,11 @@ total-taken,
 );
 
 
-const difference=
+/*
+已拿－收入＝差額
+*/
+
+const diff=
 Math.max(
 taken-total,
 0
@@ -1466,330 +1220,49 @@ money(profit);
 document.getElementById(
 "difference"
 ).textContent=
-money(difference);
+money(diff);
 
 
-updateDetail();
-
-saveDraftSoon();
-
-}
-
-
-async function copyDetail(){
-
-const text=
 buildDetail();
 
-
-try{
-
-await navigator.clipboard.writeText(
-text
-);
-
-alert(
-"✅ 詳細明細已複製！"
-);
-
-}catch(e){
-
-const ta=
-document.createElement(
-"textarea"
-);
-
-ta.value=text;
-
-document.body.appendChild(
-ta
-);
-
-ta.select();
-
-document.execCommand(
-"copy"
-);
-
-ta.remove();
-
-alert(
-"✅ 詳細明細已複製！"
-);
-
-}
+autoSave();
 
 }
 
 
-function sendLine(){
+/* 明細 */
 
-const text=
-encodeURIComponent(
-buildDetail()
-);
+function buildDetail(){
 
-
-window.location.href=
-`https://line.me/R/msg/text/?${text}`;
-
-}
-
-
-function autoSaveDraft(){
-
-const draft={
-
-date:
-document.getElementById(
-"date"
-).value||today(),
-
-items:
-getCurrentItems(),
-
-taken:
-Number(
-document.getElementById(
-"taken"
-).value
-)||0,
-
-quantities:{
-...quantities
-}
-
-};
-
-
-localStorage.setItem(
-"dailyIncomeDraft",
-JSON.stringify(
-draft
-)
-);
-
-
-setSaveStatus(
-"💾 已自動儲存"
-);
-
-}
-
-
-function loadDraft(){
-
-const raw=
-localStorage.getItem(
-"dailyIncomeDraft"
-);
-
-
-if(!raw)
-return false;
-
-
-try{
-
-const d=
-JSON.parse(raw);
-
-
-if(d.date){
-
-document.getElementById(
-"date"
-).value=
-d.date;
-
-}
-
-
-if(d.quantities){
-
-quantities.lemon=
-Number(
-d.quantities.lemon
-)||0;
-
-quantities.oyster=
-Number(
-d.quantities.oyster
-)||0;
-
-quantities.intestine=
-Number(
-d.quantities.intestine
-)||0;
-
-}
-
-
-if(
-Array.isArray(
-d.items
-)
-){
-
-const normal=
-d.items.filter(
-x=>
-![
-"🍋",
-"蚵仔一包",
-"大腸一包"
-].includes(
-x.name
-)
-);
-
-
-/* 恢復 🍜 的手動金額 */
-
-const noodle=
-normal.find(
-x=>
-x.name==="🍜"
-);
-
-
-const noodleInput=
-document.querySelector(
-".fixed-noodle .income-amount"
-);
-
-
-if(noodleInput){
-
-noodleInput.value=
-noodle &&
-Number.isFinite(
-Number(noodle.amount)
-)
-?
-Number(noodle.amount)
-:
-850;
-
-}
-
-
-const extra=
-normal.filter(
-x=>
-x.name!=="🍜"
-);
-
-
-renderIncome(
-extra
-);
-
-}
-
-
-document.getElementById(
-"taken"
-).value=
-d.taken||0;
-
-
-[
-"lemon",
-"oyster",
-"intestine"
-].forEach(
-type=>{
-
-const q=
-document.getElementById(
-type+"Qty"
-);
-
-
-const total=
-document.getElementById(
-type+"Total"
-);
-
-
-if(q){
-
-q.value=
-quantities[type]===0
-?
-""
-:
-quantities[type];
-
-}
-
-
-if(total){
-
-total.textContent=
-money(
-quantities[type]*
-unitPrices[type]
-);
-
-}
-
-}
-);
-
-
-updateDateText();
-
-calculate();
-
-return true;
-
-
-}catch(e){
-
-return false;
-
-}
-
-}
-
-
-function saveDraftSoon(){
-
-clearTimeout(
-window.__draftTimer
-);
-
-
-window.__draftTimer=
-setTimeout(
-autoSaveDraft,
-150
-);
-
-}
-
-
-function saveRecord(){
-
-const date=
+const v=
 document.getElementById(
 "date"
 ).value||today();
 
+const d=
+new Date(
+v+"T00:00:00"
+);
+
+const w=[
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六"
+];
 
 const items=
-getCurrentItems();
-
+getItems();
 
 const total=
 items.reduce(
-(sum,x)=>
-sum+x.amount,
+(s,x)=>
+s+x.amount,
 0
 );
-
 
 const taken=
 Number(
@@ -1798,24 +1271,270 @@ document.getElementById(
 ).value
 )||0;
 
-
 const profit=
 Math.max(
 total-taken,
 0
 );
 
-
-const difference=
+const diff=
 Math.max(
 taken-total,
 0
 );
 
+const lines=
+items.map(
+x=>
+`${x.name} ${money(x.amount)}${
+x.qty!==undefined
+?
+"（"+x.qty+"個／包）"
+:
+""
+}`
+).join("\n");
 
-const record={
 
-date,
+const text=
+`📅 日期：${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${w[d.getDay()]}
+
+💰 收入明細
+${lines||"無"}
+
+💰 收入合計：${money(total)}
+💵 已拿：${money(taken)}
+
+🟢 盈餘：${money(profit)}
+🔴 差額：${money(diff)}`;
+
+
+document.getElementById(
+"detail"
+).value=
+text;
+
+
+return text;
+
+}
+
+
+/* 自動儲存 */
+
+function autoSave(){
+
+const draft={
+
+date:
+document.getElementById(
+"date"
+).value||today(),
+
+noodle:
+Number(
+document.getElementById(
+"noodleAmount"
+).value
+)||0,
+
+custom:
+[
+...
+document.querySelectorAll(
+"#customIncome .income-row"
+)
+].map(
+r=>({
+
+name:
+r.querySelector(
+".income-name"
+).value,
+
+amount:
+Number(
+r.querySelector(
+".income-amount"
+).value
+)||0
+
+})
+),
+
+qty:{
+...qty
+},
+
+taken:
+Number(
+document.getElementById(
+"taken"
+).value
+)||0
+
+};
+
+
+localStorage.setItem(
+"dailyIncomeDraft1319",
+JSON.stringify(
+draft
+)
+);
+
+
+document.getElementById(
+"status"
+).textContent=
+"💾 已自動儲存";
+
+}
+
+
+/* 載入 */
+
+function loadDraft(){
+
+const d=
+JSON.parse(
+localStorage.getItem(
+"dailyIncomeDraft1319"
+)||"null"
+);
+
+
+if(!d)
+return;
+
+
+/*
+日期永遠自動使用今天
+*/
+
+document.getElementById(
+"date"
+).value=
+today();
+
+
+/*
+🍜 恢復手動金額
+*/
+
+document.getElementById(
+"noodleAmount"
+).value=
+d.noodle!==undefined
+?
+d.noodle
+:
+850;
+
+
+document.getElementById(
+"taken"
+).value=
+d.taken||0;
+
+
+qty={
+...qty,
+...(d.qty||{})
+};
+
+
+const box=
+document.getElementById(
+"customIncome"
+);
+
+box.innerHTML="";
+
+
+(
+d.custom||[]
+).forEach(
+x=>{
+
+const r=
+document.createElement(
+"div"
+);
+
+r.className=
+"income-row";
+
+
+r.innerHTML=`
+
+<input
+class="income-name"
+value="${esc(x.name)}">
+
+<input
+class="income-amount"
+type="number"
+min="0"
+step="1"
+value="${Number(x.amount)||0}">
+
+<button
+class="delete"
+type="button"
+onclick="this.parentElement.remove();calculate()">
+×
+</button>
+
+`;
+
+
+box.appendChild(r);
+
+});
+
+
+[
+"lemon",
+"oyster",
+"intestine"
+]
+.forEach(
+syncQty
+);
+
+}
+
+
+/* 儲存今天 */
+
+function saveRecord(){
+
+const v=
+document.getElementById(
+"date"
+).value||today();
+
+const items=
+getItems();
+
+const total=
+items.reduce(
+(s,x)=>
+s+x.amount,
+0
+);
+
+const taken=
+Number(
+document.getElementById(
+"taken"
+).value
+)||0;
+
+const r={
+
+date:v,
 
 items,
 
@@ -1823,30 +1542,35 @@ total,
 
 taken,
 
-profit,
+profit:
+Math.max(
+total-taken,
+0
+),
 
-difference,
-
-updatedAt:
-Date.now()
+difference:
+Math.max(
+taken-total,
+0
+)
 
 };
 
 
-const index=
+const i=
 records.findIndex(
-r=>
-r.date===date
+x=>
+x.date===v
 );
 
 
-if(index>=0){
+if(i>=0){
 
-records[index]=record;
+records[i]=r;
 
 }else{
 
-records.push(record);
+records.push(r);
 
 }
 
@@ -1860,7 +1584,7 @@ a.date
 
 
 localStorage.setItem(
-"dailyIncomeRecords",
+"dailyIncomeRecords1319",
 JSON.stringify(
 records
 )
@@ -1872,12 +1596,20 @@ renderHistory();
 calculateAccum();
 
 
+document.getElementById(
+"status"
+).textContent=
+"💾 今天紀錄已儲存";
+
+
 alert(
 "✅ 已儲存今天紀錄！"
 );
 
 }
 
+
+/* 累加 */
 
 function calculateAccum(){
 
@@ -1887,7 +1619,6 @@ records.reduce(
 s+(Number(r.profit)||0),
 0
 );
-
 
 const diff=
 records.reduce(
@@ -1899,13 +1630,7 @@ s+(Number(r.difference)||0),
 
 /*
 差額累加－盈餘累加
-
-例如：
-
-12,800 - 1,250
-= 11,550
 */
-
 
 const net=
 diff-profit;
@@ -1923,58 +1648,15 @@ document.getElementById(
 money(diff);
 
 
-const netEl=
 document.getElementById(
 "netAccum"
-);
-
-
-const netBox=
-document.getElementById(
-"netAccumBox"
-);
-
-
-if(net>0){
-
-netEl.textContent=
+).textContent=
 money(net);
 
-netBox.style.background=
-"#fff0ef";
-
-netBox.style.color=
-"#c7372d";
-
-}else if(net<0){
-
-netEl.textContent=
-"盈餘 "+
-money(
-Math.abs(net)
-);
-
-netBox.style.background=
-"#eaf8ed";
-
-netBox.style.color=
-"#19733a";
-
-}else{
-
-netEl.textContent=
-"0";
-
-netBox.style.background=
-"#f3f3f3";
-
-netBox.style.color=
-"#555";
-
 }
 
-}
 
+/* 歷史紀錄 */
 
 function renderHistory(){
 
@@ -1984,16 +1666,29 @@ document.getElementById(
 );
 
 
-if(!records.length){
+if(
+!records.length
+){
 
 box.innerHTML=
-'<div class="empty">目前還沒有紀錄</div>';
+'<div style="text-align:center;color:#9b8d87;padding:20px">目前還沒有紀錄</div>';
 
 calculateAccum();
 
 return;
 
 }
+
+
+const w=[
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六"
+];
 
 
 box.innerHTML=
@@ -2006,22 +1701,7 @@ r.date+"T00:00:00"
 );
 
 
-const weekdays=[
-"星期日",
-"星期一",
-"星期二",
-"星期三",
-"星期四",
-"星期五",
-"星期六"
-];
-
-
-const dateText=
-`${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${weekdays[d.getDay()]}`;
-
-
-const itemText=
+const items=
 (r.items||[])
 .map(
 x=>
@@ -2037,9 +1717,8 @@ return`
 <div class="history-head">
 
 <span>
-📅 ${esc(dateText)}
+📅 ${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${w[d.getDay()]}
 </span>
-
 
 <span>
 
@@ -2061,13 +1740,12 @@ r.profit>0
 💰 收入：
 ${money(r.total)}
 
-｜
-💵 已拿：
+　💵 已拿：
 ${money(r.taken)}
 
 <br>
 
-${itemText||"無收入項目"}
+${items}
 
 </div>
 
@@ -2076,17 +1754,15 @@ ${itemText||"無收入項目"}
 
 <button
 type="button"
-onclick="loadRecord(${i})"
->
+onclick="loadRecord(${i})">
 ✏️ 載入修改
 </button>
 
 
 <button
-type="button"
 class="danger"
-onclick="deleteRecord(${i})"
->
+type="button"
+onclick="deleteRecord(${i})">
 🗑️ 刪除
 </button>
 
@@ -2105,6 +1781,8 @@ calculateAccum();
 }
 
 
+/* 載入歷史 */
+
 function loadRecord(i){
 
 const r=
@@ -2117,10 +1795,85 @@ document.getElementById(
 r.date;
 
 
-const normal=
+/*
+🍜
+*/
+
+const noodle=
+(r.items||[])
+.find(
+x=>
+x.name==="🍜"
+);
+
+
+document.getElementById(
+"noodleAmount"
+).value=
+noodle
+?
+noodle.amount
+:
+850;
+
+
+/*
+數量
+*/
+
+qty.lemon=
+Number(
+(r.items||[])
+.find(
+x=>x.name==="🍋"
+)?.qty
+)||0;
+
+
+qty.oyster=
+Number(
+(r.items||[])
+.find(
+x=>x.name==="蚵仔一包"
+)?.qty
+)||0;
+
+
+qty.intestine=
+Number(
+(r.items||[])
+.find(
+x=>x.name==="大腸一包"
+)?.qty
+)||0;
+
+
+[
+"lemon",
+"oyster",
+"intestine"
+]
+.forEach(
+syncQty
+);
+
+
+document.getElementById(
+"taken"
+).value=
+r.taken||0;
+
+
+/*
+其他收入
+*/
+
+const custom=
 (r.items||[])
 .filter(
 x=>
+x.name!=="🍜"
+&&
 ![
 "🍋",
 "蚵仔一包",
@@ -2131,142 +1884,55 @@ x.name
 );
 
 
-/* 恢復 🍜 手動金額 */
-
-const noodle=
-normal.find(
-x=>
-x.name==="🍜"
-);
-
-
-const noodleInput=
-document.querySelector(
-".fixed-noodle .income-amount"
-);
-
-
-if(noodleInput){
-
-noodleInput.value=
-noodle &&
-Number.isFinite(
-Number(noodle.amount)
-)
-?
-Number(noodle.amount)
-:
-850;
-
-}
-
-
-const extra=
-normal.filter(
-x=>
-x.name!=="🍜"
-);
-
-
-renderIncome(
-extra
-);
-
-
-const lemon=
-(r.items||[])
-.find(
-x=>
-x.name==="🍋"
-);
-
-
-const oyster=
-(r.items||[])
-.find(
-x=>
-x.name==="蚵仔一包"
-);
-
-
-const intestine=
-(r.items||[])
-.find(
-x=>
-x.name==="大腸一包"
-);
-
-
-quantities.lemon=
-Number(
-lemon?.qty
-)||0;
-
-
-quantities.oyster=
-Number(
-oyster?.qty
-)||0;
-
-
-quantities.intestine=
-Number(
-intestine?.qty
-)||0;
-
-
-[
-"lemon",
-"oyster",
-"intestine"
-].forEach(
-type=>{
-
-const q=
+const box=
 document.getElementById(
-type+"Qty"
+"customIncome"
 );
 
+box.innerHTML="";
 
-const total=
-document.getElementById(
-type+"Total"
+
+custom.forEach(
+x=>{
+
+const el=
+document.createElement(
+"div"
 );
 
-
-if(q){
-
-q.value=
-quantities[type]===0
-?
-""
-:
-quantities[type];
-
-}
+el.className=
+"income-row";
 
 
-if(total){
+el.innerHTML=`
 
-total.textContent=
-money(
-quantities[type]*
-unitPrices[type]
-);
+<input
+class="income-name"
+value="${esc(x.name)}">
 
-}
+<input
+class="income-amount"
+type="number"
+min="0"
+step="1"
+value="${x.amount}">
 
-}
-);
+<button
+class="delete"
+type="button"
+onclick="this.parentElement.remove();calculate()">
+×
+</button>
+
+`;
 
 
-document.getElementById(
-"taken"
-).value=
-r.taken||0;
+box.appendChild(el);
+
+});
 
 
-updateDateText();
+updateDate();
 
 calculate();
 
@@ -2278,6 +1944,8 @@ behavior:"smooth"
 
 }
 
+
+/* 刪除 */
 
 function deleteRecord(i){
 
@@ -2296,7 +1964,7 @@ i,
 
 
 localStorage.setItem(
-"dailyIncomeRecords",
+"dailyIncomeRecords1319",
 JSON.stringify(
 records
 )
@@ -2308,57 +1976,13 @@ renderHistory();
 }
 
 
-function showNetAccum(){
-
-const profit=
-records.reduce(
-(s,r)=>
-s+(Number(r.profit)||0),
-0
-);
-
-
-const diff=
-records.reduce(
-(s,r)=>
-s+(Number(r.difference)||0),
-0
-);
-
-
-/*
-差額累加－盈餘累加
-*/
-
-
-const net=
-diff-profit;
-
-
-if(net>=0){
-
-alert(
-"🔴 目前實際差額： "+
-money(net)
-);
-
-}else{
-
-alert(
-"🟢 目前盈餘： "+
-money(
-Math.abs(net)
-)
-);
-
-}
-
-}
-
+/* 清除 */
 
 function clearAll(){
 
-if(!records.length){
+if(
+!records.length
+){
 
 alert(
 "目前沒有紀錄。"
@@ -2371,7 +1995,7 @@ return;
 
 if(
 !confirm(
-"確定要清除全部歷史紀錄嗎？此動作無法復原。"
+"確定清除全部歷史紀錄嗎？"
 )
 )
 return;
@@ -2381,11 +2005,119 @@ records=[];
 
 
 localStorage.removeItem(
-"dailyIncomeRecords"
+"dailyIncomeRecords1319"
 );
 
 
 renderHistory();
+
+}
+
+
+/* 複製 */
+
+async function copyDetail(){
+
+const text=
+buildDetail();
+
+
+try{
+
+await navigator.clipboard.writeText(
+text
+);
+
+alert(
+"✅ 詳細明細已複製！"
+);
+
+}catch(e){
+
+const t=
+document.createElement(
+"textarea"
+);
+
+t.value=text;
+
+document.body.appendChild(
+t
+);
+
+t.select();
+
+document.execCommand(
+"copy"
+);
+
+t.remove();
+
+alert(
+"✅ 詳細明細已複製！"
+);
+
+}
+
+}
+
+
+/* LINE */
+
+function sendLine(){
+
+location.href=
+"https://line.me/R/msg/text/?"
++
+encodeURIComponent(
+buildDetail()
+);
+
+}
+
+
+/* 顯示差額 */
+
+function showNet(){
+
+const profit=
+records.reduce(
+(s,r)=>
+s+(Number(r.profit)||0),
+0
+);
+
+const diff=
+records.reduce(
+(s,r)=>
+s+(Number(r.difference)||0),
+0
+);
+
+
+const net=
+diff-profit;
+
+
+if(net>=0){
+
+alert(
+"🔴 差額累加－盈餘累加："
++
+money(net)
+);
+
+}else{
+
+alert(
+"🟢 盈餘多於差額："
++
+money(
+Math.abs(net)
+)
+);
+
+}
 
 }
 
@@ -2404,7 +2136,7 @@ document.getElementById(
 "change",
 ()=>{
 
-updateDateText();
+updateDate();
 
 calculate();
 
@@ -2412,30 +2144,69 @@ calculate();
 );
 
 
-updateDateText();
-
-
-if(
-!loadDraft()
-){
+/*
+🍜 這裡明確使用 input 事件
+可以自由修改
+*/
 
 document.getElementById(
-"date"
-).value=
-today();
+"noodleAmount"
+).addEventListener(
+"input",
+function(){
 
-updateDateText();
+calculate();
 
-renderIncome([]);
+}
+);
+
+
+/* 已拿 */
+
+document.getElementById(
+"taken"
+).addEventListener(
+"input",
+function(){
+
+calculate();
+
+}
+);
+
+
+/* 其他收入 */
+
+document.addEventListener(
+"input",
+function(e){
+
+if(
+e.target.closest(
+"#customIncome"
+)
+){
 
 calculate();
 
 }
 
+}
+);
+
+
+/* 載入自動儲存 */
+
+loadDraft();
+
+
+updateDate();
+
+
+calculate();
+
 
 renderHistory();
-
-calculateAccum();
 
 </script>
 
