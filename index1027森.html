@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>股票盈虧月曆</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#f7f3ef;
+  color:#3b302b;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",Arial,sans-serif;
+}
+
+.wrap{
+  max-width:1100px;
+  margin:auto;
+  padding:12px;
+}
+
+h1{
+  text-align:center;
+  font-size:28px;
+  margin:8px 0 14px;
+}
+
+.card{
+  background:#fff;
+  border-radius:20px;
+  padding:12px;
+  margin-bottom:14px;
+  box-shadow:0 3px 15px rgba(0,0,0,.06);
+}
+
+.nav{
+  display:grid;
+  grid-template-columns:54px 1fr 54px;
+  gap:8px;
+  align-items:center;
+}
+
+.nav button{
+  height:46px;
+  border:0;
+  border-radius:12px;
+  background:#fff0d9;
+  color:#8b5b18;
+  font-size:28px;
+  font-weight:900;
+}
+
+.month{
+  text-align:center;
+  font-size:25px;
+  font-weight:900;
+}
+
+.week{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:0;
+  margin-top:10px;
+}
+
+.week div{
+  text-align:center;
+  padding:10px 2px;
+  background:#fff;
+  font-size:18px;
+  font-weight:800;
+  border-bottom:1px solid #eee;
+}
+
+.calendar{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:0;
+  margin-top:0;
+}
+
+.day{
+  min-height:145px;
+  border:0;
+  border-right:1px solid #f0ece9;
+  border-bottom:1px solid #f0ece9;
+  border-radius:0;
+  background:#fff;
+  padding:8px 7px;
+  display:flex;
+  flex-direction:column;
+}
+
+.day.empty{
+  background:#fff;
+}
+
+.day.today{
+  background:#fffaf2;
+}
+
+.day.positive{
+  background:#f5fcf6;
+}
+
+.day.negative{
+  background:#fff7f6;
+}
+
+.day.weekend{
+  background:#f7f7f7;
+}
+
+.daynum{
+  font-size:19px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.profitInput{
+  width:100%;
+  flex:1;
+  min-height:85px;
+  border:0;
+  border-radius:0;
+  padding:4px;
+  font-size:19px;
+  font-weight:900;
+  text-align:center;
+  background:transparent;
+}
+
+.profitInput:focus{
+  outline:2px solid #e7a05e;
+  outline-offset:-2px;
+  background:#fffdf9;
+}
+
+.day.positive .profitInput{
+  color:#19733a;
+  background:#f8fff9;
+}
+
+.day.negative .profitInput{
+  color:#c7372d;
+  background:#fffafa;
+}
+
+.restText{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#999;
+  font-size:22px;
+  font-weight:900;
+}
+
+.buttonRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
+
+.mainBtn{
+  border:0;
+  border-radius:14px;
+  padding:14px;
+  font-size:18px;
+  font-weight:900;
+}
+
+.save{
+  background:#e88c43;
+  color:#fff;
+}
+
+.clear{
+  background:#ffe2df;
+  color:#b9362c;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+
+.box{
+  border-radius:15px;
+  padding:14px;
+  text-align:center;
+}
+
+.label{
+  font-size:14px;
+  font-weight:800;
+}
+
+.value{
+  font-size:27px;
+  font-weight:900;
+  margin-top:5px;
+}
+
+.green{
+  background:#eaf8ed;
+  color:#19733a;
+}
+
+.red{
+  background:#fff0ef;
+  color:#c7372d;
+}
+
+.total{
+  background:#fff5dc;
+  color:#8a5a00;
+}
+
+.note{
+  text-align:center;
+  color:#8c7e77;
+  font-size:13px;
+  line-height:1.5;
+  margin-top:10px;
+}
+
+.status{
+  text-align:center;
+  color:#6f625c;
+  font-size:14px;
+  margin-top:8px;
+}
+
+@media(max-width:600px){
+
+  .wrap{
+    padding:6px;
+  }
+
+  h1{
+    font-size:24px;
+  }
+
+  .card{
+    padding:8px;
+    border-radius:16px;
+  }
+
+  .nav button{
+    height:42px;
+  }
+
+  .month{
+    font-size:21px;
+  }
+
+  .week{
+    gap:2px;
+  }
+
+  .calendar{
+    gap:2px;
+  }
+
+  .week div{
+    font-size:12px;
+    padding:7px 1px;
+  }
+
+  .day{
+    min-height:108px;
+    padding:6px;
+    border-radius:0;
+  }
+
+  .daynum{
+    font-size:15px;
+  }
+
+  .profitInput{
+    min-height:65px;
+    font-size:16px;
+  }
+
+  .restText{
+    font-size:17px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<h1>📈 股票盈虧月曆</h1>
+
+<div class="card">
+
+<div class="nav">
+
+<button type="button" onclick="changeMonth(-1)">‹</button>
+
+<div id="monthTitle" class="month"></div>
+
+<button type="button" onclick="changeMonth(1)">›</button>
+
+</div>
+
+<div class="week">
+
+<div>日</div>
+<div>一</div>
+<div>二</div>
+<div>三</div>
+<div>四</div>
+<div>五</div>
+<div>六</div>
+
+</div>
+
+<div id="calendar" class="calendar"></div>
+
+<div class="buttonRow">
+
+<button
+type="button"
+class="mainBtn save"
+onclick="saveNow()">
+💾 儲存
+</button>
+
+<button
+type="button"
+class="mainBtn clear"
+onclick="clearMonth()">
+🗑️ 清除本月
+</button>
+
+</div>
+
+<div id="status" class="status">
+💾 自動儲存已開啟
+</div>
+
+<div class="note">
+星期六、星期日會自動顯示「休息」；星期一至星期五可直接輸入股票淨盈虧。
+</div>
+
+</div>
+
+
+<div class="card">
+
+<div class="summary">
+
+<div class="box green">
+
+<div class="label">
+🟢 本月獲利
+</div>
+
+<div id="profit" class="value">
++0
+</div>
+
+</div>
+
+
+<div class="box red">
+
+<div class="label">
+🔴 本月虧損
+</div>
+
+<div id="loss" class="value">
+-0
+</div>
+
+</div>
+
+
+<div class="box total">
+
+<div class="label">
+💰 本月淨盈虧
+</div>
+
+<div id="net" class="value">
+0
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let view=new Date();
+
+view.setDate(1);
+
+
+let data=JSON.parse(
+localStorage.getItem("stockProfitCalendar2026")||"{}"
+);
+
+
+function key(y,m,d){
+
+return y+"-"+
+String(m+1).padStart(2,"0")+"-"+
+String(d).padStart(2,"0");
+
+}
+
+
+function money(n){
+
+return Math.round(Number(n)||0)
+.toLocaleString("zh-TW");
+
+}
+
+
+function render(){
+
+const y=view.getFullYear();
+
+const m=view.getMonth();
+
+
+document.getElementById("monthTitle").textContent=
+y+"年"+(m+1)+"月";
+
+
+const cal=
+document.getElementById("calendar");
+
+cal.innerHTML="";
+
+
+/*
+星期日 = 0
+星期一 = 1
+星期二 = 2
+星期三 = 3
+星期四 = 4
+星期五 = 5
+星期六 = 6
+
+所以直接使用 getDay()
+讓月曆從星期日開始。
+*/
+
+let start=
+new Date(y,m,1).getDay();
+
+
+const days=
+new Date(y,m+1,0).getDate();
+
+
+const now=new Date();
+
+
+/* 月初前的空白格 */
+
+for(let i=0;i<start;i++){
+
+const empty=
+document.createElement("div");
+
+empty.className="day empty";
+
+cal.appendChild(empty);
+
+}
+
+
+/* 建立當月每一天 */
+
+for(let d=1;d<=days;d++){
+
+const k=
+key(y,m,d);
+
+
+const dateObj=
+new Date(y,m,d);
+
+
+const weekday=
+dateObj.getDay();
+
+
+/*
+星期六 = 6
+星期日 = 0
+*/
+
+const isWeekend=
+weekday===0 ||
+weekday===6;
+
+
+/*
+平日預設空白
+六日自動顯示休息
+*/
+
+const value=
+data[k]===undefined
+?
+(isWeekend ? "休息" : "")
+:
+data[k];
+
+
+const cell=
+document.createElement("div");
+
+cell.className="day";
+
+
+/* 今天標記 */
+
+if(
+y===now.getFullYear() &&
+m===now.getMonth() &&
+d===now.getDate()
+){
+
+cell.classList.add("today");
+
+}
+
+
+/* 六日灰色 */
+
+if(isWeekend){
+
+cell.classList.add("weekend");
+
+}
+
+
+/* 平日盈虧顏色 */
+
+if(!isWeekend){
+
+if(Number(value)>0){
+
+cell.classList.add("positive");
+
+}
+
+if(Number(value)<0){
+
+cell.classList.add("negative");
+
+}
+
+}
+
+
+/*
+日期＋輸入區
+*/
+
+cell.innerHTML=
+
+'<div class="daynum">'+
+d+
+'號</div>'+
+
+(
+isWeekend
+?
+'<div class="restText">休息</div>'
+:
+'<input '+
+'class="profitInput" '+
+'type="number" '+
+'inputmode="decimal" '+
+'placeholder="" '+
+'value="'+value+'">'
+);
+
+
+const input=
+cell.querySelector(".profitInput");
+
+
+/*
+星期六日沒有輸入框
+*/
+
+if(isWeekend){
+
+cal.appendChild(cell);
+
+continue;
+
+}
+
+
+/*
+平日可以自由輸入
+*/
+
+input.addEventListener(
+"input",
+function(){
+
+const raw=
+input.value.trim();
+
+
+if(raw===""){
+
+delete data[k];
+
+}else{
+
+data[k]=
+Number(raw)||0;
+
+}
+
+
+/* 自動儲存 */
+
+autoSave();
+
+
+/* 更新顏色 */
+
+cell.classList.toggle(
+"positive",
+Number(raw)>0
+);
+
+cell.classList.toggle(
+"negative",
+Number(raw)<0
+);
+
+
+/* 更新統計 */
+
+update();
+
+});
+
+
+
+cal.appendChild(cell);
+
+}
+
+
+/* 更新統計 */
+
+update();
+
+}
+
+
+/*
+計算本月
+*/
+
+function update(){
+
+const y=
+view.getFullYear();
+
+const m=
+view.getMonth();
+
+
+const prefix=
+y+"-"+
+String(m+1).padStart(2,"0")+
+"-";
+
+
+let profit=0;
+
+let loss=0;
+
+
+Object.keys(data).forEach(
+function(k){
+
+if(k.startsWith(prefix)){
+
+const n=
+Number(data[k])||0;
+
+
+if(n>0){
+
+profit+=n;
+
+}
+
+
+if(n<0){
+
+loss+=
+Math.abs(n);
+
+}
+
+}
+
+});
+
+
+document.getElementById(
+"profit"
+).textContent=
+"+"+
+money(profit);
+
+
+document.getElementById(
+"loss"
+).textContent=
+"-"+
+money(loss);
+
+
+const net=
+profit-loss;
+
+
+document.getElementById(
+"net"
+).textContent=
+(net>0?"+":"")+
+money(net);
+
+}
+
+
+/*
+自動儲存
+*/
+
+function autoSave(){
+
+localStorage.setItem(
+"stockProfitCalendar2026",
+JSON.stringify(data)
+);
+
+
+document.getElementById(
+"status"
+).textContent=
+"💾 已自動儲存";
+
+}
+
+
+/*
+手動儲存按鈕
+*/
+
+function saveNow(){
+
+localStorage.setItem(
+"stockProfitCalendar2026",
+JSON.stringify(data)
+);
+
+
+document.getElementById(
+"status"
+).textContent=
+"💾 已儲存";
+
+
+alert(
+"✅ 股票盈虧資料已儲存！"
+);
+
+}
+
+
+/*
+清除目前月份
+*/
+
+function clearMonth(){
+
+if(
+!confirm(
+"確定要清除目前月份全部盈虧嗎？"
+)
+){
+
+return;
+
+}
+
+
+const y=
+view.getFullYear();
+
+const m=
+view.getMonth();
+
+
+const prefix=
+y+"-"+
+String(m+1).padStart(2,"0")+
+"-";
+
+
+Object.keys(data).forEach(
+function(k){
+
+if(k.startsWith(prefix)){
+
+delete data[k];
+
+}
+
+});
+
+
+localStorage.setItem(
+"stockProfitCalendar2026",
+JSON.stringify(data)
+);
+
+
+render();
+
+
+document.getElementById(
+"status"
+).textContent=
+"🗑️ 本月已清除";
+
+}
+
+
+/*
+上一個月／下一個月
+*/
+
+function changeMonth(n){
+
+view.setMonth(
+view.getMonth()+n
+);
+
+render();
+
+}
+
+
+/*
+啟動
+*/
+
+render();
+
+</script>
+
+</body>
+</html>
