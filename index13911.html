@@ -3,319 +3,571 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#17191d">
-<title>台指期真實行情模擬｜限價委託</title>
+<meta name="theme-color" content="#111315">
+<title>台指期｜真實行情＋虛擬限價交易</title>
 
 <style>
 *{
   box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:#0d0f11;
+  color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;
 }
 
 body{
-  margin:0;
-  background:#101114;
-  color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,
-  "PingFang TC","Noto Sans TC",
-  "Microsoft JhengHei",sans-serif;
-  padding-bottom:82px
+  min-height:100vh;
+  padding-bottom:95px;
 }
 
-.wrap{
-  max-width:900px;
-  margin:auto
+button,input,select{
+  font-family:inherit;
 }
 
-.header{
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:#17191d;
-  padding:14px;
-  border-bottom:1px solid #383b42
-}
-
-.title{
-  font-size:19px;
-  color:#aaa
-}
-
-.price{
-  text-align:center;
-  font-size:54px;
-  font-weight:900;
-  color:#55ed55
-}
-
-.change{
-  text-align:center;
-  font-size:18px;
-  margin:3px 0 9px
-}
-
-.status{
-  text-align:center;
-  padding:10px;
-  border-radius:11px;
-  background:#25282d;
-  color:#ffd166
-}
-
-.status.live{
-  color:#55ed55
-}
-
-.status.off{
-  color:#ff6262
+button{
+  border:0;
+  cursor:pointer;
 }
 
 .container{
-  padding:13px
+  width:100%;
+  max-width:900px;
+  margin:0 auto;
+  padding:18px 16px 110px;
+}
+
+.header{
+  text-align:center;
+  padding:10px 0 12px;
+}
+
+.title{
+  font-size:24px;
+  font-weight:700;
+  color:#b9bec4;
+  margin-bottom:8px;
+}
+
+.big-price{
+  font-size:76px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-3px;
+  color:#48e44f;
+}
+
+.change{
+  margin-top:10px;
+  font-size:24px;
+  font-weight:700;
+}
+
+.up{
+  color:#48e44f;
+}
+
+.down{
+  color:#ff4c4c;
+}
+
+.flat{
+  color:#ddd;
+}
+
+.status{
+  margin:20px 0;
+  padding:15px 18px;
+  border-radius:20px;
+  background:#202428;
+  text-align:center;
+  font-size:21px;
+  color:#f3c546;
+  border:1px solid #30353a;
+}
+
+.status.real{
+  color:#4be85b;
+}
+
+.status.error{
+  color:#ff6868;
+}
+
+.reset-btn{
+  width:100%;
+  background:#3199d4;
+  color:#fff;
+  border-radius:20px;
+  padding:17px;
+  font-size:23px;
+  font-weight:800;
+  margin-bottom:18px;
 }
 
 .card{
-  background:#191b1f;
-  border:1px solid #41454d;
-  border-radius:18px;
-  padding:16px;
-  margin-bottom:13px
+  background:#15181b;
+  border:1px solid #373d44;
+  border-radius:25px;
+  padding:20px;
+  margin-bottom:18px;
+  box-shadow:0 5px 20px rgba(0,0,0,.15);
 }
 
-h2{
-  font-size:23px;
-  margin:0 0 14px
+.card h2{
+  margin:0 0 18px;
+  font-size:28px;
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px
-}
-
-.stat{
-  background:#25282d;
-  border-radius:13px;
-  padding:12px
-}
-
-.stat span{
-  display:block;
-  color:#aaa;
-  font-size:14px
-}
-
-.stat b{
-  font-size:24px;
-  display:block;
-  margin-top:5px
-}
-
-label{
-  display:block;
-  color:#aaa;
-  font-size:14px;
-  margin:9px 0 5px
-}
-
-input,
-select{
-  width:100%;
-  height:48px;
-  background:#101216;
-  color:#fff;
-  border:1px solid #555b64;
-  border-radius:11px;
-  padding:0 10px;
-  font-size:18px
-}
-
-.btn{
-  width:100%;
-  min-height:50px;
-  border:0;
-  border-radius:12px;
-  color:#fff;
-  font-size:18px;
-  font-weight:900
-}
-
-.green{
-  background:#159447
-}
-
-.red{
-  background:#bd3030
-}
-
-.blue{
-  background:#2d8ecb
-}
-
-.orange{
-  background:#e99e20;
-  color:#171717
-}
-
-.gray{
-  background:#45484e
-}
-
-.dark{
-  background:#292c31
-}
-
-.actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px
-}
-
-.actions .btn{
-  min-height:58px
+.sub{
+  color:#9ea4ab;
+  font-size:15px;
+  margin-bottom:8px;
 }
 
 .row{
   display:flex;
-  gap:9px
+  gap:14px;
 }
 
-.row>*{
-  flex:1
+.col{
+  flex:1;
+  min-width:0;
 }
 
-.notice{
-  padding:12px;
-  border-radius:12px;
-  background:#25282d;
-  color:#bbb;
-  line-height:1.55;
-  font-size:14px
+label{
+  display:block;
+  color:#aeb4ba;
+  font-size:17px;
+  margin-bottom:8px;
 }
 
-.order{
-  background:#24272c;
-  border-radius:13px;
-  padding:13px;
-  margin-bottom:9px;
-  border-left:4px solid #555
+input,select{
+  width:100%;
+  background:#0b0d0f;
+  color:#fff;
+  border:2px solid #3b4148;
+  border-radius:15px;
+  padding:15px;
+  font-size:20px;
+  outline:none;
 }
 
-.order.pending{
-  border-left-color:#f0a52a
+input:focus,select:focus{
+  border-color:#3ca7ff;
 }
 
-.order.done{
-  border-left-color:#52df62
+.manual-note{
+  color:#ffbd35;
+  font-size:15px;
+  line-height:1.5;
+  margin-top:8px;
 }
 
-.order.cancelled{
-  border-left-color:#777
+.qty-control{
+  display:flex;
+  height:56px;
 }
 
-.orderHead{
+.qty-control button{
+  width:56px;
+  background:#292d31;
+  color:#fff;
+  font-size:28px;
+}
+
+.qty-control input{
+  border-radius:0;
+  text-align:center;
+  border-left:0;
+  border-right:0;
+}
+
+.mode-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:15px;
+}
+
+.mode-card{
+  padding:15px;
+  border-radius:18px;
+  border:1px solid #3a4047;
+  background:#1e2226;
+}
+
+.mode-card strong{
+  display:block;
+  font-size:19px;
+  margin-bottom:6px;
+}
+
+.mode-card span{
+  color:#b4bac0;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.order-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:14px;
+}
+
+.order-btn{
+  min-height:64px;
+  border-radius:17px;
+  color:#fff;
+  font-size:21px;
+  font-weight:800;
+}
+
+.buy-limit{
+  background:#078c3e;
+}
+
+.sell-limit{
+  background:#b52d32;
+}
+
+.buy-market{
+  background:#137bb8;
+}
+
+.sell-market{
+  background:#c77c08;
+}
+
+.add-long{
+  background:#66319b;
+}
+
+.add-short{
+  background:#8c5700;
+}
+
+.close-long{
+  background:#185d86;
+}
+
+.close-short{
+  background:#883238;
+}
+
+.disabled{
+  opacity:.35;
+}
+
+.full{
+  grid-column:1 / -1;
+}
+
+.info{
+  margin-top:16px;
+  background:#202429;
+  border-radius:17px;
+  padding:15px;
+  color:#c0c5ca;
+  font-size:15px;
+  line-height:1.7;
+}
+
+.position-box{
+  border-radius:20px;
+  background:#101214;
+  padding:18px;
+}
+
+.position-empty{
+  text-align:center;
+  color:#92989f;
+  padding:25px 0;
+  font-size:20px;
+}
+
+.position-title{
   display:flex;
   justify-content:space-between;
-  font-weight:900
+  align-items:center;
+  margin-bottom:12px;
 }
 
-.sub{
-  font-size:13px;
-  color:#999;
-  margin-top:4px
-}
-
-.pnl{
-  text-align:center;
-  font-size:27px;
+.position-side{
+  font-size:26px;
   font-weight:900;
-  margin:12px 0
 }
 
-.pos{
-  background:#24272c;
-  border-radius:14px;
-  padding:14px
+.position-side.long{
+  color:#4be85b;
 }
 
-.empty{
+.position-side.short{
+  color:#ff5555;
+}
+
+.position-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.stat{
+  background:#202428;
+  border-radius:15px;
+  padding:12px;
+}
+
+.stat .name{
+  color:#9fa5ab;
+  font-size:14px;
+}
+
+.stat .value{
+  font-size:21px;
+  font-weight:800;
+  margin-top:5px;
+}
+
+.pnl-positive{
+  color:#4be85b;
+}
+
+.pnl-negative{
+  color:#ff5555;
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:600px;
+}
+
+th,td{
+  padding:12px 8px;
+  border-bottom:1px solid #30353a;
   text-align:center;
-  color:#888;
-  padding:28px
+  white-space:nowrap;
 }
 
-.greenText{
-  color:#55ed55
+th{
+  color:#aaa;
+  font-weight:600;
 }
 
-.redText{
-  color:#ff5a5a
+td{
+  color:#eee;
 }
 
-.yellowText{
-  color:#ffc14a
+.buy-text{
+  color:#4be85b;
 }
 
-.muted{
-  color:#aaa
+.sell-text{
+  color:#ff5555;
+}
+
+.pending{
+  color:#ffc247;
+}
+
+.filled{
+  color:#4be85b;
+}
+
+.cancelled{
+  color:#aaa;
+}
+
+.cancel-btn{
+  padding:8px 12px;
+  border-radius:9px;
+  background:#343a40;
+  color:#fff;
+}
+
+.market-info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.market-stat{
+  background:#202428;
+  border-radius:16px;
+  padding:15px;
+}
+
+.market-stat .label{
+  color:#999fa6;
+  font-size:15px;
+}
+
+.market-stat .number{
+  font-size:25px;
+  font-weight:800;
+  margin-top:5px;
 }
 
 .tabs{
   position:fixed;
+  bottom:0;
   left:0;
   right:0;
-  bottom:0;
-  height:70px;
-  background:#292c31;
-  border-top:1px solid #444;
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  z-index:50
+  z-index:1000;
+  display:flex;
+  background:#25292d;
+  border-top:1px solid #3b4046;
+  padding-bottom:env(safe-area-inset-bottom);
 }
 
 .tab{
-  border:0;
-  background:transparent;
-  color:#fff;
-  font-size:15px
+  flex:1;
+  padding:19px 4px;
+  text-align:center;
+  color:#d7d9db;
+  font-size:18px;
 }
 
 .tab.active{
-  background:#5d6066;
-  font-weight:900
+  background:#5b5f64;
+  color:#fff;
 }
 
 .section{
-  display:none
+  display:none;
 }
 
 .section.active{
-  display:block
+  display:block;
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:100px;
+  transform:translateX(-50%);
+  background:#24282c;
+  border:1px solid #555;
+  color:#fff;
+  padding:14px 20px;
+  border-radius:15px;
+  z-index:2000;
+  font-size:17px;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+  display:none;
+  max-width:90%;
+  text-align:center;
+}
+
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:3000;
+  padding:20px;
+}
+
+.modal{
+  background:#1b1e21;
+  border:1px solid #454a50;
+  border-radius:22px;
+  padding:25px;
+  width:100%;
+  max-width:500px;
+}
+
+.modal h3{
+  margin-top:0;
+  font-size:24px;
+}
+
+.modal button{
+  width:100%;
+  background:#2d8ed0;
+  color:#fff;
+  border-radius:14px;
+  padding:13px;
+  font-size:18px;
+  margin-top:15px;
+}
+
+.green{
+  color:#4be85b;
+}
+
+.yellow{
+  color:#ffc247;
+}
+
+.red{
+  color:#ff5555;
 }
 
 .small{
-  font-size:12px;
-  color:#888;
-  line-height:1.5
+  color:#8f959b;
+  font-size:13px;
 }
 
-.flash{
-  animation:flash .35s ease
+.range-summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
 }
 
-@keyframes flash{
-  50%{
-    transform:scale(1.035)
+.range-box{
+  background:#202428;
+  border-radius:15px;
+  padding:15px;
+}
+
+.range-box strong{
+  display:block;
+  font-size:24px;
+  margin-top:5px;
+}
+
+@media(max-width:600px){
+  .container{
+    padding-left:12px;
+    padding-right:12px;
   }
-}
 
-@media(max-width:430px){
-  .price{
-    font-size:45px
+  .big-price{
+    font-size:62px;
   }
 
-  .stat b{
-    font-size:20px
+  .title{
+    font-size:20px;
+  }
+
+  .card{
+    padding:16px;
+    border-radius:21px;
+  }
+
+  .card h2{
+    font-size:25px;
+  }
+
+  .order-btn{
+    font-size:18px;
+  }
+
+  .row{
+    gap:9px;
   }
 }
 </style>
@@ -323,3086 +575,2148 @@ select{
 
 <body>
 
-<div class="wrap">
+<div class="container">
 
-<header class="header">
+  <div class="header">
+    <div class="title">📊 台指期｜真實行情＋虛擬限價交易</div>
 
-<div class="title">
-📊 台指期｜真實行情＋虛擬限價交易
-</div>
+    <div id="price" class="big-price">--</div>
 
-<div id="price" class="price">
-45,814
-</div>
+    <div id="change" class="change flat">
+      -- 點　--%
+    </div>
+  </div>
 
-<div id="change" class="change greenText">
-+0 點　0.00%
-</div>
+  <div id="status" class="status">
+    🟡 正在連接臺指期即時行情……
+  </div>
 
-<div id="status" class="status off">
-🔴 真實行情尚未連線
-</div>
+  <button class="reset-btn" onclick="resetAccount()">
+    重設模擬帳戶
+  </button>
+
+  <!-- ==================== 下單 ==================== -->
+  <section id="section-order" class="section active">
+
+    <div class="card">
+
+      <h2>🎯 限價／現價下單</h2>
+
+      <label>下單方式</label>
+
+      <select id="orderMode">
+        <option value="limit">限價單｜指定價格等待成交</option>
+        <option value="market">現價單｜目前價格立即成交</option>
+      </select>
+
+      <div class="row" style="margin-top:15px;">
+
+        <div class="col">
+
+          <label>
+            委託價格
+            <span class="small">（手動輸入）</span>
+          </label>
+
+          <input
+            id="orderPrice"
+            type="number"
+            inputmode="decimal"
+            step="1"
+            placeholder="請手動輸入"
+          >
+
+          <div class="manual-note">
+            🔒 委託價格完全手動<br>
+            不會因行情更新而自動跳動
+          </div>
+
+        </div>
+
+        <div class="col">
+
+          <label>口數</label>
+
+          <div class="qty-control">
+            <button onclick="changeQty(-1)">−</button>
+            <input
+              id="qty"
+              type="number"
+              min="1"
+              step="1"
+              value="1"
+              inputmode="numeric"
+            >
+            <button onclick="changeQty(1)">＋</button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="mode-grid">
 
-</header>
+        <div class="mode-card">
+          <strong class="green">限價單</strong>
+          <span>
+            買多：市場價格到達你的委託價才成交。
+            <br>
+            買空：市場價格到達你的委託價才成交。
+          </span>
+        </div>
+
+        <div class="mode-card">
+          <strong style="color:#4dafff;">現價單</strong>
+          <span>
+            直接使用目前最新市場價格模擬成交，
+            不需要等待限價。
+          </span>
+        </div>
+
+      </div>
 
+      <!-- 第一排：一般進場 -->
+      <div class="order-grid">
+
+        <button
+          class="order-btn buy-limit"
+          onclick="placeOrder('long','limit')">
+          🟢 買多（限價）
+        </button>
+
+        <button
+          class="order-btn sell-limit"
+          onclick="placeOrder('short','limit')">
+          🔴 買空（限價）
+        </button>
+
+        <button
+          class="order-btn buy-market"
+          onclick="placeOrder('long','market')">
+          🔵 買多（現價）
+        </button>
+
+        <button
+          class="order-btn sell-market"
+          onclick="placeOrder('short','market')">
+          🟠 買空（現價）
+        </button>
+
+      </div>
+
+      <!-- 第二排：已有倉位加碼 -->
+      <div class="order-grid">
+
+        <button
+          id="addLongBtn"
+          class="order-btn add-long full"
+          onclick="addPosition('long')">
+          🟣 加碼多（已有多單可繼續買）
+        </button>
+
+        <button
+          id="addShortBtn"
+          class="order-btn add-short full"
+          onclick="addPosition('short')">
+          🟡 加碼空（已有空單可繼續買）
+        </button>
+
+      </div>
+
+      <div class="info">
+        <b>📌 交易規則</b><br>
+        • 限價單：到達你手動設定的價格才模擬成交。<br>
+        • 現價單：使用目前最新行情立即模擬成交。<br>
+        • 已有多單：可以繼續使用「加碼多」。<br>
+        • 已有空單：可以繼續使用「加碼空」。<br>
+        • 多空方向不同時，不會偷偷幫你反向交易。<br>
+        • 要反向操作，先使用「平多／平空」。
+      </div>
+
+    </div>
 
-<main class="container">
 
+    <!-- 停利停損 -->
+    <div class="card">
 
-<!-- =========================
-     下單頁
-========================= -->
+      <h2>🛑 停利／停損</h2>
 
-<section id="orderPage" class="section active">
+      <div class="row">
 
+        <div class="col">
+          <label>停利點數</label>
+          <input id="takeProfit" type="number" value="100">
+        </div>
 
-<div class="card">
+        <div class="col">
+          <label>停損點數</label>
+          <input id="stopLoss" type="number" value="100">
+        </div>
 
-<h2>📈 台指期行情</h2>
+      </div>
 
-<div class="grid">
+      <div style="margin-top:15px;">
+        <label style="display:flex;align-items:center;gap:10px;">
+          <input
+            id="autoSLTP"
+            type="checkbox"
+            style="width:24px;height:24px;"
+          >
+          啟用自動停利／停損
+        </label>
+      </div>
 
-<div class="stat">
-<span>最新成交</span>
-<b id="last">45,814</b>
-</div>
+    </div>
 
 
-<div class="stat">
-<span>買價</span>
-<b id="bid">--</b>
-</div>
+    <!-- 真實行情 -->
+    <div class="card">
 
+      <h2>📡 真實行情</h2>
 
-<div class="stat">
-<span>賣價</span>
-<b id="ask">--</b>
-</div>
+      <div class="market-info">
 
+        <div class="market-stat">
+          <div class="label">最新成交</div>
+          <div id="mLast" class="number">--</div>
+        </div>
 
-<div class="stat">
-<span>每點</span>
-<b>50 元</b>
-</div>
+        <div class="market-stat">
+          <div class="label">買價</div>
+          <div id="mBid" class="number">--</div>
+        </div>
 
+        <div class="market-stat">
+          <div class="label">賣價</div>
+          <div id="mAsk" class="number">--</div>
+        </div>
 
-<div class="stat">
-<span>今日開盤</span>
-<b id="open">--</b>
-</div>
+        <div class="market-stat">
+          <div class="label">開盤</div>
+          <div id="mOpen" class="number">--</div>
+        </div>
 
+        <div class="market-stat">
+          <div class="label">最高</div>
+          <div id="mHigh" class="number">--</div>
+        </div>
 
-<div class="stat">
-<span>今日最高</span>
-<b id="high">--</b>
-</div>
+        <div class="market-stat">
+          <div class="label">最低</div>
+          <div id="mLow" class="number">--</div>
+        </div>
 
+      </div>
 
-<div class="stat">
-<span>今日最低</span>
-<b id="low">--</b>
-</div>
+      <div class="info">
+        行情更新時，只更新上面的市場行情。
+        <br>
+        <b class="yellow">
+          你的「委託價格」不會被行情更新改掉。
+        </b>
+      </div>
 
+    </div>
 
-<div class="stat">
-<span>成交量</span>
-<b id="volume">--</b>
-</div>
+  </section>
 
-</div>
 
+  <!-- ==================== 部位 ==================== -->
+  <section id="section-position" class="section">
 
-<div class="notice" style="margin-top:10px">
+    <div class="card">
 
-行情欄位以合法即時行情來源為準。<br>
+      <h2>📌 我的期貨部位</h2>
 
-尚未連線時，不會把模擬數字冒充真實行情。
+      <div id="positionArea">
+        <div class="position-empty">
+          目前沒有期貨部位
+        </div>
+      </div>
 
-</div>
+    </div>
 
-</div>
+  </section>
 
 
-<!-- =========================
-     模擬帳戶
-========================= -->
+  <!-- ==================== 委託 ==================== -->
+  <section id="section-orders" class="section">
 
-<div class="card">
+    <div class="card">
 
-<h2>💰 模擬帳戶</h2>
+      <h2>📋 委託紀錄</h2>
 
-<div class="grid">
+      <div class="table-wrap">
 
-<div>
+        <table>
 
-<label>
-初始模擬資金
-</label>
+          <thead>
+            <tr>
+              <th>時間</th>
+              <th>方向</th>
+              <th>類型</th>
+              <th>價格</th>
+              <th>口數</th>
+              <th>狀態</th>
+              <th>操作</th>
+            </tr>
+          </thead>
 
-<input
-id="capital"
-type="number"
-value="1000000"
-min="0"
-step="1000"
->
+          <tbody id="ordersTable">
+          </tbody>
 
-</div>
+        </table>
 
+      </div>
 
-<div>
+    </div>
 
-<label>
-口數
-</label>
+  </section>
 
-<input
-id="qty"
-type="number"
-value="1"
-min="1"
-step="1"
->
 
-</div>
+  <!-- ==================== 成交 ==================== -->
+  <section id="section-trades" class="section">
 
-</div>
+    <div class="card">
 
+      <h2>📒 成交紀錄</h2>
 
-<div class="grid" style="margin-top:9px">
+      <div class="table-wrap">
 
-<div class="stat">
+        <table>
 
-<span>
-可用資金
-</span>
+          <thead>
+            <tr>
+              <th>時間</th>
+              <th>方向</th>
+              <th>類型</th>
+              <th>成交價</th>
+              <th>口數</th>
+              <th>損益</th>
+            </tr>
+          </thead>
 
-<b id="cash">
-1,000,000
-</b>
+          <tbody id="tradesTable">
+          </tbody>
 
-</div>
+        </table>
 
+      </div>
 
-<div class="stat">
+    </div>
 
-<span>
-已實現損益
-</span>
+  </section>
 
-<b id="realized">
-0
-</b>
 
-</div>
+  <!-- ==================== 設定 ==================== -->
+  <section id="section-settings" class="section">
 
-</div>
+    <div class="card">
 
+      <h2>⚙️ 模擬帳戶</h2>
 
-<button
-id="resetAccount"
-class="btn blue"
-style="margin-top:10px"
->
-重設模擬帳戶
-</button>
+      <div class="stat">
+        <div class="name">虛擬資金</div>
+        <div id="balance" class="value">
+          1,000,000
+        </div>
+      </div>
 
-</div>
+      <div style="height:10px;"></div>
 
+      <div class="stat">
+        <div class="name">已實現損益</div>
+        <div id="realized" class="value">
+          0
+        </div>
+      </div>
 
-<!-- =========================
-     限價下單
-========================= -->
+      <div style="height:10px;"></div>
 
-<div class="card">
+      <div class="stat">
+        <div class="name">浮動損益</div>
+        <div id="unrealized" class="value">
+          0
+        </div>
+      </div>
 
-<h2>
-🎯 限價／市價下單
-</h2>
+      <div class="info">
+        本網站為練習用虛擬交易帳戶。
+        <br>
+        不會真的送單到期貨商。
+      </div>
 
+    </div>
 
-<label>
-下單方式
-</label>
 
-<select id="orderType">
+    <!-- 本月統計 -->
+    <div class="card">
 
-<option value="limit">
-限價單｜指定價格等待成交
-</option>
+      <h2>📊 本月台指期統計</h2>
 
-<option value="market">
-市價單｜以目前行情模擬成交
-</option>
+      <div class="range-summary">
 
-</select>
+        <div class="range-box">
+          <div class="small">本月最高</div>
+          <strong id="monthHigh">--</strong>
+        </div>
 
+        <div class="range-box">
+          <div class="small">本月最低</div>
+          <strong id="monthLow">--</strong>
+        </div>
 
-<label>
-委託價格
-</label>
+        <div class="range-box">
+          <div class="small">最高－最低</div>
+          <strong id="monthRange">--</strong>
+        </div>
 
-<input
-id="limitPrice"
-type="number"
-value="45814"
-step="1"
->
+        <div class="range-box">
+          <div class="small">交易日數</div>
+          <strong id="monthDays">--</strong>
+        </div>
 
+      </div>
 
-<div class="notice" style="margin-top:10px">
+      <div style="margin-top:18px;" class="table-wrap">
 
-<strong>限價單：</strong>
+        <table>
 
-買多會等待市場價格到達你設定的價格。
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>最高</th>
+              <th>最低</th>
+              <th>日內波幅</th>
+            </tr>
+          </thead>
 
-<br>
+          <tbody id="monthTable">
+          </tbody>
 
-買空也會等待市場價格到達你設定的價格。
+        </table>
 
-<br>
+      </div>
 
-成交前可以到「委託」頁撤單。
+      <div class="info">
+        日內波幅＝當日最高點－當日最低點。
+      </div>
 
-</div>
+    </div>
 
-
-<div
-class="actions"
-style="margin-top:12px"
->
-
-<button
-id="longBtn"
-class="btn green"
->
-🟢 買多
-</button>
-
-
-<button
-id="shortBtn"
-class="btn red"
->
-🔴 買空
-</button>
-
-
-<button
-id="closeLongBtn"
-class="btn blue"
->
-🔵 平多
-</button>
-
-
-<button
-id="closeShortBtn"
-class="btn orange"
->
-🟠 平空
-</button>
-
-</div>
-
-</div>
-
-
-<!-- =========================
-     停利停損
-========================= -->
-
-<div class="card">
-
-<h2>
-🛑 停利／停損
-</h2>
-
-<div class="row">
-
-<div>
-
-<label>
-停利點
-</label>
-
-<input
-id="tp"
-type="number"
-value="100"
-min="0"
->
-
-</div>
-
-
-<div>
-
-<label>
-停損點
-</label>
-
-<input
-id="sl"
-type="number"
-value="100"
-min="0"
->
-
-</div>
-
-</div>
-
-
-<label style="margin-top:12px">
-
-<input
-id="autoExit"
-type="checkbox"
-style="width:auto;margin-right:6px"
->
-
-啟用自動停利／停損
-
-</label>
-
-</div>
-
-
-<!-- =========================
-     目前部位
-========================= -->
-
-<div class="card">
-
-<h2>
-📌 目前部位
-</h2>
-
-<div id="quickPosition">
-<div class="empty">
-目前沒有部位
-</div>
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =========================
-     部位
-========================= -->
-
-<section
-id="positionPage"
-class="section"
->
-
-<div class="card">
-
-<h2>
-📌 我的期貨部位
-</h2>
-
-<div id="positionList">
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =========================
-     委託
-========================= -->
-
-<section
-id="ordersPage"
-class="section"
->
-
-<div class="card">
-
-<h2>
-📋 委託回報
-</h2>
-
-<div id="orderList">
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =========================
-     成交
-========================= -->
-
-<section
-id="fillsPage"
-class="section"
->
-
-<div class="card">
-
-<h2>
-✅ 成交回報
-</h2>
-
-<div id="fillList">
-</div>
-
-</div>
-
-</section>
-
-
-<!-- =========================
-     設定
-========================= -->
-
-<section
-id="settingsPage"
-class="section"
->
-
-
-<div class="card">
-
-<h2>
-🔌 真實行情連線
-</h2>
-
-<div class="notice">
-
-這個 GitHub HTML 不會內藏券商帳號、密碼或 API Token。
-
-<br><br>
-
-接上合法即時行情 WebSocket 後，收到：
-
-<br>
-
-最新價／買價／賣價／開盤／最高／最低／成交量
-
-<br>
-
-就會更新本頁。
-
-<br><br>
-
-虛擬委託與虛擬損益仍然留在本機。
-
-</div>
+  </section>
 
 </div>
 
 
-<div class="card">
-
-<h2>
-🧪 練習行情
-</h2>
-
-<button
-id="demoStart"
-class="btn orange"
->
-啟動練習行情
-</button>
-
-<div
-class="small"
-style="margin-top:9px"
->
-
-練習行情僅供測試限價單流程，
-不代表真實台指期行情。
-
-</div>
-
-</div>
-
-
-<div class="card">
-
-<h2>
-💾 資料保存
-</h2>
-
-<div class="notice">
-
-模擬部位、委託、成交及損益會儲存在手機瀏覽器。
-
-<br><br>
-
-關閉網頁後重新打開，
-資料仍會保留。
-
-</div>
-
-</div>
-
-</section>
-
-
-</main>
-
-</div>
-
-
-<!-- =========================
-     底部導覽
-========================= -->
-
+<!-- 底部導航 -->
 <nav class="tabs">
 
-<button
-class="tab active"
-data-target="orderPage"
->
-下單
-</button>
+  <button class="tab active" onclick="showSection('order',this)">
+    下單
+  </button>
 
+  <button class="tab" onclick="showSection('position',this)">
+    部位
+  </button>
 
-<button
-class="tab"
-data-target="positionPage"
->
-部位
-</button>
+  <button class="tab" onclick="showSection('orders',this)">
+    委託
+  </button>
 
+  <button class="tab" onclick="showSection('trades',this)">
+    成交
+  </button>
 
-<button
-class="tab"
-data-target="ordersPage"
->
-委託
-</button>
-
-
-<button
-class="tab"
-data-target="fillsPage"
->
-成交
-</button>
-
-
-<button
-class="tab"
-data-target="settingsPage"
->
-設定
-</button>
+  <button class="tab" onclick="showSection('settings',this)">
+    設定
+  </button>
 
 </nav>
 
 
+<div id="toast" class="toast"></div>
+
+
 <script>
-
-"use strict";
-
-
 /* =========================================================
-   台指期模擬交易 V1
-
-   功能：
-
-   1. 買多
-   2. 買空
-   3. 平多
-   4. 平空
-   5. 限價委託
-   6. 市價模擬
-   7. 待成交
-   8. 撤單
-   9. 成交回報
-   10. 虛擬損益
-   11. 停利
-   12. 停損
-   13. LocalStorage 保存
-   14. 真實行情接入口
-
-   注意：
-
-   本程式本身不假裝擁有真實即時行情。
-
-   真實行情需要合法行情 API / WebSocket。
+   台指期虛擬交易系統
+   真實行情＋手動限價＋現價單＋加碼
 ========================================================= */
 
+const STORAGE_KEY = "TAIFEX_SIM_ACCOUNT_V4";
 
-const STORAGE_KEY =
-"TXF_LIMIT_SIM_V1";
-
-
-let state = {
-
-price:45814,
-
-prev:45814,
-
-bid:0,
-
-ask:0,
-
-open:0,
-
-high:0,
-
-low:0,
-
-volume:0,
-
-initialCash:1000000,
-
-cash:1000000,
-
-realized:0,
-
-qty:1,
-
-position:null,
-
-orders:[],
-
-fills:[],
-
-tp:100,
-
-sl:100,
-
-autoExit:false,
-
-demo:false,
-
-lastUpdate:Date.now()
-
+let market = {
+  last:null,
+  bid:null,
+  ask:null,
+  open:null,
+  high:null,
+  low:null,
+  change:null,
+  changePct:null,
+  time:null,
+  contract:"TXF",
+  expireMonth:"",
+  connected:false
 };
 
-
-let demoTimer=null;
-
-
-/* =========================================================
-   基本工具
-========================================================= */
-
-function $(id){
-
-return document.getElementById(id);
-
-}
-
-
-function money(n){
-
-return Math
-.round(Number(n)||0)
-.toLocaleString("zh-TW");
-
-}
-
-
-function price(n){
-
-return Math
-.round(Number(n)||0)
-.toLocaleString("zh-TW");
-
-}
-
-
-function timeNow(){
-
-return new Date()
-.toLocaleTimeString(
-"zh-TW",
-{
-hour12:false
-}
-);
-
-}
-
-
-function showToast(text){
-
-let box=
-document.getElementById(
-"status"
-);
-
-box.textContent=text;
-
-setTimeout(()=>{
-
-if(state.demo){
-
-box.textContent=
-"🟡 練習行情運行中（非真實行情）";
-
-}else{
-
-box.textContent=
-"🔴 真實行情尚未連線";
-
-}
-
-},1800);
-
-}
-
-
-/* =========================================================
-   儲存
-========================================================= */
-
-function save(){
-
-state.lastUpdate=
-Date.now();
-
-localStorage.setItem(
-STORAGE_KEY,
-JSON.stringify(state)
-);
-
-}
-
-
-/* =========================================================
-   載入
-========================================================= */
-
-function load(){
-
-try{
-
-const raw=
-localStorage.getItem(
-STORAGE_KEY
-);
-
-if(!raw)return;
-
-const data=
-JSON.parse(raw);
-
-state={
-...state,
-...data
+let account = {
+  balance:1000000,
+  realized:0,
+  position:null,
+  orders:[],
+  trades:[],
+  monthly:[]
 };
 
-}catch(e){
+let initializedPrice = false;
 
-console.log(e);
 
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+function loadAccount(){
+
+  try{
+
+    const raw = localStorage.getItem(STORAGE_KEY);
+
+    if(raw){
+
+      const saved = JSON.parse(raw);
+
+      account = Object.assign(account,saved);
+
+    }
+
+  }catch(e){
+
+    console.log(e);
+
+  }
+
+  renderAll();
 }
+
+
+function saveAccount(){
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(account)
+  );
 
 }
 
 
 /* =========================================================
-   行情顯示
+   TOAST
+========================================================= */
+
+function toast(message){
+
+  const el = document.getElementById("toast");
+
+  el.innerText = message;
+
+  el.style.display = "block";
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer = setTimeout(()=>{
+
+    el.style.display = "none";
+
+  },2600);
+
+}
+
+
+/* =========================================================
+   TAB
+========================================================= */
+
+function showSection(name,button){
+
+  document.querySelectorAll(".section")
+    .forEach(x=>x.classList.remove("active"));
+
+  document.getElementById("section-"+name)
+    .classList.add("active");
+
+  document.querySelectorAll(".tab")
+    .forEach(x=>x.classList.remove("active"));
+
+  button.classList.add("active");
+
+  renderAll();
+
+}
+
+
+/* =========================================================
+   QTY
+========================================================= */
+
+function changeQty(delta){
+
+  const input = document.getElementById("qty");
+
+  let value = parseInt(input.value || "1",10);
+
+  value += delta;
+
+  if(value < 1) value = 1;
+
+  input.value = value;
+
+}
+
+
+/* =========================================================
+   PRICE FORMAT
+========================================================= */
+
+function fmt(value){
+
+  if(value === null || value === undefined || value === "" || isNaN(value)){
+    return "--";
+  }
+
+  return Number(value).toLocaleString("zh-TW",{
+    maximumFractionDigits:0
+  });
+
+}
+
+
+function money(value){
+
+  const n = Number(value || 0);
+
+  return n.toLocaleString("zh-TW",{
+    maximumFractionDigits:0
+  });
+
+}
+
+
+/* =========================================================
+   MARKET UI
 ========================================================= */
 
 function renderMarket(){
 
-$("price")
-.textContent=
-price(state.price);
+  const price = document.getElementById("price");
+  const change = document.getElementById("change");
 
+  if(market.last == null){
 
-$("last")
-.textContent=
-price(state.price);
+    price.innerText = "--";
 
+    change.innerText = "-- 點　--%";
 
-$("bid")
-.textContent=
-state.bid
-?
-price(state.bid)
-:
-"--";
+  }else{
 
+    price.innerText = fmt(market.last);
 
-$("ask")
-.textContent=
-state.ask
-?
-price(state.ask)
-:
-"--";
+    const diff = Number(market.change || 0);
 
+    const pct = Number(market.changePct || 0);
 
-$("open")
-.textContent=
-state.open
-?
-price(state.open)
-:
-"--";
+    change.innerText =
+      (diff > 0 ? "+" : "") +
+      fmt(diff) +
+      " 點　" +
+      (pct > 0 ? "+" : "") +
+      pct.toFixed(2) +
+      "%";
 
+    change.className =
+      "change " +
+      (diff > 0 ? "up" : diff < 0 ? "down" : "flat");
 
-$("high")
-.textContent=
-state.high
-?
-price(state.high)
-:
-"--";
+  }
 
-
-$("low")
-.textContent=
-state.low
-?
-price(state.low)
-:
-"--";
-
-
-$("volume")
-.textContent=
-state.volume
-?
-money(state.volume)
-:
-"--";
-
-
-const diff=
-state.price-
-state.prev;
-
-
-const percent=
-state.prev
-?
-(diff/state.prev)*100
-:
-0;
-
-
-const change=
-$("change");
-
-
-change.textContent=
-(
-diff>=0
-?
-"+"
-:
-""
-)+
-price(diff)+
-" 點　"+
-(
-percent>=0
-?
-"+"
-:
-""
-)+
-percent.toFixed(2)+
-"%";
-
-
-change.className=
-"change "+
-(
-diff>=0
-?
-"greenText"
-:
-"redText"
-);
+  document.getElementById("mLast").innerText = fmt(market.last);
+  document.getElementById("mBid").innerText = fmt(market.bid);
+  document.getElementById("mAsk").innerText = fmt(market.ask);
+  document.getElementById("mOpen").innerText = fmt(market.open);
+  document.getElementById("mHigh").innerText = fmt(market.high);
+  document.getElementById("mLow").innerText = fmt(market.low);
 
 }
 
 
 /* =========================================================
-   模擬行情
+   STATUS
 ========================================================= */
 
-function startDemo(){
+function setStatus(text,type=""){
 
-if(demoTimer){
+  const el = document.getElementById("status");
 
-clearInterval(
-demoTimer
-);
+  el.className = "status " + type;
 
-}
-
-
-state.demo=true;
-
-
-if(!state.open){
-
-state.open=
-state.price;
-
-}
-
-
-if(!state.high){
-
-state.high=
-state.price;
-
-}
-
-
-if(!state.low){
-
-state.low=
-state.price;
-
-}
-
-
-state.bid=
-state.price-1;
-
-state.ask=
-state.price+1;
-
-
-demoTimer=
-setInterval(
-demoTick,
-1000
-);
-
-
-setConnectionDemo();
-
-save();
-
-render();
-
-}
-
-
-function setConnectionDemo(){
-
-$("status")
-.className=
-"status";
-
-$("status")
-.textContent=
-"🟡 練習行情運行中（非真實行情）";
-
-}
-
-
-function demoTick(){
-
-if(!state.demo)return;
-
-
-const old=
-state.price;
-
-
-let step=
-Math.floor(
-Math.random()*11
-)+1;
-
-
-if(
-Math.random()<0.5
-){
-
-step=
--step;
-
-}
-
-
-state.prev=
-old;
-
-
-state.price=
-Math.max(
-1000,
-old+step
-);
-
-
-state.bid=
-state.price-1;
-
-state.ask=
-state.price+1;
-
-
-state.high=
-Math.max(
-state.high||state.price,
-state.price
-);
-
-
-state.low=
-Math.min(
-state.low||state.price,
-state.price
-);
-
-
-state.volume+=
-Math.floor(
-Math.random()*5
-)+1;
-
-
-checkPendingOrders();
-
-checkStops();
-
-save();
-
-render();
+  el.innerText = text;
 
 }
 
 
 /* =========================================================
-   真實行情接入口
-=========================================================
-
-   合法 WebSocket 收到行情後，
-   將資料送入：
-
-   receiveRealQuote({
-      last:45814,
-      bid:45813,
-      ask:45815,
-      open:45800,
-      high:46142,
-      low:45772,
-      volume:12345,
-      prev:45790
-   });
-
+   REAL TAIFEX QUOTE
 ========================================================= */
 
-window.receiveRealQuote=
-function(q){
+async function fetchTaifexQuote(){
 
-const last=
-Number(q.last);
+  const url =
+    "https://mis.taifex.com.tw/futures/api/getQuoteList";
+
+  const payload = {
+
+    MarketType:"0",
+
+    SymbolType:"F",
+
+    KindID:"1",
+
+    CID:"TXF",
+
+    ExpireMonth:"",
+
+    RowSize:"全部",
+
+    PageNo:"",
+
+    SortColumn:"",
+
+    AscDesc:"A"
+
+  };
 
 
-if(
-!Number.isFinite(last)||
-last<=0
-){
+  try{
 
-return;
+    const response = await fetch(url,{
+
+      method:"POST",
+
+      headers:{
+        "Content-Type":"application/json",
+        "Accept":"application/json"
+      },
+
+      body:JSON.stringify(payload),
+
+      cache:"no-store"
+
+    });
+
+
+    if(!response.ok){
+
+      throw new Error("HTTP "+response.status);
+
+    }
+
+
+    const data = await response.json();
+
+    const list =
+      data &&
+      data.RtData &&
+      data.RtData.QuoteList
+        ? data.RtData.QuoteList
+        : [];
+
+
+    if(!Array.isArray(list) || list.length===0){
+
+      throw new Error("沒有取得行情");
+
+    }
+
+
+    /*
+      優先找 TXF / 臺股期貨
+    */
+
+    let q =
+      list.find(x =>
+        String(x.CID || "").toUpperCase()==="TXF"
+      );
+
+
+    if(!q){
+
+      q =
+        list.find(x =>
+          String(x.DispCName || "").includes("臺股期貨")
+        );
+
+    }
+
+
+    if(!q){
+
+      q = list[0];
+
+    }
+
+
+    const last = num(
+      q.CLastPrice
+    );
+
+    if(last == null){
+
+      throw new Error("最新成交價不存在");
+
+    }
+
+
+    market.last = last;
+    market.bid = num(q.CBidPrice1);
+    market.ask = num(q.CAskPrice1);
+    market.open = num(q.COpenPrice);
+    market.high = num(q.CHighPrice);
+    market.low = num(q.CLowPrice);
+    market.change = num(q.CDiff);
+    market.changePct = num(q.CAmpRate);
+    market.time = q.CTime || "";
+    market.expireMonth = q.ExpireMonth || "";
+    market.contract = "TXF";
+    market.connected = true;
+
+
+    /*
+      只有第一次沒有委託價時才帶入一次。
+      之後絕對不跟著行情跳。
+    */
+
+    if(!initializedPrice){
+
+      const input =
+        document.getElementById("orderPrice");
+
+      if(
+        input &&
+        (!input.value || input.value==="")
+      ){
+
+        input.value = Math.round(last);
+
+      }
+
+      initializedPrice = true;
+
+    }
+
+
+    setStatus(
+      "🟢 已連線｜臺指期真實行情 " +
+      (market.time ? market.time : ""),
+      "real"
+    );
+
+
+    renderMarket();
+
+    checkPendingOrders();
+
+    checkAutoSLTP();
+
+    renderPosition();
+
+    return true;
+
+  }catch(error){
+
+    console.log("TAIFEX quote error:",error);
+
+    market.connected = false;
+
+    setStatus(
+      "🔴 暫時無法連線臺指期即時行情｜不使用亂數行情",
+      "error"
+    );
+
+    renderMarket();
+
+    return false;
+
+  }
 
 }
 
 
-state.demo=false;
+function num(v){
 
+  if(v === null || v === undefined || v === ""){
 
-if(demoTimer){
+    return null;
 
-clearInterval(
-demoTimer
-);
+  }
 
-demoTimer=null;
+  const n =
+    Number(
+      String(v)
+        .replace(/,/g,"")
+        .replace(/▲/g,"")
+        .replace(/▼/g,"")
+    );
+
+  return Number.isFinite(n) ? n : null;
 
 }
-
-
-state.prev=
-Number(q.prev)||
-state.price;
-
-
-state.price=
-last;
-
-
-state.bid=
-Number(q.bid)||
-last;
-
-
-state.ask=
-Number(q.ask)||
-last;
-
-
-state.open=
-Number(q.open)||
-state.open||
-last;
-
-
-state.high=
-Number(q.high)||
-state.high||
-last;
-
-
-state.low=
-Number(q.low)||
-state.low||
-last;
-
-
-state.volume=
-Number(q.volume)||
-state.volume||
-0;
-
-
-$("status")
-.className=
-"status live";
-
-
-$("status")
-textContent=
-"🟢 真實行情已連線｜"+
-timeNow();
-
-
-checkPendingOrders();
-
-checkStops();
-
-save();
-
-render();
-
-};
 
 
 /* =========================================================
-   限價單判斷
+   PLACE ORDER
 ========================================================= */
 
-function canFillOpen(order){
+function placeOrder(side,type){
 
-if(
-order.action===
-"買多"
-){
+  const qty =
+    parseInt(
+      document.getElementById("qty").value || "1",
+      10
+    );
 
-return (
-state.price<=order.price
-||
-(
-state.ask&&
-state.ask<=order.price
-)
-);
+  if(!Number.isFinite(qty) || qty < 1){
 
-}
+    toast("請輸入口數");
+
+    return;
+
+  }
 
 
-if(
-order.action===
-"買空"
-){
+  if(market.last == null){
 
-return (
-state.price>=order.price
-||
-(
-state.bid&&
-state.bid>=order.price
-)
-);
+    toast("目前沒有即時行情，無法成交");
 
-}
+    return;
+
+  }
 
 
-return false;
+  /*
+    如果已有部位
+    不允許用一般進場按鈕反向亂開
+  */
+
+  if(account.position){
+
+    if(account.position.side !== side){
+
+      toast("目前已有相反方向部位，請先平倉");
+
+      return;
+
+    }
+
+    toast("已有同方向部位，請使用「加碼」");
+
+    return;
+
+  }
+
+
+  if(type === "market"){
+
+    const price = market.last;
+
+    executeEntry(side,price,qty,"現價");
+
+    return;
+
+  }
+
+
+  const price =
+    num(
+      document.getElementById("orderPrice").value
+    );
+
+
+  if(price == null){
+
+    toast("請手動輸入委託價格");
+
+    return;
+
+  }
+
+
+  const order = {
+
+    id:Date.now()+Math.random(),
+
+    time:new Date().toLocaleTimeString("zh-TW",{
+      hour12:false
+    }),
+
+    side,
+
+    type:"限價",
+
+    price,
+
+    qty,
+
+    status:"pending"
+
+  };
+
+
+  account.orders.unshift(order);
+
+  saveAccount();
+
+  renderAll();
+
+  toast(
+    (side==="long" ? "買多" : "買空") +
+    " 限價委託已送出｜"+
+    fmt(price)
+  );
+
+
+  checkPendingOrders();
 
 }
 
 
 /* =========================================================
-   平倉限價判斷
+   ADD POSITION
 ========================================================= */
 
-function canFillClose(order){
+function addPosition(side){
 
-if(
-order.action===
-"平多"
-){
+  if(!account.position){
 
-return (
-state.price>=order.price
-||
-(
-state.bid&&
-state.bid>=order.price
-)
-);
+    toast("目前沒有倉位，請先進場");
 
-}
+    return;
+
+  }
 
 
-if(
-order.action===
-"平空"
-){
+  if(account.position.side !== side){
 
-return (
-state.price<=order.price
-||
-(
-state.ask&&
-state.ask<=order.price
-)
-);
+    toast("已有相反方向部位，不能直接加碼");
 
-}
+    return;
+
+  }
 
 
-return false;
+  const qty =
+    parseInt(
+      document.getElementById("qty").value || "1",
+      10
+    );
+
+
+  if(!Number.isFinite(qty) || qty<1){
+
+    toast("請輸入口數");
+
+    return;
+
+  }
+
+
+  if(market.last == null){
+
+    toast("目前沒有即時行情");
+
+    return;
+
+  }
+
+
+  /*
+    加碼使用目前行情立即成交
+  */
+
+  const price = market.last;
+
+  addToPosition(side,price,qty);
 
 }
 
 
 /* =========================================================
-   建立委託
+   EXECUTE ENTRY
 ========================================================= */
 
-function createOrder(
-action,
-type,
-priceValue,
-qty
-){
+function executeEntry(side,price,qty,type){
 
-return {
+  price = Number(price);
 
-id:
-String(Date.now())+
-Math.random()
-.toString(16)
-.slice(2),
+  qty = Number(qty);
 
-time:
-timeNow(),
 
-action:
-action,
+  if(!price || !qty){
 
-type:
-type,
+    return;
 
-price:
-priceValue,
+  }
 
-qty:
-qty,
 
-status:
-"待成交"
+  account.position = {
 
-};
+    side,
+
+    qty,
+
+    avgPrice:price,
+
+    openedAt:new Date().toLocaleTimeString("zh-TW",{
+      hour12:false
+    })
+
+  };
+
+
+  const trade = {
+
+    time:new Date().toLocaleTimeString("zh-TW",{
+      hour12:false
+    }),
+
+    side,
+
+    type,
+
+    price,
+
+    qty,
+
+    pnl:0
+
+  };
+
+
+  account.trades.unshift(trade);
+
+  saveAccount();
+
+  renderAll();
+
+
+  toast(
+    "✅ " +
+    (side==="long" ? "買多" : "買空") +
+    " 成交｜" +
+    fmt(price) +
+    "｜" +
+    qty +
+    "口"
+  );
 
 }
 
 
 /* =========================================================
-   買多
+   ADD TO POSITION
 ========================================================= */
 
-function buyLong(){
+function addToPosition(side,price,qty){
 
-if(state.position){
+  const p = account.position;
 
-alert(
-"目前已有部位，請先平倉。"
-);
+  const totalQty =
+    p.qty + qty;
 
-return;
-
-}
-
-
-const qty=
-Math.max(
-1,
-Math.floor(
-Number($("qty").value)||1
-)
-);
+  const newAvg =
+    (
+      p.avgPrice * p.qty +
+      price * qty
+    ) / totalQty;
 
 
-let orderPrice=
-Number(
-$("limitPrice").value
-);
+  p.avgPrice = newAvg;
+
+  p.qty = totalQty;
 
 
-if(
-!Number.isFinite(orderPrice)
-){
+  account.trades.unshift({
 
-orderPrice=
-state.price;
+    time:new Date().toLocaleTimeString("zh-TW",{
+      hour12:false
+    }),
 
-}
+    side,
 
+    type:"加碼",
 
-const type=
-$("orderType").value;
+    price,
 
+    qty,
 
-if(type==="market"){
+    pnl:0
 
-orderPrice=
-state.ask||
-state.price;
-
-}
+  });
 
 
-const order=
-createOrder(
-"買多",
-type,
-orderPrice,
-qty
-);
+  saveAccount();
+
+  renderAll();
 
 
-state.orders.unshift(
-order
-);
-
-
-if(
-type==="market"
-){
-
-fillOpen(
-order
-);
-
-}else{
-
-if(
-canFillOpen(order)
-){
-
-fillOpen(
-order
-);
-
-}else{
-
-save();
-
-render();
-
-showToast(
-"📋 買多限價單已掛出"
-);
-
-}
-
-}
+  toast(
+    "✅ 加碼成交｜" +
+    (side==="long" ? "多單" : "空單") +
+    " +" +
+    qty +
+    "口｜均價 " +
+    fmt(newAvg)
+  );
 
 }
 
 
 /* =========================================================
-   買空
-========================================================= */
-
-function buyShort(){
-
-if(state.position){
-
-alert(
-"目前已有部位，請先平倉。"
-);
-
-return;
-
-}
-
-
-const qty=
-Math.max(
-1,
-Math.floor(
-Number($("qty").value)||1
-)
-);
-
-
-let orderPrice=
-Number(
-$("limitPrice").value
-);
-
-
-if(
-!Number.isFinite(orderPrice)
-){
-
-orderPrice=
-state.price;
-
-}
-
-
-const type=
-$("orderType").value;
-
-
-if(type==="market"){
-
-orderPrice=
-state.bid||
-state.price;
-
-}
-
-
-const order=
-createOrder(
-"買空",
-type,
-orderPrice,
-qty
-);
-
-
-state.orders.unshift(
-order
-);
-
-
-if(
-type==="market"
-){
-
-fillOpen(
-order
-);
-
-}else{
-
-if(
-canFillOpen(order)
-){
-
-fillOpen(
-order
-);
-
-}else{
-
-save();
-
-render();
-
-showToast(
-"📋 買空限價單已掛出"
-);
-
-}
-
-}
-
-}
-
-
-/* =========================================================
-   成交開倉
-========================================================= */
-
-function fillOpen(order){
-
-if(
-state.position
-){
-
-return;
-
-}
-
-
-order.status=
-"已成交";
-
-
-state.position={
-
-side:
-order.action==="買多"
-?
-"LONG"
-:
-"SHORT",
-
-entry:
-order.price,
-
-qty:
-order.qty,
-
-time:
-order.time
-
-};
-
-
-state.fills.unshift({
-
-id:
-Date.now(),
-
-time:
-timeNow(),
-
-action:
-order.action,
-
-price:
-order.price,
-
-qty:
-order.qty
-
-});
-
-
-save();
-
-render();
-
-showToast(
-"✅ "+
-order.action+
-" 成交 "+
-price(order.price)
-);
-
-}
-
-
-/* =========================================================
-   平多
-========================================================= */
-
-function closeLong(){
-
-if(
-!state.position||
-state.position.side!=="LONG"
-){
-
-alert(
-"目前沒有多單。"
-);
-
-return;
-
-}
-
-
-closePosition(
-"LONG"
-);
-
-}
-
-
-/* =========================================================
-   平空
-========================================================= */
-
-function closeShort(){
-
-if(
-!state.position||
-state.position.side!=="SHORT"
-){
-
-alert(
-"目前沒有空單。"
-);
-
-return;
-
-}
-
-
-closePosition(
-"SHORT"
-);
-
-}
-
-
-/* =========================================================
-   平倉
-========================================================= */
-
-function closePosition(side){
-
-const type=
-$("orderType").value;
-
-
-let orderPrice=
-Number(
-$("limitPrice").value
-);
-
-
-if(
-!Number.isFinite(orderPrice)
-){
-
-orderPrice=
-state.price;
-
-}
-
-
-if(type==="market"){
-
-orderPrice=
-side==="LONG"
-?
-state.bid||
-state.price
-:
-state.ask||
-state.price;
-
-}
-
-
-const action=
-side==="LONG"
-?
-"平多"
-:
-"平空";
-
-
-const order=
-createOrder(
-action,
-type,
-orderPrice,
-state.position.qty
-);
-
-
-state.orders.unshift(
-order
-);
-
-
-if(type==="market"){
-
-fillClose(
-order
-);
-
-}else{
-
-if(
-canFillClose(order)
-){
-
-fillClose(
-order
-);
-
-}else{
-
-save();
-
-render();
-
-showToast(
-"📋 平倉限價單已掛出"
-);
-
-}
-
-}
-
-}
-
-
-/* =========================================================
-   成交平倉
-========================================================= */
-
-function fillClose(order){
-
-if(
-!state.position
-){
-
-return;
-
-}
-
-
-order.status=
-"已成交";
-
-
-const p=
-state.position;
-
-
-let pnl=0;
-
-
-if(
-p.side==="LONG"
-){
-
-pnl=
-(
-order.price-
-p.entry
-)*
-p.qty*
-50;
-
-}else{
-
-pnl=
-(
-p.entry-
-order.price
-)*
-p.qty*
-50;
-
-}
-
-
-state.realized+=
-pnl;
-
-
-state.cash+=
-pnl;
-
-
-state.fills.unshift({
-
-id:
-Date.now(),
-
-time:
-timeNow(),
-
-action:
-order.action,
-
-price:
-order.price,
-
-qty:
-order.qty,
-
-pnl:
-pnl
-
-});
-
-
-state.position=null;
-
-
-save();
-
-render();
-
-showToast(
-"✅ "+
-order.action+
-" 成交｜損益 "+
-(
-pnl>=0
-?
-"+"
-:
-""
-)+
-money(pnl)+
-" 元"
-);
-
-}
-
-
-/* =========================================================
-   掃描待成交委託
+   CHECK LIMIT ORDERS
 ========================================================= */
 
 function checkPendingOrders(){
 
-const pending=
-[
-...state.orders
-]
-.filter(
-x=>x.status==="待成交"
-);
+  if(market.last == null){
+
+    return;
+
+  }
 
 
-pending.forEach(
-order=>{
+  account.orders.forEach(order=>{
 
-if(
-order.action==="買多"||
-order.action==="買空"
-){
+    if(order.status !== "pending"){
 
-if(
-!state.position&&
-canFillOpen(order)
-){
+      return;
 
-fillOpen(order);
-
-}
-
-}
+    }
 
 
-if(
-order.action==="平多"||
-order.action==="平空"
-){
+    /*
+      已有倉位時
+      限價單同方向可視為加碼。
+    */
 
-if(
-state.position&&
-canFillClose(order)
-){
+    if(order.side==="long"){
 
-fillClose(order);
+      if(market.last <= order.price){
 
-}
+        order.status="filled";
 
-}
+        if(!account.position){
 
-}
-);
+          executeEntry(
+            "long",
+            order.price,
+            order.qty,
+            "限價"
+          );
+
+        }else if(account.position.side==="long"){
+
+          addToPosition(
+            "long",
+            order.price,
+            order.qty
+          );
+
+        }else{
+
+          order.status="cancelled";
+
+        }
+
+      }
+
+    }
+
+
+    if(order.side==="short"){
+
+      if(market.last >= order.price){
+
+        order.status="filled";
+
+        if(!account.position){
+
+          executeEntry(
+            "short",
+            order.price,
+            order.qty,
+            "限價"
+          );
+
+        }else if(account.position.side==="short"){
+
+          addToPosition(
+            "short",
+            order.price,
+            order.qty
+          );
+
+        }else{
+
+          order.status="cancelled";
+
+        }
+
+      }
+
+    }
+
+  });
+
+
+  saveAccount();
+
+  renderAll();
 
 }
 
 
 /* =========================================================
-   撤單
+   CLOSE POSITION
+========================================================= */
+
+function closePosition(){
+
+  if(!account.position){
+
+    toast("目前沒有部位");
+
+    return;
+
+  }
+
+
+  if(market.last == null){
+
+    toast("目前沒有行情");
+
+    return;
+
+  }
+
+
+  const p = account.position;
+
+  const exitPrice = market.last;
+
+  let pnl = 0;
+
+
+  if(p.side==="long"){
+
+    pnl =
+      (exitPrice - p.avgPrice) *
+      50 *
+      p.qty;
+
+  }else{
+
+    pnl =
+      (p.avgPrice - exitPrice) *
+      50 *
+      p.qty;
+
+  }
+
+
+  account.realized += pnl;
+
+  account.balance += pnl;
+
+
+  account.trades.unshift({
+
+    time:new Date().toLocaleTimeString("zh-TW",{
+      hour12:false
+    }),
+
+    side:p.side==="long" ? "平多" : "平空",
+
+    type:"平倉",
+
+    price:exitPrice,
+
+    qty:p.qty,
+
+    pnl
+
+  });
+
+
+  account.position = null;
+
+  saveAccount();
+
+  renderAll();
+
+
+  toast(
+    "✅ 平倉完成｜損益 " +
+    (pnl>=0 ? "+" : "") +
+    money(pnl) +
+    " 元"
+  );
+
+}
+
+
+/* =========================================================
+   CANCEL ORDER
 ========================================================= */
 
 function cancelOrder(id){
 
-const order=
-state.orders.find(
-x=>x.id===id
-);
+  const order =
+    account.orders.find(x=>x.id===id);
+
+  if(!order){
+
+    return;
+
+  }
 
 
-if(
-!order||
-order.status!=="待成交"
-){
+  if(order.status !== "pending"){
 
-return;
+    return;
 
-}
+  }
 
 
-order.status=
-"已撤銷";
+  order.status="cancelled";
 
+  saveAccount();
 
-save();
+  renderAll();
 
-render();
-
-showToast(
-"❌ 委託已撤銷"
-);
+  toast("委託已撤單");
 
 }
 
 
 /* =========================================================
-   停利停損
+   UNREALIZED PNL
 ========================================================= */
 
-function checkStops(){
+function getUnrealized(){
 
-if(
-!state.position||
-!state.autoExit
-){
+  if(
+    !account.position ||
+    market.last == null
+  ){
 
-return;
+    return 0;
 
-}
-
-
-const p=
-state.position;
+  }
 
 
-let move=0;
+  const p = account.position;
 
 
-if(
-p.side==="LONG"
-){
+  if(p.side==="long"){
 
-move=
-state.price-
-p.entry;
+    return (
+      market.last -
+      p.avgPrice
+    ) * 50 * p.qty;
 
-}else{
-
-move=
-p.entry-
-state.price;
-
-}
+  }
 
 
-const tp=
-Math.max(
-0,
-Number(state.tp)||0
-);
-
-
-const sl=
-Math.max(
-0,
-Number(state.sl)||0
-);
-
-
-if(
-tp>0&&
-move>=tp
-){
-
-closePosition(
-p.side
-);
-
-return;
-
-}
-
-
-if(
-sl>0&&
-move<=-sl
-){
-
-closePosition(
-p.side
-);
-
-return;
-
-}
+  return (
+    p.avgPrice -
+    market.last
+  ) * 50 * p.qty;
 
 }
 
 
 /* =========================================================
-   部位顯示
+   POSITION UI
 ========================================================= */
 
 function renderPosition(){
 
-const boxes=[
-$("quickPosition"),
-$("positionList")
-];
+  const area =
+    document.getElementById("positionArea");
+
+  if(!account.position){
+
+    area.innerHTML = `
+      <div class="position-empty">
+        目前沒有期貨部位
+      </div>
+    `;
+
+    return;
+
+  }
 
 
-if(
-!state.position
-){
+  const p = account.position;
 
-boxes.forEach(
-box=>{
-
-box.innerHTML=
-`
-<div class="empty">
-目前沒有部位
-</div>
-`;
-
-}
-);
-
-return;
-
-}
+  const pnl = getUnrealized();
 
 
-const p=
-state.position;
+  area.innerHTML = `
 
+    <div class="position-box">
 
-let floating=0;
+      <div class="position-title">
 
+        <div class="position-side ${p.side}">
+          ${p.side==="long" ? "🟢 多單" : "🔴 空單"}
+        </div>
 
-if(
-p.side==="LONG"
-){
+        <div>
+          ${p.qty} 口
+        </div>
 
-floating=
-(
-state.price-
-p.entry
-)*
-p.qty*
-50;
+      </div>
 
-}else{
+      <div class="position-grid">
 
-floating=
-(
-p.entry-
-state.price
-)*
-p.qty*
-50;
+        <div class="stat">
+          <div class="name">平均進場價</div>
+          <div class="value">
+            ${fmt(p.avgPrice)}
+          </div>
+        </div>
 
-}
+        <div class="stat">
+          <div class="name">目前價格</div>
+          <div class="value">
+            ${fmt(market.last)}
+          </div>
+        </div>
 
+        <div class="stat">
+          <div class="name">口數</div>
+          <div class="value">
+            ${p.qty}
+          </div>
+        </div>
 
-const html=
-`
+        <div class="stat">
+          <div class="name">浮動損益</div>
+          <div class="value ${pnl>=0 ? "pnl-positive" : "pnl-negative"}">
+            ${pnl>=0 ? "+" : ""}${money(pnl)} 元
+          </div>
+        </div>
 
-<div class="pos">
+      </div>
 
-<div class="orderHead">
+      <div class="order-grid" style="margin-top:15px;">
 
-<span>
-${
-p.side==="LONG"
-?
-"🟢 買多"
-:
-"🔴 買空"
-}
-${p.qty}口
-</span>
+        <button
+          class="order-btn close-long"
+          onclick="closePosition()">
+          ${p.side==="long" ? "平多" : "平空"}
+        </button>
 
-<span class="${
-floating>=0
-?
-"greenText"
-:
-"redText"
-}">
+        <button
+          class="order-btn add-long"
+          onclick="addPosition('${p.side}')">
+          ${p.side==="long" ? "加碼多" : "加碼空"}
+        </button>
 
-${
-floating>=0
-?
-"+"
-:
-""
-}
-${money(floating)}
-元
+      </div>
 
-</span>
+      <div class="info">
+        你目前可以繼續增加同方向口數。
+        <br>
+        加碼後系統會重新計算平均成本。
+      </div>
 
-</div>
-
-
-<div
-class="grid"
-style="margin-top:10px"
->
-
-<div class="stat">
-
-<span>
-進場價格
-</span>
-
-<b>
-${price(p.entry)}
-</b>
-
-</div>
-
-
-<div class="stat">
-
-<span>
-目前價格
-</span>
-
-<b>
-${price(state.price)}
-</b>
-
-</div>
-
-
-<div class="stat">
-
-<span>
-點數
-</span>
-
-<b>
-${
-floating/(50*p.qty)>=0
-?
-"+"
-:
-""
-}
-${Math.round(
-floating/(50*p.qty)
-)}
-</b>
-
-</div>
-
-
-<div class="stat">
-
-<span>
-每點
-</span>
-
-<b>
-50 元
-</b>
-
-</div>
-
-</div>
-
-</div>
-
-`;
-
-
-boxes.forEach(
-box=>{
-box.innerHTML=html;
-}
-);
+    </div>
+  `;
 
 }
 
 
 /* =========================================================
-   委託顯示
+   ORDERS TABLE
 ========================================================= */
 
 function renderOrders(){
 
-if(
-!state.orders.length
-){
+  const tbody =
+    document.getElementById("ordersTable");
 
-$("orderList")
-.innerHTML=
-`
-<div class="empty">
-目前沒有委託
-</div>
-`;
+  if(!account.orders.length){
 
-return;
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7">目前沒有委託</td>
+      </tr>
+    `;
 
-}
+    return;
 
-
-$("orderList")
-.innerHTML=
-state.orders
-.slice(0,50)
-.map(
-o=>`
-
-<div
-class="order ${
-o.status==="待成交"
-?
-"pending"
-:
-o.status==="已成交"
-?
-"done"
-:
-"cancelled"
-}"
->
-
-<div class="orderHead">
-
-<span>
-
-${o.action}
-
-｜
-${
-o.type==="limit"
-?
-"限價"
-:
-"市價"
-}
-
-</span>
+  }
 
 
-<span>
+  tbody.innerHTML =
+    account.orders.map(order=>{
 
-${o.status}
+      let statusClass="pending";
 
-</span>
+      if(order.status==="filled"){
+        statusClass="filled";
+      }
 
-</div>
-
-
-<div class="sub">
-
-時間：
-${o.time}
-
-｜
-口數：
-${o.qty}
-
-｜
-委託價：
-${price(o.price)}
-
-</div>
+      if(order.status==="cancelled"){
+        statusClass="cancelled";
+      }
 
 
-${
-o.status==="待成交"
-?
-`
+      return `
 
-<button
-class="btn gray"
-style="margin-top:9px"
-onclick="cancelOrder('${o.id}')"
->
+        <tr>
 
-❌ 撤銷委託
+          <td>${order.time}</td>
 
-</button>
+          <td class="${order.side==="long" ? "buy-text" : "sell-text"}">
+            ${order.side==="long" ? "買多" : "買空"}
+          </td>
 
-`
-:
-""
+          <td>${order.type}</td>
 
-}
+          <td>${fmt(order.price)}</td>
 
-</div>
+          <td>${order.qty}</td>
 
-`
-)
-.join("");
+          <td class="${statusClass}">
+            ${
+              order.status==="pending"
+              ? "等待成交"
+              : order.status==="filled"
+              ? "已成交"
+              : "已撤單"
+            }
+          </td>
+
+          <td>
+            ${
+              order.status==="pending"
+              ?
+              `<button class="cancel-btn"
+                 onclick="cancelOrder(${order.id})">
+                 撤單
+               </button>`
+              :
+              "-"
+            }
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join("");
 
 }
 
 
 /* =========================================================
-   成交顯示
+   TRADES TABLE
 ========================================================= */
 
-function renderFills(){
+function renderTrades(){
 
-if(
-!state.fills.length
-){
-
-$("fillList")
-.innerHTML=
-`
-<div class="empty">
-目前沒有成交
-</div>
-`;
-
-return;
-
-}
+  const tbody =
+    document.getElementById("tradesTable");
 
 
-$("fillList")
-.innerHTML=
-state.fills
-.slice(0,50)
-.map(
-f=>`
+  if(!account.trades.length){
 
-<div class="order done">
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">目前沒有成交紀錄</td>
+      </tr>
+    `;
 
-<div class="orderHead">
+    return;
 
-<span>
-${f.action}
-</span>
-
-<span>
-${price(f.price)}
-</span>
-
-</div>
+  }
 
 
-<div class="sub">
+  tbody.innerHTML =
+    account.trades.map(t=>`
 
-${f.time}
+      <tr>
 
-｜
-${f.qty}口
+        <td>${t.time}</td>
 
-</div>
+        <td class="${
+          t.side==="long" ||
+          t.side==="平空"
+          ? "buy-text"
+          : "sell-text"
+        }">
+          ${t.side==="long" ? "買多" :
+            t.side==="short" ? "買空" :
+            t.side}
+        </td>
 
+        <td>${t.type}</td>
 
-${
-f.pnl!==undefined
-?
-`
+        <td>${fmt(t.price)}</td>
 
-<div
-class="${
-f.pnl>=0
-?
-"greenText"
-:
-"redText"
-}"
-style="
-font-weight:900;
-margin-top:5px
-"
->
+        <td>${t.qty}</td>
 
-損益：
-${
-f.pnl>=0
-?
-"+"
-:
-""
-}
-${money(f.pnl)}
-元
+        <td class="${
+          Number(t.pnl||0)>=0
+          ? "pnl-positive"
+          : "pnl-negative"
+        }">
+          ${
+            t.pnl
+            ? (t.pnl>=0 ? "+" : "") + money(t.pnl)
+            : "—"
+          }
+        </td>
 
-</div>
+      </tr>
 
-`
-:
-""
-
-}
-
-</div>
-
-`
-)
-.join("");
+    `).join("");
 
 }
 
 
 /* =========================================================
-   全畫面
+   SETTINGS
 ========================================================= */
 
-function render(){
+function renderSettings(){
 
-renderMarket();
-
-renderPosition();
-
-renderOrders();
-
-renderFills();
-
-$("capital")
-.value=
-state.initialCash;
+  const unrealized =
+    getUnrealized();
 
 
-$("qty")
-.value=
-state.qty;
+  document.getElementById("balance")
+    .innerText =
+      money(account.balance);
 
 
-$("limitPrice")
-.value=
-state.price;
+  document.getElementById("realized")
+    .innerText =
+      (account.realized>=0 ? "+" : "") +
+      money(account.realized);
 
 
-$("tp")
-.value=
-state.tp;
+  document.getElementById("unrealized")
+    .innerText =
+      (unrealized>=0 ? "+" : "") +
+      money(unrealized);
 
 
-$("sl")
-.value=
-state.sl;
-
-
-$("autoExit")
-.checked=
-state.autoExit;
-
-
-$("cash")
-.textContent=
-money(state.cash);
-
-
-$("realized")
-.textContent=
-(
-state.realized>=0
-?
-"+"
-:
-""
-)+
-money(state.realized);
+  document.getElementById("unrealized")
+    .className =
+      "value " +
+      (
+        unrealized>=0
+        ? "pnl-positive"
+        : "pnl-negative"
+      );
 
 }
 
 
 /* =========================================================
-   頁面切換
+   ADD LONG / SHORT BUTTON STATE
 ========================================================= */
 
-document
-.querySelectorAll(".tab")
-.forEach(
-tab=>{
+function renderAddButtons(){
 
-tab.onclick=
-function(){
+  const longBtn =
+    document.getElementById("addLongBtn");
 
-document
-.querySelectorAll(".tab")
-.forEach(
-x=>
-x.classList.remove(
-"active"
-)
-);
+  const shortBtn =
+    document.getElementById("addShortBtn");
 
 
-this.classList.add(
-"active"
-);
+  if(!account.position){
+
+    longBtn.classList.add("disabled");
+    shortBtn.classList.add("disabled");
+
+    return;
+
+  }
 
 
-document
-.querySelectorAll(".section")
-.forEach(
-x=>
-x.classList.remove(
-"active"
-)
-);
+  if(account.position.side==="long"){
 
+    longBtn.classList.remove("disabled");
+    shortBtn.classList.add("disabled");
 
-const page=
-document.getElementById(
-this.dataset.target
-);
+  }else{
 
+    shortBtn.classList.remove("disabled");
+    longBtn.classList.add("disabled");
 
-if(page){
-
-page.classList.add(
-"active"
-);
+  }
 
 }
 
 
-window.scrollTo({
-top:0,
-behavior:"smooth"
-});
-
-};
-
-}
-);
-
-
 /* =========================================================
-   下單方式
+   RENDER ALL
 ========================================================= */
 
-$("orderType")
-.onchange=
-function(){
+function renderAll(){
 
-if(
-this.value==="limit"
-){
+  renderMarket();
 
-$("limitPrice")
-.value=
-state.price;
+  renderPosition();
 
-}
+  renderOrders();
 
-};
+  renderTrades();
 
+  renderSettings();
 
-/* =========================================================
-   口數
-========================================================= */
-
-$("qty")
-.onchange=
-function(){
-
-state.qty=
-Math.max(
-1,
-Math.floor(
-Number(
-this.value
-)||1
-)
-);
-
-save();
-
-};
-
-
-/* =========================================================
-   模擬金額
-========================================================= */
-
-$("capital")
-.onchange=
-function(){
-
-const value=
-Math.max(
-0,
-Number(
-this.value
-)||0
-);
-
-
-state.initialCash=
-value;
-
-
-state.cash=
-value+
-state.realized;
-
-
-save();
-
-render();
-
-};
-
-
-/* =========================================================
-   停利
-========================================================= */
-
-$("tp")
-.onchange=
-function(){
-
-state.tp=
-Math.max(
-0,
-Number(
-this.value
-)||0
-);
-
-save();
-
-};
-
-
-/* =========================================================
-   停損
-========================================================= */
-
-$("sl")
-.onchange=
-function(){
-
-state.sl=
-Math.max(
-0,
-Number(
-this.value
-)||0
-);
-
-save();
-
-};
-
-
-/* =========================================================
-   自動停利停損
-========================================================= */
-
-$("autoExit")
-.onchange=
-function(){
-
-state.autoExit=
-this.checked;
-
-save();
-
-};
-
-
-/* =========================================================
-   買多
-========================================================= */
-
-$("longBtn")
-.onclick=
-function(){
-
-buyLong();
-
-};
-
-
-/* =========================================================
-   買空
-========================================================= */
-
-$("shortBtn")
-.onclick=
-function(){
-
-buyShort();
-
-};
-
-
-/* =========================================================
-   平多
-========================================================= */
-
-$("closeLongBtn")
-.onclick=
-function(){
-
-closeLong();
-
-};
-
-
-/* =========================================================
-   平空
-========================================================= */
-
-$("closeShortBtn")
-.onclick=
-function(){
-
-closeShort();
-
-};
-
-
-/* =========================================================
-   重設帳戶
-========================================================= */
-
-$("resetAccount")
-.onclick=
-function(){
-
-if(
-!confirm(
-"確定要重設模擬帳戶嗎？"
-)
-){
-
-return;
+  renderAddButtons();
 
 }
 
 
-const capital=
-Math.max(
-0,
-Number(
-$("capital").value
-)||
-1000000
-);
+/* =========================================================
+   RESET
+========================================================= */
+
+function resetAccount(){
+
+  if(!confirm("確定要重設模擬帳戶嗎？")){
+
+    return;
+
+  }
 
 
-state.initialCash=
-capital;
+  account = {
+
+    balance:1000000,
+
+    realized:0,
+
+    position:null,
+
+    orders:[],
+
+    trades:[],
+
+    monthly:[]
+
+  };
 
 
-state.cash=
-capital;
+  saveAccount();
 
+  renderAll();
 
-state.realized=
-0;
+  toast("模擬帳戶已重設");
 
-
-state.position=
-null;
-
-
-state.orders=[];
-
-
-state.fills=[];
-
-
-save();
-
-render();
-
-showToast(
-"✅ 模擬帳戶已重設"
-);
-
-};
+}
 
 
 /* =========================================================
-   練習行情
+   AUTO STOP LOSS / TAKE PROFIT
 ========================================================= */
 
-$("demoStart")
-.onclick=
-function(){
+function checkAutoSLTP(){
 
-startDemo();
+  if(!document.getElementById("autoSLTP").checked){
 
-showToast(
-"🟡 練習行情已啟動"
-);
+    return;
 
-};
+  }
+
+
+  if(!account.position || market.last==null){
+
+    return;
+
+  }
+
+
+  const p = account.position;
+
+  const tp =
+    Number(
+      document.getElementById("takeProfit").value || 0
+    );
+
+  const sl =
+    Number(
+      document.getElementById("stopLoss").value || 0
+    );
+
+
+  if(tp>0){
+
+    if(
+      p.side==="long" &&
+      market.last >= p.avgPrice + tp
+    ){
+
+      toast("🎯 多單達到停利");
+
+      closePosition();
+
+      return;
+
+    }
+
+
+    if(
+      p.side==="short" &&
+      market.last <= p.avgPrice - tp
+    ){
+
+      toast("🎯 空單達到停利");
+
+      closePosition();
+
+      return;
+
+    }
+
+  }
+
+
+  if(sl>0){
+
+    if(
+      p.side==="long" &&
+      market.last <= p.avgPrice - sl
+    ){
+
+      toast("🛑 多單達到停損");
+
+      closePosition();
+
+      return;
+
+    }
+
+
+    if(
+      p.side==="short" &&
+      market.last >= p.avgPrice + sl
+    ){
+
+      toast("🛑 空單達到停損");
+
+      closePosition();
+
+      return;
+
+    }
+
+  }
+
+}
 
 
 /* =========================================================
-   關閉網頁保存
+   MONTHLY DATA
+   使用官方每日行情頁面做資料讀取的準備區。
+   若瀏覽器禁止跨來源讀取，這裡不會用亂數代替。
 ========================================================= */
 
-document.addEventListener(
-"visibilitychange",
-function(){
+async function loadMonthlyStats(){
 
-if(
-document.hidden
-){
+  /*
+    保留本月已取得的真實日資料。
+    不使用虛構數字。
+  */
 
-save();
+  const month =
+    new Date().getMonth()+1;
 
-}else{
+  const year =
+    new Date().getFullYear();
 
-load();
 
-render();
+  /*
+    目前頁面行情可直接使用即時資料。
+    歷史日資料若瀏覽器拒絕跨來源，
+    顯示尚未取得，不自行亂填。
+  */
+
+  document.getElementById("monthDays")
+    .innerText =
+      account.monthly.length || "--";
+
+
+  if(account.monthly.length){
+
+    const highs =
+      account.monthly
+        .map(x=>Number(x.high))
+        .filter(Number.isFinite);
+
+    const lows =
+      account.monthly
+        .map(x=>Number(x.low))
+        .filter(Number.isFinite);
+
+
+    if(highs.length){
+
+      const h =
+        Math.max(...highs);
+
+      document.getElementById("monthHigh")
+        .innerText=fmt(h);
+
+    }
+
+
+    if(lows.length){
+
+      const l =
+        Math.min(...lows);
+
+      document.getElementById("monthLow")
+        .innerText=fmt(l);
+
+    }
+
+
+    if(highs.length && lows.length){
+
+      document.getElementById("monthRange")
+        .innerText=
+          fmt(
+            Math.max(...highs) -
+            Math.min(...lows)
+          );
+
+    }
+
+
+    document.getElementById("monthTable")
+      .innerHTML =
+        account.monthly.map(x=>`
+
+          <tr>
+
+            <td>${x.date}</td>
+
+            <td>${fmt(x.high)}</td>
+
+            <td>${fmt(x.low)}</td>
+
+            <td>
+              <b>
+                ${fmt(
+                  Number(x.high)-Number(x.low)
+                )}
+              </b>
+            </td>
+
+          </tr>
+
+        `).join("");
+
+  }
 
 }
-
-}
-);
-
-
-window.addEventListener(
-"beforeunload",
-function(){
-
-save();
-
-}
-);
 
 
 /* =========================================================
-   初始化
+   KEEP QUOTE RUNNING
 ========================================================= */
 
-load();
+async function refreshQuote(){
 
-
-if(
-!state.open
-){
-
-state.open=
-state.price;
+  await fetchTaifexQuote();
 
 }
-
-
-if(
-!state.high
-){
-
-state.high=
-state.price;
-
-}
-
-
-if(
-!state.low
-){
-
-state.low=
-state.price;
-
-}
-
-
-render();
 
 
 /*
-  預設不自動啟動練習行情。
-
-  如果你要練習，
-  到「設定」按：
-  啟動練習行情
+  每 3 秒嘗試更新一次。
+  不使用亂數。
 */
 
+setInterval(()=>{
 
-/* =========================================================
-   真實行情標準入口
-=========================================================
+  refreshQuote();
 
-   真實行情服務取得資料後：
-
-   receiveRealQuote({
-
-      last:45814,
-
-      bid:45813,
-
-      ask:45815,
-
-      open:45800,
-
-      high:46142,
-
-      low:45772,
-
-      volume:12345,
-
-      prev:45790
-
-   });
-
-   就會：
-
-   1. 更新真實價格
-   2. 更新真實買價
-   3. 更新真實賣價
-   4. 更新真實開盤
-   5. 更新真實最高
-   6. 更新真實最低
-   7. 更新真實成交量
-   8. 掃描限價委託
-   9. 模擬成交
-   10. 計算虛擬損益
-
-========================================================= */
-
-window.receiveRealQuote=
-function(q){
-
-const last=
-Number(
-q.last
-);
-
-
-if(
-!Number.isFinite(last)||
-last<=0
-){
-
-return;
-
-}
-
-
-/* 停止練習行情 */
-
-state.demo=
-false;
-
-
-if(
-demoTimer
-){
-
-clearInterval(
-demoTimer
-);
-
-demoTimer=
-null;
-
-}
-
-
-/* 真實行情 */
-
-state.prev=
-Number(
-q.prev
-)||
-state.price;
-
-
-state.price=
-last;
-
-
-state.bid=
-Number(
-q.bid
-)||
-last;
-
-
-state.ask=
-Number(
-q.ask
-)||
-last;
-
-
-state.open=
-Number(
-q.open
-)||
-state.open||
-last;
-
-
-state.high=
-Number(
-q.high
-)||
-state.high||
-last;
-
-
-state.low=
-Number(
-q.low
-)||
-state.low||
-last;
-
-
-state.volume=
-Number(
-q.volume
-)||
-state.volume||
-0;
-
-
-/* 真實連線顯示 */
-
-$("status")
-.className=
-"status live";
-
-
-$("status")
-.textContent=
-"🟢 真實行情已連線｜"+
-timeNow();
-
-
-/* 掃描限價單 */
-
-checkPendingOrders();
-
-
-/* 停利停損 */
-
-checkStops();
-
-
-save();
-
-render();
-
-};
+},3000);
 
 
 /* =========================================================
-   初始化完成
+   INIT
 ========================================================= */
 
-console.log(
-"台指期限價模擬交易已啟動"
-);
+document.addEventListener("DOMContentLoaded",()=>{
 
+  loadAccount();
+
+  /*
+    委託價格只在第一次行情成功時填一次。
+    後面完全不自動改。
+  */
+
+  refreshQuote();
+
+  loadMonthlyStats();
+
+
+  /*
+    使用者手動切換限價／現價時，
+    不改委託價格。
+  */
+
+  document
+    .getElementById("orderMode")
+    .addEventListener("change",function(){
+
+      if(this.value==="market"){
+
+        document.getElementById("orderPrice")
+          .style.opacity=".45";
+
+      }else{
+
+        document.getElementById("orderPrice")
+          .style.opacity="1";
+
+      }
+
+    });
+
+
+  /*
+    離開頁面前儲存
+  */
+
+  window.addEventListener("beforeunload",()=>{
+
+    saveAccount();
+
+  });
+
+});
 </script>
 
 </body>
