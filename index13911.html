@@ -3,10 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#111315">
-<title>台指期｜真實行情＋虛擬限價交易</title>
+<meta name="theme-color" content="#101113">
+<title>股票模擬器｜富貴角6號風格</title>
 
 <style>
+:root{
+  --bg:#101113;
+  --panel:#191b1f;
+  --panel2:#23252a;
+  --panel3:#2d3036;
+  --line:#464a52;
+  --text:#f5f5f5;
+  --muted:#aeb3bc;
+  --blue:#00a7df;
+  --blue2:#007fc1;
+  --orange:#ff9f00;
+  --green:#21e56b;
+  --red:#ff5364;
+  --yellow:#ffd84d;
+  --purple:#8f7cff;
+}
+
 *{
   box-sizing:border-box;
   -webkit-tap-highlight-color:transparent;
@@ -15,18 +32,20 @@
 html,body{
   margin:0;
   padding:0;
-  background:#0d0f11;
-  color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;
+  background:#090a0c;
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang TC","Noto Sans TC",Arial,sans-serif;
 }
 
 body{
   min-height:100vh;
-  padding-bottom:95px;
+  padding-bottom:78px;
 }
 
-button,input,select{
-  font-family:inherit;
+button,
+input,
+select{
+  font:inherit;
 }
 
 button{
@@ -34,540 +53,765 @@ button{
   cursor:pointer;
 }
 
-.container{
+.app{
   width:100%;
-  max-width:900px;
-  margin:0 auto;
-  padding:18px 16px 110px;
+  max-width:720px;
+  margin:auto;
+  min-height:100vh;
+  background:var(--bg);
+  overflow:hidden;
 }
 
-.header{
-  text-align:center;
-  padding:10px 0 12px;
+/* TOP */
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:#111214;
+  border-bottom:1px solid #34363b;
 }
 
-.title{
-  font-size:24px;
-  font-weight:700;
-  color:#b9bec4;
-  margin-bottom:8px;
-}
-
-.big-price{
-  font-size:76px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:-3px;
-  color:#48e44f;
-}
-
-.change{
-  margin-top:10px;
-  font-size:24px;
-  font-weight:700;
-}
-
-.up{
-  color:#48e44f;
-}
-
-.down{
-  color:#ff4c4c;
-}
-
-.flat{
-  color:#ddd;
-}
-
-.status{
-  margin:20px 0;
-  padding:15px 18px;
-  border-radius:20px;
-  background:#202428;
-  text-align:center;
-  font-size:21px;
-  color:#f3c546;
-  border:1px solid #30353a;
-}
-
-.status.real{
-  color:#4be85b;
-}
-
-.status.error{
-  color:#ff6868;
-}
-
-.reset-btn{
-  width:100%;
-  background:#3199d4;
-  color:#fff;
-  border-radius:20px;
-  padding:17px;
-  font-size:23px;
-  font-weight:800;
-  margin-bottom:18px;
-}
-
-.card{
-  background:#15181b;
-  border:1px solid #373d44;
-  border-radius:25px;
-  padding:20px;
-  margin-bottom:18px;
-  box-shadow:0 5px 20px rgba(0,0,0,.15);
-}
-
-.card h2{
-  margin:0 0 18px;
-  font-size:28px;
-}
-
-.sub{
-  color:#9ea4ab;
-  font-size:15px;
-  margin-bottom:8px;
-}
-
-.row{
+.top-main{
   display:flex;
-  gap:14px;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px 8px;
 }
 
-.col{
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(145deg,#16b9ef,#007dbd);
+  font-size:23px;
+  font-weight:900;
+}
+
+.title-wrap{
   flex:1;
   min-width:0;
 }
 
-label{
-  display:block;
-  color:#aeb4ba;
-  font-size:17px;
-  margin-bottom:8px;
+.title{
+  font-size:19px;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
-input,select{
-  width:100%;
-  background:#0b0d0f;
+.subtitle{
+  color:#8d939d;
+  font-size:11px;
+  margin-top:2px;
+}
+
+.icon-btn{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:#292b30;
   color:#fff;
-  border:2px solid #3b4148;
-  border-radius:15px;
-  padding:15px;
   font-size:20px;
+}
+
+.cash-bar{
+  padding:8px 14px 12px;
+  display:flex;
+  gap:8px;
+}
+
+.cash-box{
+  flex:1;
+  background:#1d2025;
+  border-radius:11px;
+  padding:7px 10px;
+  border:1px solid #30343a;
+}
+
+.cash-label{
+  color:#949aa3;
+  font-size:11px;
+}
+
+.cash-value{
+  font-size:16px;
+  font-weight:800;
+  margin-top:2px;
+}
+
+/* MAIN NAV */
+.main-tabs{
+  display:flex;
+  overflow-x:auto;
+  background:#24262c;
+  border-bottom:1px solid #41434a;
+  scrollbar-width:none;
+}
+
+.main-tabs::-webkit-scrollbar{
+  display:none;
+}
+
+.main-tab{
+  min-width:105px;
+  padding:13px 9px 11px;
+  text-align:center;
+  color:#bfc3ca;
+  font-size:15px;
+  white-space:nowrap;
+  border-bottom:3px solid transparent;
+}
+
+.main-tab.active{
+  color:#fff;
+  border-bottom-color:var(--orange);
+}
+
+/* PAGES */
+.page{
+  display:none;
+}
+
+.page.active{
+  display:block;
+}
+
+/* SEARCH */
+.search-area{
+  padding:14px;
+  background:#141518;
+}
+
+.search-row{
+  display:flex;
+  gap:8px;
+}
+
+.search-input{
+  flex:1;
+  min-width:0;
+  height:48px;
+  border-radius:12px;
+  border:1px solid #4a4e55;
+  background:#22252a;
+  color:#fff;
+  padding:0 14px;
   outline:none;
 }
 
-input:focus,select:focus{
-  border-color:#3ca7ff;
+.search-input:focus{
+  border-color:var(--blue);
 }
 
-.manual-note{
-  color:#ffbd35;
-  font-size:15px;
-  line-height:1.5;
-  margin-top:8px;
-}
-
-.qty-control{
-  display:flex;
-  height:56px;
-}
-
-.qty-control button{
-  width:56px;
-  background:#292d31;
-  color:#fff;
-  font-size:28px;
-}
-
-.qty-control input{
-  border-radius:0;
-  text-align:center;
-  border-left:0;
-  border-right:0;
-}
-
-.mode-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:15px;
-}
-
-.mode-card{
-  padding:15px;
-  border-radius:18px;
-  border:1px solid #3a4047;
-  background:#1e2226;
-}
-
-.mode-card strong{
-  display:block;
-  font-size:19px;
-  margin-bottom:6px;
-}
-
-.mode-card span{
-  color:#b4bac0;
-  font-size:14px;
-  line-height:1.5;
-}
-
-.order-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:14px;
-}
-
-.order-btn{
-  min-height:64px;
-  border-radius:17px;
-  color:#fff;
-  font-size:21px;
-  font-weight:800;
-}
-
-.buy-limit{
-  background:#078c3e;
-}
-
-.sell-limit{
-  background:#b52d32;
-}
-
-.buy-market{
-  background:#137bb8;
-}
-
-.sell-market{
-  background:#c77c08;
-}
-
-.add-long{
-  background:#66319b;
-}
-
-.add-short{
-  background:#8c5700;
-}
-
-.close-long{
-  background:#185d86;
-}
-
-.close-short{
-  background:#883238;
-}
-
-.disabled{
-  opacity:.35;
-}
-
-.full{
-  grid-column:1 / -1;
-}
-
-.info{
-  margin-top:16px;
-  background:#202429;
-  border-radius:17px;
-  padding:15px;
-  color:#c0c5ca;
-  font-size:15px;
-  line-height:1.7;
-}
-
-.position-box{
-  border-radius:20px;
-  background:#101214;
-  padding:18px;
-}
-
-.position-empty{
-  text-align:center;
-  color:#92989f;
-  padding:25px 0;
-  font-size:20px;
-}
-
-.position-title{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px;
-}
-
-.position-side{
-  font-size:26px;
+.primary{
+  height:48px;
+  padding:0 18px;
+  border-radius:12px;
+  background:linear-gradient(180deg,#ffad21,#f58c00);
+  color:#111;
   font-weight:900;
 }
 
-.position-side.long{
-  color:#4be85b;
-}
-
-.position-side.short{
-  color:#ff5555;
-}
-
-.position-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.stat{
-  background:#202428;
-  border-radius:15px;
-  padding:12px;
-}
-
-.stat .name{
-  color:#9fa5ab;
-  font-size:14px;
-}
-
-.stat .value{
-  font-size:21px;
-  font-weight:800;
-  margin-top:5px;
-}
-
-.pnl-positive{
-  color:#4be85b;
-}
-
-.pnl-negative{
-  color:#ff5555;
-}
-
-.table-wrap{
-  overflow-x:auto;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:600px;
-}
-
-th,td{
-  padding:12px 8px;
-  border-bottom:1px solid #30353a;
-  text-align:center;
-  white-space:nowrap;
-}
-
-th{
-  color:#aaa;
-  font-weight:600;
-}
-
-td{
-  color:#eee;
-}
-
-.buy-text{
-  color:#4be85b;
-}
-
-.sell-text{
-  color:#ff5555;
-}
-
-.pending{
-  color:#ffc247;
-}
-
-.filled{
-  color:#4be85b;
-}
-
-.cancelled{
-  color:#aaa;
-}
-
-.cancel-btn{
-  padding:8px 12px;
-  border-radius:9px;
-  background:#343a40;
-  color:#fff;
-}
-
-.market-info{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.market-stat{
-  background:#202428;
-  border-radius:16px;
-  padding:15px;
-}
-
-.market-stat .label{
-  color:#999fa6;
-  font-size:15px;
-}
-
-.market-stat .number{
-  font-size:25px;
-  font-weight:800;
-  margin-top:5px;
-}
-
-.tabs{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  z-index:1000;
+.quick-search{
   display:flex;
-  background:#25292d;
-  border-top:1px solid #3b4046;
-  padding-bottom:env(safe-area-inset-bottom);
+  gap:7px;
+  overflow-x:auto;
+  margin-top:10px;
+  scrollbar-width:none;
 }
 
-.tab{
-  flex:1;
-  padding:19px 4px;
-  text-align:center;
-  color:#d7d9db;
-  font-size:18px;
-}
-
-.tab.active{
-  background:#5b5f64;
-  color:#fff;
-}
-
-.section{
+.quick-search::-webkit-scrollbar{
   display:none;
 }
 
-.section.active{
-  display:block;
+.quick-btn{
+  flex:0 0 auto;
+  padding:7px 11px;
+  border-radius:18px;
+  background:#292c31;
+  color:#ddd;
+  border:1px solid #3a3e44;
+  font-size:12px;
 }
 
+/* QUOTE */
+.quote{
+  margin:0 14px 14px;
+  background:#191b1f;
+  border:1px solid #34373d;
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.quote-head{
+  padding:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#202329;
+}
+
+.quote-name{
+  flex:1;
+}
+
+.stock-name{
+  font-size:21px;
+  font-weight:900;
+}
+
+.stock-code{
+  color:#9ba1aa;
+  font-size:12px;
+  margin-top:2px;
+}
+
+.market-badge{
+  background:#30343a;
+  color:#d7d9dd;
+  border-radius:7px;
+  padding:5px 8px;
+  font-size:11px;
+}
+
+.favorite{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  background:#303239;
+  color:#8d939c;
+  font-size:20px;
+}
+
+.favorite.on{
+  color:#ffd33d;
+}
+
+.price-row{
+  padding:3px 14px 15px;
+  display:flex;
+  align-items:end;
+  gap:12px;
+}
+
+.price{
+  font-size:37px;
+  font-weight:900;
+  letter-spacing:-1px;
+}
+
+.change{
+  font-size:17px;
+  font-weight:800;
+  padding-bottom:6px;
+}
+
+.up{
+  color:var(--red);
+}
+
+.down{
+  color:var(--green);
+}
+
+.flat{
+  color:#ccc;
+}
+
+.quote-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  border-top:1px solid #34373d;
+}
+
+.q-item{
+  padding:11px 8px;
+  border-right:1px solid #34373d;
+  border-bottom:1px solid #34373d;
+}
+
+.q-item:nth-child(4n){
+  border-right:0;
+}
+
+.q-label{
+  color:#9298a1;
+  font-size:11px;
+}
+
+.q-value{
+  margin-top:4px;
+  font-size:14px;
+  font-weight:700;
+}
+
+.market-status{
+  padding:9px 14px;
+  background:#131519;
+  color:#aeb3bb;
+  font-size:12px;
+  border-top:1px solid #34373d;
+}
+
+/* ACTIONS */
+.trade-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:0 14px 14px;
+}
+
+.buy-btn,
+.sell-btn{
+  height:54px;
+  border-radius:13px;
+  color:#fff;
+  font-size:18px;
+  font-weight:900;
+}
+
+.buy-btn{
+  background:linear-gradient(180deg,#e9505f,#bd3546);
+}
+
+.sell-btn{
+  background:linear-gradient(180deg,#16c873,#079955);
+}
+
+/* SECTION */
+.section{
+  margin:0 14px 14px;
+  background:var(--panel);
+  border:1px solid #34373d;
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.section-title{
+  padding:13px 14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:17px;
+  font-weight:900;
+  background:#202329;
+  border-bottom:1px solid #34373d;
+}
+
+.section-title .more{
+  margin-left:auto;
+  color:#8f959e;
+  font-size:12px;
+  font-weight:500;
+}
+
+.list{
+  padding:0;
+}
+
+.row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px 14px;
+  border-bottom:1px solid #30333a;
+}
+
+.row:last-child{
+  border-bottom:0;
+}
+
+.row-main{
+  flex:1;
+  min-width:0;
+}
+
+.row-title{
+  font-size:15px;
+  font-weight:800;
+}
+
+.row-sub{
+  color:#8f9598;
+  font-size:11px;
+  margin-top:3px;
+}
+
+.row-right{
+  text-align:right;
+}
+
+.row-price{
+  font-size:15px;
+  font-weight:800;
+}
+
+.row-change{
+  font-size:12px;
+  margin-top:3px;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  background:rgba(0,0,0,.72);
+}
+
+.modal.show{
+  display:flex;
+}
+
+.sheet{
+  width:100%;
+  max-width:720px;
+  max-height:92vh;
+  overflow:auto;
+  background:#191b1f;
+  border-radius:22px 22px 0 0;
+  border-top:1px solid #4b4f56;
+  padding-bottom:25px;
+}
+
+.sheet-head{
+  position:sticky;
+  top:0;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  padding:15px;
+  background:#191b1f;
+  border-bottom:1px solid #34373d;
+}
+
+.sheet-title{
+  font-size:19px;
+  font-weight:900;
+  flex:1;
+}
+
+.close{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  background:#303238;
+  color:#fff;
+  font-size:20px;
+}
+
+.form{
+  padding:14px;
+}
+
+.field{
+  margin-bottom:12px;
+}
+
+.field label{
+  display:block;
+  color:#aeb3bb;
+  font-size:12px;
+  margin-bottom:6px;
+}
+
+.field input,
+.field select{
+  width:100%;
+  height:48px;
+  border-radius:11px;
+  border:1px solid #464a52;
+  background:#24272c;
+  color:#fff;
+  padding:0 13px;
+  outline:none;
+}
+
+.field input:focus,
+.field select:focus{
+  border-color:var(--blue);
+}
+
+.number-pad{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:8px;
+}
+
+.num-btn{
+  height:45px;
+  background:#2b2e34;
+  color:#fff;
+  border-radius:10px;
+  font-weight:800;
+}
+
+.order-summary{
+  background:#111316;
+  border:1px solid #363940;
+  border-radius:12px;
+  padding:12px;
+  margin:10px 0 14px;
+}
+
+.summary-line{
+  display:flex;
+  justify-content:space-between;
+  padding:4px 0;
+  color:#b8bdc5;
+}
+
+.summary-line.total{
+  color:#fff;
+  font-size:18px;
+  font-weight:900;
+  border-top:1px solid #3b3e44;
+  margin-top:6px;
+  padding-top:10px;
+}
+
+.submit{
+  width:100%;
+  height:52px;
+  border-radius:12px;
+  font-weight:900;
+  font-size:17px;
+  color:#fff;
+}
+
+.submit.buy{
+  background:#c53a4b;
+}
+
+.submit.sell{
+  background:#079955;
+}
+
+/* ACCOUNT */
+.account-cards{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:14px;
+}
+
+.account-card{
+  background:#202329;
+  border:1px solid #34373d;
+  border-radius:14px;
+  padding:13px;
+}
+
+.account-label{
+  color:#9298a1;
+  font-size:12px;
+}
+
+.account-value{
+  margin-top:5px;
+  font-size:20px;
+  font-weight:900;
+}
+
+.profit{
+  color:var(--red);
+}
+
+.loss{
+  color:var(--green);
+}
+
+/* RANKING */
+.rank-tabs{
+  display:flex;
+  overflow-x:auto;
+  background:#17191d;
+  border-bottom:1px solid #363940;
+  scrollbar-width:none;
+}
+
+.rank-tabs::-webkit-scrollbar{
+  display:none;
+}
+
+.rank-tab{
+  flex:0 0 auto;
+  padding:13px 16px;
+  color:#a8adb5;
+  border-bottom:2px solid transparent;
+}
+
+.rank-tab.active{
+  color:var(--orange);
+  border-color:var(--orange);
+}
+
+/* WATCHLIST */
+.watch-add{
+  display:flex;
+  gap:8px;
+  padding:12px 14px;
+  background:#17191d;
+}
+
+.watch-add input{
+  flex:1;
+  min-width:0;
+  height:42px;
+  border-radius:10px;
+  border:1px solid #444850;
+  background:#25282d;
+  color:#fff;
+  padding:0 10px;
+}
+
+/* ORDER BOOK */
+.orderbook{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+
+.book-side{
+  padding:10px;
+}
+
+.book-title{
+  color:#aeb3bb;
+  font-size:12px;
+  margin-bottom:5px;
+}
+
+.book-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  padding:5px 0;
+  font-size:12px;
+}
+
+.book-price{
+  text-align:left;
+}
+
+.book-vol{
+  text-align:right;
+  color:#aaa;
+}
+
+/* TOAST */
 .toast{
   position:fixed;
   left:50%;
-  bottom:100px;
-  transform:translateX(-50%);
-  background:#24282c;
-  border:1px solid #555;
+  bottom:88px;
+  z-index:200;
+  transform:translateX(-50%) translateY(15px);
+  background:#30333a;
   color:#fff;
-  padding:14px 20px;
-  border-radius:15px;
-  z-index:2000;
-  font-size:17px;
-  box-shadow:0 10px 30px rgba(0,0,0,.4);
-  display:none;
+  border:1px solid #555a63;
+  border-radius:12px;
+  padding:11px 16px;
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
   max-width:90%;
   text-align:center;
-}
-
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:3000;
-  padding:20px;
-}
-
-.modal{
-  background:#1b1e21;
-  border:1px solid #454a50;
-  border-radius:22px;
-  padding:25px;
-  width:100%;
-  max-width:500px;
-}
-
-.modal h3{
-  margin-top:0;
-  font-size:24px;
-}
-
-.modal button{
-  width:100%;
-  background:#2d8ed0;
-  color:#fff;
-  border-radius:14px;
-  padding:13px;
-  font-size:18px;
-  margin-top:15px;
-}
-
-.green{
-  color:#4be85b;
-}
-
-.yellow{
-  color:#ffc247;
-}
-
-.red{
-  color:#ff5555;
-}
-
-.small{
-  color:#8f959b;
   font-size:13px;
 }
 
-.range-summary{
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* BOTTOM */
+.bottom-nav{
+  position:fixed;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:720px;
+  height:70px;
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
+  grid-template-columns:repeat(5,1fr);
+  background:#25272e;
+  border-top:1px solid #41444c;
+  z-index:60;
+  padding-bottom:env(safe-area-inset-bottom);
 }
 
-.range-box{
-  background:#202428;
-  border-radius:15px;
-  padding:15px;
+.bottom-btn{
+  color:#bfc3ca;
+  background:transparent;
+  font-size:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
 }
 
-.range-box strong{
-  display:block;
-  font-size:24px;
-  margin-top:5px;
+.bottom-btn span:first-child{
+  font-size:21px;
 }
 
-@media(max-width:600px){
-  .container{
-    padding-left:12px;
-    padding-right:12px;
+.bottom-btn.active{
+  color:#fff;
+}
+
+/* EMPTY */
+.empty{
+  padding:28px 14px;
+  text-align:center;
+  color:#858b94;
+  font-size:13px;
+}
+
+/* NOTICE */
+.notice{
+  margin:14px;
+  padding:12px;
+  border-radius:12px;
+  background:#202329;
+  border:1px solid #373a41;
+  color:#aeb3bc;
+  font-size:12px;
+  line-height:1.6;
+}
+
+/* DESKTOP */
+@media(min-width:721px){
+  body{
+    background:#050607;
+  }
+  .app{
+    box-shadow:0 0 50px rgba(0,0,0,.55);
+  }
+}
+
+/* SMALL */
+@media(max-width:390px){
+  .price{
+    font-size:31px;
   }
 
-  .big-price{
-    font-size:62px;
+  .quote-grid{
+    grid-template-columns:repeat(2,1fr);
   }
 
-  .title{
-    font-size:20px;
+  .q-item:nth-child(4n){
+    border-right:1px solid #34373d;
   }
 
-  .card{
-    padding:16px;
-    border-radius:21px;
-  }
-
-  .card h2{
-    font-size:25px;
-  }
-
-  .order-btn{
-    font-size:18px;
-  }
-
-  .row{
-    gap:9px;
+  .q-item:nth-child(2n){
+    border-right:0;
   }
 }
 </style>
@@ -575,519 +819,1152 @@ td{
 
 <body>
 
-<div class="container">
+<div class="app">
 
-  <div class="header">
-    <div class="title">📊 台指期｜真實行情＋虛擬限價交易</div>
+<!-- TOP -->
+<header class="topbar">
+  <div class="top-main">
+    <div class="logo">📈</div>
+    <div class="title-wrap">
+      <div class="title">股票模擬器｜富貴角6號風格</div>
+      <div class="subtitle">模擬交易・不會真的下單</div>
+    </div>
+    <button class="icon-btn" onclick="openSettings()">⚙️</button>
+  </div>
 
-    <div id="price" class="big-price">--</div>
+  <div class="cash-bar">
+    <div class="cash-box">
+      <div class="cash-label">模擬可用資金</div>
+      <div class="cash-value" id="cashTop">$1,000,000</div>
+    </div>
+    <div class="cash-box">
+      <div class="cash-label">庫存市值</div>
+      <div class="cash-value" id="marketValueTop">$0</div>
+    </div>
+  </div>
+</header>
 
-    <div id="change" class="change flat">
-      -- 點　--%
+<!-- MAIN TABS -->
+<nav class="main-tabs">
+  <button class="main-tab active" data-page="home">行情</button>
+  <button class="main-tab" data-page="order">下單</button>
+  <button class="main-tab" data-page="account">帳務</button>
+  <button class="main-tab" data-page="ranking">熱門排行</button>
+  <button class="main-tab" data-page="watch">自選</button>
+</nav>
+
+<!-- ================= HOME ================= -->
+<section class="page active" id="page-home">
+
+  <div class="search-area">
+    <div class="search-row">
+      <input
+        id="searchInput"
+        class="search-input"
+        placeholder="搜尋股票代號／名稱，例如 2330、台積電、1326"
+        autocomplete="off"
+      >
+      <button class="primary" onclick="searchStock()">搜尋</button>
+    </div>
+
+    <div class="quick-search">
+      <button class="quick-btn" onclick="quickStock('2330')">2330 台積電</button>
+      <button class="quick-btn" onclick="quickStock('1326')">1326 台化</button>
+      <button class="quick-btn" onclick="quickStock('1301')">1301 台塑</button>
+      <button class="quick-btn" onclick="quickStock('2317')">2317 鴻海</button>
+      <button class="quick-btn" onclick="quickStock('0050')">0050</button>
+      <button class="quick-btn" onclick="quickStock('0056')">0056</button>
     </div>
   </div>
 
-  <div id="status" class="status">
-    🟡 正在連接臺指期即時行情……
+  <div class="quote">
+
+    <div class="quote-head">
+      <div class="quote-name">
+        <div class="stock-name" id="stockName">台積電</div>
+        <div class="stock-code" id="stockCode">2330</div>
+      </div>
+
+      <div class="market-badge" id="marketBadge">上市</div>
+
+      <button class="favorite" id="favoriteBtn" onclick="toggleFavorite()">☆</button>
+    </div>
+
+    <div class="price-row">
+      <div class="price" id="stockPrice">--</div>
+      <div class="change" id="stockChange">--</div>
+    </div>
+
+    <div class="quote-grid">
+      <div class="q-item">
+        <div class="q-label">昨收</div>
+        <div class="q-value" id="qPrev">--</div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">開盤</div>
+        <div class="q-value" id="qOpen">--</div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">最高</div>
+        <div class="q-value" id="qHigh">--</div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">最低</div>
+        <div class="q-value" id="qLow">--</div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">成交量</div>
+        <div class="q-value" id="qVolume">--</div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">五日均線</div>
+        <div class="q-value" id="qMA5">--</div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">二十日均線</div>
+        <div class="q-value" id="qMA20">--</div>
+      </div>
+
+      <div class="q-item">
+        <div class="q-label">更新時間</div>
+        <div class="q-value" id="qTime">--</div>
+      </div>
+    </div>
+
+    <div class="market-status" id="marketStatus">
+      模擬行情載入中……
+    </div>
   </div>
 
-  <button class="reset-btn" onclick="resetAccount()">
-    重設模擬帳戶
+  <div class="trade-actions">
+    <button class="buy-btn" onclick="openOrder('buy')">買進</button>
+    <button class="sell-btn" onclick="openOrder('sell')">賣出</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      📊 即時五檔
+      <span class="more">模擬</span>
+    </div>
+
+    <div class="orderbook">
+
+      <div class="book-side">
+        <div class="book-title">賣盤</div>
+        <div id="asks"></div>
+      </div>
+
+      <div class="book-side">
+        <div class="book-title">買盤</div>
+        <div id="bids"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      📌 個股資訊
+    </div>
+
+    <div class="row">
+      <div class="row-main">
+        <div class="row-title">外資</div>
+        <div class="row-sub">法人買賣超</div>
+      </div>
+      <div class="row-right">
+        <div class="row-price" id="foreign">--</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row-main">
+        <div class="row-title">投信</div>
+        <div class="row-sub">法人買賣超</div>
+      </div>
+      <div class="row-right">
+        <div class="row-price" id="trust">--</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row-main">
+        <div class="row-title">自營商</div>
+        <div class="row-sub">法人買賣超</div>
+      </div>
+      <div class="row-right">
+        <div class="row-price" id="dealer">--</div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ================= ORDER ================= -->
+<section class="page" id="page-order">
+
+  <div class="notice">
+    🧪 這是股票模擬器。所有買賣都只會影響你的模擬資金與模擬庫存，不會送出真實委託。
+  </div>
+
+  <div class="section">
+
+    <div class="section-title">
+      📝 委託下單
+    </div>
+
+    <div class="form">
+
+      <div class="field">
+        <label>股票／ETF</label>
+        <input id="orderStock" value="2330">
+      </div>
+
+      <div class="field">
+        <label>交易方向</label>
+        <select id="orderSide" onchange="updateOrderSummary()">
+          <option value="buy">買進</option>
+          <option value="sell">賣出</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>價格</label>
+        <input id="orderPrice" type="number" step="0.01" oninput="updateOrderSummary()">
+      </div>
+
+      <div class="field">
+        <label>股數</label>
+        <input id="orderQty" type="number" min="1" step="1" value="1000" oninput="updateOrderSummary()">
+      </div>
+
+      <div class="field">
+        <label>委託別</label>
+        <select id="orderType">
+          <option value="limit">限價</option>
+          <option value="market">市價模擬</option>
+        </select>
+      </div>
+
+      <div class="order-summary">
+
+        <div class="summary-line">
+          <span>成交金額</span>
+          <strong id="sumAmount">$0</strong>
+        </div>
+
+        <div class="summary-line">
+          <span>手續費</span>
+          <strong id="sumFee">$0</strong>
+        </div>
+
+        <div class="summary-line">
+          <span>交易稅</span>
+          <strong id="sumTax">$0</strong>
+        </div>
+
+        <div class="summary-line total">
+          <span>預估總額</span>
+          <strong id="sumTotal">$0</strong>
+        </div>
+
+      </div>
+
+      <button id="submitOrderBtn" class="submit buy" onclick="submitOrder()">
+        買進委託
+      </button>
+
+    </div>
+  </div>
+
+  <div class="section">
+
+    <div class="section-title">
+      📋 委託回報
+      <span class="more">最近紀錄</span>
+    </div>
+
+    <div id="pendingOrders"></div>
+
+  </div>
+
+  <div class="section">
+
+    <div class="section-title">
+      ✅ 成交回報
+    </div>
+
+    <div id="filledOrders"></div>
+
+  </div>
+
+</section>
+
+<!-- ================= ACCOUNT ================= -->
+<section class="page" id="page-account">
+
+  <div class="account-cards">
+
+    <div class="account-card">
+      <div class="account-label">模擬本金</div>
+      <div class="account-value" id="aCash">$1,000,000</div>
+    </div>
+
+    <div class="account-card">
+      <div class="account-label">庫存市值</div>
+      <div class="account-value" id="aMarket">$0</div>
+    </div>
+
+    <div class="account-card">
+      <div class="account-label">未實現損益</div>
+      <div class="account-value" id="aUnrealized">$0</div>
+    </div>
+
+    <div class="account-card">
+      <div class="account-label">已實現損益</div>
+      <div class="account-value" id="aRealized">$0</div>
+    </div>
+
+    <div class="account-card">
+      <div class="account-label">總資產</div>
+      <div class="account-value" id="aTotal">$1,000,000</div>
+    </div>
+
+    <div class="account-card">
+      <div class="account-label">報酬率</div>
+      <div class="account-value" id="aReturn">0%</div>
+    </div>
+
+  </div>
+
+  <div class="section">
+
+    <div class="section-title">
+      💼 庫存
+      <span class="more">持股</span>
+    </div>
+
+    <div id="holdings"></div>
+
+  </div>
+
+  <div class="section">
+
+    <div class="section-title">
+      🧾 已實現損益
+    </div>
+
+    <div id="realizedList"></div>
+
+  </div>
+
+  <div class="section">
+
+    <div class="section-title">
+      📚 交易紀錄
+      <span class="more" onclick="clearHistory()">清除</span>
+    </div>
+
+    <div id="historyList"></div>
+
+  </div>
+
+</section>
+
+<!-- ================= RANKING ================= -->
+<section class="page" id="page-ranking">
+
+  <div class="rank-tabs">
+
+    <button class="rank-tab active" onclick="setRank('volume',this)">
+      成交量
+    </button>
+
+    <button class="rank-tab" onclick="setRank('up',this)">
+      漲幅
+    </button>
+
+    <button class="rank-tab" onclick="setRank('down',this)">
+      跌幅
+    </button>
+
+    <button class="rank-tab" onclick="setRank('hot',this)">
+      熱門
+    </button>
+
+  </div>
+
+  <div class="section" style="margin-top:14px">
+
+    <div class="section-title">
+      🔥 熱門排行
+      <span class="more" id="rankTitle">成交量排行</span>
+    </div>
+
+    <div id="rankingList"></div>
+
+  </div>
+
+  <div class="notice">
+    排行資料會優先使用目前可取得的市場資料；若公開行情服務無法回應，模擬器會使用內建股票資料及模擬價格。
+  </div>
+
+</section>
+
+<!-- ================= WATCH ================= -->
+<section class="page" id="page-watch">
+
+  <div class="watch-add">
+    <input id="watchInput" placeholder="輸入股票代號，例如 2330">
+    <button class="primary" style="height:42px" onclick="addWatch()">加入</button>
+  </div>
+
+  <div class="section">
+
+    <div class="section-title">
+      ⭐ 我的自選
+    </div>
+
+    <div id="watchList"></div>
+
+  </div>
+
+</section>
+
+<!-- BOTTOM -->
+<nav class="bottom-nav">
+
+  <button class="bottom-btn active" data-page="home">
+    <span>🏠</span>
+    <span>自選</span>
   </button>
 
-  <!-- ==================== 下單 ==================== -->
-  <section id="section-order" class="section active">
-
-    <div class="card">
-
-      <h2>🎯 限價／現價下單</h2>
-
-      <label>下單方式</label>
-
-      <select id="orderMode">
-        <option value="limit">限價單｜指定價格等待成交</option>
-        <option value="market">現價單｜目前價格立即成交</option>
-      </select>
-
-      <div class="row" style="margin-top:15px;">
-
-        <div class="col">
-
-          <label>
-            委託價格
-            <span class="small">（手動輸入）</span>
-          </label>
-
-          <input
-            id="orderPrice"
-            type="number"
-            inputmode="decimal"
-            step="1"
-            placeholder="請手動輸入"
-          >
-
-          <div class="manual-note">
-            🔒 委託價格完全手動<br>
-            不會因行情更新而自動跳動
-          </div>
-
-        </div>
-
-        <div class="col">
-
-          <label>口數</label>
-
-          <div class="qty-control">
-            <button onclick="changeQty(-1)">−</button>
-            <input
-              id="qty"
-              type="number"
-              min="1"
-              step="1"
-              value="1"
-              inputmode="numeric"
-            >
-            <button onclick="changeQty(1)">＋</button>
-          </div>
-
-        </div>
-
-      </div>
-
-      <div class="mode-grid">
-
-        <div class="mode-card">
-          <strong class="green">限價單</strong>
-          <span>
-            買多：市場價格到達你的委託價才成交。
-            <br>
-            買空：市場價格到達你的委託價才成交。
-          </span>
-        </div>
-
-        <div class="mode-card">
-          <strong style="color:#4dafff;">現價單</strong>
-          <span>
-            直接使用目前最新市場價格模擬成交，
-            不需要等待限價。
-          </span>
-        </div>
-
-      </div>
-
-      <!-- 第一排：一般進場 -->
-      <div class="order-grid">
-
-        <button
-          class="order-btn buy-limit"
-          onclick="placeOrder('long','limit')">
-          🟢 買多（限價）
-        </button>
-
-        <button
-          class="order-btn sell-limit"
-          onclick="placeOrder('short','limit')">
-          🔴 買空（限價）
-        </button>
-
-        <button
-          class="order-btn buy-market"
-          onclick="placeOrder('long','market')">
-          🔵 買多（現價）
-        </button>
-
-        <button
-          class="order-btn sell-market"
-          onclick="placeOrder('short','market')">
-          🟠 買空（現價）
-        </button>
-
-      </div>
-
-      <!-- 第二排：已有倉位加碼 -->
-      <div class="order-grid">
-
-        <button
-          id="addLongBtn"
-          class="order-btn add-long full"
-          onclick="addPosition('long')">
-          🟣 加碼多（已有多單可繼續買）
-        </button>
-
-        <button
-          id="addShortBtn"
-          class="order-btn add-short full"
-          onclick="addPosition('short')">
-          🟡 加碼空（已有空單可繼續買）
-        </button>
-
-      </div>
-
-      <div class="info">
-        <b>📌 交易規則</b><br>
-        • 限價單：到達你手動設定的價格才模擬成交。<br>
-        • 現價單：使用目前最新行情立即模擬成交。<br>
-        • 已有多單：可以繼續使用「加碼多」。<br>
-        • 已有空單：可以繼續使用「加碼空」。<br>
-        • 多空方向不同時，不會偷偷幫你反向交易。<br>
-        • 要反向操作，先使用「平多／平空」。
-      </div>
-
-    </div>
-
-
-    <!-- 停利停損 -->
-    <div class="card">
-
-      <h2>🛑 停利／停損</h2>
-
-      <div class="row">
-
-        <div class="col">
-          <label>停利點數</label>
-          <input id="takeProfit" type="number" value="100">
-        </div>
-
-        <div class="col">
-          <label>停損點數</label>
-          <input id="stopLoss" type="number" value="100">
-        </div>
-
-      </div>
-
-      <div style="margin-top:15px;">
-        <label style="display:flex;align-items:center;gap:10px;">
-          <input
-            id="autoSLTP"
-            type="checkbox"
-            style="width:24px;height:24px;"
-          >
-          啟用自動停利／停損
-        </label>
-      </div>
-
-    </div>
-
-
-    <!-- 真實行情 -->
-    <div class="card">
-
-      <h2>📡 真實行情</h2>
-
-      <div class="market-info">
-
-        <div class="market-stat">
-          <div class="label">最新成交</div>
-          <div id="mLast" class="number">--</div>
-        </div>
-
-        <div class="market-stat">
-          <div class="label">買價</div>
-          <div id="mBid" class="number">--</div>
-        </div>
-
-        <div class="market-stat">
-          <div class="label">賣價</div>
-          <div id="mAsk" class="number">--</div>
-        </div>
-
-        <div class="market-stat">
-          <div class="label">開盤</div>
-          <div id="mOpen" class="number">--</div>
-        </div>
-
-        <div class="market-stat">
-          <div class="label">最高</div>
-          <div id="mHigh" class="number">--</div>
-        </div>
-
-        <div class="market-stat">
-          <div class="label">最低</div>
-          <div id="mLow" class="number">--</div>
-        </div>
-
-      </div>
-
-      <div class="info">
-        行情更新時，只更新上面的市場行情。
-        <br>
-        <b class="yellow">
-          你的「委託價格」不會被行情更新改掉。
-        </b>
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================== 部位 ==================== -->
-  <section id="section-position" class="section">
-
-    <div class="card">
-
-      <h2>📌 我的期貨部位</h2>
-
-      <div id="positionArea">
-        <div class="position-empty">
-          目前沒有期貨部位
-        </div>
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================== 委託 ==================== -->
-  <section id="section-orders" class="section">
-
-    <div class="card">
-
-      <h2>📋 委託紀錄</h2>
-
-      <div class="table-wrap">
-
-        <table>
-
-          <thead>
-            <tr>
-              <th>時間</th>
-              <th>方向</th>
-              <th>類型</th>
-              <th>價格</th>
-              <th>口數</th>
-              <th>狀態</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-
-          <tbody id="ordersTable">
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================== 成交 ==================== -->
-  <section id="section-trades" class="section">
-
-    <div class="card">
-
-      <h2>📒 成交紀錄</h2>
-
-      <div class="table-wrap">
-
-        <table>
-
-          <thead>
-            <tr>
-              <th>時間</th>
-              <th>方向</th>
-              <th>類型</th>
-              <th>成交價</th>
-              <th>口數</th>
-              <th>損益</th>
-            </tr>
-          </thead>
-
-          <tbody id="tradesTable">
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- ==================== 設定 ==================== -->
-  <section id="section-settings" class="section">
-
-    <div class="card">
-
-      <h2>⚙️ 模擬帳戶</h2>
-
-      <div class="stat">
-        <div class="name">虛擬資金</div>
-        <div id="balance" class="value">
-          1,000,000
-        </div>
-      </div>
-
-      <div style="height:10px;"></div>
-
-      <div class="stat">
-        <div class="name">已實現損益</div>
-        <div id="realized" class="value">
-          0
-        </div>
-      </div>
-
-      <div style="height:10px;"></div>
-
-      <div class="stat">
-        <div class="name">浮動損益</div>
-        <div id="unrealized" class="value">
-          0
-        </div>
-      </div>
-
-      <div class="info">
-        本網站為練習用虛擬交易帳戶。
-        <br>
-        不會真的送單到期貨商。
-      </div>
-
-    </div>
-
-
-    <!-- 本月統計 -->
-    <div class="card">
-
-      <h2>📊 本月台指期統計</h2>
-
-      <div class="range-summary">
-
-        <div class="range-box">
-          <div class="small">本月最高</div>
-          <strong id="monthHigh">--</strong>
-        </div>
-
-        <div class="range-box">
-          <div class="small">本月最低</div>
-          <strong id="monthLow">--</strong>
-        </div>
-
-        <div class="range-box">
-          <div class="small">最高－最低</div>
-          <strong id="monthRange">--</strong>
-        </div>
-
-        <div class="range-box">
-          <div class="small">交易日數</div>
-          <strong id="monthDays">--</strong>
-        </div>
-
-      </div>
-
-      <div style="margin-top:18px;" class="table-wrap">
-
-        <table>
-
-          <thead>
-            <tr>
-              <th>日期</th>
-              <th>最高</th>
-              <th>最低</th>
-              <th>日內波幅</th>
-            </tr>
-          </thead>
-
-          <tbody id="monthTable">
-          </tbody>
-
-        </table>
-
-      </div>
-
-      <div class="info">
-        日內波幅＝當日最高點－當日最低點。
-      </div>
-
-    </div>
-
-  </section>
-
-</div>
-
-
-<!-- 底部導航 -->
-<nav class="tabs">
-
-  <button class="tab active" onclick="showSection('order',this)">
-    下單
+  <button class="bottom-btn" data-page="ranking">
+    <span>🔥</span>
+    <span>類股</span>
   </button>
 
-  <button class="tab" onclick="showSection('position',this)">
-    部位
+  <button class="bottom-btn" data-page="order">
+    <span>📝</span>
+    <span>下單</span>
   </button>
 
-  <button class="tab" onclick="showSection('orders',this)">
-    委託
+  <button class="bottom-btn" data-page="account">
+    <span>💼</span>
+    <span>帳務</span>
   </button>
 
-  <button class="tab" onclick="showSection('trades',this)">
-    成交
-  </button>
-
-  <button class="tab" onclick="showSection('settings',this)">
-    設定
+  <button class="bottom-btn" data-page="watch">
+    <span>⭐</span>
+    <span>專區</span>
   </button>
 
 </nav>
 
+</div>
 
-<div id="toast" class="toast"></div>
+<!-- ORDER MODAL -->
+<div class="modal" id="orderModal">
 
+  <div class="sheet">
+
+    <div class="sheet-head">
+      <div class="sheet-title" id="modalTitle">買進</div>
+      <button class="close" onclick="closeModal()">×</button>
+    </div>
+
+    <div class="form">
+
+      <div class="field">
+        <label>股票</label>
+        <input id="modalStock">
+      </div>
+
+      <div class="field">
+        <label>價格</label>
+        <input id="modalPrice" type="number" step="0.01">
+      </div>
+
+      <div class="field">
+        <label>股數</label>
+        <input id="modalQty" type="number" value="1000" min="1" step="1">
+      </div>
+
+      <div class="field">
+        <label>委託方式</label>
+        <select id="modalType">
+          <option value="limit">限價</option>
+          <option value="market">市價模擬</option>
+        </select>
+      </div>
+
+      <div class="order-summary">
+
+        <div class="summary-line">
+          <span>股票</span>
+          <strong id="modalStockName">--</strong>
+        </div>
+
+        <div class="summary-line">
+          <span>成交金額</span>
+          <strong id="modalAmount">$0</strong>
+        </div>
+
+        <div class="summary-line">
+          <span>手續費</span>
+          <strong id="modalFee">$0</strong>
+        </div>
+
+        <div class="summary-line">
+          <span>交易稅</span>
+          <strong id="modalTax">$0</strong>
+        </div>
+
+        <div class="summary-line total">
+          <span>預估金額</span>
+          <strong id="modalTotal">$0</strong>
+        </div>
+
+      </div>
+
+      <button class="submit buy" id="modalSubmit" onclick="submitModalOrder()">
+        確認買進
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal" id="settingsModal">
+
+  <div class="sheet">
+
+    <div class="sheet-head">
+      <div class="sheet-title">⚙️ 模擬器設定</div>
+      <button class="close" onclick="closeSettings()">×</button>
+    </div>
+
+    <div class="form">
+
+      <div class="field">
+        <label>初始模擬資金</label>
+        <input id="initialCashInput" type="number">
+      </div>
+
+      <button class="submit buy" style="background:#30343a" onclick="resetAccount()">
+        重設模擬帳戶
+      </button>
+
+      <div style="height:12px"></div>
+
+      <button class="submit buy" style="background:#30343a" onclick="exportData()">
+        匯出交易資料
+      </button>
+
+      <div style="height:12px"></div>
+
+      <button class="submit buy" style="background:#30343a" onclick="closeSettings()">
+        完成
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
-/* =========================================================
-   台指期虛擬交易系統
-   真實行情＋手動限價＋現價單＋加碼
-========================================================= */
-
-const STORAGE_KEY = "TAIFEX_SIM_ACCOUNT_V4";
-
-let market = {
-  last:null,
-  bid:null,
-  ask:null,
-  open:null,
-  high:null,
-  low:null,
-  change:null,
-  changePct:null,
-  time:null,
-  contract:"TXF",
-  expireMonth:"",
-  connected:false
-};
-
-let account = {
-  balance:1000000,
-  realized:0,
-  position:null,
-  orders:[],
-  trades:[],
-  monthly:[]
-};
-
-let initializedPrice = false;
-
 
 /* =========================================================
-   LOCAL STORAGE
-========================================================= */
+   股票模擬器
+   完整單檔版本
+   ========================================================= */
 
-function loadAccount(){
+/* -------------------------
+   股票資料
+------------------------- */
+
+const STOCKS = {
+
+  "2330":{
+    code:"2330",
+    name:"台積電",
+    market:"上市",
+    price:1160
+  },
+
+  "1326":{
+    code:"1326",
+    name:"台化",
+    market:"上市",
+    price:58.5
+  },
+
+  "1301":{
+    code:"1301",
+    name:"台塑",
+    market:"上市",
+    price:39.5
+  },
+
+  "1303":{
+    code:"1303",
+    name:"南亞",
+    market:"上市",
+    price:35.2
+  },
+
+  "2317":{
+    code:"2317",
+    name:"鴻海",
+    market:"上市",
+    price:205
+  },
+
+  "2303":{
+    code:"2303",
+    name:"聯電",
+    market:"上市",
+    price:46.5
+  },
+
+  "2308":{
+    code:"2308",
+    name:"台達電",
+    market:"上市",
+    price:835
+  },
+
+  "2002":{
+    code:"2002",
+    name:"中鋼",
+    market:"上市",
+    price:20.8
+  },
+
+  "2313":{
+    code:"2313",
+    name:"華通",
+    market:"上市",
+    price:84
+  },
+
+  "3481":{
+    code:"3481",
+    name:"群創",
+    market:"上市",
+    price:18.6
+  },
+
+  "3711":{
+    code:"3711",
+    name:"日月光投控",
+    market:"上市",
+    price:218
+  },
+
+  "2367":{
+    code:"2367",
+    name:"燿華",
+    market:"上市",
+    price:52
+  },
+
+  "8046":{
+    code:"8046",
+    name:"南電",
+    market:"上市",
+    price:190
+  },
+
+  "3324":{
+    code:"3324",
+    name:"雙鴻",
+    market:"上櫃",
+    price:890
+  },
+
+  "6770":{
+    code:"6770",
+    name:"力積電",
+    market:"上市",
+    price:25.5
+  },
+
+  "2618":{
+    code:"2618",
+    name:"長榮航",
+    market:"上市",
+    price:32.5
+  },
+
+  "5425":{
+    code:"5425",
+    name:"台半",
+    market:"上櫃",
+    price:52
+  },
+
+  "6244":{
+    code:"6244",
+    name:"茂迪",
+    market:"上市",
+    price:39.8
+  },
+
+  "0050":{
+    code:"0050",
+    name:"元大台灣50",
+    market:"ETF",
+    price:62.3
+  },
+
+  "0056":{
+    code:"0056",
+    name:"元大高股息",
+    market:"ETF",
+    price:38.7
+  },
+
+  "00878":{
+    code:"00878",
+    name:"國泰永續高股息",
+    market:"ETF",
+    price:23.6
+  },
+
+  "00919":{
+    code:"00919",
+    name:"群益台灣精選高息",
+    market:"ETF",
+    price:23.8
+  },
+
+  "00981A":{
+    code:"00981A",
+    name:"統一台股增長",
+    market:"ETF",
+    price:18.9
+  },
+
+  "00631L":{
+    code:"00631L",
+    name:"元大台灣50正2",
+    market:"ETF",
+    price:175
+  },
+
+  "00685L":{
+    code:"00685L",
+    name:"群益臺灣加權正2",
+    market:"ETF",
+    price:86
+  }
+
+};
+
+/* 名稱搜尋 */
+const NAME_MAP = {};
+
+Object.values(STOCKS).forEach(s=>{
+  NAME_MAP[s.name.toLowerCase()] = s.code;
+});
+
+
+/* -------------------------
+   State
+------------------------- */
+
+const STORAGE_KEY = "stockSimulator_FG6_v1";
+
+let state = {
+
+  initialCash:1000000,
+
+  cash:1000000,
+
+  holdings:{},
+
+  favorites:["2330","1326","0050"],
+
+  pendingOrders:[],
+
+  filledOrders:[],
+
+  history:[],
+
+  realized:[],
+
+  currentCode:"2330",
+
+  marketData:{}
+
+};
+
+
+/* -------------------------
+   Load / Save
+------------------------- */
+
+function loadState(){
 
   try{
 
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw=localStorage.getItem(STORAGE_KEY);
 
     if(raw){
 
-      const saved = JSON.parse(raw);
+      const saved=JSON.parse(raw);
 
-      account = Object.assign(account,saved);
+      state={
+        ...state,
+        ...saved
+      };
+
+    }
+
+  }catch(e){
+
+    console.log("load error",e);
+
+  }
+
+}
+
+
+function saveState(){
+
+  try{
+
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(state)
+    );
+
+  }catch(e){
+
+    console.log("save error",e);
+
+  }
+
+}
+
+
+/* -------------------------
+   Utilities
+------------------------- */
+
+function money(n){
+
+  n=Number(n)||0;
+
+  return "$"+Math.round(n).toLocaleString("zh-TW");
+
+}
+
+
+function number(n){
+
+  n=Number(n)||0;
+
+  return Math.round(n).toLocaleString("zh-TW");
+
+}
+
+
+function decimal(n){
+
+  if(n===null || n===undefined || isNaN(n)) return "--";
+
+  return Number(n).toFixed(2);
+
+}
+
+
+function escapeHtml(str){
+
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function toast(msg){
+
+  const el=document.getElementById("toast");
+
+  el.textContent=msg;
+
+  el.classList.add("show");
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer=setTimeout(()=>{
+    el.classList.remove("show");
+  },2200);
+
+}
+
+
+/* -------------------------
+   Price model
+------------------------- */
+
+function getStock(code){
+
+  code=String(code||"").trim().toUpperCase();
+
+  if(STOCKS[code]) return STOCKS[code];
+
+  return {
+    code,
+    name:"未知股票",
+    market:"市場",
+    price:100
+  };
+
+}
+
+
+function getPrice(code){
+
+  const s=getStock(code);
+
+  if(state.marketData[code] &&
+     Number(state.marketData[code].price)>0){
+
+    return Number(state.marketData[code].price);
+
+  }
+
+  return Number(s.price)||100;
+
+}
+
+
+/* -------------------------
+   Simulated market data
+------------------------- */
+
+function createMarketData(code){
+
+  const s=getStock(code);
+
+  const base=getPrice(code);
+
+  const variation=(Math.random()-0.5)*base*0.008;
+
+  const price=Math.max(
+    0.01,
+    base+variation
+  );
+
+  const prev=base;
+
+  const change=price-prev;
+
+  const pct=prev ? change/prev*100 : 0;
+
+  const open=prev*(1+(Math.random()-0.5)*0.006);
+
+  const high=Math.max(
+    price,
+    open,
+    prev
+  )*(1+Math.random()*0.004);
+
+  const low=Math.min(
+    price,
+    open,
+    prev
+  )*(1-Math.random()*0.004);
+
+  const volume=Math.round(
+    1000+Math.random()*900000
+  );
+
+  const ma5=price*(1+(Math.random()-0.5)*0.025);
+
+  const ma20=price*(1+(Math.random()-0.5)*0.06);
+
+  const data={
+    code:s.code,
+    name:s.name,
+    market:s.market,
+    price,
+    prev,
+    change,
+    pct,
+    open,
+    high,
+    low,
+    volume,
+    ma5,
+    ma20,
+    time:new Date().toLocaleTimeString("zh-TW")
+  };
+
+  state.marketData[code]=data;
+
+  return data;
+
+}
+
+
+/* -------------------------
+   Try public TWSE quote
+------------------------- */
+
+async function fetchRealQuote(code){
+
+  const clean=String(code).trim().toUpperCase();
+
+  if(!/^\d{4,6}[A-Z]?$/.test(clean)){
+    return null;
+  }
+
+  try{
+
+    const urls=[
+
+      "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_"+encodeURIComponent(clean)+".tw",
+
+      "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=otc_"+encodeURIComponent(clean)+".tw"
+
+    ];
+
+    for(const url of urls){
+
+      try{
+
+        const controller=new AbortController();
+
+        const timer=setTimeout(
+          ()=>controller.abort(),
+          4500
+        );
+
+        const res=await fetch(
+          url,
+          {
+            signal:controller.signal,
+            cache:"no-store"
+          }
+        );
+
+        clearTimeout(timer);
+
+        if(!res.ok) continue;
+
+        const json=await res.json();
+
+        if(
+          json &&
+          Array.isArray(json.msgArray) &&
+          json.msgArray.length
+        ){
+
+          const q=json.msgArray[0];
+
+          const price=
+            Number(q.z) ||
+            Number(q.pz) ||
+            Number(q.y);
+
+          if(price>0){
+
+            const prev=
+              Number(q.y) ||
+              price;
+
+            const open=
+              Number(q.o) ||
+              price;
+
+            const high=
+              Number(q.h) ||
+              price;
+
+            const low=
+              Number(q.l) ||
+              price;
+
+            const volume=
+              Number(q.v) ||
+              0;
+
+            const change=
+              price-prev;
+
+            const pct=
+              prev ? change/prev*100 : 0;
+
+            const result={
+
+              code:clean,
+
+              name:q.n||getStock(clean).name,
+
+              market:q.ex==="tse"?"上市":
+                     q.ex==="otc"?"上櫃":
+                     getStock(clean).market,
+
+              price,
+
+              prev,
+
+              change,
+
+              pct,
+
+              open,
+
+              high,
+
+              low,
+
+              volume,
+
+              ma5:state.marketData[clean]?.ma5 || price,
+
+              ma20:state.marketData[clean]?.ma20 || price,
+
+              time:new Date().toLocaleTimeString("zh-TW"),
+
+              real:true
+
+            };
+
+            state.marketData[clean]=result;
+
+            saveState();
+
+            return result;
+
+          }
+
+        }
+
+      }catch(e){
+
+        console.log("quote endpoint failed",e);
+
+      }
 
     }
 
@@ -1097,1133 +1974,1022 @@ function loadAccount(){
 
   }
 
-  renderAll();
+  return null;
+
 }
 
 
-function saveAccount(){
+/* -------------------------
+   Search
+------------------------- */
 
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(account)
+async function searchStock(){
+
+  const input=document.getElementById("searchInput");
+
+  const value=input.value.trim();
+
+  if(!value){
+
+    toast("請輸入股票代號或名稱");
+
+    return;
+
+  }
+
+  let code=value.toUpperCase();
+
+  const byName=NAME_MAP[value.toLowerCase()];
+
+  if(byName){
+
+    code=byName;
+
+  }
+
+  if(!STOCKS[code] && !/^\d{4,6}[A-Z]?$/.test(code)){
+
+    toast("找不到這個股票代號，請輸入例如 2330");
+
+    return;
+
+  }
+
+  await selectStock(code);
+
+}
+
+
+async function quickStock(code){
+
+  document.getElementById("searchInput").value=code;
+
+  await selectStock(code);
+
+}
+
+
+async function selectStock(code){
+
+  code=String(code).trim().toUpperCase();
+
+  state.currentCode=code;
+
+  saveState();
+
+  renderQuote();
+
+  toast("正在取得 "+code+" 行情…");
+
+  const real=await fetchRealQuote(code);
+
+  if(real){
+
+    renderQuote();
+
+    toast(real.name+" 行情已更新");
+
+  }else{
+
+    createMarketData(code);
+
+    renderQuote();
+
+    toast("目前使用模擬行情");
+
+  }
+
+}
+
+
+/* -------------------------
+   Render quote
+------------------------- */
+
+function renderQuote(){
+
+  const code=state.currentCode;
+
+  let data=state.marketData[code];
+
+  if(!data){
+
+    data=createMarketData(code);
+
+  }
+
+  const s=getStock(code);
+
+  document.getElementById("stockName").textContent=
+    data.name || s.name;
+
+  document.getElementById("stockCode").textContent=
+    code;
+
+  document.getElementById("marketBadge").textContent=
+    data.market || s.market;
+
+  document.getElementById("stockPrice").textContent=
+    decimal(data.price);
+
+  const changeEl=document.getElementById("stockChange");
+
+  const sign=data.change>0?"+":"";
+
+  changeEl.textContent=
+    sign+decimal(data.change)+" ("+sign+decimal(data.pct)+"%)";
+
+  changeEl.className=
+    "change "+(
+      data.change>0?"up":
+      data.change<0?"down":
+      "flat"
+    );
+
+  document.getElementById("qPrev").textContent=
+    decimal(data.prev);
+
+  document.getElementById("qOpen").textContent=
+    decimal(data.open);
+
+  document.getElementById("qHigh").textContent=
+    decimal(data.high);
+
+  document.getElementById("qLow").textContent=
+    decimal(data.low);
+
+  document.getElementById("qVolume").textContent=
+    number(data.volume);
+
+  document.getElementById("qMA5").textContent=
+    decimal(data.ma5);
+
+  document.getElementById("qMA20").textContent=
+    decimal(data.ma20);
+
+  document.getElementById("qTime").textContent=
+    data.time||"--";
+
+  document.getElementById("marketStatus").textContent=
+    data.real
+      ?"🟢 公開行情資料｜"+data.time
+      :"🟡 模擬行情｜僅供練習，不代表真實成交";
+
+  const fav=state.favorites.includes(code);
+
+  const fb=document.getElementById("favoriteBtn");
+
+  fb.textContent=fav?"★":"☆";
+
+  fb.classList.toggle("on",fav);
+
+  renderOrderBook(data);
+
+  renderAccount();
+
+}
+
+
+/* -------------------------
+   Order book
+------------------------- */
+
+function renderOrderBook(data){
+
+  const asks=document.getElementById("asks");
+
+  const bids=document.getElementById("bids");
+
+  let a="";
+  let b="";
+
+  const tick=getTick(data.price);
+
+  for(let i=5;i>=1;i--){
+
+    const p=data.price+tick*i;
+
+    const v=Math.round(
+      100+Math.random()*2500
+    );
+
+    a+=`
+      <div class="book-row">
+        <span class="book-price up">${decimal(p)}</span>
+        <span class="book-vol">${number(v)}</span>
+      </div>
+    `;
+
+  }
+
+  for(let i=1;i<=5;i++){
+
+    const p=data.price-tick*i;
+
+    const v=Math.round(
+      100+Math.random()*2500
+    );
+
+    b+=`
+      <div class="book-row">
+        <span class="book-price down">${decimal(p)}</span>
+        <span class="book-vol">${number(v)}</span>
+      </div>
+    `;
+
+  }
+
+  asks.innerHTML=a;
+  bids.innerHTML=b;
+
+}
+
+
+function getTick(price){
+
+  if(price<10) return 0.01;
+  if(price<50) return 0.05;
+  if(price<150) return 0.1;
+  if(price<500) return 0.5;
+  if(price<1000) return 1;
+  return 5;
+
+}
+
+
+/* -------------------------
+   Favorite
+------------------------- */
+
+function toggleFavorite(){
+
+  const code=state.currentCode;
+
+  const index=state.favorites.indexOf(code);
+
+  if(index>=0){
+
+    state.favorites.splice(index,1);
+
+    toast("已移除自選");
+
+  }else{
+
+    state.favorites.push(code);
+
+    toast("已加入自選");
+
+  }
+
+  saveState();
+
+  renderQuote();
+
+  renderWatch();
+
+}
+
+
+/* -------------------------
+   Order modal
+------------------------- */
+
+let modalSide="buy";
+
+
+function openOrder(side){
+
+  modalSide=side;
+
+  const code=state.currentCode;
+
+  const data=state.marketData[code] || createMarketData(code);
+
+  document.getElementById("modalStock").value=code;
+
+  document.getElementById("modalPrice").value=
+    decimal(data.price);
+
+  document.getElementById("modalQty").value=1000;
+
+  document.getElementById("modalStockName").textContent=
+    data.name || getStock(code).name;
+
+  document.getElementById("modalTitle").textContent=
+    side==="buy"?"買進":"賣出";
+
+  const submit=document.getElementById("modalSubmit");
+
+  submit.textContent=
+    side==="buy"?"確認買進":"確認賣出";
+
+  submit.className=
+    "submit "+side;
+
+  document.getElementById("orderModal").classList.add("show");
+
+  updateModalSummary();
+
+}
+
+
+function closeModal(){
+
+  document.getElementById("orderModal").classList.remove("show");
+
+}
+
+
+function calcFee(amount){
+
+  return Math.floor(
+    amount*0.001425
   );
 
 }
 
 
-/* =========================================================
-   TOAST
-========================================================= */
+function calcTax(amount,side){
 
-function toast(message){
+  if(side==="sell"){
 
-  const el = document.getElementById("toast");
-
-  el.innerText = message;
-
-  el.style.display = "block";
-
-  clearTimeout(window.toastTimer);
-
-  window.toastTimer = setTimeout(()=>{
-
-    el.style.display = "none";
-
-  },2600);
-
-}
-
-
-/* =========================================================
-   TAB
-========================================================= */
-
-function showSection(name,button){
-
-  document.querySelectorAll(".section")
-    .forEach(x=>x.classList.remove("active"));
-
-  document.getElementById("section-"+name)
-    .classList.add("active");
-
-  document.querySelectorAll(".tab")
-    .forEach(x=>x.classList.remove("active"));
-
-  button.classList.add("active");
-
-  renderAll();
-
-}
-
-
-/* =========================================================
-   QTY
-========================================================= */
-
-function changeQty(delta){
-
-  const input = document.getElementById("qty");
-
-  let value = parseInt(input.value || "1",10);
-
-  value += delta;
-
-  if(value < 1) value = 1;
-
-  input.value = value;
-
-}
-
-
-/* =========================================================
-   PRICE FORMAT
-========================================================= */
-
-function fmt(value){
-
-  if(value === null || value === undefined || value === "" || isNaN(value)){
-    return "--";
-  }
-
-  return Number(value).toLocaleString("zh-TW",{
-    maximumFractionDigits:0
-  });
-
-}
-
-
-function money(value){
-
-  const n = Number(value || 0);
-
-  return n.toLocaleString("zh-TW",{
-    maximumFractionDigits:0
-  });
-
-}
-
-
-/* =========================================================
-   MARKET UI
-========================================================= */
-
-function renderMarket(){
-
-  const price = document.getElementById("price");
-  const change = document.getElementById("change");
-
-  if(market.last == null){
-
-    price.innerText = "--";
-
-    change.innerText = "-- 點　--%";
-
-  }else{
-
-    price.innerText = fmt(market.last);
-
-    const diff = Number(market.change || 0);
-
-    const pct = Number(market.changePct || 0);
-
-    change.innerText =
-      (diff > 0 ? "+" : "") +
-      fmt(diff) +
-      " 點　" +
-      (pct > 0 ? "+" : "") +
-      pct.toFixed(2) +
-      "%";
-
-    change.className =
-      "change " +
-      (diff > 0 ? "up" : diff < 0 ? "down" : "flat");
+    return Math.floor(
+      amount*0.003
+    );
 
   }
 
-  document.getElementById("mLast").innerText = fmt(market.last);
-  document.getElementById("mBid").innerText = fmt(market.bid);
-  document.getElementById("mAsk").innerText = fmt(market.ask);
-  document.getElementById("mOpen").innerText = fmt(market.open);
-  document.getElementById("mHigh").innerText = fmt(market.high);
-  document.getElementById("mLow").innerText = fmt(market.low);
+  return 0;
 
 }
 
 
-/* =========================================================
-   STATUS
-========================================================= */
+function updateModalSummary(){
 
-function setStatus(text,type=""){
+  const price=Number(
+    document.getElementById("modalPrice").value
+  )||0;
 
-  const el = document.getElementById("status");
+  const qty=Number(
+    document.getElementById("modalQty").value
+  )||0;
 
-  el.className = "status " + type;
+  const amount=price*qty;
 
-  el.innerText = text;
+  const fee=calcFee(amount);
+
+  const tax=calcTax(amount,modalSide);
+
+  const total=
+    modalSide==="buy"
+      ?amount+fee
+      :amount-fee-tax;
+
+  document.getElementById("modalAmount").textContent=
+    money(amount);
+
+  document.getElementById("modalFee").textContent=
+    money(fee);
+
+  document.getElementById("modalTax").textContent=
+    money(tax);
+
+  document.getElementById("modalTotal").textContent=
+    money(total);
 
 }
 
 
-/* =========================================================
-   REAL TAIFEX QUOTE
-========================================================= */
+document.getElementById("modalPrice")
+.addEventListener("input",updateModalSummary);
 
-async function fetchTaifexQuote(){
-
-  const url =
-    "https://mis.taifex.com.tw/futures/api/getQuoteList";
-
-  const payload = {
-
-    MarketType:"0",
-
-    SymbolType:"F",
-
-    KindID:"1",
-
-    CID:"TXF",
-
-    ExpireMonth:"",
-
-    RowSize:"全部",
-
-    PageNo:"",
-
-    SortColumn:"",
-
-    AscDesc:"A"
-
-  };
+document.getElementById("modalQty")
+.addEventListener("input",updateModalSummary);
 
 
-  try{
+/* -------------------------
+   Execute trade
+------------------------- */
 
-    const response = await fetch(url,{
+function submitModalOrder(){
 
-      method:"POST",
+  const code=
+    document.getElementById("modalStock").value
+    .trim()
+    .toUpperCase();
 
-      headers:{
-        "Content-Type":"application/json",
-        "Accept":"application/json"
-      },
+  const price=
+    Number(document.getElementById("modalPrice").value);
 
-      body:JSON.stringify(payload),
+  const qty=
+    Number(document.getElementById("modalQty").value);
 
-      cache:"no-store"
+  if(!code){
+
+    toast("請輸入股票代號");
+
+    return;
+
+  }
+
+  if(!price || price<=0){
+
+    toast("價格不正確");
+
+    return;
+
+  }
+
+  if(!qty || qty<=0){
+
+    toast("股數不正確");
+
+    return;
+
+  }
+
+  executeTrade(
+    modalSide,
+    code,
+    price,
+    qty,
+    "模擬限價"
+  );
+
+}
+
+
+function executeTrade(
+  side,
+  code,
+  price,
+  qty,
+  orderType
+){
+
+  const stock=getStock(code);
+
+  const amount=price*qty;
+
+  const fee=calcFee(amount);
+
+  const tax=calcTax(amount,side);
+
+  const now=new Date().toLocaleString("zh-TW");
+
+  if(side==="buy"){
+
+    const required=amount+fee;
+
+    if(required>state.cash){
+
+      toast("模擬資金不足");
+
+      return false;
+
+    }
+
+    state.cash-=required;
+
+    if(!state.holdings[code]){
+
+      state.holdings[code]={
+        code,
+        name:stock.name,
+        qty:0,
+        avg:0,
+        cost:0
+      };
+
+    }
+
+    const h=state.holdings[code];
+
+    const oldCost=h.cost||0;
+
+    const newCost=oldCost+amount+fee;
+
+    const newQty=h.qty+qty;
+
+    h.qty=newQty;
+
+    h.cost=newCost;
+
+    h.avg=
+      newQty ? newCost/newQty : 0;
+
+    state.filledOrders.unshift({
+
+      id:Date.now(),
+
+      side:"buy",
+
+      code,
+
+      name:stock.name,
+
+      price,
+
+      qty,
+
+      amount,
+
+      fee,
+
+      tax,
+
+      time:now,
+
+      status:"成交"
 
     });
 
+    state.history.unshift({
 
-    if(!response.ok){
+      id:Date.now(),
 
-      throw new Error("HTTP "+response.status);
+      type:"買進",
 
-    }
+      code,
 
+      name:stock.name,
 
-    const data = await response.json();
+      price,
 
-    const list =
-      data &&
-      data.RtData &&
-      data.RtData.QuoteList
-        ? data.RtData.QuoteList
-        : [];
+      qty,
 
+      amount,
 
-    if(!Array.isArray(list) || list.length===0){
+      fee,
 
-      throw new Error("沒有取得行情");
+      tax,
 
-    }
+      time:now
 
+    });
 
-    /*
-      優先找 TXF / 臺股期貨
-    */
-
-    let q =
-      list.find(x =>
-        String(x.CID || "").toUpperCase()==="TXF"
-      );
-
-
-    if(!q){
-
-      q =
-        list.find(x =>
-          String(x.DispCName || "").includes("臺股期貨")
-        );
-
-    }
-
-
-    if(!q){
-
-      q = list[0];
-
-    }
-
-
-    const last = num(
-      q.CLastPrice
+    toast(
+      "買進成交｜"+stock.name+
+      " "+number(qty)+" 股"
     );
-
-    if(last == null){
-
-      throw new Error("最新成交價不存在");
-
-    }
-
-
-    market.last = last;
-    market.bid = num(q.CBidPrice1);
-    market.ask = num(q.CAskPrice1);
-    market.open = num(q.COpenPrice);
-    market.high = num(q.CHighPrice);
-    market.low = num(q.CLowPrice);
-    market.change = num(q.CDiff);
-    market.changePct = num(q.CAmpRate);
-    market.time = q.CTime || "";
-    market.expireMonth = q.ExpireMonth || "";
-    market.contract = "TXF";
-    market.connected = true;
-
-
-    /*
-      只有第一次沒有委託價時才帶入一次。
-      之後絕對不跟著行情跳。
-    */
-
-    if(!initializedPrice){
-
-      const input =
-        document.getElementById("orderPrice");
-
-      if(
-        input &&
-        (!input.value || input.value==="")
-      ){
-
-        input.value = Math.round(last);
-
-      }
-
-      initializedPrice = true;
-
-    }
-
-
-    setStatus(
-      "🟢 已連線｜臺指期真實行情 " +
-      (market.time ? market.time : ""),
-      "real"
-    );
-
-
-    renderMarket();
-
-    checkPendingOrders();
-
-    checkAutoSLTP();
-
-    renderPosition();
-
-    return true;
-
-  }catch(error){
-
-    console.log("TAIFEX quote error:",error);
-
-    market.connected = false;
-
-    setStatus(
-      "🔴 暫時無法連線臺指期即時行情｜不使用亂數行情",
-      "error"
-    );
-
-    renderMarket();
-
-    return false;
-
-  }
-
-}
-
-
-function num(v){
-
-  if(v === null || v === undefined || v === ""){
-
-    return null;
-
-  }
-
-  const n =
-    Number(
-      String(v)
-        .replace(/,/g,"")
-        .replace(/▲/g,"")
-        .replace(/▼/g,"")
-    );
-
-  return Number.isFinite(n) ? n : null;
-
-}
-
-
-/* =========================================================
-   PLACE ORDER
-========================================================= */
-
-function placeOrder(side,type){
-
-  const qty =
-    parseInt(
-      document.getElementById("qty").value || "1",
-      10
-    );
-
-  if(!Number.isFinite(qty) || qty < 1){
-
-    toast("請輸入口數");
-
-    return;
-
-  }
-
-
-  if(market.last == null){
-
-    toast("目前沒有即時行情，無法成交");
-
-    return;
-
-  }
-
-
-  /*
-    如果已有部位
-    不允許用一般進場按鈕反向亂開
-  */
-
-  if(account.position){
-
-    if(account.position.side !== side){
-
-      toast("目前已有相反方向部位，請先平倉");
-
-      return;
-
-    }
-
-    toast("已有同方向部位，請使用「加碼」");
-
-    return;
-
-  }
-
-
-  if(type === "market"){
-
-    const price = market.last;
-
-    executeEntry(side,price,qty,"現價");
-
-    return;
-
-  }
-
-
-  const price =
-    num(
-      document.getElementById("orderPrice").value
-    );
-
-
-  if(price == null){
-
-    toast("請手動輸入委託價格");
-
-    return;
-
-  }
-
-
-  const order = {
-
-    id:Date.now()+Math.random(),
-
-    time:new Date().toLocaleTimeString("zh-TW",{
-      hour12:false
-    }),
-
-    side,
-
-    type:"限價",
-
-    price,
-
-    qty,
-
-    status:"pending"
-
-  };
-
-
-  account.orders.unshift(order);
-
-  saveAccount();
-
-  renderAll();
-
-  toast(
-    (side==="long" ? "買多" : "買空") +
-    " 限價委託已送出｜"+
-    fmt(price)
-  );
-
-
-  checkPendingOrders();
-
-}
-
-
-/* =========================================================
-   ADD POSITION
-========================================================= */
-
-function addPosition(side){
-
-  if(!account.position){
-
-    toast("目前沒有倉位，請先進場");
-
-    return;
-
-  }
-
-
-  if(account.position.side !== side){
-
-    toast("已有相反方向部位，不能直接加碼");
-
-    return;
-
-  }
-
-
-  const qty =
-    parseInt(
-      document.getElementById("qty").value || "1",
-      10
-    );
-
-
-  if(!Number.isFinite(qty) || qty<1){
-
-    toast("請輸入口數");
-
-    return;
-
-  }
-
-
-  if(market.last == null){
-
-    toast("目前沒有即時行情");
-
-    return;
-
-  }
-
-
-  /*
-    加碼使用目前行情立即成交
-  */
-
-  const price = market.last;
-
-  addToPosition(side,price,qty);
-
-}
-
-
-/* =========================================================
-   EXECUTE ENTRY
-========================================================= */
-
-function executeEntry(side,price,qty,type){
-
-  price = Number(price);
-
-  qty = Number(qty);
-
-
-  if(!price || !qty){
-
-    return;
-
-  }
-
-
-  account.position = {
-
-    side,
-
-    qty,
-
-    avgPrice:price,
-
-    openedAt:new Date().toLocaleTimeString("zh-TW",{
-      hour12:false
-    })
-
-  };
-
-
-  const trade = {
-
-    time:new Date().toLocaleTimeString("zh-TW",{
-      hour12:false
-    }),
-
-    side,
-
-    type,
-
-    price,
-
-    qty,
-
-    pnl:0
-
-  };
-
-
-  account.trades.unshift(trade);
-
-  saveAccount();
-
-  renderAll();
-
-
-  toast(
-    "✅ " +
-    (side==="long" ? "買多" : "買空") +
-    " 成交｜" +
-    fmt(price) +
-    "｜" +
-    qty +
-    "口"
-  );
-
-}
-
-
-/* =========================================================
-   ADD TO POSITION
-========================================================= */
-
-function addToPosition(side,price,qty){
-
-  const p = account.position;
-
-  const totalQty =
-    p.qty + qty;
-
-  const newAvg =
-    (
-      p.avgPrice * p.qty +
-      price * qty
-    ) / totalQty;
-
-
-  p.avgPrice = newAvg;
-
-  p.qty = totalQty;
-
-
-  account.trades.unshift({
-
-    time:new Date().toLocaleTimeString("zh-TW",{
-      hour12:false
-    }),
-
-    side,
-
-    type:"加碼",
-
-    price,
-
-    qty,
-
-    pnl:0
-
-  });
-
-
-  saveAccount();
-
-  renderAll();
-
-
-  toast(
-    "✅ 加碼成交｜" +
-    (side==="long" ? "多單" : "空單") +
-    " +" +
-    qty +
-    "口｜均價 " +
-    fmt(newAvg)
-  );
-
-}
-
-
-/* =========================================================
-   CHECK LIMIT ORDERS
-========================================================= */
-
-function checkPendingOrders(){
-
-  if(market.last == null){
-
-    return;
-
-  }
-
-
-  account.orders.forEach(order=>{
-
-    if(order.status !== "pending"){
-
-      return;
-
-    }
-
-
-    /*
-      已有倉位時
-      限價單同方向可視為加碼。
-    */
-
-    if(order.side==="long"){
-
-      if(market.last <= order.price){
-
-        order.status="filled";
-
-        if(!account.position){
-
-          executeEntry(
-            "long",
-            order.price,
-            order.qty,
-            "限價"
-          );
-
-        }else if(account.position.side==="long"){
-
-          addToPosition(
-            "long",
-            order.price,
-            order.qty
-          );
-
-        }else{
-
-          order.status="cancelled";
-
-        }
-
-      }
-
-    }
-
-
-    if(order.side==="short"){
-
-      if(market.last >= order.price){
-
-        order.status="filled";
-
-        if(!account.position){
-
-          executeEntry(
-            "short",
-            order.price,
-            order.qty,
-            "限價"
-          );
-
-        }else if(account.position.side==="short"){
-
-          addToPosition(
-            "short",
-            order.price,
-            order.qty
-          );
-
-        }else{
-
-          order.status="cancelled";
-
-        }
-
-      }
-
-    }
-
-  });
-
-
-  saveAccount();
-
-  renderAll();
-
-}
-
-
-/* =========================================================
-   CLOSE POSITION
-========================================================= */
-
-function closePosition(){
-
-  if(!account.position){
-
-    toast("目前沒有部位");
-
-    return;
-
-  }
-
-
-  if(market.last == null){
-
-    toast("目前沒有行情");
-
-    return;
-
-  }
-
-
-  const p = account.position;
-
-  const exitPrice = market.last;
-
-  let pnl = 0;
-
-
-  if(p.side==="long"){
-
-    pnl =
-      (exitPrice - p.avgPrice) *
-      50 *
-      p.qty;
 
   }else{
 
-    pnl =
-      (p.avgPrice - exitPrice) *
-      50 *
-      p.qty;
+    const h=state.holdings[code];
+
+    if(!h || h.qty<qty){
+
+      toast("庫存不足，無法賣出");
+
+      return false;
+
+    }
+
+    const revenue=amount-fee-tax;
+
+    const avgCost=h.avg*qty;
+
+    const realized=revenue-avgCost;
+
+    state.cash+=revenue;
+
+    h.qty-=qty;
+
+    h.cost=Math.max(
+      0,
+      h.avg*h.qty
+    );
+
+    h.avg=h.qty ? h.cost/h.qty : 0;
+
+    state.realized.unshift({
+
+      id:Date.now(),
+
+      code,
+
+      name:stock.name,
+
+      price,
+
+      qty,
+
+      profit:realized,
+
+      time:now
+
+    });
+
+    state.filledOrders.unshift({
+
+      id:Date.now(),
+
+      side:"sell",
+
+      code,
+
+      name:stock.name,
+
+      price,
+
+      qty,
+
+      amount,
+
+      fee,
+
+      tax,
+
+      time:now,
+
+      status:"成交"
+
+    });
+
+    state.history.unshift({
+
+      id:Date.now(),
+
+      type:"賣出",
+
+      code,
+
+      name:stock.name,
+
+      price,
+
+      qty,
+
+      amount,
+
+      fee,
+
+      tax,
+
+      profit:realized,
+
+      time:now
+
+    });
+
+    if(h.qty<=0){
+
+      delete state.holdings[code];
+
+    }
+
+    toast(
+      "賣出成交｜"+
+      stock.name+
+      "｜損益 "+
+      money(realized)
+    );
 
   }
 
-
-  account.realized += pnl;
-
-  account.balance += pnl;
-
-
-  account.trades.unshift({
-
-    time:new Date().toLocaleTimeString("zh-TW",{
-      hour12:false
-    }),
-
-    side:p.side==="long" ? "平多" : "平空",
-
-    type:"平倉",
-
-    price:exitPrice,
-
-    qty:p.qty,
-
-    pnl
-
-  });
-
-
-  account.position = null;
-
-  saveAccount();
+  saveState();
 
   renderAll();
 
+  closeModal();
 
-  toast(
-    "✅ 平倉完成｜損益 " +
-    (pnl>=0 ? "+" : "") +
-    money(pnl) +
-    " 元"
-  );
+  return true;
 
 }
 
 
-/* =========================================================
-   CANCEL ORDER
-========================================================= */
+/* -------------------------
+   Normal order page
+------------------------- */
+
+function updateOrderSummary(){
+
+  const side=
+    document.getElementById("orderSide").value;
+
+  const price=
+    Number(document.getElementById("orderPrice").value)||0;
+
+  const qty=
+    Number(document.getElementById("orderQty").value)||0;
+
+  const amount=price*qty;
+
+  const fee=calcFee(amount);
+
+  const tax=calcTax(amount,side);
+
+  const total=
+    side==="buy"
+      ?amount+fee
+      :amount-fee-tax;
+
+  document.getElementById("sumAmount").textContent=
+    money(amount);
+
+  document.getElementById("sumFee").textContent=
+    money(fee);
+
+  document.getElementById("sumTax").textContent=
+    money(tax);
+
+  document.getElementById("sumTotal").textContent=
+    money(total);
+
+  const btn=document.getElementById("submitOrderBtn");
+
+  btn.textContent=
+    side==="buy"?"買進委託":"賣出委託";
+
+  btn.className=
+    "submit "+side;
+
+}
+
+
+document.getElementById("orderSide")
+.addEventListener("change",updateOrderSummary);
+
+
+/* -------------------------
+   Submit page order
+------------------------- */
+
+function submitOrder(){
+
+  const code=
+    document.getElementById("orderStock")
+    .value.trim().toUpperCase();
+
+  const side=
+    document.getElementById("orderSide").value;
+
+  const price=
+    Number(document.getElementById("orderPrice").value);
+
+  const qty=
+    Number(document.getElementById("orderQty").value);
+
+  const type=
+    document.getElementById("orderType").value;
+
+  if(!code){
+
+    toast("請輸入股票代號");
+
+    return;
+
+  }
+
+  if(!price || price<=0){
+
+    toast("請輸入價格");
+
+    return;
+
+  }
+
+  if(!qty || qty<=0){
+
+    toast("請輸入股數");
+
+    return;
+
+  }
+
+  const order={
+
+    id:Date.now(),
+
+    side,
+
+    code,
+
+    name:getStock(code).name,
+
+    price,
+
+    qty,
+
+    type,
+
+    status:"委託",
+
+    time:new Date().toLocaleString("zh-TW")
+
+  };
+
+  state.pendingOrders.unshift(order);
+
+  saveState();
+
+  renderOrders();
+
+  toast("委託已送出");
+
+}
+
+
+/* -------------------------
+   Pending orders
+------------------------- */
 
 function cancelOrder(id){
 
-  const order =
-    account.orders.find(x=>x.id===id);
+  state.pendingOrders=
+    state.pendingOrders.filter(
+      x=>x.id!==id
+    );
 
-  if(!order){
+  saveState();
 
-    return;
+  renderOrders();
 
-  }
-
-
-  if(order.status !== "pending"){
-
-    return;
-
-  }
-
-
-  order.status="cancelled";
-
-  saveAccount();
-
-  renderAll();
-
-  toast("委託已撤單");
+  toast("委託已取消");
 
 }
 
-
-/* =========================================================
-   UNREALIZED PNL
-========================================================= */
-
-function getUnrealized(){
-
-  if(
-    !account.position ||
-    market.last == null
-  ){
-
-    return 0;
-
-  }
-
-
-  const p = account.position;
-
-
-  if(p.side==="long"){
-
-    return (
-      market.last -
-      p.avgPrice
-    ) * 50 * p.qty;
-
-  }
-
-
-  return (
-    p.avgPrice -
-    market.last
-  ) * 50 * p.qty;
-
-}
-
-
-/* =========================================================
-   POSITION UI
-========================================================= */
-
-function renderPosition(){
-
-  const area =
-    document.getElementById("positionArea");
-
-  if(!account.position){
-
-    area.innerHTML = `
-      <div class="position-empty">
-        目前沒有期貨部位
-      </div>
-    `;
-
-    return;
-
-  }
-
-
-  const p = account.position;
-
-  const pnl = getUnrealized();
-
-
-  area.innerHTML = `
-
-    <div class="position-box">
-
-      <div class="position-title">
-
-        <div class="position-side ${p.side}">
-          ${p.side==="long" ? "🟢 多單" : "🔴 空單"}
-        </div>
-
-        <div>
-          ${p.qty} 口
-        </div>
-
-      </div>
-
-      <div class="position-grid">
-
-        <div class="stat">
-          <div class="name">平均進場價</div>
-          <div class="value">
-            ${fmt(p.avgPrice)}
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="name">目前價格</div>
-          <div class="value">
-            ${fmt(market.last)}
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="name">口數</div>
-          <div class="value">
-            ${p.qty}
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="name">浮動損益</div>
-          <div class="value ${pnl>=0 ? "pnl-positive" : "pnl-negative"}">
-            ${pnl>=0 ? "+" : ""}${money(pnl)} 元
-          </div>
-        </div>
-
-      </div>
-
-      <div class="order-grid" style="margin-top:15px;">
-
-        <button
-          class="order-btn close-long"
-          onclick="closePosition()">
-          ${p.side==="long" ? "平多" : "平空"}
-        </button>
-
-        <button
-          class="order-btn add-long"
-          onclick="addPosition('${p.side}')">
-          ${p.side==="long" ? "加碼多" : "加碼空"}
-        </button>
-
-      </div>
-
-      <div class="info">
-        你目前可以繼續增加同方向口數。
-        <br>
-        加碼後系統會重新計算平均成本。
-      </div>
-
-    </div>
-  `;
-
-}
-
-
-/* =========================================================
-   ORDERS TABLE
-========================================================= */
 
 function renderOrders(){
 
-  const tbody =
-    document.getElementById("ordersTable");
+  const pending=
+    document.getElementById("pendingOrders");
 
-  if(!account.orders.length){
+  const filled=
+    document.getElementById("filledOrders");
 
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7">目前沒有委託</td>
-      </tr>
-    `;
+  if(!state.pendingOrders.length){
+
+    pending.innerHTML=
+      `<div class="empty">目前沒有委託單</div>`;
+
+  }else{
+
+    pending.innerHTML=
+      state.pendingOrders
+      .slice(0,20)
+      .map(o=>`
+
+        <div class="row">
+
+          <div class="row-main">
+
+            <div class="row-title">
+              ${o.side==="buy"?"買進":"賣出"}
+              ${escapeHtml(o.name)}
+            </div>
+
+            <div class="row-sub">
+              ${o.code}｜
+              ${decimal(o.price)}｜
+              ${number(o.qty)} 股｜
+              ${o.time}
+            </div>
+
+          </div>
+
+          <button
+            class="quick-btn"
+            onclick="cancelOrder(${o.id})">
+            取消
+          </button>
+
+        </div>
+
+      `)
+      .join("");
+
+  }
+
+  if(!state.filledOrders.length){
+
+    filled.innerHTML=
+      `<div class="empty">目前沒有成交紀錄</div>`;
+
+  }else{
+
+    filled.innerHTML=
+      state.filledOrders
+      .slice(0,30)
+      .map(o=>`
+
+        <div class="row">
+
+          <div class="row-main">
+
+            <div class="row-title">
+
+              <span class="${o.side==="buy"?"up":"down"}">
+                ${o.side==="buy"?"買進":"賣出"}
+              </span>
+
+              ${escapeHtml(o.name)}
+
+            </div>
+
+            <div class="row-sub">
+              ${o.code}｜
+              ${decimal(o.price)}｜
+              ${number(o.qty)} 股｜
+              ${o.time}
+            </div>
+
+          </div>
+
+          <div class="row-right">
+
+            <div class="row-price">
+              ${money(o.amount)}
+            </div>
+
+            <div class="row-sub">
+              ${o.status}
+            </div>
+
+          </div>
+
+        </div>
+
+      `)
+      .join("");
+
+  }
+
+}
+
+
+/* -------------------------
+   Holdings
+------------------------- */
+
+function renderHoldings(){
+
+  const el=document.getElementById("holdings");
+
+  const codes=
+    Object.keys(state.holdings)
+    .filter(c=>state.holdings[c].qty>0);
+
+  if(!codes.length){
+
+    el.innerHTML=
+      `<div class="empty">目前沒有持股</div>`;
 
     return;
 
   }
 
+  el.innerHTML=
+    codes.map(code=>{
 
-  tbody.innerHTML =
-    account.orders.map(order=>{
+      const h=state.holdings[code];
 
-      let statusClass="pending";
+      const price=getPrice(code);
 
-      if(order.status==="filled"){
-        statusClass="filled";
-      }
+      const market=price*h.qty;
 
-      if(order.status==="cancelled"){
-        statusClass="cancelled";
-      }
+      const profit=
+        market-h.cost;
 
+      const pct=
+        h.cost ? profit/h.cost*100 : 0;
 
       return `
 
-        <tr>
+        <div
+          class="row"
+          onclick="quickStock('${code}')"
+          style="cursor:pointer"
+        >
 
-          <td>${order.time}</td>
+          <div class="row-main">
 
-          <td class="${order.side==="long" ? "buy-text" : "sell-text"}">
-            ${order.side==="long" ? "買多" : "買空"}
-          </td>
+            <div class="row-title">
+              ${escapeHtml(h.name||getStock(code).name)}
+            </div>
 
-          <td>${order.type}</td>
+            <div class="row-sub">
+              ${code}｜
+              ${number(h.qty)} 股｜
+              均價 ${decimal(h.avg)}
+            </div>
 
-          <td>${fmt(order.price)}</td>
+          </div>
 
-          <td>${order.qty}</td>
+          <div class="row-right">
 
-          <td class="${statusClass}">
-            ${
-              order.status==="pending"
-              ? "等待成交"
-              : order.status==="filled"
-              ? "已成交"
-              : "已撤單"
-            }
-          </td>
+            <div class="row-price">
+              ${money(market)}
+            </div>
 
-          <td>
-            ${
-              order.status==="pending"
-              ?
-              `<button class="cancel-btn"
-                 onclick="cancelOrder(${order.id})">
-                 撤單
-               </button>`
-              :
-              "-"
-            }
-          </td>
+            <div class="row-change ${profit>=0?"up":"down"}">
+              ${profit>=0?"+":""}${money(profit)}
+              (${profit>=0?"+":""}${pct.toFixed(2)}%)
+            </div>
 
-        </tr>
+          </div>
+
+        </div>
 
       `;
 
@@ -2232,491 +2998,950 @@ function renderOrders(){
 }
 
 
-/* =========================================================
-   TRADES TABLE
-========================================================= */
+/* -------------------------
+   Account
+------------------------- */
 
-function renderTrades(){
+function renderAccount(){
 
-  const tbody =
-    document.getElementById("tradesTable");
+  let market=0;
+
+  let unrealized=0;
+
+  Object.keys(state.holdings)
+  .forEach(code=>{
+
+    const h=state.holdings[code];
+
+    if(!h.qty) return;
+
+    const price=getPrice(code);
+
+    market+=price*h.qty;
+
+    unrealized+=
+      price*h.qty-h.cost;
+
+  });
+
+  const realized=
+    state.realized.reduce(
+      (sum,x)=>sum+(Number(x.profit)||0),
+      0
+    );
+
+  const total=
+    state.cash+market;
+
+  const returnPct=
+    state.initialCash
+      ?(total-state.initialCash)/
+       state.initialCash*100
+      :0;
+
+  document.getElementById("cashTop").textContent=
+    money(state.cash);
+
+  document.getElementById("marketValueTop").textContent=
+    money(market);
+
+  document.getElementById("aCash").textContent=
+    money(state.cash);
+
+  document.getElementById("aMarket").textContent=
+    money(market);
+
+  const u=document.getElementById("aUnrealized");
+
+  u.textContent=
+    (unrealized>=0?"+":"")+
+    money(unrealized);
+
+  u.className=
+    "account-value "+
+    (unrealized>=0?"profit":"loss");
+
+  const r=document.getElementById("aRealized");
+
+  r.textContent=
+    (realized>=0?"+":"")+
+    money(realized);
+
+  r.className=
+    "account-value "+
+    (realized>=0?"profit":"loss");
+
+  document.getElementById("aTotal").textContent=
+    money(total);
+
+  document.getElementById("aReturn").textContent=
+    (returnPct>=0?"+":"")+
+    returnPct.toFixed(2)+"%";
+
+  renderHoldings();
+
+  renderRealized();
+
+}
 
 
-  if(!account.trades.length){
+/* -------------------------
+   Realized
+------------------------- */
 
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6">目前沒有成交紀錄</td>
-      </tr>
-    `;
+function renderRealized(){
+
+  const el=
+    document.getElementById("realizedList");
+
+  if(!state.realized.length){
+
+    el.innerHTML=
+      `<div class="empty">尚無已實現損益</div>`;
 
     return;
 
   }
 
+  el.innerHTML=
+    state.realized
+    .slice(0,30)
+    .map(x=>`
 
-  tbody.innerHTML =
-    account.trades.map(t=>`
+      <div class="row">
 
-      <tr>
+        <div class="row-main">
 
-        <td>${t.time}</td>
+          <div class="row-title">
+            ${escapeHtml(x.name)}
+          </div>
 
-        <td class="${
-          t.side==="long" ||
-          t.side==="平空"
-          ? "buy-text"
-          : "sell-text"
-        }">
-          ${t.side==="long" ? "買多" :
-            t.side==="short" ? "買空" :
-            t.side}
-        </td>
+          <div class="row-sub">
+            ${x.code}｜
+            ${number(x.qty)} 股｜
+            ${x.time}
+          </div>
 
-        <td>${t.type}</td>
+        </div>
 
-        <td>${fmt(t.price)}</td>
+        <div class="row-right">
 
-        <td>${t.qty}</td>
+          <div
+            class="row-price ${x.profit>=0?"up":"down"}"
+          >
+            ${x.profit>=0?"+":""}${money(x.profit)}
+          </div>
 
-        <td class="${
-          Number(t.pnl||0)>=0
-          ? "pnl-positive"
-          : "pnl-negative"
-        }">
-          ${
-            t.pnl
-            ? (t.pnl>=0 ? "+" : "") + money(t.pnl)
-            : "—"
-          }
-        </td>
+        </div>
 
-      </tr>
+      </div>
 
-    `).join("");
+    `)
+    .join("");
 
 }
 
 
-/* =========================================================
-   SETTINGS
-========================================================= */
+/* -------------------------
+   History
+------------------------- */
 
-function renderSettings(){
+function renderHistory(){
 
-  const unrealized =
-    getUnrealized();
+  const el=
+    document.getElementById("historyList");
 
+  if(!state.history.length){
 
-  document.getElementById("balance")
-    .innerText =
-      money(account.balance);
-
-
-  document.getElementById("realized")
-    .innerText =
-      (account.realized>=0 ? "+" : "") +
-      money(account.realized);
-
-
-  document.getElementById("unrealized")
-    .innerText =
-      (unrealized>=0 ? "+" : "") +
-      money(unrealized);
-
-
-  document.getElementById("unrealized")
-    .className =
-      "value " +
-      (
-        unrealized>=0
-        ? "pnl-positive"
-        : "pnl-negative"
-      );
-
-}
-
-
-/* =========================================================
-   ADD LONG / SHORT BUTTON STATE
-========================================================= */
-
-function renderAddButtons(){
-
-  const longBtn =
-    document.getElementById("addLongBtn");
-
-  const shortBtn =
-    document.getElementById("addShortBtn");
-
-
-  if(!account.position){
-
-    longBtn.classList.add("disabled");
-    shortBtn.classList.add("disabled");
+    el.innerHTML=
+      `<div class="empty">尚無交易紀錄</div>`;
 
     return;
 
   }
 
+  el.innerHTML=
+    state.history
+    .slice(0,50)
+    .map(x=>`
 
-  if(account.position.side==="long"){
+      <div class="row">
 
-    longBtn.classList.remove("disabled");
-    shortBtn.classList.add("disabled");
+        <div class="row-main">
+
+          <div class="row-title">
+
+            <span class="${x.type==="買進"?"up":"down"}">
+              ${x.type}
+            </span>
+
+            ${escapeHtml(x.name)}
+
+          </div>
+
+          <div class="row-sub">
+            ${x.code}｜
+            ${decimal(x.price)}｜
+            ${number(x.qty)} 股｜
+            ${x.time}
+          </div>
+
+        </div>
+
+        <div class="row-right">
+
+          <div class="row-price">
+            ${money(x.amount)}
+          </div>
+
+        </div>
+
+      </div>
+
+    `)
+    .join("");
+
+}
+
+
+/* -------------------------
+   Watchlist
+------------------------- */
+
+function addWatch(){
+
+  const input=
+    document.getElementById("watchInput");
+
+  const code=
+    input.value.trim().toUpperCase();
+
+  if(!code){
+
+    toast("請輸入股票代號");
+
+    return;
+
+  }
+
+  if(!state.favorites.includes(code)){
+
+    state.favorites.push(code);
+
+    saveState();
+
+    renderWatch();
+
+    toast("已加入自選");
 
   }else{
 
-    shortBtn.classList.remove("disabled");
-    longBtn.classList.add("disabled");
+    toast("已經在自選");
 
   }
 
-}
-
-
-/* =========================================================
-   RENDER ALL
-========================================================= */
-
-function renderAll(){
-
-  renderMarket();
-
-  renderPosition();
-
-  renderOrders();
-
-  renderTrades();
-
-  renderSettings();
-
-  renderAddButtons();
+  input.value="";
 
 }
 
 
-/* =========================================================
-   RESET
-========================================================= */
+function removeWatch(code){
 
-function resetAccount(){
+  state.favorites=
+    state.favorites.filter(x=>x!==code);
 
-  if(!confirm("確定要重設模擬帳戶嗎？")){
+  saveState();
+
+  renderWatch();
+
+}
+
+
+function renderWatch(){
+
+  const el=
+    document.getElementById("watchList");
+
+  if(!state.favorites.length){
+
+    el.innerHTML=
+      `<div class="empty">尚無自選股票</div>`;
 
     return;
 
   }
 
+  el.innerHTML=
+    state.favorites.map(code=>{
 
-  account = {
+      const data=
+        state.marketData[code] ||
+        createMarketData(code);
 
-    balance:1000000,
+      const stock=
+        getStock(code);
 
-    realized:0,
+      return `
 
-    position:null,
+        <div
+          class="row"
+          onclick="selectStock('${code}')"
+          style="cursor:pointer"
+        >
 
-    orders:[],
+          <div class="row-main">
 
-    trades:[],
+            <div class="row-title">
+              ${escapeHtml(data.name||stock.name)}
+            </div>
 
-    monthly:[]
+            <div class="row-sub">
+              ${code}｜
+              ${data.market||stock.market}
+            </div>
+
+          </div>
+
+          <div class="row-right">
+
+            <div class="row-price">
+              ${decimal(data.price)}
+            </div>
+
+            <div class="row-change ${data.change>=0?"up":"down"}">
+              ${data.change>=0?"+":""}${decimal(data.pct)}%
+            </div>
+
+          </div>
+
+          <button
+            class="quick-btn"
+            onclick="event.stopPropagation();removeWatch('${code}')"
+          >
+            刪除
+          </button>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+}
+
+
+/* -------------------------
+   Ranking
+------------------------- */
+
+let currentRank="volume";
+
+
+function setRank(type,btn){
+
+  currentRank=type;
+
+  document
+    .querySelectorAll(".rank-tab")
+    .forEach(x=>x.classList.remove("active"));
+
+  btn.classList.add("active");
+
+  renderRanking();
+
+}
+
+
+function renderRanking(){
+
+  const list=
+    Object.values(STOCKS)
+    .map(s=>{
+
+      const d=
+        state.marketData[s.code] ||
+        createMarketData(s.code);
+
+      return {
+        ...s,
+        ...d
+      };
+
+    });
+
+  let sorted=[...list];
+
+  if(currentRank==="volume"){
+
+    sorted.sort(
+      (a,b)=>b.volume-a.volume
+    );
+
+    document.getElementById("rankTitle")
+      .textContent="成交量排行";
+
+  }
+
+  if(currentRank==="up"){
+
+    sorted.sort(
+      (a,b)=>b.pct-a.pct
+    );
+
+    document.getElementById("rankTitle")
+      .textContent="漲幅排行";
+
+  }
+
+  if(currentRank==="down"){
+
+    sorted.sort(
+      (a,b)=>a.pct-b.pct
+    );
+
+    document.getElementById("rankTitle")
+      .textContent="跌幅排行";
+
+  }
+
+  if(currentRank==="hot"){
+
+    sorted.sort(
+      (a,b)=>b.volume*Math.abs(b.pct+0.2)-
+             a.volume*Math.abs(a.pct+0.2)
+    );
+
+    document.getElementById("rankTitle")
+      .textContent="熱門排行";
+
+  }
+
+  const el=
+    document.getElementById("rankingList");
+
+  el.innerHTML=
+    sorted.slice(0,20)
+    .map((s,i)=>`
+
+      <div
+        class="row"
+        onclick="selectStock('${s.code}')"
+        style="cursor:pointer"
+      >
+
+        <div
+          style="
+            width:28px;
+            height:28px;
+            border-radius:8px;
+            background:#30343a;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-weight:900
+          "
+        >
+          ${i+1}
+        </div>
+
+        <div class="row-main">
+
+          <div class="row-title">
+            ${escapeHtml(s.name)}
+          </div>
+
+          <div class="row-sub">
+            ${s.code}｜
+            ${s.market}
+          </div>
+
+        </div>
+
+        <div class="row-right">
+
+          <div class="row-price">
+            ${decimal(s.price)}
+          </div>
+
+          <div class="row-change ${s.pct>=0?"up":"down"}">
+            ${s.pct>=0?"+":""}${decimal(s.pct)}%
+          </div>
+
+        </div>
+
+      </div>
+
+    `)
+    .join("");
+
+}
+
+
+/* -------------------------
+   Navigation
+------------------------- */
+
+function showPage(page){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(p=>{
+      p.classList.remove("active");
+    });
+
+  const target=
+    document.getElementById("page-"+page);
+
+  if(target){
+    target.classList.add("active");
+  }
+
+  document
+    .querySelectorAll(".main-tab")
+    .forEach(btn=>{
+      btn.classList.toggle(
+        "active",
+        btn.dataset.page===page
+      );
+    });
+
+  document
+    .querySelectorAll(".bottom-btn")
+    .forEach(btn=>{
+      btn.classList.toggle(
+        "active",
+        btn.dataset.page===page
+      );
+    });
+
+  if(page==="account"){
+
+    renderAccount();
+
+    renderHistory();
+
+  }
+
+  if(page==="order"){
+
+    const data=
+      state.marketData[state.currentCode] ||
+      createMarketData(state.currentCode);
+
+    document.getElementById("orderStock").value=
+      state.currentCode;
+
+    document.getElementById("orderPrice").value=
+      decimal(data.price);
+
+    updateOrderSummary();
+
+    renderOrders();
+
+  }
+
+  if(page==="ranking"){
+
+    renderRanking();
+
+  }
+
+  if(page==="watch"){
+
+    renderWatch();
+
+  }
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+document
+.querySelectorAll(".main-tab,.bottom-btn")
+.forEach(btn=>{
+
+  btn.addEventListener(
+    "click",
+    ()=>{
+      showPage(btn.dataset.page);
+    }
+  );
+
+});
+
+
+/* -------------------------
+   Settings
+------------------------- */
+
+function openSettings(){
+
+  document.getElementById("initialCashInput").value=
+    state.initialCash;
+
+  document
+    .getElementById("settingsModal")
+    .classList.add("show");
+
+}
+
+
+function closeSettings(){
+
+  const val=
+    Number(
+      document.getElementById("initialCashInput").value
+    );
+
+  if(val>0){
+
+    state.initialCash=val;
+
+    saveState();
+
+  }
+
+  document
+    .getElementById("settingsModal")
+    .classList.remove("show");
+
+  renderAccount();
+
+}
+
+
+function resetAccount(){
+
+  const ok=
+    confirm(
+      "確定要重設模擬帳戶嗎？所有持股、損益與交易紀錄都會清除。"
+    );
+
+  if(!ok) return;
+
+  const cash=
+    Number(
+      document.getElementById("initialCashInput").value
+    )||1000000;
+
+  state={
+
+    initialCash:cash,
+
+    cash:cash,
+
+    holdings:{},
+
+    favorites:["2330","1326","0050"],
+
+    pendingOrders:[],
+
+    filledOrders:[],
+
+    history:[],
+
+    realized:[],
+
+    currentCode:"2330",
+
+    marketData:{}
 
   };
 
-
-  saveAccount();
+  saveState();
 
   renderAll();
+
+  closeSettings();
 
   toast("模擬帳戶已重設");
 
 }
 
 
-/* =========================================================
-   AUTO STOP LOSS / TAKE PROFIT
-========================================================= */
+/* -------------------------
+   Export
+------------------------- */
 
-function checkAutoSLTP(){
+function exportData(){
 
-  if(!document.getElementById("autoSLTP").checked){
-
-    return;
-
-  }
-
-
-  if(!account.position || market.last==null){
-
-    return;
-
-  }
-
-
-  const p = account.position;
-
-  const tp =
-    Number(
-      document.getElementById("takeProfit").value || 0
+  const blob=
+    new Blob(
+      [
+        JSON.stringify(
+          state,
+          null,
+          2
+        )
+      ],
+      {
+        type:"application/json"
+      }
     );
 
-  const sl =
-    Number(
-      document.getElementById("stopLoss").value || 0
-    );
+  const url=
+    URL.createObjectURL(blob);
 
+  const a=
+    document.createElement("a");
 
-  if(tp>0){
+  a.href=url;
 
-    if(
-      p.side==="long" &&
-      market.last >= p.avgPrice + tp
-    ){
+  a.download=
+    "股票模擬器交易資料.json";
 
-      toast("🎯 多單達到停利");
+  a.click();
 
-      closePosition();
+  URL.revokeObjectURL(url);
 
-      return;
-
-    }
-
-
-    if(
-      p.side==="short" &&
-      market.last <= p.avgPrice - tp
-    ){
-
-      toast("🎯 空單達到停利");
-
-      closePosition();
-
-      return;
-
-    }
-
-  }
-
-
-  if(sl>0){
-
-    if(
-      p.side==="long" &&
-      market.last <= p.avgPrice - sl
-    ){
-
-      toast("🛑 多單達到停損");
-
-      closePosition();
-
-      return;
-
-    }
-
-
-    if(
-      p.side==="short" &&
-      market.last >= p.avgPrice + sl
-    ){
-
-      toast("🛑 空單達到停損");
-
-      closePosition();
-
-      return;
-
-    }
-
-  }
+  toast("資料已匯出");
 
 }
 
 
-/* =========================================================
-   MONTHLY DATA
-   使用官方每日行情頁面做資料讀取的準備區。
-   若瀏覽器禁止跨來源讀取，這裡不會用亂數代替。
-========================================================= */
+/* -------------------------
+   Clear history
+------------------------- */
 
-async function loadMonthlyStats(){
+function clearHistory(){
 
-  /*
-    保留本月已取得的真實日資料。
-    不使用虛構數字。
-  */
+  if(!confirm("確定清除交易紀錄？")) return;
 
-  const month =
-    new Date().getMonth()+1;
+  state.history=[];
 
-  const year =
-    new Date().getFullYear();
+  state.filledOrders=[];
 
+  saveState();
 
-  /*
-    目前頁面行情可直接使用即時資料。
-    歷史日資料若瀏覽器拒絕跨來源，
-    顯示尚未取得，不自行亂填。
-  */
+  renderHistory();
 
-  document.getElementById("monthDays")
-    .innerText =
-      account.monthly.length || "--";
+  renderOrders();
+
+  toast("交易紀錄已清除");
+
+}
 
 
-  if(account.monthly.length){
+/* -------------------------
+   Render all
+------------------------- */
 
-    const highs =
-      account.monthly
-        .map(x=>Number(x.high))
-        .filter(Number.isFinite);
+function renderAll(){
 
-    const lows =
-      account.monthly
-        .map(x=>Number(x.low))
-        .filter(Number.isFinite);
+  renderQuote();
 
+  renderAccount();
 
-    if(highs.length){
+  renderOrders();
 
-      const h =
-        Math.max(...highs);
+  renderHistory();
 
-      document.getElementById("monthHigh")
-        .innerText=fmt(h);
+  renderWatch();
 
-    }
+  renderRanking();
+
+}
 
 
-    if(lows.length){
+/* -------------------------
+   Auto refresh simulation
+------------------------- */
 
-      const l =
-        Math.min(...lows);
+async function refreshCurrent(){
 
-      document.getElementById("monthLow")
-        .innerText=fmt(l);
+  const code=state.currentCode;
 
-    }
+  const real=
+    await fetchRealQuote(code);
 
+  if(!real){
 
-    if(highs.length && lows.length){
+    const old=
+      state.marketData[code] ||
+      createMarketData(code);
 
-      document.getElementById("monthRange")
-        .innerText=
-          fmt(
-            Math.max(...highs) -
-            Math.min(...lows)
-          );
+    const base=
+      Number(old.price)||getPrice(code);
 
-    }
+    const move=
+      (Math.random()-0.5)*
+      base*
+      0.004;
 
+    const price=
+      Math.max(
+        0.01,
+        base+move
+      );
 
-    document.getElementById("monthTable")
-      .innerHTML =
-        account.monthly.map(x=>`
+    old.prev=
+      Number(old.prev)||base;
 
-          <tr>
+    old.price=price;
 
-            <td>${x.date}</td>
+    old.change=
+      price-old.prev;
 
-            <td>${fmt(x.high)}</td>
+    old.pct=
+      old.prev
+        ?old.change/old.prev*100
+        :0;
 
-            <td>${fmt(x.low)}</td>
+    old.high=
+      Math.max(
+        old.high||price,
+        price
+      );
 
-            <td>
-              <b>
-                ${fmt(
-                  Number(x.high)-Number(x.low)
-                )}
-              </b>
-            </td>
+    old.low=
+      Math.min(
+        old.low||price,
+        price
+      );
 
-          </tr>
+    old.volume=
+      Number(old.volume||0)+
+      Math.round(Math.random()*5000);
 
-        `).join("");
+    old.time=
+      new Date().toLocaleTimeString("zh-TW");
+
+    old.ma5=
+      old.ma5*0.95+
+      price*0.05;
+
+    old.ma20=
+      old.ma20*0.98+
+      price*0.02;
+
+    state.marketData[code]=old;
+
+    saveState();
 
   }
 
-}
-
-
-/* =========================================================
-   KEEP QUOTE RUNNING
-========================================================= */
-
-async function refreshQuote(){
-
-  await fetchTaifexQuote();
+  renderAll();
 
 }
 
 
-/*
-  每 3 秒嘗試更新一次。
-  不使用亂數。
-*/
+/* -------------------------
+   Keyboard
+------------------------- */
+
+document
+.getElementById("searchInput")
+.addEventListener(
+  "keydown",
+  e=>{
+    if(e.key==="Enter"){
+      searchStock();
+    }
+  }
+);
+
+
+/* -------------------------
+   Click modal background
+------------------------- */
+
+document
+.getElementById("orderModal")
+.addEventListener(
+  "click",
+  e=>{
+    if(e.target.id==="orderModal"){
+      closeModal();
+    }
+  }
+);
+
+
+document
+.getElementById("settingsModal")
+.addEventListener(
+  "click",
+  e=>{
+    if(e.target.id==="settingsModal"){
+      closeSettings();
+    }
+  }
+);
+
+
+/* -------------------------
+   Initial
+------------------------- */
+
+loadState();
+
+if(!state.marketData[state.currentCode]){
+
+  createMarketData(state.currentCode);
+
+}
+
+renderAll();
+
+setInterval(
+  refreshCurrent,
+  10000
+);
+
+
+/* -------------------------
+   Update order page whenever
+   current stock changes
+------------------------- */
 
 setInterval(()=>{
 
-  refreshQuote();
+  const code=state.currentCode;
+
+  const input=
+    document.getElementById("orderStock");
+
+  const price=
+    document.getElementById("orderPrice");
+
+  if(
+    document
+      .getElementById("page-order")
+      .classList.contains("active")
+  ){
+
+    if(
+      document.activeElement!==input &&
+      document.activeElement!==price
+    ){
+
+      input.value=code;
+
+      price.value=
+        decimal(getPrice(code));
+
+      updateOrderSummary();
+
+    }
+
+  }
 
 },3000);
 
 
-/* =========================================================
-   INIT
-========================================================= */
+/* -------------------------
+   Prevent accidental zoom
+------------------------- */
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener(
+  "gesturestart",
+  e=>e.preventDefault()
+);
 
-  loadAccount();
-
-  /*
-    委託價格只在第一次行情成功時填一次。
-    後面完全不自動改。
-  */
-
-  refreshQuote();
-
-  loadMonthlyStats();
-
-
-  /*
-    使用者手動切換限價／現價時，
-    不改委託價格。
-  */
-
-  document
-    .getElementById("orderMode")
-    .addEventListener("change",function(){
-
-      if(this.value==="market"){
-
-        document.getElementById("orderPrice")
-          .style.opacity=".45";
-
-      }else{
-
-        document.getElementById("orderPrice")
-          .style.opacity="1";
-
-      }
-
-    });
-
-
-  /*
-    離開頁面前儲存
-  */
-
-  window.addEventListener("beforeunload",()=>{
-
-    saveAccount();
-
-  });
-
-});
 </script>
 
 </body>
