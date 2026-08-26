@@ -2,166 +2,180 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<title>每日收入・拿・盈餘・差額記帳</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>每日收入記帳</title>
 <style>
 *{
   box-sizing:border-box;
   -webkit-tap-highlight-color:transparent;
 }
-html,body{
+body{
   margin:0;
   padding:0;
-  background:#101112;
-  color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
-}
-body{
-  min-height:100vh;
-  padding-bottom:40px;
+  background:#f5f6f8;
+  color:#222;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;
 }
 .container{
-  width:min(100%,900px);
-  margin:auto;
-  padding:14px;
+  max-width:760px;
+  margin:0 auto;
+  padding:18px 14px 40px;
 }
 h1{
   text-align:center;
-  font-size:30px;
   margin:8px 0 18px;
+  font-size:30px;
+  font-weight:900;
+  color:#333;
 }
 .card{
-  background:#252627;
-  border:1px solid #555;
+  background:#fff;
+  border:1px solid #e1e3e6;
   border-radius:22px;
-  padding:17px;
-  margin-bottom:15px;
-  box-shadow:0 8px 25px rgba(0,0,0,.25);
+  padding:18px;
+  margin-bottom:16px;
+  box-shadow:0 5px 18px rgba(0,0,0,.06);
 }
-.title{
-  font-size:23px;
-  font-weight:900;
-  margin-bottom:14px;
-}
-.date-grid{
+.date-card{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
 }
-label{
-  display:block;
-  color:#aaa;
-  font-size:15px;
-  margin-bottom:7px;
-}
-input,select{
-  width:100%;
-  padding:13px;
-  border-radius:14px;
-  border:2px solid #555;
-  background:#171819;
-  color:#fff;
-  font-size:18px;
-  outline:none;
-}
-input:focus,select:focus{
-  border-color:#ffae2b;
-}
-.date-display{
-  margin-top:14px;
+.info-box{
+  background:#f7f8fa;
+  border-radius:16px;
   padding:15px;
-  border-radius:15px;
-  background:#171819;
   text-align:center;
+}
+.info-label{
+  color:#777;
+  font-size:16px;
+  margin-bottom:5px;
+}
+.info-value{
+  font-size:23px;
+  font-weight:900;
+  color:#333;
+}
+.section-title{
   font-size:24px;
   font-weight:900;
-  color:#ffbd45;
+  margin-bottom:15px;
+  color:#333;
 }
-.weekday{
-  color:#59b4ff;
+.item{
+  background:#f8f9fb;
+  border:1px solid #e2e4e8;
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:12px;
 }
-.buttons{
+.item-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.item-name{
+  font-size:22px;
+  font-weight:900;
+}
+.unit{
+  color:#777;
+  font-size:14px;
+}
+.price-wrap{
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.price-label{
+  font-size:14px;
+  color:#777;
+}
+.price-input{
+  width:105px;
+  border:1px solid #d7d9dd;
+  border-radius:10px;
+  padding:8px 9px;
+  font-size:18px;
+  font-weight:800;
+  text-align:right;
+  background:#fff;
+  color:#222;
+}
+.qty-row{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:9px;
+  grid-template-columns:55px 1fr 55px;
+  align-items:center;
+  gap:10px;
   margin-top:12px;
 }
-button{
+.qty-btn{
+  height:48px;
   border:0;
   border-radius:14px;
-  padding:13px 10px;
-  font-size:17px;
-  font-weight:900;
-  cursor:pointer;
-  touch-action:manipulation;
-}
-.orange{
-  background:#ff9f1c;
-  color:#111;
-}
-.green{
-  background:#37d36d;
-  color:#111;
-}
-.red{
-  background:#ff4f60;
-  color:#fff;
-}
-.gray{
-  background:#45484b;
-  color:#fff;
-}
-.blue{
-  background:#35a9ff;
-  color:#07131c;
-}
-.expense-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:12px;
-}
-.expense-box{
-  background:#171819;
-  border-radius:16px;
-  padding:14px;
-}
-.expense-name{
-  font-size:21px;
-  font-weight:900;
-}
-.expense-price{
-  color:#ffbd45;
-  font-size:25px;
-  font-weight:900;
-  margin-top:4px;
-}
-.expense-total{
-  margin-top:14px;
-  padding:16px;
-  background:#171819;
-  border-radius:16px;
-  text-align:center;
-}
-.expense-total span{
-  color:#ff6875;
   font-size:30px;
+  font-weight:900;
+  background:#e8eaed;
+  color:#333;
+  cursor:pointer;
+}
+.qty-btn:active{
+  transform:scale(.95);
+}
+.qty-input{
+  width:100%;
+  height:48px;
+  border:2px solid #d8dbe0;
+  border-radius:14px;
+  background:#fff;
+  color:#222;
+  text-align:center;
+  font-size:22px;
+  font-weight:900;
+}
+.total-line{
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px dashed #ddd;
+}
+.total-label{
+  color:#777;
+}
+.total-value{
+  font-size:20px;
   font-weight:900;
 }
 .money-grid{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
+  grid-template-columns:1fr;
+  gap:13px;
 }
 .money-box{
-  background:#171819;
-  border-radius:16px;
-  padding:15px;
+  background:#f7f8fa;
+  border-radius:17px;
+  padding:14px;
 }
-.money-box.full{
-  grid-column:1/-1;
+.money-label{
+  display:block;
+  font-size:18px;
+  font-weight:800;
+  color:#666;
+  margin-bottom:8px;
 }
-.money-box input{
-  margin-top:5px;
+.money-input{
+  width:100%;
+  height:55px;
+  border:2px solid #d9dce1;
+  border-radius:14px;
+  background:#fff;
+  color:#222;
+  font-size:25px;
+  font-weight:900;
+  padding:0 14px;
 }
 .result-grid{
   display:grid;
@@ -169,791 +183,529 @@ button{
   gap:12px;
 }
 .result{
-  background:#171819;
-  border-radius:17px;
-  padding:17px;
+  border-radius:18px;
+  padding:18px 14px;
+  text-align:center;
+}
+.result.green{
+  background:#eaf8ee;
+  border:1px solid #bce5c8;
+}
+.result.red{
+  background:#fff0f0;
+  border:1px solid #f0c2c2;
+}
+.result.gray{
+  background:#f3f4f6;
+  border:1px solid #dddfe3;
 }
 .result-label{
-  color:#aaa;
   font-size:16px;
+  color:#666;
+  margin-bottom:6px;
 }
 .result-value{
-  font-size:30px;
+  font-size:28px;
   font-weight:900;
-  margin-top:6px;
 }
-.profit{
-  color:#43df78;
+.green .result-value{
+  color:#159447;
 }
-.shortage{
-  color:#ff5968;
+.red .result-value{
+  color:#d63c3c;
 }
-.neutral{
-  color:#ffbd45;
+.gray .result-value{
+  color:#333;
 }
-.summary-grid{
+.button-row{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:12px;
 }
-.summary{
-  background:#171819;
+.main-btn{
+  border:0;
   border-radius:16px;
-  padding:16px;
-}
-.summary-label{
-  color:#aaa;
-}
-.summary-value{
-  font-size:26px;
+  height:55px;
+  font-size:19px;
   font-weight:900;
-  margin-top:5px;
+  cursor:pointer;
 }
-.entry{
-  background:#171819;
-  border:1px solid #444;
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:10px;
-}
-.entry-head{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  align-items:center;
-}
-.entry-date{
-  color:#ffbd45;
-  font-size:18px;
-  font-weight:900;
-}
-.entry-result{
-  font-size:21px;
-  font-weight:900;
-}
-.entry-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:5px 15px;
-  margin-top:9px;
-  color:#bbb;
-}
-.entry-row b{
+.save-btn{
+  background:#4b8df8;
   color:#fff;
 }
-.status{
-  margin-top:12px;
-  text-align:center;
-  padding:10px;
-  border-radius:12px;
-  background:#171819;
-  color:#7ee89b;
-  font-weight:800;
+.clear-btn{
+  background:#f0f1f3;
+  color:#444;
 }
-.note{
-  color:#999;
-  font-size:13px;
-  line-height:1.6;
-  margin-top:10px;
+.main-btn:active{
+  transform:scale(.97);
+}
+.history{
+  overflow:hidden;
+}
+.history-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:5px;
+  padding:11px 5px;
+  border-bottom:1px solid #e5e6e8;
+  text-align:center;
+  font-size:14px;
+}
+.history-row.header{
+  font-weight:900;
+  color:#666;
+  background:#f5f6f8;
 }
 .empty{
   text-align:center;
-  color:#888;
-  padding:18px;
+  color:#999;
+  padding:20px;
 }
-@media(max-width:600px){
+.notice{
+  text-align:center;
+  color:#777;
+  font-size:14px;
+  margin-top:10px;
+}
+@media(max-width:520px){
   .container{
-    padding:10px;
+    padding:12px 10px 30px;
   }
   h1{
-    font-size:25px;
+    font-size:27px;
   }
   .card{
-    padding:13px;
+    padding:14px;
     border-radius:18px;
   }
-  .date-grid,
-  .money-grid,
-  .expense-grid,
-  .result-grid,
-  .summary-grid{
+  .date-card{
     grid-template-columns:1fr 1fr;
   }
-  .buttons{
-    grid-template-columns:1fr 1fr 1fr;
-  }
-  .expense-name{
-    font-size:18px;
-  }
-  .expense-price{
-    font-size:23px;
+  .result-grid{
+    grid-template-columns:1fr 1fr;
   }
   .result-value{
-    font-size:26px;
+    font-size:24px;
+  }
+  .item-name{
+    font-size:20px;
+  }
+  .price-input{
+    width:95px;
   }
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
 
-<h1>🍜 每日收入・拿・盈餘・差額</h1>
+<h1>🧾 每日收入記帳</h1>
 
-<div class="card">
-  <div class="title">📅 日期</div>
-
-  <div class="date-grid">
-    <div>
-      <label>年份</label>
-      <input id="year" type="number" min="2000" max="2100">
-    </div>
-
-    <div>
-      <label>月份</label>
-      <select id="month">
-        <option value="0">1 月</option>
-        <option value="1">2 月</option>
-        <option value="2">3 月</option>
-        <option value="3">4 月</option>
-        <option value="4">5 月</option>
-        <option value="5">6 月</option>
-        <option value="6">7 月</option>
-        <option value="7">8 月</option>
-        <option value="8">9 月</option>
-        <option value="9">10 月</option>
-        <option value="10">11 月</option>
-        <option value="11">12 月</option>
-      </select>
-    </div>
+<div class="card date-card">
+  <div class="info-box">
+    <div class="info-label">日期</div>
+    <div class="info-value" id="todayDate">--</div>
   </div>
-
-  <div class="date-display">
-    <span id="dateText"></span>
-    <span class="weekday" id="weekdayText"></span>
-  </div>
-
-  <div class="buttons">
-    <button class="orange" id="todayBtn">今天</button>
-    <button class="green" id="saveBtn">儲存</button>
-    <button class="red" id="clearBtn">清除</button>
-  </div>
-
-  <div class="status" id="status">資料會自動儲存</div>
-</div>
-
-<div class="card">
-  <div class="title">🧾 每日固定項目</div>
-
-  <div class="expense-grid">
-
-    <div class="expense-box">
-      <div class="expense-name">🍜</div>
-      <div class="expense-price">$850</div>
-    </div>
-
-    <div class="expense-box">
-      <div class="expense-name">🍋</div>
-      <div class="expense-price">$1,200</div>
-    </div>
-
-    <div class="expense-box">
-      <div class="expense-name">大腸</div>
-      <div class="expense-price">$150／包</div>
-    </div>
-
-    <div class="expense-box">
-      <div class="expense-name">蚵仔</div>
-      <div class="expense-price">$150／包</div>
-    </div>
-
-  </div>
-
-  <div class="expense-total">
-    每日固定成本
-    <br>
-    <span>$2,350</span>
+  <div class="info-box">
+    <div class="info-label">星期</div>
+    <div class="info-value" id="todayWeek">--</div>
   </div>
 </div>
 
 <div class="card">
-  <div class="title">💰 每日收入</div>
+  <div class="section-title">📦 今日項目</div>
+
+  <div class="item">
+    <div class="item-top">
+      <div>
+        <div class="item-name">🍜 麵線</div>
+        <div class="unit">單價可自由修改</div>
+      </div>
+      <div class="price-wrap">
+        <span class="price-label">$</span>
+        <input id="priceNoodles" class="price-input" type="number" inputmode="decimal" value="850">
+      </div>
+    </div>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="changeQty('qtyNoodles',-1)">−</button>
+      <input id="qtyNoodles" class="qty-input" type="number" inputmode="numeric" value="1" min="0">
+      <button class="qty-btn" onclick="changeQty('qtyNoodles',1)">＋</button>
+    </div>
+    <div class="total-line">
+      <span class="total-label">小計</span>
+      <span class="total-value" id="totalNoodles">$850</span>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="item-top">
+      <div>
+        <div class="item-name">🍋 檸檬</div>
+        <div class="unit">單價可自由修改</div>
+      </div>
+      <div class="price-wrap">
+        <span class="price-label">$</span>
+        <input id="priceLemon" class="price-input" type="number" inputmode="decimal" value="1200">
+      </div>
+    </div>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="changeQty('qtyLemon',-1)">−</button>
+      <input id="qtyLemon" class="qty-input" type="number" inputmode="numeric" value="1" min="0">
+      <button class="qty-btn" onclick="changeQty('qtyLemon',1)">＋</button>
+    </div>
+    <div class="total-line">
+      <span class="total-label">小計</span>
+      <span class="total-value" id="totalLemon">$1,200</span>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="item-top">
+      <div>
+        <div class="item-name">🥣 大腸</div>
+        <div class="unit">一包單價可自由修改</div>
+      </div>
+      <div class="price-wrap">
+        <span class="price-label">$</span>
+        <input id="priceLarge" class="price-input" type="number" inputmode="decimal" value="150">
+      </div>
+    </div>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="changeQty('qtyLarge',-1)">−</button>
+      <input id="qtyLarge" class="qty-input" type="number" inputmode="numeric" value="0" min="0">
+      <button class="qty-btn" onclick="changeQty('qtyLarge',1)">＋</button>
+    </div>
+    <div class="total-line">
+      <span class="total-label">小計</span>
+      <span class="total-value" id="totalLarge">$0</span>
+    </div>
+  </div>
+
+  <div class="item">
+    <div class="item-top">
+      <div>
+        <div class="item-name">🦪 蚵仔</div>
+        <div class="unit">一包單價可自由修改</div>
+      </div>
+      <div class="price-wrap">
+        <span class="price-label">$</span>
+        <input id="priceOyster" class="price-input" type="number" inputmode="decimal" value="150">
+      </div>
+    </div>
+    <div class="qty-row">
+      <button class="qty-btn" onclick="changeQty('qtyOyster',-1)">−</button>
+      <input id="qtyOyster" class="qty-input" type="number" inputmode="numeric" value="0" min="0">
+      <button class="qty-btn" onclick="changeQty('qtyOyster',1)">＋</button>
+    </div>
+    <div class="total-line">
+      <span class="total-label">小計</span>
+      <span class="total-value" id="totalOyster">$0</span>
+    </div>
+  </div>
+
+  <div class="total-line" style="margin-top:18px;border-top:2px solid #ddd;">
+    <span style="font-size:19px;font-weight:900;">📦 項目合計</span>
+    <span class="total-value" id="itemsTotal">$2,050</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">💰 今日金額</div>
 
   <div class="money-grid">
 
     <div class="money-box">
-      <label>收入</label>
-      <input id="income" type="number" min="0" step="1" placeholder="輸入收入">
+      <label class="money-label">💵 收入</label>
+      <input id="income" class="money-input" type="number" inputmode="decimal" placeholder="輸入收入">
     </div>
 
     <div class="money-box">
-      <label>拿</label>
-      <input id="take" type="number" min="0" step="1" placeholder="輸入拿">
+      <label class="money-label">💸 拿</label>
+      <input id="take" class="money-input" type="number" inputmode="decimal" placeholder="輸入拿的金額">
     </div>
 
   </div>
-
-  <div class="note">
-    「收入－拿」自動判斷：<br>
-    正數 → 盈餘累加<br>
-    負數 → 差額累加
-  </div>
-
-  <button class="orange" id="calculateBtn" style="width:100%;margin-top:14px;">
-    🧮 計算並儲存今天
-  </button>
 </div>
 
 <div class="card">
-  <div class="title">📊 今天結果</div>
+  <div class="section-title">📊 今日結果</div>
 
   <div class="result-grid">
 
-    <div class="result">
-      <div class="result-label">收入</div>
-      <div class="result-value neutral" id="todayIncome">0 元</div>
+    <div class="result green">
+      <div class="result-label">收入 − 拿</div>
+      <div class="result-value" id="todayProfit">$0</div>
     </div>
 
-    <div class="result">
-      <div class="result-label">拿</div>
-      <div class="result-value neutral" id="todayTake">0 元</div>
+    <div class="result red">
+      <div class="result-label">不足差額</div>
+      <div class="result-value" id="todayShortage">$0</div>
     </div>
 
-    <div class="result">
-      <div class="result-label">收入－拿</div>
-      <div class="result-value" id="todayDifference">0 元</div>
+    <div class="result gray">
+      <div class="result-label">盈餘累加</div>
+      <div class="result-value" id="profitAccum">$0</div>
     </div>
 
-    <div class="result">
-      <div class="result-label">今天狀態</div>
-      <div class="result-value" id="todayStatus">—</div>
+    <div class="result gray">
+      <div class="result-label">差額累加</div>
+      <div class="result-value" id="shortageAccum">$0</div>
     </div>
 
   </div>
 </div>
 
 <div class="card">
-  <div class="title">📈 累加統計</div>
-
-  <div class="summary-grid">
-
-    <div class="summary">
-      <div class="summary-label">累加收入</div>
-      <div class="summary-value neutral" id="totalIncome">0 元</div>
-    </div>
-
-    <div class="summary">
-      <div class="summary-label">累加拿</div>
-      <div class="summary-value neutral" id="totalTake">0 元</div>
-    </div>
-
-    <div class="summary">
-      <div class="summary-label">盈餘累加</div>
-      <div class="summary-value profit" id="totalProfit">0 元</div>
-    </div>
-
-    <div class="summary">
-      <div class="summary-label">差額累加</div>
-      <div class="summary-value shortage" id="totalShortage">0 元</div>
-    </div>
-
+  <div class="button-row">
+    <button class="main-btn save-btn" onclick="saveToday()">💾 儲存今日</button>
+    <button class="main-btn clear-btn" onclick="clearToday()">🗑️ 清除今日</button>
   </div>
-
-  <div class="expense-total" style="margin-top:14px;">
-    💰 最終淨額
-    <br>
-    <span id="netResult" style="color:#43df78;">0 元</span>
-  </div>
+  <div class="notice">資料會自動儲存在此裝置</div>
 </div>
 
-<div class="card">
-  <div class="title">📋 每日紀錄</div>
-  <div id="records"></div>
+<div class="card history">
+  <div class="section-title">📅 每日紀錄</div>
+
+  <div class="history-row header">
+    <div>日期</div>
+    <div>收入</div>
+    <div>拿</div>
+    <div>結果</div>
+  </div>
+
+  <div id="historyList"></div>
 </div>
 
 </div>
 
 <script>
-(function(){
+const $ = id => document.getElementById(id);
 
-const STORAGE_KEY = "daily_income_take_profit_v20260826";
+const weekNames = [
+  "星期日",
+  "星期一",
+  "星期二",
+  "星期三",
+  "星期四",
+  "星期五",
+  "星期六"
+];
 
-const state = {
-  year: new Date().getFullYear(),
-  month: new Date().getMonth(),
-  day: new Date().getDate(),
-  records: {}
-};
-
-function $(id){
-  return document.getElementById(id);
+function money(n){
+  return "$" + Number(n || 0).toLocaleString("zh-TW",{
+    maximumFractionDigits:0
+  });
 }
 
-function pad(n){
-  return String(n).padStart(2,"0");
+function todayKey(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
 }
 
-function keyOf(year,month,day){
-  return year + "-" + pad(month + 1) + "-" + pad(day);
+function updateDate(){
+  const d = new Date();
+  $("todayDate").textContent = todayKey();
+  $("todayWeek").textContent = weekNames[d.getDay()];
 }
 
-function money(value){
-  return Number(value || 0).toLocaleString("zh-TW") + " 元";
+function changeQty(id,amount){
+  const input = $(id);
+  let value = Number(input.value || 0);
+  value += amount;
+  if(value < 0) value = 0;
+  input.value = value;
+  calculate();
 }
 
-function getWeekday(year,month,day){
-  const names = [
-    "星期日",
-    "星期一",
-    "星期二",
-    "星期三",
-    "星期四",
-    "星期五",
-    "星期六"
-  ];
-
-  return names[new Date(year,month,day).getDay()];
-}
-
-function load(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-
-    if(!raw) return;
-
-    const obj = JSON.parse(raw);
-
-    if(obj && obj.records){
-      state.records = obj.records;
-    }
-
-  }catch(error){
-    console.error(error);
-  }
-}
-
-function save(show=true){
-  try{
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        records:state.records,
-        updatedAt:new Date().toISOString()
-      })
-    );
-
-    if(show){
-      $("status").textContent =
-        "✅ 已儲存 " +
-        new Date().toLocaleTimeString("zh-TW",{hour12:false});
-    }
-
-  }catch(error){
-    $("status").textContent = "⚠️ 儲存失敗";
-  }
-}
-
-function currentKey(){
-  return keyOf(
-    state.year,
-    state.month,
-    state.day
-  );
-}
-
-function renderDate(){
-
-  $("year").value = state.year;
-  $("month").value = state.month;
-
-  $("dateText").textContent =
-    state.year +
-    " 年 " +
-    (state.month + 1) +
-    " 月 " +
-    state.day +
-    " 日 ";
-
-  $("weekdayText").textContent =
-    "（" +
-    getWeekday(
-      state.year,
-      state.month,
-      state.day
-    ) +
-    "）";
-}
-
-function renderToday(){
-
-  const key = currentKey();
-  const record = state.records[key];
-
-  if(!record){
-
-    $("income").value = "";
-    $("take").value = "";
-
-    $("todayIncome").textContent = "0 元";
-    $("todayTake").textContent = "0 元";
-    $("todayDifference").textContent = "0 元";
-    $("todayDifference").className =
-      "result-value neutral";
-
-    $("todayStatus").textContent = "尚未記帳";
-    $("todayStatus").className =
-      "result-value neutral";
-
-    return;
-  }
-
-  $("income").value = record.income;
-  $("take").value = record.take;
-
-  const diff =
-    Number(record.income) -
-    Number(record.take);
-
-  $("todayIncome").textContent =
-    money(record.income);
-
-  $("todayTake").textContent =
-    money(record.take);
-
-  $("todayDifference").textContent =
-    money(Math.abs(diff));
-
-  if(diff > 0){
-
-    $("todayDifference").className =
-      "result-value profit";
-
-    $("todayStatus").textContent =
-      "盈餘";
-
-    $("todayStatus").className =
-      "result-value profit";
-
-  }else if(diff < 0){
-
-    $("todayDifference").className =
-      "result-value shortage";
-
-    $("todayStatus").textContent =
-      "差額不足";
-
-    $("todayStatus").className =
-      "result-value shortage";
-
-  }else{
-
-    $("todayDifference").className =
-      "result-value neutral";
-
-    $("todayStatus").textContent =
-      "剛好";
-
-    $("todayStatus").className =
-      "result-value neutral";
-  }
+function value(id){
+  return Number($(id).value || 0);
 }
 
 function calculate(){
+  const noodles = value("priceNoodles") * value("qtyNoodles");
+  const lemon = value("priceLemon") * value("qtyLemon");
+  const large = value("priceLarge") * value("qtyLarge");
+  const oyster = value("priceOyster") * value("qtyOyster");
 
-  const income = Number($("income").value || 0);
-  const take = Number($("take").value || 0);
+  const total = noodles + lemon + large + oyster;
 
-  if(income < 0 || take < 0){
-    alert("金額不能小於 0");
-    return;
+  $("totalNoodles").textContent = money(noodles);
+  $("totalLemon").textContent = money(lemon);
+  $("totalLarge").textContent = money(large);
+  $("totalOyster").textContent = money(oyster);
+  $("itemsTotal").textContent = money(total);
+
+  const income = value("income");
+  const take = value("take");
+  const diff = income - take;
+
+  if(diff >= 0){
+    $("todayProfit").textContent = money(diff);
+    $("todayShortage").textContent = money(0);
+  }else{
+    $("todayProfit").textContent = money(0);
+    $("todayShortage").textContent = money(Math.abs(diff));
   }
 
-  const key = currentKey();
+  updateAccumulation();
+}
 
-  state.records[key] = {
-    year:state.year,
-    month:state.month,
-    day:state.day,
+function getHistory(){
+  try{
+    return JSON.parse(localStorage.getItem("dailyAccountingData") || "{}");
+  }catch(e){
+    return {};
+  }
+}
+
+function saveHistory(data){
+  localStorage.setItem("dailyAccountingData",JSON.stringify(data));
+}
+
+function updateAccumulation(){
+  const data = getHistory();
+  let profit = 0;
+  let shortage = 0;
+
+  Object.keys(data).sort().forEach(key=>{
+    const item = data[key];
+    if(item.profit > 0) profit += Number(item.profit);
+    if(item.shortage > 0) shortage += Number(item.shortage);
+  });
+
+  const currentIncome = value("income");
+  const currentTake = value("take");
+  const currentDiff = currentIncome - currentTake;
+
+  if(currentDiff >= 0){
+    profit += currentDiff;
+  }else{
+    shortage += Math.abs(currentDiff);
+  }
+
+  $("profitAccum").textContent = money(profit);
+  $("shortageAccum").textContent = money(shortage);
+}
+
+function saveToday(){
+  const key = todayKey();
+  const income = value("income");
+  const take = value("take");
+  const diff = income - take;
+
+  const data = getHistory();
+
+  data[key] = {
+    date:key,
+    week:weekNames[new Date().getDay()],
     income:income,
     take:take,
-    updatedAt:new Date().toLocaleString(
-      "zh-TW",
-      {hour12:false}
-    )
+    profit:diff > 0 ? diff : 0,
+    shortage:diff < 0 ? Math.abs(diff) : 0,
+    noodlesPrice:value("priceNoodles"),
+    noodlesQty:value("qtyNoodles"),
+    lemonPrice:value("priceLemon"),
+    lemonQty:value("qtyLemon"),
+    largePrice:value("priceLarge"),
+    largeQty:value("qtyLarge"),
+    oysterPrice:value("priceOyster"),
+    oysterQty:value("qtyOyster")
   };
 
-  save(true);
-  renderAll();
+  saveHistory(data);
+  renderHistory();
+  updateAccumulation();
+
+  alert("✅ 今日資料已儲存");
 }
 
-function renderSummary(){
+function clearToday(){
+  if(!confirm("確定要清除今天輸入的資料嗎？")) return;
 
-  let totalIncome = 0;
-  let totalTake = 0;
-  let totalProfit = 0;
-  let totalShortage = 0;
+  $("income").value = "";
+  $("take").value = "";
 
-  Object.keys(state.records).forEach(key=>{
+  $("qtyNoodles").value = 1;
+  $("qtyLemon").value = 1;
+  $("qtyLarge").value = 0;
+  $("qtyOyster").value = 0;
 
-    const r = state.records[key];
-
-    totalIncome += Number(r.income || 0);
-    totalTake += Number(r.take || 0);
-
-    const diff =
-      Number(r.income || 0) -
-      Number(r.take || 0);
-
-    if(diff > 0){
-      totalProfit += diff;
-    }
-
-    if(diff < 0){
-      totalShortage += Math.abs(diff);
-    }
-  });
-
-  const net =
-    totalProfit -
-    totalShortage;
-
-  $("totalIncome").textContent =
-    money(totalIncome);
-
-  $("totalTake").textContent =
-    money(totalTake);
-
-  $("totalProfit").textContent =
-    money(totalProfit);
-
-  $("totalShortage").textContent =
-    money(totalShortage);
-
-  $("netResult").textContent =
-    money(net);
-
-  if(net >= 0){
-    $("netResult").style.color =
-      "#43df78";
-  }else{
-    $("netResult").style.color =
-      "#ff5968";
-  }
+  calculate();
 }
 
-function renderRecords(){
+function loadToday(){
+  const data = getHistory();
+  const item = data[todayKey()];
 
-  const container = $("records");
-  const keys = Object.keys(state.records);
-
-  if(keys.length === 0){
-    container.innerHTML =
-      '<div class="empty">還沒有每日紀錄</div>';
+  if(!item){
+    calculate();
     return;
   }
 
-  keys.sort().reverse();
+  $("income").value = item.income || "";
+  $("take").value = item.take || "";
 
-  container.innerHTML = "";
+  $("priceNoodles").value = item.noodlesPrice ?? 850;
+  $("qtyNoodles").value = item.noodlesQty ?? 1;
 
-  keys.forEach(key=>{
+  $("priceLemon").value = item.lemonPrice ?? 1200;
+  $("qtyLemon").value = item.lemonQty ?? 1;
 
-    const r = state.records[key];
+  $("priceLarge").value = item.largePrice ?? 150;
+  $("qtyLarge").value = item.largeQty ?? 0;
 
-    const income = Number(r.income || 0);
-    const take = Number(r.take || 0);
-    const diff = income - take;
+  $("priceOyster").value = item.oysterPrice ?? 150;
+  $("qtyOyster").value = item.oysterQty ?? 0;
 
-    let resultText = "";
-    let resultClass = "";
+  calculate();
+}
 
-    if(diff > 0){
-      resultText =
-        "盈餘 +" + money(diff);
-      resultClass = "profit";
-    }else if(diff < 0){
-      resultText =
-        "差額 -" + money(Math.abs(diff));
-      resultClass = "shortage";
-    }else{
-      resultText = "剛好 0 元";
-      resultClass = "neutral";
-    }
+function renderHistory(){
+  const data = getHistory();
+  const keys = Object.keys(data).sort().reverse();
+  const box = $("historyList");
 
-    const div = document.createElement("div");
-    div.className = "entry";
+  if(keys.length === 0){
+    box.innerHTML = '<div class="empty">目前還沒有每日紀錄</div>';
+    return;
+  }
 
-    div.innerHTML = `
-      <div class="entry-head">
-        <div>
-          <div class="entry-date">
-            ${r.year}-${pad(r.month+1)}-${pad(r.day)}
-          </div>
-          <div style="color:#65b7ff;font-weight:800;margin-top:3px;">
-            ${getWeekday(r.year,r.month,r.day)}
-          </div>
-        </div>
+  box.innerHTML = keys.map(key=>{
+    const item = data[key];
+    const diff = Number(item.profit || 0) - Number(item.shortage || 0);
+    const result = diff >= 0
+      ? `<span style="color:#159447;font-weight:900;">+${diff.toLocaleString()}</span>`
+      : `<span style="color:#d63c3c;font-weight:900;">-${Math.abs(diff).toLocaleString()}</span>`;
 
-        <div class="entry-result ${resultClass}">
-          ${resultText}
-        </div>
-      </div>
-
-      <div class="entry-row">
-        <div>收入：<b>${money(income)}</b></div>
-        <div>拿：<b>${money(take)}</b></div>
-      </div>
-
-      <div class="entry-row">
-        <div>收入－拿：</div>
-        <div><b>${money(Math.abs(diff))}</b></div>
-      </div>
-
-      <div style="margin-top:10px;">
-        <button class="red delete-btn">刪除</button>
+    return `
+      <div class="history-row">
+        <div>${item.date}<br><small>${item.week || ""}</small></div>
+        <div>${money(item.income)}</div>
+        <div>${money(item.take)}</div>
+        <div>${result}</div>
       </div>
     `;
-
-    div.querySelector(".delete-btn")
-      .addEventListener("click",function(){
-
-        if(!confirm(
-          "確定刪除 " +
-          r.year + "-" +
-          pad(r.month+1) + "-" +
-          pad(r.day) +
-          " 的紀錄嗎？"
-        )){
-          return;
-        }
-
-        delete state.records[key];
-
-        save(true);
-        renderAll();
-      });
-
-    container.appendChild(div);
-  });
+  }).join("");
 }
 
-function renderAll(){
-  renderDate();
-  renderToday();
-  renderSummary();
-  renderRecords();
-}
-
-$("year").addEventListener("change",function(){
-
-  const value = Number(this.value);
-
-  if(value >= 2000 && value <= 2100){
-    state.year = value;
-
-    const maxDay =
-      new Date(
-        state.year,
-        state.month + 1,
-        0
-      ).getDate();
-
-    if(state.day > maxDay){
-      state.day = maxDay;
-    }
-
-    renderAll();
-  }
+document.querySelectorAll("input").forEach(input=>{
+  input.addEventListener("input",calculate);
 });
 
-$("month").addEventListener("change",function(){
+updateDate();
+loadToday();
+renderHistory();
+calculate();
 
-  state.month = Number(this.value);
-
-  const maxDay =
-    new Date(
-      state.year,
-      state.month + 1,
-      0
-    ).getDate();
-
-  if(state.day > maxDay){
-    state.day = maxDay;
-  }
-
-  renderAll();
-});
-
-$("todayBtn").addEventListener("click",function(){
-
-  const now = new Date();
-
-  state.year = now.getFullYear();
-  state.month = now.getMonth();
-  state.day = now.getDate();
-
-  renderAll();
-});
-
-$("saveBtn").addEventListener("click",function(){
-  save(true);
-});
-
-$("calculateBtn").addEventListener(
-  "click",
-  calculate
-);
-
-$("clearBtn").addEventListener(
-  "click",
-  function(){
-
-    if(!confirm(
-      "確定要清除全部每日收入、拿、盈餘、差額資料嗎？"
-    )){
-      return;
-    }
-
-    state.records = {};
-
-    localStorage.removeItem(
-      STORAGE_KEY
-    );
-
-    $("status").textContent =
-      "🗑️ 已清除全部資料";
-
-    renderAll();
-  }
-);
-
-$("income").addEventListener(
-  "keydown",
-  function(e){
-    if(e.key === "Enter"){
-      $("take").focus();
-    }
-  }
-);
-
-$("take").addEventListener(
-  "keydown",
-  function(e){
-    if(e.key === "Enter"){
-      calculate();
-    }
-  }
-);
-
-load();
-renderAll();
-
-setInterval(function(){
-  save(false);
-},30000);
-
-})();
+setInterval(()=>{
+  updateDate();
+},60000);
 </script>
 
 </body>
