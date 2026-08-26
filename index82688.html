@@ -3,709 +3,2055 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>每日收入記帳</title>
+<meta name="theme-color" content="#f5f7fa">
+<title>每日收入・拿・盈餘・差額記帳</title>
+
 <style>
 *{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
+box-sizing:border-box;
+-webkit-tap-highlight-color:transparent;
 }
+
+html,body{
+margin:0;
+padding:0;
+background:#f4f6f8;
+color:#222;
+font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",Arial,sans-serif;
+}
+
 body{
-  margin:0;
-  padding:0;
-  background:#f5f6f8;
-  color:#222;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;
+min-height:100vh;
+padding-bottom:40px;
 }
+
 .container{
-  max-width:760px;
-  margin:0 auto;
-  padding:18px 14px 40px;
+width:min(100%,900px);
+margin:auto;
+padding:12px 12px 50px;
 }
+
 h1{
-  text-align:center;
-  margin:8px 0 18px;
-  font-size:30px;
-  font-weight:900;
-  color:#333;
+text-align:center;
+font-size:30px;
+font-weight:900;
+margin:8px 0 18px;
+color:#222;
 }
+
 .card{
-  background:#fff;
-  border:1px solid #e1e3e6;
-  border-radius:22px;
-  padding:18px;
-  margin-bottom:16px;
-  box-shadow:0 5px 18px rgba(0,0,0,.06);
+background:#fff;
+border:1px solid #e1e4e8;
+border-radius:22px;
+padding:18px;
+margin-bottom:16px;
+box-shadow:0 5px 18px rgba(0,0,0,.06);
 }
-.date-card{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-.info-box{
-  background:#f7f8fa;
-  border-radius:16px;
-  padding:15px;
-  text-align:center;
-}
-.info-label{
-  color:#777;
-  font-size:16px;
-  margin-bottom:5px;
-}
-.info-value{
-  font-size:23px;
-  font-weight:900;
-  color:#333;
-}
+
 .section-title{
-  font-size:24px;
-  font-weight:900;
-  margin-bottom:15px;
-  color:#333;
+font-size:23px;
+font-weight:900;
+margin-bottom:15px;
+color:#222;
 }
-.item{
-  background:#f8f9fb;
-  border:1px solid #e2e4e8;
-  border-radius:18px;
-  padding:14px;
-  margin-bottom:12px;
+
+.date-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
 }
-.item-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
+
+.info-box{
+background:#f7f8fa;
+border-radius:16px;
+padding:14px;
+text-align:center;
 }
-.item-name{
-  font-size:22px;
-  font-weight:900;
+
+.info-label{
+color:#777;
+font-size:15px;
+margin-bottom:5px;
 }
-.unit{
-  color:#777;
-  font-size:14px;
+
+.info-value{
+font-size:23px;
+font-weight:900;
+color:#333;
 }
-.price-wrap{
-  display:flex;
-  align-items:center;
-  gap:5px;
+
+.weekday{
+color:#3789e8;
 }
-.price-label{
-  font-size:14px;
-  color:#777;
-}
-.price-input{
-  width:105px;
-  border:1px solid #d7d9dd;
-  border-radius:10px;
-  padding:8px 9px;
-  font-size:18px;
-  font-weight:800;
-  text-align:right;
-  background:#fff;
-  color:#222;
-}
-.qty-row{
-  display:grid;
-  grid-template-columns:55px 1fr 55px;
-  align-items:center;
-  gap:10px;
-  margin-top:12px;
-}
-.qty-btn{
-  height:48px;
-  border:0;
-  border-radius:14px;
-  font-size:30px;
-  font-weight:900;
-  background:#e8eaed;
-  color:#333;
-  cursor:pointer;
-}
-.qty-btn:active{
-  transform:scale(.95);
-}
-.qty-input{
-  width:100%;
-  height:48px;
-  border:2px solid #d8dbe0;
-  border-radius:14px;
-  background:#fff;
-  color:#222;
-  text-align:center;
-  font-size:22px;
-  font-weight:900;
-}
-.total-line{
-  display:flex;
-  justify-content:space-between;
-  margin-top:10px;
-  padding-top:10px;
-  border-top:1px dashed #ddd;
-}
-.total-label{
-  color:#777;
-}
-.total-value{
-  font-size:20px;
-  font-weight:900;
-}
-.money-grid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:13px;
-}
-.money-box{
-  background:#f7f8fa;
-  border-radius:17px;
-  padding:14px;
-}
-.money-label{
-  display:block;
-  font-size:18px;
-  font-weight:800;
-  color:#666;
-  margin-bottom:8px;
-}
-.money-input{
-  width:100%;
-  height:55px;
-  border:2px solid #d9dce1;
-  border-radius:14px;
-  background:#fff;
-  color:#222;
-  font-size:25px;
-  font-weight:900;
-  padding:0 14px;
-}
-.result-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-.result{
-  border-radius:18px;
-  padding:18px 14px;
-  text-align:center;
-}
-.result.green{
-  background:#eaf8ee;
-  border:1px solid #bce5c8;
-}
-.result.red{
-  background:#fff0f0;
-  border:1px solid #f0c2c2;
-}
-.result.gray{
-  background:#f3f4f6;
-  border:1px solid #dddfe3;
-}
-.result-label{
-  font-size:16px;
-  color:#666;
-  margin-bottom:6px;
-}
-.result-value{
-  font-size:28px;
-  font-weight:900;
-}
-.green .result-value{
-  color:#159447;
-}
-.red .result-value{
-  color:#d63c3c;
-}
-.gray .result-value{
-  color:#333;
-}
+
 .button-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:9px;
+margin-top:13px;
 }
-.main-btn{
-  border:0;
-  border-radius:16px;
-  height:55px;
-  font-size:19px;
-  font-weight:900;
-  cursor:pointer;
+
+button{
+border:0;
+border-radius:14px;
+font:inherit;
+font-weight:900;
+cursor:pointer;
+touch-action:manipulation;
 }
+
+.top-btn{
+height:48px;
+font-size:16px;
+}
+
+.today-btn{
+background:#ffb52e;
+color:#222;
+}
+
 .save-btn{
-  background:#4b8df8;
-  color:#fff;
+background:#45bd68;
+color:#fff;
 }
+
 .clear-btn{
-  background:#f0f1f3;
-  color:#444;
+background:#e9ebee;
+color:#333;
 }
-.main-btn:active{
-  transform:scale(.97);
+
+.item{
+background:#f8f9fb;
+border:1px solid #e1e4e8;
+border-radius:18px;
+padding:14px;
+margin-bottom:12px;
 }
+
+.item-head{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+}
+
+.item-name{
+font-size:21px;
+font-weight:900;
+}
+
+.item-note{
+font-size:13px;
+color:#888;
+margin-top:3px;
+}
+
+.price-area{
+display:flex;
+align-items:center;
+gap:4px;
+}
+
+.price-input{
+width:105px;
+height:42px;
+border:1px solid #d5d9de;
+border-radius:11px;
+background:#fff;
+font-size:19px;
+font-weight:900;
+text-align:right;
+padding:0 8px;
+color:#222;
+}
+
+.qty-row{
+display:grid;
+grid-template-columns:54px 1fr 54px;
+gap:9px;
+margin-top:12px;
+}
+
+.qty-btn{
+height:48px;
+background:#e8ebef;
+color:#333;
+font-size:29px;
+font-weight:900;
+}
+
+.qty-input{
+width:100%;
+height:48px;
+border:2px solid #d8dce1;
+border-radius:13px;
+background:#fff;
+text-align:center;
+font-size:22px;
+font-weight:900;
+color:#222;
+}
+
+.subtotal{
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-top:1px dashed #d8dadd;
+margin-top:10px;
+padding-top:9px;
+}
+
+.subtotal-label{
+color:#777;
+font-size:15px;
+}
+
+.subtotal-value{
+font-size:21px;
+font-weight:900;
+color:#333;
+}
+
+.income-total{
+background:#fff8e8;
+border:1px solid #f2d38b;
+border-radius:18px;
+padding:17px;
+text-align:center;
+margin-top:14px;
+}
+
+.income-total-label{
+font-size:16px;
+color:#866b32;
+}
+
+.income-total-value{
+font-size:34px;
+font-weight:900;
+color:#e48a00;
+margin-top:4px;
+}
+
+.other-item{
+background:#f7f8fa;
+border:1px solid #e0e3e7;
+border-radius:16px;
+padding:12px;
+margin-bottom:9px;
+}
+
+.other-grid{
+display:grid;
+grid-template-columns:1fr 130px 48px;
+gap:8px;
+align-items:center;
+}
+
+.other-input{
+width:100%;
+height:46px;
+border:1px solid #d3d7dc;
+border-radius:11px;
+background:#fff;
+color:#222;
+font-size:17px;
+padding:0 10px;
+}
+
+.other-amount{
+text-align:right;
+font-weight:900;
+}
+
+.delete-other{
+height:46px;
+background:#ffe7e7;
+color:#d23c3c;
+font-size:21px;
+}
+
+.add-other{
+width:100%;
+height:50px;
+background:#e8f2ff;
+color:#2879d4;
+font-size:17px;
+margin-top:5px;
+}
+
+.money-box{
+background:#f7f8fa;
+border-radius:18px;
+padding:15px;
+}
+
+.money-label{
+font-size:18px;
+font-weight:900;
+color:#666;
+margin-bottom:8px;
+}
+
+.money-input{
+width:100%;
+height:56px;
+border:2px solid #d7dbe0;
+border-radius:14px;
+background:#fff;
+color:#222;
+font-size:25px;
+font-weight:900;
+padding:0 14px;
+}
+
+.result-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+}
+
+.result{
+border-radius:18px;
+padding:17px 12px;
+text-align:center;
+}
+
+.result-label{
+font-size:15px;
+color:#666;
+margin-bottom:6px;
+}
+
+.result-value{
+font-size:28px;
+font-weight:900;
+}
+
+.result-green{
+background:#ebf9ef;
+border:1px solid #bce6c8;
+}
+
+.result-green .result-value{
+color:#159447;
+}
+
+.result-red{
+background:#fff0f0;
+border:1px solid #efc3c3;
+}
+
+.result-red .result-value{
+color:#d43e3e;
+}
+
+.result-blue{
+background:#edf5ff;
+border:1px solid #c8ddfa;
+}
+
+.result-blue .result-value{
+color:#2879d4;
+}
+
+.result-gray{
+background:#f3f4f6;
+border:1px solid #dddfe3;
+}
+
+.result-gray .result-value{
+color:#333;
+}
+
+.status-box{
+margin-top:14px;
+border-radius:17px;
+padding:15px;
+text-align:center;
+font-size:22px;
+font-weight:900;
+}
+
+.status-profit{
+background:#eaf8ee;
+color:#159447;
+border:1px solid #bce5c8;
+}
+
+.status-shortage{
+background:#fff0f0;
+color:#d43e3e;
+border:1px solid #efc3c3;
+}
+
+.status-even{
+background:#f1f3f5;
+color:#555;
+border:1px solid #ddd;
+}
+
+.summary-grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:12px;
+}
+
+.summary{
+background:#f7f8fa;
+border-radius:17px;
+padding:15px;
+}
+
+.summary-label{
+font-size:15px;
+color:#777;
+}
+
+.summary-value{
+font-size:27px;
+font-weight:900;
+margin-top:5px;
+}
+
+.summary-profit{
+color:#159447;
+}
+
+.summary-shortage{
+color:#d43e3e;
+}
+
+.summary-net{
+color:#2879d4;
+}
+
 .history{
-  overflow:hidden;
+overflow:hidden;
 }
+
+.history-head{
+display:grid;
+grid-template-columns:1.35fr .9fr .9fr 1fr;
+gap:5px;
+padding:11px 4px;
+background:#f1f3f5;
+color:#666;
+font-weight:900;
+font-size:13px;
+text-align:center;
+}
+
 .history-row{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr 1fr;
-  gap:5px;
-  padding:11px 5px;
-  border-bottom:1px solid #e5e6e8;
-  text-align:center;
-  font-size:14px;
+display:grid;
+grid-template-columns:1.35fr .9fr .9fr 1fr;
+gap:5px;
+padding:12px 4px;
+border-bottom:1px solid #e5e7e9;
+text-align:center;
+font-size:13px;
+align-items:center;
 }
-.history-row.header{
-  font-weight:900;
-  color:#666;
-  background:#f5f6f8;
+
+.history-date{
+font-weight:900;
+color:#333;
 }
+
+.history-week{
+color:#438de2;
+font-size:12px;
+margin-top:2px;
+}
+
+.history-profit{
+color:#159447;
+font-weight:900;
+}
+
+.history-shortage{
+color:#d43e3e;
+font-weight:900;
+}
+
 .empty{
-  text-align:center;
-  color:#999;
-  padding:20px;
+text-align:center;
+color:#999;
+padding:22px 5px;
 }
-.notice{
-  text-align:center;
-  color:#777;
-  font-size:14px;
-  margin-top:10px;
+
+.note{
+color:#888;
+font-size:13px;
+line-height:1.7;
+margin-top:10px;
 }
-@media(max-width:520px){
-  .container{
-    padding:12px 10px 30px;
-  }
-  h1{
-    font-size:27px;
-  }
-  .card{
-    padding:14px;
-    border-radius:18px;
-  }
-  .date-card{
-    grid-template-columns:1fr 1fr;
-  }
-  .result-grid{
-    grid-template-columns:1fr 1fr;
-  }
-  .result-value{
-    font-size:24px;
-  }
-  .item-name{
-    font-size:20px;
-  }
-  .price-input{
-    width:95px;
-  }
+
+.confirm-box{
+position:fixed;
+left:0;
+right:0;
+bottom:0;
+top:0;
+background:rgba(0,0,0,.38);
+display:none;
+align-items:center;
+justify-content:center;
+padding:20px;
+z-index:9999;
+}
+
+.confirm-box.show{
+display:flex;
+}
+
+.confirm-card{
+width:min(100%,420px);
+background:#fff;
+border-radius:22px;
+padding:22px;
+box-shadow:0 15px 50px rgba(0,0,0,.25);
+}
+
+.confirm-title{
+font-size:22px;
+font-weight:900;
+margin-bottom:10px;
+}
+
+.confirm-text{
+color:#666;
+line-height:1.7;
+margin-bottom:18px;
+}
+
+.confirm-buttons{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+.confirm-cancel{
+height:50px;
+background:#eef0f2;
+color:#333;
+}
+
+.confirm-ok{
+height:50px;
+background:#e64c55;
+color:#fff;
+}
+
+@media(max-width:600px){
+
+.container{
+padding:10px 10px 35px;
+}
+
+h1{
+font-size:26px;
+}
+
+.card{
+padding:14px;
+border-radius:18px;
+}
+
+.item-name{
+font-size:19px;
+}
+
+.price-input{
+width:94px;
+}
+
+.other-grid{
+grid-template-columns:1fr 110px 45px;
+}
+
+.result-value{
+font-size:24px;
+}
+
+.summary-value{
+font-size:24px;
+}
+
+.history-head,
+.history-row{
+font-size:12px;
+}
+
+}
+
+@media(max-width:390px){
+
+.other-grid{
+grid-template-columns:1fr 90px 42px;
+}
+
+.price-input{
+width:88px;
+}
+
 }
 </style>
 </head>
 
 <body>
+
 <div class="container">
 
-<h1>🧾 每日收入記帳</h1>
+<h1>🧾 每日收入・盈餘・差額</h1>
 
-<div class="card date-card">
-  <div class="info-box">
-    <div class="info-label">日期</div>
-    <div class="info-value" id="todayDate">--</div>
-  </div>
-  <div class="info-box">
-    <div class="info-label">星期</div>
-    <div class="info-value" id="todayWeek">--</div>
-  </div>
+<div class="card">
+
+<div class="section-title">📅 日期</div>
+
+<div class="date-grid">
+
+<div class="info-box">
+<div class="info-label">今天日期</div>
+<div class="info-value" id="dateText">—</div>
+</div>
+
+<div class="info-box">
+<div class="info-label">星期</div>
+<div class="info-value weekday" id="weekText">—</div>
+</div>
+
+</div>
+
+<div class="button-row">
+
+<button class="top-btn today-btn" id="todayBtn">
+今天
+</button>
+
+<button class="top-btn save-btn" id="saveBtn">
+💾 儲存
+</button>
+
+<button class="top-btn clear-btn" id="clearTodayBtn">
+🗑️ 清除今天
+</button>
+
+</div>
+
 </div>
 
 <div class="card">
-  <div class="section-title">📦 今日項目</div>
 
-  <div class="item">
-    <div class="item-top">
-      <div>
-        <div class="item-name">🍜 麵線</div>
-        <div class="unit">單價可自由修改</div>
-      </div>
-      <div class="price-wrap">
-        <span class="price-label">$</span>
-        <input id="priceNoodles" class="price-input" type="number" inputmode="decimal" value="850">
-      </div>
-    </div>
-    <div class="qty-row">
-      <button class="qty-btn" onclick="changeQty('qtyNoodles',-1)">−</button>
-      <input id="qtyNoodles" class="qty-input" type="number" inputmode="numeric" value="1" min="0">
-      <button class="qty-btn" onclick="changeQty('qtyNoodles',1)">＋</button>
-    </div>
-    <div class="total-line">
-      <span class="total-label">小計</span>
-      <span class="total-value" id="totalNoodles">$850</span>
-    </div>
-  </div>
+<div class="section-title">🍜 固定收入項目</div>
 
-  <div class="item">
-    <div class="item-top">
-      <div>
-        <div class="item-name">🍋 檸檬</div>
-        <div class="unit">單價可自由修改</div>
-      </div>
-      <div class="price-wrap">
-        <span class="price-label">$</span>
-        <input id="priceLemon" class="price-input" type="number" inputmode="decimal" value="1200">
-      </div>
-    </div>
-    <div class="qty-row">
-      <button class="qty-btn" onclick="changeQty('qtyLemon',-1)">−</button>
-      <input id="qtyLemon" class="qty-input" type="number" inputmode="numeric" value="1" min="0">
-      <button class="qty-btn" onclick="changeQty('qtyLemon',1)">＋</button>
-    </div>
-    <div class="total-line">
-      <span class="total-label">小計</span>
-      <span class="total-value" id="totalLemon">$1,200</span>
-    </div>
-  </div>
+<div class="item">
 
-  <div class="item">
-    <div class="item-top">
-      <div>
-        <div class="item-name">🥣 大腸</div>
-        <div class="unit">一包單價可自由修改</div>
-      </div>
-      <div class="price-wrap">
-        <span class="price-label">$</span>
-        <input id="priceLarge" class="price-input" type="number" inputmode="decimal" value="150">
-      </div>
-    </div>
-    <div class="qty-row">
-      <button class="qty-btn" onclick="changeQty('qtyLarge',-1)">−</button>
-      <input id="qtyLarge" class="qty-input" type="number" inputmode="numeric" value="0" min="0">
-      <button class="qty-btn" onclick="changeQty('qtyLarge',1)">＋</button>
-    </div>
-    <div class="total-line">
-      <span class="total-label">小計</span>
-      <span class="total-value" id="totalLarge">$0</span>
-    </div>
-  </div>
+<div class="item-head">
 
-  <div class="item">
-    <div class="item-top">
-      <div>
-        <div class="item-name">🦪 蚵仔</div>
-        <div class="unit">一包單價可自由修改</div>
-      </div>
-      <div class="price-wrap">
-        <span class="price-label">$</span>
-        <input id="priceOyster" class="price-input" type="number" inputmode="decimal" value="150">
-      </div>
-    </div>
-    <div class="qty-row">
-      <button class="qty-btn" onclick="changeQty('qtyOyster',-1)">−</button>
-      <input id="qtyOyster" class="qty-input" type="number" inputmode="numeric" value="0" min="0">
-      <button class="qty-btn" onclick="changeQty('qtyOyster',1)">＋</button>
-    </div>
-    <div class="total-line">
-      <span class="total-label">小計</span>
-      <span class="total-value" id="totalOyster">$0</span>
-    </div>
-  </div>
+<div>
+<div class="item-name">🍜</div>
+<div class="item-note">單價可以直接修改</div>
+</div>
 
-  <div class="total-line" style="margin-top:18px;border-top:2px solid #ddd;">
-    <span style="font-size:19px;font-weight:900;">📦 項目合計</span>
-    <span class="total-value" id="itemsTotal">$2,050</span>
-  </div>
+<div class="price-area">
+<span>$</span>
+<input
+id="noodlePrice"
+class="price-input"
+type="number"
+inputmode="numeric"
+value="850">
+</div>
+
+</div>
+
+<div class="qty-row">
+
+<button class="qty-btn" data-target="noodleQty" data-change="-1">−</button>
+
+<input
+id="noodleQty"
+class="qty-input"
+type="number"
+inputmode="numeric"
+min="0"
+value="1">
+
+<button class="qty-btn" data-target="noodleQty" data-change="1">＋</button>
+
+</div>
+
+<div class="subtotal">
+<span class="subtotal-label">小計</span>
+<span class="subtotal-value" id="noodleTotal">$850</span>
+</div>
+
+</div>
+
+<div class="item">
+
+<div class="item-head">
+
+<div>
+<div class="item-name">🍋 檸檬</div>
+<div class="item-note">單價可以直接修改</div>
+</div>
+
+<div class="price-area">
+<span>$</span>
+<input
+id="lemonPrice"
+class="price-input"
+type="number"
+inputmode="numeric"
+value="1200">
+</div>
+
+</div>
+
+<div class="qty-row">
+
+<button class="qty-btn" data-target="lemonQty" data-change="-1">−</button>
+
+<input
+id="lemonQty"
+class="qty-input"
+type="number"
+inputmode="numeric"
+min="0"
+value="1">
+
+<button class="qty-btn" data-target="lemonQty" data-change="1">＋</button>
+
+</div>
+
+<div class="subtotal">
+<span class="subtotal-label">小計</span>
+<span class="subtotal-value" id="lemonTotal">$1,200</span>
+</div>
+
+</div>
+
+<div class="item">
+
+<div class="item-head">
+
+<div>
+<div class="item-name">大腸</div>
+<div class="item-note">一包 $150，可修改單價</div>
+</div>
+
+<div class="price-area">
+<span>$</span>
+<input
+id="largePrice"
+class="price-input"
+type="number"
+inputmode="numeric"
+value="150">
+</div>
+
+</div>
+
+<div class="qty-row">
+
+<button class="qty-btn" data-target="largeQty" data-change="-1">−</button>
+
+<input
+id="largeQty"
+class="qty-input"
+type="number"
+inputmode="numeric"
+min="0"
+value="1">
+
+<button class="qty-btn" data-target="largeQty" data-change="1">＋</button>
+
+</div>
+
+<div class="subtotal">
+<span class="subtotal-label">大腸小計</span>
+<span class="subtotal-value" id="largeTotal">$150</span>
+</div>
+
+</div>
+
+<div class="item">
+
+<div class="item-head">
+
+<div>
+<div class="item-name">蚵仔</div>
+<div class="item-note">一包 $150，可修改單價</div>
+</div>
+
+<div class="price-area">
+<span>$</span>
+<input
+id="oysterPrice"
+class="price-input"
+type="number"
+inputmode="numeric"
+value="150">
+</div>
+
+</div>
+
+<div class="qty-row">
+
+<button class="qty-btn" data-target="oysterQty" data-change="-1">−</button>
+
+<input
+id="oysterQty"
+class="qty-input"
+type="number"
+inputmode="numeric"
+min="0"
+value="1">
+
+<button class="qty-btn" data-target="oysterQty" data-change="1">＋</button>
+
+</div>
+
+<div class="subtotal">
+<span class="subtotal-label">蚵仔小計</span>
+<span class="subtotal-value" id="oysterTotal">$150</span>
+</div>
+
+</div>
+
 </div>
 
 <div class="card">
-  <div class="section-title">💰 今日金額</div>
 
-  <div class="money-grid">
+<div class="section-title">➕ 其他項目收入</div>
 
-    <div class="money-box">
-      <label class="money-label">💵 收入</label>
-      <input id="income" class="money-input" type="number" inputmode="decimal" placeholder="輸入收入">
-    </div>
+<div id="otherItems"></div>
 
-    <div class="money-box">
-      <label class="money-label">💸 拿</label>
-      <input id="take" class="money-input" type="number" inputmode="decimal" placeholder="輸入拿的金額">
-    </div>
+<button class="add-other" id="addOtherBtn">
+＋ 新增其他項目收入
+</button>
 
-  </div>
+<div class="note">
+其他收入會自動加入每日收入。
+</div>
+
 </div>
 
 <div class="card">
-  <div class="section-title">📊 今日結果</div>
 
-  <div class="result-grid">
+<div class="income-total">
 
-    <div class="result green">
-      <div class="result-label">收入 − 拿</div>
-      <div class="result-value" id="todayProfit">$0</div>
-    </div>
+<div class="income-total-label">
+💰 今日收入合計
+</div>
 
-    <div class="result red">
-      <div class="result-label">不足差額</div>
-      <div class="result-value" id="todayShortage">$0</div>
-    </div>
+<div class="income-total-value" id="incomeTotal">
+$2,350
+</div>
 
-    <div class="result gray">
-      <div class="result-label">盈餘累加</div>
-      <div class="result-value" id="profitAccum">$0</div>
-    </div>
+</div>
 
-    <div class="result gray">
-      <div class="result-label">差額累加</div>
-      <div class="result-value" id="shortageAccum">$0</div>
-    </div>
-
-  </div>
 </div>
 
 <div class="card">
-  <div class="button-row">
-    <button class="main-btn save-btn" onclick="saveToday()">💾 儲存今日</button>
-    <button class="main-btn clear-btn" onclick="clearToday()">🗑️ 清除今日</button>
-  </div>
-  <div class="notice">資料會自動儲存在此裝置</div>
+
+<div class="section-title">💸 拿</div>
+
+<div class="money-box">
+
+<div class="money-label">
+今天拿多少？
 </div>
 
-<div class="card history">
-  <div class="section-title">📅 每日紀錄</div>
+<input
+id="takeInput"
+class="money-input"
+type="number"
+inputmode="numeric"
+min="0"
+placeholder="輸入拿的金額">
 
-  <div class="history-row header">
-    <div>日期</div>
-    <div>收入</div>
-    <div>拿</div>
-    <div>結果</div>
-  </div>
+</div>
 
-  <div id="historyList"></div>
+<div class="note">
+收入 − 拿 = 當日結果。
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="section-title">📊 今日結果</div>
+
+<div class="result-grid">
+
+<div class="result result-green">
+
+<div class="result-label">
+🟢 盈餘
+</div>
+
+<div class="result-value" id="todayProfit">
+$0
+</div>
+
+</div>
+
+<div class="result result-red">
+
+<div class="result-label">
+🔴 差額
+</div>
+
+<div class="result-value" id="todayShortage">
+$0
+</div>
+
+</div>
+
+<div class="result result-blue">
+
+<div class="result-label">
+💰 今日收入
+</div>
+
+<div class="result-value" id="resultIncome">
+$0
+</div>
+
+</div>
+
+<div class="result result-gray">
+
+<div class="result-label">
+💸 今日拿
+</div>
+
+<div class="result-value" id="resultTake">
+$0
+</div>
+
+</div>
+
+</div>
+
+<div id="statusBox" class="status-box status-even">
+尚未輸入拿的金額
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="section-title">📈 累加統計</div>
+
+<div class="summary-grid">
+
+<div class="summary">
+
+<div class="summary-label">
+🟢 盈餘累加
+</div>
+
+<div class="summary-value summary-profit" id="profitAccum">
+$0
+</div>
+
+</div>
+
+<div class="summary">
+
+<div class="summary-label">
+🔴 差額累加
+</div>
+
+<div class="summary-value summary-shortage" id="shortageAccum">
+$0
+</div>
+
+</div>
+
+<div class="summary">
+
+<div class="summary-label">
+💰 累加收入
+</div>
+
+<div class="summary-value" id="incomeAccum">
+$0
+</div>
+
+</div>
+
+<div class="summary">
+
+<div class="summary-label">
+💸 累加拿
+</div>
+
+<div class="summary-value" id="takeAccum">
+$0
+</div>
+
+</div>
+
+</div>
+
+<div class="income-total" style="margin-top:14px;">
+
+<div class="income-total-label">
+⭐ 累計淨額
+</div>
+
+<div class="income-total-value" id="netAccum">
+$0
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="section-title">📚 每日紀錄</div>
+
+<div class="history">
+
+<div class="history-head">
+<div>日期</div>
+<div>收入</div>
+<div>拿</div>
+<div>結果</div>
+</div>
+
+<div id="historyList"></div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<button
+class="top-btn clear-btn"
+id="clearAllBtn"
+style="width:100%;height:52px;background:#ffe8e8;color:#d33b3b;">
+🗑️ 清除全部資料
+</button>
+
+<div class="note" style="text-align:center;">
+清除前一定會詢問確認。
+</div>
+
+</div>
+
+</div>
+
+<div class="confirm-box" id="confirmBox">
+
+<div class="confirm-card">
+
+<div class="confirm-title" id="confirmTitle">
+⚠️ 確認刪除
+</div>
+
+<div class="confirm-text" id="confirmText">
+確定要刪除嗎？
+</div>
+
+<div class="confirm-buttons">
+
+<button class="confirm-cancel" id="confirmCancel">
+取消
+</button>
+
+<button class="confirm-ok" id="confirmOk">
+確定刪除
+</button>
+
+</div>
+
 </div>
 
 </div>
 
 <script>
-const $ = id => document.getElementById(id);
+"use strict";
 
-const weekNames = [
-  "星期日",
-  "星期一",
-  "星期二",
-  "星期三",
-  "星期四",
-  "星期五",
-  "星期六"
-];
+const STORAGE_KEY="daily_income_accounting_v3";
 
-function money(n){
-  return "$" + Number(n || 0).toLocaleString("zh-TW",{
-    maximumFractionDigits:0
-  });
+const state={
+data:{},
+otherItems:[],
+confirmAction:null
+};
+
+function $(id){
+return document.getElementById(id);
 }
 
-function todayKey(){
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,"0");
-  const day = String(d.getDate()).padStart(2,"0");
-  return `${y}-${m}-${day}`;
+function money(value){
+const n=Number(value||0);
+return "$"+n.toLocaleString("zh-TW",{
+maximumFractionDigits:0
+});
 }
 
-function updateDate(){
-  const d = new Date();
-  $("todayDate").textContent = todayKey();
-  $("todayWeek").textContent = weekNames[d.getDay()];
+function today(){
+const d=new Date();
+
+return{
+date:
+d.getFullYear()+
+"-"+
+String(d.getMonth()+1).padStart(2,"0")+
+"-"+
+String(d.getDate()).padStart(2,"0"),
+
+week:
+[
+"星期日",
+"星期一",
+"星期二",
+"星期三",
+"星期四",
+"星期五",
+"星期六"
+][d.getDay()]
+};
+
 }
 
-function changeQty(id,amount){
-  const input = $(id);
-  let value = Number(input.value || 0);
-  value += amount;
-  if(value < 0) value = 0;
-  input.value = value;
-  calculate();
+function escapeHTML(value){
+return String(value??"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 }
 
-function value(id){
-  return Number($(id).value || 0);
+function load(){
+
+try{
+
+const raw=
+localStorage.getItem(STORAGE_KEY);
+
+if(!raw)return;
+
+const saved=
+JSON.parse(raw);
+
+if(saved&&saved.data){
+state.data=saved.data;
 }
 
-function calculate(){
-  const noodles = value("priceNoodles") * value("qtyNoodles");
-  const lemon = value("priceLemon") * value("qtyLemon");
-  const large = value("priceLarge") * value("qtyLarge");
-  const oyster = value("priceOyster") * value("qtyOyster");
+}catch(e){
 
-  const total = noodles + lemon + large + oyster;
+console.error(e);
 
-  $("totalNoodles").textContent = money(noodles);
-  $("totalLemon").textContent = money(lemon);
-  $("totalLarge").textContent = money(large);
-  $("totalOyster").textContent = money(oyster);
-  $("itemsTotal").textContent = money(total);
-
-  const income = value("income");
-  const take = value("take");
-  const diff = income - take;
-
-  if(diff >= 0){
-    $("todayProfit").textContent = money(diff);
-    $("todayShortage").textContent = money(0);
-  }else{
-    $("todayProfit").textContent = money(0);
-    $("todayShortage").textContent = money(Math.abs(diff));
-  }
-
-  updateAccumulation();
 }
 
-function getHistory(){
-  try{
-    return JSON.parse(localStorage.getItem("dailyAccountingData") || "{}");
-  }catch(e){
-    return {};
-  }
 }
 
-function saveHistory(data){
-  localStorage.setItem("dailyAccountingData",JSON.stringify(data));
+function save(){
+
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify({
+data:state.data,
+savedAt:new Date().toISOString()
+})
+);
+
 }
 
-function updateAccumulation(){
-  const data = getHistory();
-  let profit = 0;
-  let shortage = 0;
+function getNumber(id){
 
-  Object.keys(data).sort().forEach(key=>{
-    const item = data[key];
-    if(item.profit > 0) profit += Number(item.profit);
-    if(item.shortage > 0) shortage += Number(item.shortage);
-  });
+const n=
+Number($(id).value);
 
-  const currentIncome = value("income");
-  const currentTake = value("take");
-  const currentDiff = currentIncome - currentTake;
+return Number.isFinite(n)
+?
+Math.max(0,n)
+:
+0;
 
-  if(currentDiff >= 0){
-    profit += currentDiff;
-  }else{
-    shortage += Math.abs(currentDiff);
-  }
-
-  $("profitAccum").textContent = money(profit);
-  $("shortageAccum").textContent = money(shortage);
 }
 
-function saveToday(){
-  const key = todayKey();
-  const income = value("income");
-  const take = value("take");
-  const diff = income - take;
+function calculateIncome(){
 
-  const data = getHistory();
+const noodle=
+getNumber("noodlePrice")*
+getNumber("noodleQty");
 
-  data[key] = {
-    date:key,
-    week:weekNames[new Date().getDay()],
-    income:income,
-    take:take,
-    profit:diff > 0 ? diff : 0,
-    shortage:diff < 0 ? Math.abs(diff) : 0,
-    noodlesPrice:value("priceNoodles"),
-    noodlesQty:value("qtyNoodles"),
-    lemonPrice:value("priceLemon"),
-    lemonQty:value("qtyLemon"),
-    largePrice:value("priceLarge"),
-    largeQty:value("qtyLarge"),
-    oysterPrice:value("priceOyster"),
-    oysterQty:value("qtyOyster")
-  };
+const lemon=
+getNumber("lemonPrice")*
+getNumber("lemonQty");
 
-  saveHistory(data);
-  renderHistory();
-  updateAccumulation();
+const large=
+getNumber("largePrice")*
+getNumber("largeQty");
 
-  alert("✅ 今日資料已儲存");
+const oyster=
+getNumber("oysterPrice")*
+getNumber("oysterQty");
+
+let other=0;
+
+state.otherItems.forEach(item=>{
+
+other+=
+Math.max(0,Number(item.amount)||0);
+
+});
+
+const total=
+noodle+
+lemon+
+large+
+oyster+
+other;
+
+$("noodleTotal").textContent=
+money(noodle);
+
+$("lemonTotal").textContent=
+money(lemon);
+
+$("largeTotal").textContent=
+money(large);
+
+$("oysterTotal").textContent=
+money(oyster);
+
+$("incomeTotal").textContent=
+money(total);
+
+return total;
+
 }
 
-function clearToday(){
-  if(!confirm("確定要清除今天輸入的資料嗎？")) return;
+function calculateResult(){
 
-  $("income").value = "";
-  $("take").value = "";
+const income=
+calculateIncome();
 
-  $("qtyNoodles").value = 1;
-  $("qtyLemon").value = 1;
-  $("qtyLarge").value = 0;
-  $("qtyOyster").value = 0;
+const take=
+getNumber("takeInput");
 
-  calculate();
+const difference=
+income-take;
+
+let profit=0;
+let shortage=0;
+
+if(difference>0){
+
+profit=difference;
+
+}else if(difference<0){
+
+shortage=Math.abs(difference);
+
 }
 
-function loadToday(){
-  const data = getHistory();
-  const item = data[todayKey()];
+$("todayProfit").textContent=
+money(profit);
 
-  if(!item){
-    calculate();
-    return;
-  }
+$("todayShortage").textContent=
+money(shortage);
 
-  $("income").value = item.income || "";
-  $("take").value = item.take || "";
+$("resultIncome").textContent=
+money(income);
 
-  $("priceNoodles").value = item.noodlesPrice ?? 850;
-  $("qtyNoodles").value = item.noodlesQty ?? 1;
+$("resultTake").textContent=
+money(take);
 
-  $("priceLemon").value = item.lemonPrice ?? 1200;
-  $("qtyLemon").value = item.lemonQty ?? 1;
+const status=$("statusBox");
 
-  $("priceLarge").value = item.largePrice ?? 150;
-  $("qtyLarge").value = item.largeQty ?? 0;
+if(difference>0){
 
-  $("priceOyster").value = item.oysterPrice ?? 150;
-  $("qtyOyster").value = item.oysterQty ?? 0;
+status.className=
+"status-box status-profit";
 
-  calculate();
+status.textContent=
+"🟢 收入 − 拿 = 盈餘 "+money(profit);
+
+}else if(difference<0){
+
+status.className=
+"status-box status-shortage";
+
+status.textContent=
+"🔴 收入 − 拿不足，差額 "+money(shortage);
+
+}else{
+
+status.className=
+"status-box status-even";
+
+status.textContent=
+"⚪ 收入 − 拿 = 0，剛好";
+
+}
+
+return{
+income,
+take,
+profit,
+shortage
+};
+
+}
+
+function currentRecord(){
+
+const t=today();
+
+const result=
+calculateResult();
+
+return{
+
+date:t.date,
+
+week:t.week,
+
+income:result.income,
+
+take:result.take,
+
+profit:result.profit,
+
+shortage:result.shortage,
+
+noodlePrice:getNumber("noodlePrice"),
+
+noodleQty:getNumber("noodleQty"),
+
+lemonPrice:getNumber("lemonPrice"),
+
+lemonQty:getNumber("lemonQty"),
+
+largePrice:getNumber("largePrice"),
+
+largeQty:getNumber("largeQty"),
+
+oysterPrice:getNumber("oysterPrice"),
+
+oysterQty:getNumber("oysterQty"),
+
+otherItems:
+JSON.parse(
+JSON.stringify(state.otherItems)
+)
+
+};
+
+}
+
+function autoSave(){
+
+const record=
+currentRecord();
+
+state.data[record.date]=record;
+
+save();
+
+renderSummary();
+
+renderHistory();
+
+}
+
+function renderDate(){
+
+const t=today();
+
+$("dateText").textContent=t.date;
+$("weekText").textContent=t.week;
+
+}
+
+function renderOtherItems(){
+
+const box=
+$("otherItems");
+
+if(!state.otherItems.length){
+
+box.innerHTML=
+`
+<div class="empty">
+尚未新增其他收入
+</div>
+`;
+
+return;
+
+}
+
+box.innerHTML=
+state.otherItems.map(function(item,index){
+
+return`
+<div class="other-item">
+
+<div class="other-grid">
+
+<input
+class="other-input"
+data-other-name="${index}"
+value="${escapeHTML(item.name)}"
+placeholder="其他項目名稱">
+
+<input
+class="other-input other-amount"
+data-other-amount="${index}"
+type="number"
+inputmode="numeric"
+min="0"
+value="${Number(item.amount)||0}"
+placeholder="金額">
+
+<button
+class="delete-other"
+data-delete-other="${index}">
+×
+</button>
+
+</div>
+
+</div>
+`;
+
+}).join("");
+
+box.querySelectorAll(
+"[data-other-name]"
+).forEach(function(input){
+
+input.addEventListener(
+"input",
+function(){
+
+const index=
+Number(input.dataset.otherName);
+
+state.otherItems[index].name=
+input.value;
+
+calculateResult();
+autoSave();
+
+}
+);
+
+});
+
+box.querySelectorAll(
+"[data-other-amount]"
+).forEach(function(input){
+
+input.addEventListener(
+"input",
+function(){
+
+const index=
+Number(input.dataset.otherAmount);
+
+state.otherItems[index].amount=
+Number(input.value)||0;
+
+calculateResult();
+autoSave();
+
+}
+);
+
+});
+
+box.querySelectorAll(
+"[data-delete-other]"
+).forEach(function(button){
+
+button.addEventListener(
+"click",
+function(){
+
+const index=
+Number(button.dataset.deleteOther);
+
+showConfirm(
+"⚠️ 確認刪除",
+"確定要刪除這個其他收入項目嗎？",
+function(){
+
+state.otherItems.splice(
+index,
+1
+);
+
+renderOtherItems();
+calculateResult();
+autoSave();
+
+}
+);
+
+}
+);
+
+});
+
+}
+
+function renderSummary(){
+
+let income=0;
+let take=0;
+let profit=0;
+let shortage=0;
+
+Object.keys(state.data).forEach(function(key){
+
+const r=state.data[key];
+
+income+=
+Number(r.income)||0;
+
+take+=
+Number(r.take)||0;
+
+profit+=
+Number(r.profit)||0;
+
+shortage+=
+Number(r.shortage)||0;
+
+});
+
+$("incomeAccum").textContent=
+money(income);
+
+$("takeAccum").textContent=
+money(take);
+
+$("profitAccum").textContent=
+money(profit);
+
+$("shortageAccum").textContent=
+money(shortage);
+
+const net=
+profit-shortage;
+
+$("netAccum").textContent=
+money(net);
+
+if(net>=0){
+
+$("netAccum").style.color=
+"#159447";
+
+}else{
+
+$("netAccum").style.color=
+"#d43e3e";
+
+}
+
 }
 
 function renderHistory(){
-  const data = getHistory();
-  const keys = Object.keys(data).sort().reverse();
-  const box = $("historyList");
 
-  if(keys.length === 0){
-    box.innerHTML = '<div class="empty">目前還沒有每日紀錄</div>';
-    return;
-  }
+const box=
+$("historyList");
 
-  box.innerHTML = keys.map(key=>{
-    const item = data[key];
-    const diff = Number(item.profit || 0) - Number(item.shortage || 0);
-    const result = diff >= 0
-      ? `<span style="color:#159447;font-weight:900;">+${diff.toLocaleString()}</span>`
-      : `<span style="color:#d63c3c;font-weight:900;">-${Math.abs(diff).toLocaleString()}</span>`;
+const keys=
+Object.keys(state.data)
+.sort()
+.reverse();
 
-    return `
-      <div class="history-row">
-        <div>${item.date}<br><small>${item.week || ""}</small></div>
-        <div>${money(item.income)}</div>
-        <div>${money(item.take)}</div>
-        <div>${result}</div>
-      </div>
-    `;
-  }).join("");
+if(!keys.length){
+
+box.innerHTML=
+`
+<div class="empty">
+目前還沒有每日紀錄
+</div>
+`;
+
+return;
+
 }
 
-document.querySelectorAll("input").forEach(input=>{
-  input.addEventListener("input",calculate);
+box.innerHTML=
+keys.map(function(key){
+
+const r=
+state.data[key];
+
+let result="";
+
+if(Number(r.profit)>0){
+
+result=
+`
+<span class="history-profit">
++${money(r.profit)}
+</span>
+`;
+
+}else if(Number(r.shortage)>0){
+
+result=
+`
+<span class="history-shortage">
+-${money(r.shortage)}
+</span>
+`;
+
+}else{
+
+result=
+`
+<span style="color:#777;font-weight:900;">
+0
+</span>
+`;
+
+}
+
+return`
+<div class="history-row">
+
+<div>
+<div class="history-date">
+${escapeHTML(r.date)}
+</div>
+<div class="history-week">
+${escapeHTML(r.week||"")}
+</div>
+</div>
+
+<div>
+${money(r.income)}
+</div>
+
+<div>
+${money(r.take)}
+</div>
+
+<div>
+${result}
+</div>
+
+</div>
+`;
+
+}).join("");
+
+}
+
+function loadToday(){
+
+const t=today();
+
+const r=
+state.data[t.date];
+
+if(!r){
+
+state.otherItems=[];
+
+calculateResult();
+renderOtherItems();
+renderSummary();
+renderHistory();
+
+return;
+
+}
+
+$("noodlePrice").value=
+r.noodlePrice??850;
+
+$("noodleQty").value=
+r.noodleQty??1;
+
+$("lemonPrice").value=
+r.lemonPrice??1200;
+
+$("lemonQty").value=
+r.lemonQty??1;
+
+$("largePrice").value=
+r.largePrice??150;
+
+$("largeQty").value=
+r.largeQty??1;
+
+$("oysterPrice").value=
+r.oysterPrice??150;
+
+$("oysterQty").value=
+r.oysterQty??1;
+
+$("takeInput").value=
+r.take??"";
+
+state.otherItems=
+Array.isArray(r.otherItems)
+?
+JSON.parse(
+JSON.stringify(r.otherItems)
+)
+:
+[];
+
+renderOtherItems();
+
+calculateResult();
+renderSummary();
+renderHistory();
+
+}
+
+function showConfirm(
+title,
+text,
+action
+){
+
+$("confirmTitle").textContent=
+title;
+
+$("confirmText").textContent=
+text;
+
+state.confirmAction=action;
+
+$("confirmBox")
+.classList.add("show");
+
+}
+
+function closeConfirm(){
+
+$("confirmBox")
+.classList.remove("show");
+
+state.confirmAction=null;
+
+}
+
+function saveToday(){
+
+const record=
+currentRecord();
+
+state.data[record.date]=record;
+
+save();
+
+renderSummary();
+renderHistory();
+
+alert(
+"✅ 今天資料已自動儲存"
+);
+
+}
+
+function clearToday(){
+
+const t=today();
+
+if(!state.data[t.date]){
+
+state.otherItems=[];
+
+$("takeInput").value="";
+
+calculateResult();
+
+renderOtherItems();
+
+return;
+
+}
+
+showConfirm(
+"⚠️ 確認清除今天",
+"確定要刪除今天 "+t.date+" 的所有資料嗎？",
+function(){
+
+delete state.data[t.date];
+
+save();
+
+state.otherItems=[];
+
+$("noodlePrice").value=850;
+$("noodleQty").value=1;
+
+$("lemonPrice").value=1200;
+$("lemonQty").value=1;
+
+$("largePrice").value=150;
+$("largeQty").value=1;
+
+$("oysterPrice").value=150;
+$("oysterQty").value=1;
+
+$("takeInput").value="";
+
+renderOtherItems();
+calculateResult();
+renderSummary();
+renderHistory();
+
+}
+);
+
+}
+
+function clearAll(){
+
+const count=
+Object.keys(state.data).length;
+
+showConfirm(
+"⚠️ 確認清除全部",
+"確定要清除全部 "+count+" 天的歷史資料嗎？此操作無法復原。",
+function(){
+
+state.data={};
+state.otherItems=[];
+
+localStorage.removeItem(
+STORAGE_KEY
+);
+
+$("noodlePrice").value=850;
+$("noodleQty").value=1;
+
+$("lemonPrice").value=1200;
+$("lemonQty").value=1;
+
+$("largePrice").value=150;
+$("largeQty").value=1;
+
+$("oysterPrice").value=150;
+$("oysterQty").value=1;
+
+$("takeInput").value="";
+
+renderOtherItems();
+calculateResult();
+renderSummary();
+renderHistory();
+
+}
+);
+
+}
+
+function bind(){
+
+$("todayBtn")
+.addEventListener(
+"click",
+function(){
+
+loadToday();
+
+}
+);
+
+$("saveBtn")
+.addEventListener(
+"click",
+saveToday
+);
+
+$("clearTodayBtn")
+.addEventListener(
+"click",
+clearToday
+);
+
+$("clearAllBtn")
+.addEventListener(
+"click",
+clearAll
+);
+
+$("addOtherBtn")
+.addEventListener(
+"click",
+function(){
+
+state.otherItems.push({
+name:"",
+amount:0
 });
 
-updateDate();
-loadToday();
-renderHistory();
-calculate();
+renderOtherItems();
+calculateResult();
+autoSave();
 
-setInterval(()=>{
-  updateDate();
-},60000);
+const inputs=
+document.querySelectorAll(
+"[data-other-name]"
+);
+
+if(inputs.length){
+
+inputs[inputs.length-1].focus();
+
+}
+
+}
+);
+
+document.querySelectorAll(
+".qty-btn"
+).forEach(function(button){
+
+button.addEventListener(
+"click",
+function(){
+
+const id=
+button.dataset.target;
+
+const change=
+Number(button.dataset.change);
+
+const input=$(id);
+
+let value=
+Number(input.value)||0;
+
+value+=change;
+
+if(value<0)value=0;
+
+input.value=value;
+
+calculateResult();
+autoSave();
+
+}
+);
+
+});
+
+document.querySelectorAll(
+"input"
+).forEach(function(input){
+
+input.addEventListener(
+"input",
+function(){
+
+calculateResult();
+autoSave();
+
+}
+);
+
+});
+
+$("confirmCancel")
+.addEventListener(
+"click",
+closeConfirm
+);
+
+$("confirmOk")
+.addEventListener(
+"click",
+function(){
+
+const action=
+state.confirmAction;
+
+closeConfirm();
+
+if(typeof action==="function"){
+action();
+}
+
+}
+);
+
+$("confirmBox")
+.addEventListener(
+"click",
+function(e){
+
+if(e.target===$("confirmBox")){
+closeConfirm();
+}
+
+}
+);
+
+}
+
+function boot(){
+
+load();
+
+renderDate();
+
+bind();
+
+loadToday();
+
+renderOtherItems();
+
+calculateResult();
+
+renderSummary();
+
+renderHistory();
+
+}
+
+boot();
+
+setInterval(function(){
+
+renderDate();
+
+autoSave();
+
+},30000);
+
+document.addEventListener(
+"visibilitychange",
+function(){
+
+if(!document.hidden){
+
+renderDate();
+
+loadToday();
+
+}
+
+}
+);
+
 </script>
 
 </body>
