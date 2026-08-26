@@ -3,1084 +3,342 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#f5f7fa">
+<meta name="theme-color" content="#f4f6f8">
 <title>每日收入・拿・盈餘・差額記帳</title>
-
 <style>
-*{
-box-sizing:border-box;
--webkit-tap-highlight-color:transparent;
-}
-
-html,body{
-margin:0;
-padding:0;
-background:#f4f6f8;
-color:#222;
-font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",Arial,sans-serif;
-}
-
-body{
-min-height:100vh;
-padding-bottom:40px;
-}
-
-.container{
-width:min(100%,900px);
-margin:auto;
-padding:12px 12px 50px;
-}
-
-h1{
-text-align:center;
-font-size:30px;
-font-weight:900;
-margin:8px 0 18px;
-color:#222;
-}
-
-.card{
-background:#fff;
-border:1px solid #e1e4e8;
-border-radius:22px;
-padding:18px;
-margin-bottom:16px;
-box-shadow:0 5px 18px rgba(0,0,0,.06);
-}
-
-.section-title{
-font-size:23px;
-font-weight:900;
-margin-bottom:15px;
-color:#222;
-}
-
-.date-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-}
-
-.info-box{
-background:#f7f8fa;
-border-radius:16px;
-padding:14px;
-text-align:center;
-}
-
-.info-label{
-color:#777;
-font-size:15px;
-margin-bottom:5px;
-}
-
-.info-value{
-font-size:23px;
-font-weight:900;
-color:#333;
-}
-
-.weekday{
-color:#3789e8;
-}
-
-.button-row{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:9px;
-margin-top:13px;
-}
-
-button{
-border:0;
-border-radius:14px;
-font:inherit;
-font-weight:900;
-cursor:pointer;
-touch-action:manipulation;
-}
-
-.top-btn{
-height:48px;
-font-size:16px;
-}
-
-.today-btn{
-background:#ffb52e;
-color:#222;
-}
-
-.save-btn{
-background:#45bd68;
-color:#fff;
-}
-
-.clear-btn{
-background:#e9ebee;
-color:#333;
-}
-
-.item{
-background:#f8f9fb;
-border:1px solid #e1e4e8;
-border-radius:18px;
-padding:14px;
-margin-bottom:12px;
-}
-
-.item-head{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-}
-
-.item-name{
-font-size:21px;
-font-weight:900;
-}
-
-.item-note{
-font-size:13px;
-color:#888;
-margin-top:3px;
-}
-
-.price-area{
-display:flex;
-align-items:center;
-gap:4px;
-}
-
-.price-input{
-width:105px;
-height:42px;
-border:1px solid #d5d9de;
-border-radius:11px;
-background:#fff;
-font-size:19px;
-font-weight:900;
-text-align:right;
-padding:0 8px;
-color:#222;
-}
-
-.qty-row{
-display:grid;
-grid-template-columns:54px 1fr 54px;
-gap:9px;
-margin-top:12px;
-}
-
-.qty-btn{
-height:48px;
-background:#e8ebef;
-color:#333;
-font-size:29px;
-font-weight:900;
-}
-
-.qty-input{
-width:100%;
-height:48px;
-border:2px solid #d8dce1;
-border-radius:13px;
-background:#fff;
-text-align:center;
-font-size:22px;
-font-weight:900;
-color:#222;
-}
-
-.subtotal{
-display:flex;
-justify-content:space-between;
-align-items:center;
-border-top:1px dashed #d8dadd;
-margin-top:10px;
-padding-top:9px;
-}
-
-.subtotal-label{
-color:#777;
-font-size:15px;
-}
-
-.subtotal-value{
-font-size:21px;
-font-weight:900;
-color:#333;
-}
-
-.income-total{
-background:#fff8e8;
-border:1px solid #f2d38b;
-border-radius:18px;
-padding:17px;
-text-align:center;
-margin-top:14px;
-}
-
-.income-total-label{
-font-size:16px;
-color:#866b32;
-}
-
-.income-total-value{
-font-size:34px;
-font-weight:900;
-color:#e48a00;
-margin-top:4px;
-}
-
-.other-item{
-background:#f7f8fa;
-border:1px solid #e0e3e7;
-border-radius:16px;
-padding:12px;
-margin-bottom:9px;
-}
-
-.other-grid{
-display:grid;
-grid-template-columns:1fr 130px 48px;
-gap:8px;
-align-items:center;
-}
-
-.other-input{
-width:100%;
-height:46px;
-border:1px solid #d3d7dc;
-border-radius:11px;
-background:#fff;
-color:#222;
-font-size:17px;
-padding:0 10px;
-}
-
-.other-amount{
-text-align:right;
-font-weight:900;
-}
-
-.delete-other{
-height:46px;
-background:#ffe7e7;
-color:#d23c3c;
-font-size:21px;
-}
-
-.add-other{
-width:100%;
-height:50px;
-background:#e8f2ff;
-color:#2879d4;
-font-size:17px;
-margin-top:5px;
-}
-
-.money-box{
-background:#f7f8fa;
-border-radius:18px;
-padding:15px;
-}
-
-.money-label{
-font-size:18px;
-font-weight:900;
-color:#666;
-margin-bottom:8px;
-}
-
-.money-input{
-width:100%;
-height:56px;
-border:2px solid #d7dbe0;
-border-radius:14px;
-background:#fff;
-color:#222;
-font-size:25px;
-font-weight:900;
-padding:0 14px;
-}
-
-.result-grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-}
-
-.result{
-border-radius:18px;
-padding:17px 12px;
-text-align:center;
-}
-
-.result-label{
-font-size:15px;
-color:#666;
-margin-bottom:6px;
-}
-
-.result-value{
-font-size:28px;
-font-weight:900;
-}
-
-.result-green{
-background:#ebf9ef;
-border:1px solid #bce6c8;
-}
-
-.result-green .result-value{
-color:#159447;
-}
-
-.result-red{
-background:#fff0f0;
-border:1px solid #efc3c3;
-}
-
-.result-red .result-value{
-color:#d43e3e;
-}
-
-.result-blue{
-background:#edf5ff;
-border:1px solid #c8ddfa;
-}
-
-.result-blue .result-value{
-color:#2879d4;
-}
-
-.result-gray{
-background:#f3f4f6;
-border:1px solid #dddfe3;
-}
-
-.result-gray .result-value{
-color:#333;
-}
-
-.status-box{
-margin-top:14px;
-border-radius:17px;
-padding:15px;
-text-align:center;
-font-size:22px;
-font-weight:900;
-}
-
-.status-profit{
-background:#eaf8ee;
-color:#159447;
-border:1px solid #bce5c8;
-}
-
-.status-shortage{
-background:#fff0f0;
-color:#d43e3e;
-border:1px solid #efc3c3;
-}
-
-.status-even{
-background:#f1f3f5;
-color:#555;
-border:1px solid #ddd;
-}
-
-.summary-grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:12px;
-}
-
-.summary{
-background:#f7f8fa;
-border-radius:17px;
-padding:15px;
-}
-
-.summary-label{
-font-size:15px;
-color:#777;
-}
-
-.summary-value{
-font-size:27px;
-font-weight:900;
-margin-top:5px;
-}
-
-.summary-profit{
-color:#159447;
-}
-
-.summary-shortage{
-color:#d43e3e;
-}
-
-.summary-net{
-color:#2879d4;
-}
-
-.history{
-overflow:hidden;
-}
-
-.history-head{
-display:grid;
-grid-template-columns:1.35fr .9fr .9fr 1fr;
-gap:5px;
-padding:11px 4px;
-background:#f1f3f5;
-color:#666;
-font-weight:900;
-font-size:13px;
-text-align:center;
-}
-
-.history-row{
-display:grid;
-grid-template-columns:1.35fr .9fr .9fr 1fr;
-gap:5px;
-padding:12px 4px;
-border-bottom:1px solid #e5e7e9;
-text-align:center;
-font-size:13px;
-align-items:center;
-}
-
-.history-date{
-font-weight:900;
-color:#333;
-}
-
-.history-week{
-color:#438de2;
-font-size:12px;
-margin-top:2px;
-}
-
-.history-profit{
-color:#159447;
-font-weight:900;
-}
-
-.history-shortage{
-color:#d43e3e;
-font-weight:900;
-}
-
-.empty{
-text-align:center;
-color:#999;
-padding:22px 5px;
-}
-
-.note{
-color:#888;
-font-size:13px;
-line-height:1.7;
-margin-top:10px;
-}
-
-.confirm-box{
-position:fixed;
-left:0;
-right:0;
-bottom:0;
-top:0;
-background:rgba(0,0,0,.38);
-display:none;
-align-items:center;
-justify-content:center;
-padding:20px;
-z-index:9999;
-}
-
-.confirm-box.show{
-display:flex;
-}
-
-.confirm-card{
-width:min(100%,420px);
-background:#fff;
-border-radius:22px;
-padding:22px;
-box-shadow:0 15px 50px rgba(0,0,0,.25);
-}
-
-.confirm-title{
-font-size:22px;
-font-weight:900;
-margin-bottom:10px;
-}
-
-.confirm-text{
-color:#666;
-line-height:1.7;
-margin-bottom:18px;
-}
-
-.confirm-buttons{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-}
-
-.confirm-cancel{
-height:50px;
-background:#eef0f2;
-color:#333;
-}
-
-.confirm-ok{
-height:50px;
-background:#e64c55;
-color:#fff;
-}
-
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:#f4f6f8;color:#222;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",Arial,sans-serif}
+body{min-height:100vh;padding-bottom:40px}
+.container{width:min(100%,900px);margin:auto;padding:12px 12px 50px}
+h1{text-align:center;font-size:30px;font-weight:900;margin:8px 0 18px;color:#222}
+.card{background:#fff;border:1px solid #e1e4e8;border-radius:22px;padding:18px;margin-bottom:16px;box-shadow:0 5px 18px rgba(0,0,0,.06)}
+.section-title{font-size:23px;font-weight:900;margin-bottom:15px;color:#222}
+.date-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.info-box{background:#f7f8fa;border-radius:16px;padding:14px;text-align:center}
+.info-label{color:#777;font-size:15px;margin-bottom:5px}
+.info-value{font-size:23px;font-weight:900;color:#333}
+.weekday{color:#3789e8}
+.button-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:13px}
+button{border:0;border-radius:14px;font:inherit;font-weight:900;cursor:pointer;touch-action:manipulation}
+.top-btn{height:48px;font-size:16px}
+.today-btn{background:#ffb52e;color:#222}
+.save-btn{background:#45bd68;color:#fff}
+.clear-btn{background:#e9ebee;color:#333}
+.item{background:#f8f9fb;border:1px solid #e1e4e8;border-radius:18px;padding:14px;margin-bottom:12px}
+.item-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.item-name{font-size:21px;font-weight:900}
+.item-note{font-size:13px;color:#888;margin-top:3px}
+.price-area{display:flex;align-items:center;gap:4px}
+.price-input{width:105px;height:42px;border:1px solid #d5d9de;border-radius:11px;background:#fff;font-size:19px;font-weight:900;text-align:right;padding:0 8px;color:#222}
+.qty-row{display:grid;grid-template-columns:54px 1fr 54px;gap:9px;margin-top:12px}
+.qty-btn{height:48px;background:#e8ebef;color:#333;font-size:29px;font-weight:900}
+.qty-input{width:100%;height:48px;border:2px solid #d8dce1;border-radius:13px;background:#fff;text-align:center;font-size:22px;font-weight:900;color:#222}
+.subtotal{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed #d8dadd;margin-top:10px;padding-top:9px}
+.subtotal-label{color:#777;font-size:15px}
+.subtotal-value{font-size:21px;font-weight:900;color:#333}
+.income-total{background:#fff8e8;border:1px solid #f2d38b;border-radius:18px;padding:17px;text-align:center;margin-top:14px}
+.income-total-label{font-size:16px;color:#866b32}
+.income-total-value{font-size:34px;font-weight:900;color:#e48a00;margin-top:4px}
+.other-item{background:#f7f8fa;border:1px solid #e0e3e7;border-radius:16px;padding:12px;margin-bottom:9px}
+.other-grid{display:grid;grid-template-columns:1fr 130px 48px;gap:8px;align-items:center}
+.other-input{width:100%;height:46px;border:1px solid #d3d7dc;border-radius:11px;background:#fff;color:#222;font-size:17px;padding:0 10px}
+.other-amount{text-align:right;font-weight:900}
+.delete-other{height:46px;background:#ffe7e7;color:#d23c3c;font-size:21px}
+.add-other{width:100%;height:50px;background:#e8f2ff;color:#2879d4;font-size:17px;margin-top:5px}
+.money-box{background:#f7f8fa;border-radius:18px;padding:15px}
+.money-label{font-size:18px;font-weight:900;color:#666;margin-bottom:8px}
+.money-input{width:100%;height:56px;border:2px solid #d7dbe0;border-radius:14px;background:#fff;color:#222;font-size:25px;font-weight:900;padding:0 14px}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.result{border-radius:18px;padding:17px 12px;text-align:center}
+.result-label{font-size:15px;color:#666;margin-bottom:6px}
+.result-value{font-size:28px;font-weight:900}
+.result-green{background:#ebf9ef;border:1px solid #bce6c8}
+.result-green .result-value{color:#159447}
+.result-red{background:#fff0f0;border:1px solid #efc3c3}
+.result-red .result-value{color:#d43e3e}
+.result-blue{background:#edf5ff;border:1px solid #c8ddfa}
+.result-blue .result-value{color:#2879d4}
+.result-gray{background:#f3f4f6;border:1px solid #dddfe3}
+.result-gray .result-value{color:#333}
+.status-box{margin-top:14px;border-radius:17px;padding:15px;text-align:center;font-size:22px;font-weight:900}
+.status-profit{background:#eaf8ee;color:#159447;border:1px solid #bce5c8}
+.status-shortage{background:#fff0f0;color:#d43e3e;border:1px solid #efc3c3}
+.status-even{background:#f1f3f5;color:#555;border:1px solid #ddd}
+.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.summary{background:#f7f8fa;border-radius:17px;padding:15px}
+.summary-label{font-size:15px;color:#777}
+.summary-value{font-size:27px;font-weight:900;margin-top:5px}
+.summary-profit{color:#159447}
+.summary-shortage{color:#d43e3e}
+.summary-net{color:#2879d4}
+.history{overflow:hidden}
+.history-head{display:grid;grid-template-columns:1.35fr .9fr .9fr 1fr;gap:5px;padding:11px 4px;background:#f1f3f5;color:#666;font-weight:900;font-size:13px;text-align:center}
+.history-row{display:grid;grid-template-columns:1.35fr .9fr .9fr 1fr;gap:5px;padding:12px 4px;border-bottom:1px solid #e5e7e9;text-align:center;font-size:13px;align-items:center}
+.history-date{font-weight:900;color:#333}
+.history-week{color:#438de2;font-size:12px;margin-top:2px}
+.history-profit{color:#159447;font-weight:900}
+.history-shortage{color:#d43e3e;font-weight:900}
+.empty{text-align:center;color:#999;padding:22px 5px}
+.note{color:#888;font-size:13px;line-height:1.7;margin-top:10px}
+.confirm-box{position:fixed;left:0;right:0;bottom:0;top:0;background:rgba(0,0,0,.38);display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}
+.confirm-box.show{display:flex}
+.confirm-card{width:min(100%,420px);background:#fff;border-radius:22px;padding:22px;box-shadow:0 15px 50px rgba(0,0,0,.25)}
+.confirm-title{font-size:22px;font-weight:900;margin-bottom:10px}
+.confirm-text{color:#666;line-height:1.7;margin-bottom:18px}
+.confirm-buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.confirm-cancel{height:50px;background:#eef0f2;color:#333}
+.confirm-ok{height:50px;background:#e64c55;color:#fff}
 @media(max-width:600px){
-
-.container{
-padding:10px 10px 35px;
+.container{padding:10px 10px 35px}
+h1{font-size:26px}
+.card{padding:14px;border-radius:18px}
+.item-name{font-size:19px}
+.price-input{width:94px}
+.other-grid{grid-template-columns:1fr 110px 45px}
+.result-value{font-size:24px}
+.summary-value{font-size:24px}
+.history-head,.history-row{font-size:12px}
 }
-
-h1{
-font-size:26px;
-}
-
-.card{
-padding:14px;
-border-radius:18px;
-}
-
-.item-name{
-font-size:19px;
-}
-
-.price-input{
-width:94px;
-}
-
-.other-grid{
-grid-template-columns:1fr 110px 45px;
-}
-
-.result-value{
-font-size:24px;
-}
-
-.summary-value{
-font-size:24px;
-}
-
-.history-head,
-.history-row{
-font-size:12px;
-}
-
-}
-
 @media(max-width:390px){
-
-.other-grid{
-grid-template-columns:1fr 90px 42px;
-}
-
-.price-input{
-width:88px;
-}
-
+.other-grid{grid-template-columns:1fr 90px 42px}
+.price-input{width:88px}
 }
 </style>
 </head>
-
 <body>
-
 <div class="container">
 
 <h1>🧾 每日收入・盈餘・差額</h1>
 
 <div class="card">
-
 <div class="section-title">📅 日期</div>
-
 <div class="date-grid">
-
 <div class="info-box">
 <div class="info-label">今天日期</div>
 <div class="info-value" id="dateText">—</div>
 </div>
-
 <div class="info-box">
 <div class="info-label">星期</div>
 <div class="info-value weekday" id="weekText">—</div>
 </div>
-
 </div>
-
 <div class="button-row">
-
-<button class="top-btn today-btn" id="todayBtn">
-今天
-</button>
-
-<button class="top-btn save-btn" id="saveBtn">
-💾 儲存
-</button>
-
-<button class="top-btn clear-btn" id="clearTodayBtn">
-🗑️ 清除今天
-</button>
-
+<button class="top-btn today-btn" id="todayBtn">今天</button>
+<button class="top-btn save-btn" id="saveBtn">💾 儲存</button>
+<button class="top-btn clear-btn" id="clearTodayBtn">🗑️ 清除今天</button>
 </div>
-
 </div>
 
 <div class="card">
-
 <div class="section-title">🍜 固定收入項目</div>
 
 <div class="item">
-
 <div class="item-head">
-
 <div>
 <div class="item-name">🍜</div>
 <div class="item-note">單價可以直接修改</div>
 </div>
-
 <div class="price-area">
 <span>$</span>
-<input
-id="noodlePrice"
-class="price-input"
-type="number"
-inputmode="numeric"
-value="850">
+<input id="noodlePrice" class="price-input" type="number" inputmode="numeric" value="850">
 </div>
-
 </div>
-
 <div class="qty-row">
-
 <button class="qty-btn" data-target="noodleQty" data-change="-1">−</button>
-
-<input
-id="noodleQty"
-class="qty-input"
-type="number"
-inputmode="numeric"
-min="0"
-value="1">
-
+<input id="noodleQty" class="qty-input" type="number" inputmode="numeric" min="0" value="1">
 <button class="qty-btn" data-target="noodleQty" data-change="1">＋</button>
-
 </div>
-
 <div class="subtotal">
 <span class="subtotal-label">小計</span>
 <span class="subtotal-value" id="noodleTotal">$850</span>
 </div>
-
 </div>
 
 <div class="item">
-
 <div class="item-head">
-
 <div>
 <div class="item-name">🍋 檸檬</div>
 <div class="item-note">單價可以直接修改</div>
 </div>
-
 <div class="price-area">
 <span>$</span>
-<input
-id="lemonPrice"
-class="price-input"
-type="number"
-inputmode="numeric"
-value="1200">
+<input id="lemonPrice" class="price-input" type="number" inputmode="numeric" value="1200">
 </div>
-
 </div>
-
 <div class="qty-row">
-
 <button class="qty-btn" data-target="lemonQty" data-change="-1">−</button>
-
-<input
-id="lemonQty"
-class="qty-input"
-type="number"
-inputmode="numeric"
-min="0"
-value="1">
-
+<input id="lemonQty" class="qty-input" type="number" inputmode="numeric" min="0" value="1">
 <button class="qty-btn" data-target="lemonQty" data-change="1">＋</button>
-
 </div>
-
 <div class="subtotal">
 <span class="subtotal-label">小計</span>
 <span class="subtotal-value" id="lemonTotal">$1,200</span>
 </div>
-
 </div>
 
 <div class="item">
-
 <div class="item-head">
-
 <div>
 <div class="item-name">大腸</div>
 <div class="item-note">一包 $150，可修改單價</div>
 </div>
-
 <div class="price-area">
 <span>$</span>
-<input
-id="largePrice"
-class="price-input"
-type="number"
-inputmode="numeric"
-value="150">
+<input id="largePrice" class="price-input" type="number" inputmode="numeric" value="150">
 </div>
-
 </div>
-
 <div class="qty-row">
-
 <button class="qty-btn" data-target="largeQty" data-change="-1">−</button>
-
-<input
-id="largeQty"
-class="qty-input"
-type="number"
-inputmode="numeric"
-min="0"
-value="1">
-
+<input id="largeQty" class="qty-input" type="number" inputmode="numeric" min="0" value="1">
 <button class="qty-btn" data-target="largeQty" data-change="1">＋</button>
-
 </div>
-
 <div class="subtotal">
 <span class="subtotal-label">大腸小計</span>
 <span class="subtotal-value" id="largeTotal">$150</span>
 </div>
-
 </div>
 
 <div class="item">
-
 <div class="item-head">
-
 <div>
 <div class="item-name">蚵仔</div>
 <div class="item-note">一包 $150，可修改單價</div>
 </div>
-
 <div class="price-area">
 <span>$</span>
-<input
-id="oysterPrice"
-class="price-input"
-type="number"
-inputmode="numeric"
-value="150">
+<input id="oysterPrice" class="price-input" type="number" inputmode="numeric" value="150">
 </div>
-
 </div>
-
 <div class="qty-row">
-
 <button class="qty-btn" data-target="oysterQty" data-change="-1">−</button>
-
-<input
-id="oysterQty"
-class="qty-input"
-type="number"
-inputmode="numeric"
-min="0"
-value="1">
-
+<input id="oysterQty" class="qty-input" type="number" inputmode="numeric" min="0" value="1">
 <button class="qty-btn" data-target="oysterQty" data-change="1">＋</button>
-
 </div>
-
 <div class="subtotal">
 <span class="subtotal-label">蚵仔小計</span>
 <span class="subtotal-value" id="oysterTotal">$150</span>
 </div>
-
 </div>
-
 </div>
 
 <div class="card">
-
 <div class="section-title">➕ 其他項目收入</div>
-
 <div id="otherItems"></div>
-
-<button class="add-other" id="addOtherBtn">
-＋ 新增其他項目收入
-</button>
-
-<div class="note">
-其他收入會自動加入每日收入。
-</div>
-
+<button class="add-other" id="addOtherBtn">＋ 新增其他項目收入</button>
+<div class="note">其他收入名稱與金額保持空白，手動填寫後自動加入收入。</div>
 </div>
 
 <div class="card">
-
 <div class="income-total">
-
-<div class="income-total-label">
-💰 今日收入合計
+<div class="income-total-label">💰 今日收入合計</div>
+<div class="income-total-value" id="incomeTotal">$2,350</div>
 </div>
-
-<div class="income-total-value" id="incomeTotal">
-$2,350
-</div>
-
-</div>
-
 </div>
 
 <div class="card">
-
 <div class="section-title">💸 拿</div>
-
 <div class="money-box">
-
-<div class="money-label">
-今天拿多少？
+<div class="money-label">今天拿多少？</div>
+<input id="takeInput" class="money-input" type="number" inputmode="numeric" min="0" placeholder="輸入拿的金額">
 </div>
-
-<input
-id="takeInput"
-class="money-input"
-type="number"
-inputmode="numeric"
-min="0"
-placeholder="輸入拿的金額">
-
-</div>
-
-<div class="note">
-收入 − 拿 = 當日結果。
-</div>
-
+<div class="note">收入 − 拿 = 當日結果。</div>
 </div>
 
 <div class="card">
-
 <div class="section-title">📊 今日結果</div>
-
 <div class="result-grid">
 
 <div class="result result-green">
-
-<div class="result-label">
-🟢 盈餘
-</div>
-
-<div class="result-value" id="todayProfit">
-$0
-</div>
-
+<div class="result-label">🟢 盈餘</div>
+<div class="result-value" id="todayProfit">$0</div>
 </div>
 
 <div class="result result-red">
-
-<div class="result-label">
-🔴 差額
-</div>
-
-<div class="result-value" id="todayShortage">
-$0
-</div>
-
+<div class="result-label">🔴 差額</div>
+<div class="result-value" id="todayShortage">$0</div>
 </div>
 
 <div class="result result-blue">
-
-<div class="result-label">
-💰 今日收入
-</div>
-
-<div class="result-value" id="resultIncome">
-$0
-</div>
-
+<div class="result-label">💰 今日收入</div>
+<div class="result-value" id="resultIncome">$0</div>
 </div>
 
 <div class="result result-gray">
-
-<div class="result-label">
-💸 今日拿
-</div>
-
-<div class="result-value" id="resultTake">
-$0
+<div class="result-label">💸 今日拿</div>
+<div class="result-value" id="resultTake">$0</div>
 </div>
 
 </div>
-
-</div>
-
-<div id="statusBox" class="status-box status-even">
-尚未輸入拿的金額
-</div>
-
+<div id="statusBox" class="status-box status-even">尚未輸入拿的金額</div>
 </div>
 
 <div class="card">
-
 <div class="section-title">📈 累加統計</div>
-
 <div class="summary-grid">
 
 <div class="summary">
-
-<div class="summary-label">
-🟢 盈餘累加
-</div>
-
-<div class="summary-value summary-profit" id="profitAccum">
-$0
-</div>
-
+<div class="summary-label">🟢 盈餘累加</div>
+<div class="summary-value summary-profit" id="profitAccum">$0</div>
 </div>
 
 <div class="summary">
-
-<div class="summary-label">
-🔴 差額累加
-</div>
-
-<div class="summary-value summary-shortage" id="shortageAccum">
-$0
-</div>
-
+<div class="summary-label">🔴 差額累加</div>
+<div class="summary-value summary-shortage" id="shortageAccum">$0</div>
 </div>
 
 <div class="summary">
-
-<div class="summary-label">
-💰 累加收入
-</div>
-
-<div class="summary-value" id="incomeAccum">
-$0
-</div>
-
+<div class="summary-label">💰 累加收入</div>
+<div class="summary-value" id="incomeAccum">$0</div>
 </div>
 
 <div class="summary">
-
-<div class="summary-label">
-💸 累加拿
-</div>
-
-<div class="summary-value" id="takeAccum">
-$0
+<div class="summary-label">💸 累加拿</div>
+<div class="summary-value" id="takeAccum">$0</div>
 </div>
 
 </div>
 
+<div class="income-total" style="margin-top:14px">
+<div class="income-total-label">⭐ 累計淨額</div>
+<div class="income-total-value" id="netAccum">$0</div>
 </div>
-
-<div class="income-total" style="margin-top:14px;">
-
-<div class="income-total-label">
-⭐ 累計淨額
-</div>
-
-<div class="income-total-value" id="netAccum">
-$0
-</div>
-
-</div>
-
 </div>
 
 <div class="card">
-
 <div class="section-title">📚 每日紀錄</div>
-
 <div class="history">
-
 <div class="history-head">
 <div>日期</div>
 <div>收入</div>
 <div>拿</div>
 <div>結果</div>
 </div>
-
 <div id="historyList"></div>
-
 </div>
-
 </div>
 
 <div class="card">
-
-<button
-class="top-btn clear-btn"
-id="clearAllBtn"
-style="width:100%;height:52px;background:#ffe8e8;color:#d33b3b;">
-🗑️ 清除全部資料
-</button>
-
-<div class="note" style="text-align:center;">
-清除前一定會詢問確認。
-</div>
-
+<button class="top-btn clear-btn" id="clearAllBtn" style="width:100%;height:52px;background:#ffe8e8;color:#d33b3b">🗑️ 清除全部資料</button>
+<div class="note" style="text-align:center">清除前一定會詢問確認。</div>
 </div>
 
 </div>
 
 <div class="confirm-box" id="confirmBox">
-
 <div class="confirm-card">
-
-<div class="confirm-title" id="confirmTitle">
-⚠️ 確認刪除
-</div>
-
-<div class="confirm-text" id="confirmText">
-確定要刪除嗎？
-</div>
-
+<div class="confirm-title" id="confirmTitle">⚠️ 確認刪除</div>
+<div class="confirm-text" id="confirmText">確定要刪除嗎？</div>
 <div class="confirm-buttons">
-
-<button class="confirm-cancel" id="confirmCancel">
-取消
-</button>
-
-<button class="confirm-ok" id="confirmOk">
-確定刪除
-</button>
-
+<button class="confirm-cancel" id="confirmCancel">取消</button>
+<button class="confirm-ok" id="confirmOk">確定刪除</button>
 </div>
-
 </div>
-
 </div>
 
 <script>
 "use strict";
 
-const STORAGE_KEY="daily_income_accounting_v3";
+const STORAGE_KEY="daily_income_accounting_v4";
 
 const state={
 data:{},
@@ -1094,34 +352,15 @@ return document.getElementById(id);
 
 function money(value){
 const n=Number(value||0);
-return "$"+n.toLocaleString("zh-TW",{
-maximumFractionDigits:0
-});
+return "$"+n.toLocaleString("zh-TW",{maximumFractionDigits:0});
 }
 
 function today(){
 const d=new Date();
-
 return{
-date:
-d.getFullYear()+
-"-"+
-String(d.getMonth()+1).padStart(2,"0")+
-"-"+
-String(d.getDate()).padStart(2,"0"),
-
-week:
-[
-"星期日",
-"星期一",
-"星期二",
-"星期三",
-"星期四",
-"星期五",
-"星期六"
-][d.getDay()]
+date:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"),
+week:["星期日","星期一","星期二","星期三","星期四","星期五","星期六"][d.getDay()]
 };
-
 }
 
 function escapeHTML(value){
@@ -1134,381 +373,186 @@ return String(value??"")
 }
 
 function load(){
-
 try{
-
-const raw=
-localStorage.getItem(STORAGE_KEY);
-
+const raw=localStorage.getItem(STORAGE_KEY);
 if(!raw)return;
-
-const saved=
-JSON.parse(raw);
-
-if(saved&&saved.data){
-state.data=saved.data;
-}
-
+const saved=JSON.parse(raw);
+if(saved&&saved.data)state.data=saved.data;
 }catch(e){
-
 console.error(e);
-
 }
-
 }
 
 function save(){
-
-localStorage.setItem(
-STORAGE_KEY,
-JSON.stringify({
+localStorage.setItem(STORAGE_KEY,JSON.stringify({
 data:state.data,
 savedAt:new Date().toISOString()
-})
-);
-
+}));
 }
 
 function getNumber(id){
-
-const n=
-Number($(id).value);
-
-return Number.isFinite(n)
-?
-Math.max(0,n)
-:
-0;
-
+const el=$(id);
+if(!el)return 0;
+const n=Number(el.value);
+return Number.isFinite(n)?Math.max(0,n):0;
 }
 
 function calculateIncome(){
 
-const noodle=
-getNumber("noodlePrice")*
-getNumber("noodleQty");
-
-const lemon=
-getNumber("lemonPrice")*
-getNumber("lemonQty");
-
-const large=
-getNumber("largePrice")*
-getNumber("largeQty");
-
-const oyster=
-getNumber("oysterPrice")*
-getNumber("oysterQty");
+const noodle=getNumber("noodlePrice")*getNumber("noodleQty");
+const lemon=getNumber("lemonPrice")*getNumber("lemonQty");
+const large=getNumber("largePrice")*getNumber("largeQty");
+const oyster=getNumber("oysterPrice")*getNumber("oysterQty");
 
 let other=0;
 
-state.otherItems.forEach(item=>{
-
-other+=
-Math.max(0,Number(item.amount)||0);
-
+state.otherItems.forEach(function(item){
+const amount=Number(item.amount);
+if(Number.isFinite(amount)&&amount>0)other+=amount;
 });
 
-const total=
-noodle+
-lemon+
-large+
-oyster+
-other;
+const total=noodle+lemon+large+oyster+other;
 
-$("noodleTotal").textContent=
-money(noodle);
-
-$("lemonTotal").textContent=
-money(lemon);
-
-$("largeTotal").textContent=
-money(large);
-
-$("oysterTotal").textContent=
-money(oyster);
-
-$("incomeTotal").textContent=
-money(total);
+$("noodleTotal").textContent=money(noodle);
+$("lemonTotal").textContent=money(lemon);
+$("largeTotal").textContent=money(large);
+$("oysterTotal").textContent=money(oyster);
+$("incomeTotal").textContent=money(total);
 
 return total;
-
 }
 
 function calculateResult(){
 
-const income=
-calculateIncome();
-
-const take=
-getNumber("takeInput");
-
-const difference=
-income-take;
+const income=calculateIncome();
+const take=getNumber("takeInput");
+const difference=income-take;
 
 let profit=0;
 let shortage=0;
 
-if(difference>0){
+if(difference>0)profit=difference;
+if(difference<0)shortage=Math.abs(difference);
 
-profit=difference;
-
-}else if(difference<0){
-
-shortage=Math.abs(difference);
-
-}
-
-$("todayProfit").textContent=
-money(profit);
-
-$("todayShortage").textContent=
-money(shortage);
-
-$("resultIncome").textContent=
-money(income);
-
-$("resultTake").textContent=
-money(take);
+$("todayProfit").textContent=money(profit);
+$("todayShortage").textContent=money(shortage);
+$("resultIncome").textContent=money(income);
+$("resultTake").textContent=money(take);
 
 const status=$("statusBox");
 
 if(difference>0){
-
-status.className=
-"status-box status-profit";
-
-status.textContent=
-"🟢 收入 − 拿 = 盈餘 "+money(profit);
-
+status.className="status-box status-profit";
+status.textContent="🟢 收入 − 拿 = 盈餘 "+money(profit);
 }else if(difference<0){
-
-status.className=
-"status-box status-shortage";
-
-status.textContent=
-"🔴 收入 − 拿不足，差額 "+money(shortage);
-
+status.className="status-box status-shortage";
+status.textContent="🔴 收入 − 拿不足，差額 "+money(shortage);
+}else if(income>0&&take===income){
+status.className="status-box status-even";
+status.textContent="⚪ 收入 − 拿 = 0，剛好";
 }else{
-
-status.className=
-"status-box status-even";
-
-status.textContent=
-"⚪ 收入 − 拿 = 0，剛好";
-
+status.className="status-box status-even";
+status.textContent="尚未輸入拿的金額";
 }
 
-return{
-income,
-take,
-profit,
-shortage
-};
-
+return{income,take,profit,shortage};
 }
 
 function currentRecord(){
 
 const t=today();
-
-const result=
-calculateResult();
+const result=calculateResult();
 
 return{
-
 date:t.date,
-
 week:t.week,
-
 income:result.income,
-
 take:result.take,
-
 profit:result.profit,
-
 shortage:result.shortage,
-
 noodlePrice:getNumber("noodlePrice"),
-
 noodleQty:getNumber("noodleQty"),
-
 lemonPrice:getNumber("lemonPrice"),
-
 lemonQty:getNumber("lemonQty"),
-
 largePrice:getNumber("largePrice"),
-
 largeQty:getNumber("largeQty"),
-
 oysterPrice:getNumber("oysterPrice"),
-
 oysterQty:getNumber("oysterQty"),
-
-otherItems:
-JSON.parse(
-JSON.stringify(state.otherItems)
-)
-
+otherItems:JSON.parse(JSON.stringify(state.otherItems))
 };
-
 }
 
 function autoSave(){
 
-const record=
-currentRecord();
+const record=currentRecord();
 
 state.data[record.date]=record;
 
 save();
-
 renderSummary();
-
 renderHistory();
-
 }
 
 function renderDate(){
-
 const t=today();
-
 $("dateText").textContent=t.date;
 $("weekText").textContent=t.week;
-
 }
 
 function renderOtherItems(){
 
-const box=
-$("otherItems");
+const box=$("otherItems");
 
 if(!state.otherItems.length){
-
-box.innerHTML=
-`
-<div class="empty">
-尚未新增其他收入
-</div>
-`;
-
+box.innerHTML='<div class="empty">尚未新增其他收入</div>';
 return;
-
 }
 
-box.innerHTML=
-state.otherItems.map(function(item,index){
-
+box.innerHTML=state.otherItems.map(function(item,index){
 return`
 <div class="other-item">
-
 <div class="other-grid">
-
-<input
-class="other-input"
-data-other-name="${index}"
-value="${escapeHTML(item.name)}"
-placeholder="其他項目名稱">
-
-<input
-class="other-input other-amount"
-data-other-amount="${index}"
-type="number"
-inputmode="numeric"
-min="0"
-value="${Number(item.amount)||0}"
-placeholder="金額">
-
-<button
-class="delete-other"
-data-delete-other="${index}">
-×
-</button>
-
+<input class="other-input" data-other-name="${index}" value="${escapeHTML(item.name||"")}" placeholder="項目名稱">
+<input class="other-input other-amount" data-other-amount="${index}" type="number" inputmode="numeric" min="0" value="${item.amount?escapeHTML(item.amount):""}" placeholder="金額">
+<button class="delete-other" data-delete-other="${index}">×</button>
 </div>
-
 </div>
 `;
-
 }).join("");
 
-box.querySelectorAll(
-"[data-other-name]"
-).forEach(function(input){
-
-input.addEventListener(
-"input",
-function(){
-
-const index=
-Number(input.dataset.otherName);
-
-state.otherItems[index].name=
-input.value;
-
+box.querySelectorAll("[data-other-name]").forEach(function(input){
+input.addEventListener("input",function(){
+const index=Number(input.dataset.otherName);
+state.otherItems[index].name=input.value;
 calculateResult();
 autoSave();
-
-}
-);
-
+});
 });
 
-box.querySelectorAll(
-"[data-other-amount]"
-).forEach(function(input){
-
-input.addEventListener(
-"input",
-function(){
-
-const index=
-Number(input.dataset.otherAmount);
-
-state.otherItems[index].amount=
-Number(input.value)||0;
-
+box.querySelectorAll("[data-other-amount]").forEach(function(input){
+input.addEventListener("input",function(){
+const index=Number(input.dataset.otherAmount);
+state.otherItems[index].amount=Number(input.value)||0;
 calculateResult();
 autoSave();
-
-}
-);
-
+});
 });
 
-box.querySelectorAll(
-"[data-delete-other]"
-).forEach(function(button){
-
-button.addEventListener(
-"click",
-function(){
-
-const index=
-Number(button.dataset.deleteOther);
-
+box.querySelectorAll("[data-delete-other]").forEach(function(button){
+button.addEventListener("click",function(){
+const index=Number(button.dataset.deleteOther);
 showConfirm(
 "⚠️ 確認刪除",
 "確定要刪除這個其他收入項目嗎？",
 function(){
-
-state.otherItems.splice(
-index,
-1
-);
-
+state.otherItems.splice(index,1);
 renderOtherItems();
 calculateResult();
 autoSave();
-
 }
 );
-
-}
-);
-
 });
-
+});
 }
 
 function renderSummary(){
@@ -1519,284 +563,69 @@ let profit=0;
 let shortage=0;
 
 Object.keys(state.data).forEach(function(key){
-
 const r=state.data[key];
-
-income+=
-Number(r.income)||0;
-
-take+=
-Number(r.take)||0;
-
-profit+=
-Number(r.profit)||0;
-
-shortage+=
-Number(r.shortage)||0;
-
+income+=Number(r.income)||0;
+take+=Number(r.take)||0;
+profit+=Number(r.profit)||0;
+shortage+=Number(r.shortage)||0;
 });
 
-$("incomeAccum").textContent=
-money(income);
+$("incomeAccum").textContent=money(income);
+$("takeAccum").textContent=money(take);
+$("profitAccum").textContent=money(profit);
+$("shortageAccum").textContent=money(shortage);
 
-$("takeAccum").textContent=
-money(take);
+const net=profit-shortage;
 
-$("profitAccum").textContent=
-money(profit);
-
-$("shortageAccum").textContent=
-money(shortage);
-
-const net=
-profit-shortage;
-
-$("netAccum").textContent=
-money(net);
-
-if(net>=0){
-
-$("netAccum").style.color=
-"#159447";
-
-}else{
-
-$("netAccum").style.color=
-"#d43e3e";
-
-}
-
+$("netAccum").textContent=money(net);
+$("netAccum").style.color=net>=0?"#159447":"#d43e3e";
 }
 
 function renderHistory(){
 
-const box=
-$("historyList");
+const box=$("historyList");
 
-const keys=
-Object.keys(state.data)
-.sort()
-.reverse();
+const keys=Object.keys(state.data).sort().reverse();
 
 if(!keys.length){
-
-box.innerHTML=
-`
-<div class="empty">
-目前還沒有每日紀錄
-</div>
-`;
-
+box.innerHTML='<div class="empty">目前還沒有每日紀錄</div>';
 return;
-
 }
 
-box.innerHTML=
-keys.map(function(key){
+box.innerHTML=keys.map(function(key){
 
-const r=
-state.data[key];
+const r=state.data[key];
 
 let result="";
 
 if(Number(r.profit)>0){
-
-result=
-`
-<span class="history-profit">
-+${money(r.profit)}
-</span>
-`;
-
+result='<span class="history-profit">+'+money(r.profit)+'</span>';
 }else if(Number(r.shortage)>0){
-
-result=
-`
-<span class="history-shortage">
--${money(r.shortage)}
-</span>
-`;
-
+result='<span class="history-shortage">-'+money(r.shortage)+'</span>';
 }else{
-
-result=
-`
-<span style="color:#777;font-weight:900;">
-0
-</span>
-`;
-
+result='<span style="color:#777;font-weight:900">0</span>';
 }
 
 return`
 <div class="history-row">
-
 <div>
-<div class="history-date">
-${escapeHTML(r.date)}
+<div class="history-date">${escapeHTML(r.date)}</div>
+<div class="history-week">${escapeHTML(r.week||"")}</div>
 </div>
-<div class="history-week">
-${escapeHTML(r.week||"")}
-</div>
-</div>
-
-<div>
-${money(r.income)}
-</div>
-
-<div>
-${money(r.take)}
-</div>
-
-<div>
-${result}
-</div>
-
+<div>${money(r.income)}</div>
+<div>${money(r.take)}</div>
+<div>${result}</div>
 </div>
 `;
-
 }).join("");
-
 }
 
 function loadToday(){
 
 const t=today();
-
-const r=
-state.data[t.date];
+const r=state.data[t.date];
 
 if(!r){
-
-state.otherItems=[];
-
-calculateResult();
-renderOtherItems();
-renderSummary();
-renderHistory();
-
-return;
-
-}
-
-$("noodlePrice").value=
-r.noodlePrice??850;
-
-$("noodleQty").value=
-r.noodleQty??1;
-
-$("lemonPrice").value=
-r.lemonPrice??1200;
-
-$("lemonQty").value=
-r.lemonQty??1;
-
-$("largePrice").value=
-r.largePrice??150;
-
-$("largeQty").value=
-r.largeQty??1;
-
-$("oysterPrice").value=
-r.oysterPrice??150;
-
-$("oysterQty").value=
-r.oysterQty??1;
-
-$("takeInput").value=
-r.take??"";
-
-state.otherItems=
-Array.isArray(r.otherItems)
-?
-JSON.parse(
-JSON.stringify(r.otherItems)
-)
-:
-[];
-
-renderOtherItems();
-
-calculateResult();
-renderSummary();
-renderHistory();
-
-}
-
-function showConfirm(
-title,
-text,
-action
-){
-
-$("confirmTitle").textContent=
-title;
-
-$("confirmText").textContent=
-text;
-
-state.confirmAction=action;
-
-$("confirmBox")
-.classList.add("show");
-
-}
-
-function closeConfirm(){
-
-$("confirmBox")
-.classList.remove("show");
-
-state.confirmAction=null;
-
-}
-
-function saveToday(){
-
-const record=
-currentRecord();
-
-state.data[record.date]=record;
-
-save();
-
-renderSummary();
-renderHistory();
-
-alert(
-"✅ 今天資料已自動儲存"
-);
-
-}
-
-function clearToday(){
-
-const t=today();
-
-if(!state.data[t.date]){
-
-state.otherItems=[];
-
-$("takeInput").value="";
-
-calculateResult();
-
-renderOtherItems();
-
-return;
-
-}
-
-showConfirm(
-"⚠️ 確認清除今天",
-"確定要刪除今天 "+t.date+" 的所有資料嗎？",
-function(){
-
-delete state.data[t.date];
-
-save();
-
-state.otherItems=[];
 
 $("noodlePrice").value=850;
 $("noodleQty").value=1;
@@ -1812,6 +641,95 @@ $("oysterQty").value=1;
 
 $("takeInput").value="";
 
+state.otherItems=[];
+
+renderOtherItems();
+calculateResult();
+renderSummary();
+renderHistory();
+
+return;
+}
+
+$("noodlePrice").value=r.noodlePrice??850;
+$("noodleQty").value=r.noodleQty??1;
+
+$("lemonPrice").value=r.lemonPrice??1200;
+$("lemonQty").value=r.lemonQty??1;
+
+$("largePrice").value=r.largePrice??150;
+$("largeQty").value=r.largeQty??1;
+
+$("oysterPrice").value=r.oysterPrice??150;
+$("oysterQty").value=r.oysterQty??1;
+
+$("takeInput").value=
+r.take!==undefined&&r.take!==null&&r.take!==0
+?r.take
+:"";
+
+state.otherItems=Array.isArray(r.otherItems)
+?JSON.parse(JSON.stringify(r.otherItems))
+:[];
+
+renderOtherItems();
+calculateResult();
+renderSummary();
+renderHistory();
+}
+
+function showConfirm(title,text,action){
+$("confirmTitle").textContent=title;
+$("confirmText").textContent=text;
+state.confirmAction=action;
+$("confirmBox").classList.add("show");
+}
+
+function closeConfirm(){
+$("confirmBox").classList.remove("show");
+state.confirmAction=null;
+}
+
+function saveToday(){
+
+const record=currentRecord();
+
+state.data[record.date]=record;
+save();
+renderSummary();
+renderHistory();
+
+alert("✅ 今天資料已儲存");
+}
+
+function clearToday(){
+
+const t=today();
+
+showConfirm(
+"⚠️ 確認清除今天",
+"確定要刪除今天 "+t.date+" 的所有資料嗎？",
+function(){
+
+delete state.data[t.date];
+save();
+
+$("noodlePrice").value=850;
+$("noodleQty").value=1;
+
+$("lemonPrice").value=1200;
+$("lemonQty").value=1;
+
+$("largePrice").value=150;
+$("largeQty").value=1;
+
+$("oysterPrice").value=150;
+$("oysterQty").value=1;
+
+$("takeInput").value="";
+
+state.otherItems=[];
+
 renderOtherItems();
 calculateResult();
 renderSummary();
@@ -1819,13 +737,11 @@ renderHistory();
 
 }
 );
-
 }
 
 function clearAll(){
 
-const count=
-Object.keys(state.data).length;
+const count=Object.keys(state.data).length;
 
 showConfirm(
 "⚠️ 確認清除全部",
@@ -1835,9 +751,7 @@ function(){
 state.data={};
 state.otherItems=[];
 
-localStorage.removeItem(
-STORAGE_KEY
-);
+localStorage.removeItem(STORAGE_KEY);
 
 $("noodlePrice").value=850;
 $("noodleQty").value=1;
@@ -1860,85 +774,47 @@ renderHistory();
 
 }
 );
-
 }
 
 function bind(){
 
-$("todayBtn")
-.addEventListener(
-"click",
-function(){
-
+$("todayBtn").addEventListener("click",function(){
 loadToday();
+});
 
-}
-);
+$("saveBtn").addEventListener("click",saveToday);
 
-$("saveBtn")
-.addEventListener(
-"click",
-saveToday
-);
+$("clearTodayBtn").addEventListener("click",clearToday);
 
-$("clearTodayBtn")
-.addEventListener(
-"click",
-clearToday
-);
+$("clearAllBtn").addEventListener("click",clearAll);
 
-$("clearAllBtn")
-.addEventListener(
-"click",
-clearAll
-);
-
-$("addOtherBtn")
-.addEventListener(
-"click",
-function(){
+$("addOtherBtn").addEventListener("click",function(){
 
 state.otherItems.push({
 name:"",
-amount:0
+amount:""
 });
 
 renderOtherItems();
 calculateResult();
 autoSave();
 
-const inputs=
-document.querySelectorAll(
-"[data-other-name]"
-);
+const inputs=document.querySelectorAll("[data-other-name]");
 
 if(inputs.length){
-
 inputs[inputs.length-1].focus();
-
 }
+});
 
-}
-);
+document.querySelectorAll(".qty-btn").forEach(function(button){
 
-document.querySelectorAll(
-".qty-btn"
-).forEach(function(button){
+button.addEventListener("click",function(){
 
-button.addEventListener(
-"click",
-function(){
-
-const id=
-button.dataset.target;
-
-const change=
-Number(button.dataset.change);
-
+const id=button.dataset.target;
+const change=Number(button.dataset.change);
 const input=$(id);
 
-let value=
-Number(input.value)||0;
+let value=Number(input.value)||0;
 
 value+=change;
 
@@ -1949,40 +825,24 @@ input.value=value;
 calculateResult();
 autoSave();
 
-}
-);
-
+});
 });
 
-document.querySelectorAll(
-"input"
-).forEach(function(input){
+document.querySelectorAll("input").forEach(function(input){
 
-input.addEventListener(
-"input",
-function(){
+input.addEventListener("input",function(){
 
 calculateResult();
 autoSave();
 
-}
-);
-
+});
 });
 
-$("confirmCancel")
-.addEventListener(
-"click",
-closeConfirm
-);
+$("confirmCancel").addEventListener("click",closeConfirm);
 
-$("confirmOk")
-.addEventListener(
-"click",
-function(){
+$("confirmOk").addEventListener("click",function(){
 
-const action=
-state.confirmAction;
+const action=state.confirmAction;
 
 closeConfirm();
 
@@ -1990,39 +850,26 @@ if(typeof action==="function"){
 action();
 }
 
-}
-);
+});
 
-$("confirmBox")
-.addEventListener(
-"click",
-function(e){
+$("confirmBox").addEventListener("click",function(e){
 
 if(e.target===$("confirmBox")){
 closeConfirm();
 }
 
-}
-);
-
+});
 }
 
 function boot(){
 
 load();
-
 renderDate();
-
 bind();
-
 loadToday();
-
 renderOtherItems();
-
 calculateResult();
-
 renderSummary();
-
 renderHistory();
 
 }
@@ -2030,29 +877,18 @@ renderHistory();
 boot();
 
 setInterval(function(){
-
 renderDate();
-
 autoSave();
-
 },30000);
 
-document.addEventListener(
-"visibilitychange",
-function(){
+document.addEventListener("visibilitychange",function(){
 
 if(!document.hidden){
-
 renderDate();
-
 loadToday();
-
 }
 
-}
-);
-
+});
 </script>
-
 </body>
 </html>
