@@ -2,1617 +2,684 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>每日收入・盈餘・差額</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>每日收入・盈餘・差額｜緊湊版</title>
 <style>
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
-
-html,body{
-  margin:0;
-  padding:0;
-  background:#f4f6f8;
-  color:#222;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",
-               "Microsoft JhengHei",sans-serif;
-}
-
-body{
-  padding:18px 12px 50px;
-}
-
-.container{
-  max-width:820px;
-  margin:0 auto;
-}
-
-h1{
-  text-align:center;
-  font-size:32px;
-  margin:8px 0 22px;
-  font-weight:900;
-  color:#222;
-}
-
-.card{
-  background:#fff;
-  border:1px solid #dfe3e8;
-  border-radius:26px;
-  padding:22px;
-  margin-bottom:18px;
-  box-shadow:0 5px 18px rgba(0,0,0,.06);
-}
-
-.section-title{
-  font-size:28px;
-  font-weight:900;
-  margin-bottom:18px;
-}
-
-.date-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-
-.date-box{
-  background:#f6f8fa;
-  border-radius:20px;
-  padding:18px;
-  text-align:center;
-}
-
-.date-box label{
-  display:block;
-  color:#777;
-  font-size:18px;
-  margin-bottom:10px;
-}
-
-.date-box input{
-  width:100%;
-  border:2px solid #d8dde3;
-  border-radius:14px;
-  padding:12px 8px;
-  background:#fff;
-  font-size:23px;
-  font-weight:800;
-  color:#222;
-  text-align:center;
-}
-
-.weekday{
-  font-size:30px;
-  font-weight:900;
-  color:#4d88df;
-  min-height:42px;
-}
-
-.button-row{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:12px;
-  margin-top:16px;
-}
-
-button{
-  border:0;
-  border-radius:18px;
-  min-height:62px;
-  font-size:20px;
-  font-weight:900;
-  cursor:pointer;
-  transition:.12s;
-}
-
-button:active{
-  transform:scale(.97);
-}
-
-.btn-today{
-  background:#ffbd4a;
-  color:#222;
-}
-
-.btn-save{
-  background:#63bf72;
-  color:#fff;
-}
-
-.btn-clear{
-  background:#e9edf1;
-  color:#333;
-}
-
-.item{
-  background:#f8fafc;
-  border:2px solid #e0e5ea;
-  border-radius:24px;
-  padding:20px;
-  margin-bottom:16px;
-}
-
-.item-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-}
-
-.item-name{
-  font-size:25px;
-  font-weight:900;
-}
-
-.item-note{
-  color:#777;
-  font-size:16px;
-  margin-top:5px;
-}
-
-.price-wrap{
-  display:flex;
-  align-items:center;
-  gap:5px;
-  flex-shrink:0;
-}
-
-.price-wrap span{
-  color:#777;
-  font-size:20px;
-}
-
-.price{
-  width:130px;
-  height:55px;
-  border:2px solid #d6dce2;
-  border-radius:15px;
-  background:#fff;
-  text-align:center;
-  font-size:24px;
-  font-weight:900;
-}
-
-.qty-row{
-  display:grid;
-  grid-template-columns:80px 1fr 80px;
-  gap:12px;
-  align-items:center;
-  margin-top:18px;
-}
-
-.qty-btn{
-  min-height:65px;
-  background:#e8ecf0;
-  color:#222;
-  font-size:38px;
-  line-height:1;
-}
-
-.qty{
-  width:100%;
-  height:65px;
-  border:3px solid #d7dce1;
-  border-radius:18px;
-  background:#fff;
-  text-align:center;
-  font-size:28px;
-  font-weight:900;
-}
-
-.subtotal{
-  border-top:2px dashed #d8dde2;
-  margin-top:18px;
-  padding-top:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  color:#777;
-  font-size:19px;
-}
-
-.subtotal strong{
-  color:#222;
-  font-size:28px;
-}
-
-.other-box{
-  background:#f8fafc;
-  border:2px dashed #cfd6dd;
-  border-radius:22px;
-  padding:18px;
-  margin-bottom:14px;
-}
-
-.other-grid{
-  display:grid;
-  grid-template-columns:1fr 180px;
-  gap:12px;
-}
-
-.other-grid input{
-  width:100%;
-  height:58px;
-  border:2px solid #d5dbe1;
-  border-radius:15px;
-  background:#fff;
-  padding:0 15px;
-  font-size:20px;
-  font-weight:700;
-}
-
-.add-other{
-  background:#e8f0ff;
-  color:#3774cc;
-  width:100%;
-  min-height:52px;
-  margin-top:10px;
-}
-
-.income-box{
-  background:#eef7f0;
-  border:2px solid #b9dfc0;
-  border-radius:24px;
-  padding:22px;
-}
-
-.income-label{
-  font-size:22px;
-  font-weight:900;
-  color:#428c50;
-}
-
-.big-money{
-  font-size:44px;
-  font-weight:900;
-  margin-top:6px;
-}
-
-.take-box{
-  background:#fff8ed;
-  border:2px solid #f1d49d;
-  border-radius:24px;
-  padding:22px;
-  margin-top:16px;
-}
-
-.take-box label{
-  display:block;
-  font-size:22px;
-  font-weight:900;
-  color:#9b6b16;
-  margin-bottom:10px;
-}
-
-.take-input{
-  width:100%;
-  height:70px;
-  border:3px solid #e5c67f;
-  border-radius:18px;
-  background:#fff;
-  text-align:center;
-  font-size:34px;
-  font-weight:900;
-}
-
-.result-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:15px;
-}
-
-.result{
-  border-radius:22px;
-  padding:22px;
-  text-align:center;
-  min-height:145px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-}
-
-.result-title{
-  font-size:20px;
-  color:#666;
-  font-weight:700;
-}
-
-.result-money{
-  font-size:38px;
-  font-weight:900;
-  margin-top:8px;
-}
-
-.profit{
-  background:#edf9f0;
-  border:2px solid #b7dfc0;
-}
-
-.shortage{
-  background:#fff0f0;
-  border:2px solid #efbcbc;
-}
-
-.profit .result-money{
-  color:#37994b;
-}
-
-.shortage .result-money{
-  color:#d34a4a;
-}
-
-.summary{
-  background:#f6f8fa;
-  border-radius:22px;
-  padding:18px;
-  margin-top:16px;
-}
-
-.summary-row{
-  display:flex;
-  justify-content:space-between;
-  padding:10px 0;
-  border-bottom:1px solid #dce1e6;
-  font-size:20px;
-}
-
-.summary-row:last-child{
-  border-bottom:0;
-}
-
-.summary-row strong{
-  font-size:23px;
-}
-
-.history{
-  overflow-x:auto;
-}
-
-.history table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:600px;
-}
-
-.history th,
-.history td{
-  padding:13px 10px;
-  border-bottom:1px solid #dfe3e8;
-  text-align:center;
-  font-size:17px;
-}
-
-.history th{
-  background:#f0f3f6;
-  font-weight:900;
-}
-
-.history button{
-  min-height:42px;
-  padding:5px 14px;
-  font-size:15px;
-  background:#e8f0ff;
-  color:#3774cc;
-}
-
-.auto-save{
-  text-align:center;
-  color:#777;
-  font-size:15px;
-  margin-top:10px;
-}
-
-.danger{
-  margin-top:14px;
-  width:100%;
-  background:#fff0f0;
-  color:#c73d3d;
-  border:1px solid #efb8b8;
-}
-
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:#f4f6f8;color:#222;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif}
+body{padding:8px 8px 25px}
+.container{width:min(100%,760px);margin:auto}
+h1{text-align:center;font-size:25px;margin:4px 0 10px;font-weight:900}
+.card{background:#fff;border:1px solid #e0e4e8;border-radius:16px;padding:11px;margin-bottom:9px;box-shadow:0 2px 8px rgba(0,0,0,.045)}
+.section-title{font-size:20px;font-weight:900;margin-bottom:9px}
+.date-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:8px}
+.date-box{background:#f7f8fa;border-radius:12px;padding:8px;text-align:center}
+.date-box label{display:block;color:#777;font-size:12px;margin-bottom:4px}
+.date-box input{width:100%;height:38px;border:1px solid #d5dbe0;border-radius:9px;background:#fff;font-size:16px;font-weight:800;text-align:center}
+.weekday{height:38px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;color:#4286dc}
+.button-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+button{border:0;border-radius:10px;min-height:40px;font:inherit;font-weight:900;cursor:pointer}
+.btn-today{background:#ffbd4a}
+.btn-save{background:#58b86b;color:#fff}
+.btn-clear{background:#e9edf1;color:#333}
+.item{background:#f8fafc;border:1px solid #dfe4e9;border-radius:13px;padding:9px;margin-bottom:7px}
+.item:last-child{margin-bottom:0}
+.item-top{display:flex;justify-content:space-between;align-items:center;gap:7px}
+.item-name{font-size:18px;font-weight:900}
+.item-note{font-size:11px;color:#888;margin-top:2px}
+.price-wrap{display:flex;align-items:center;gap:3px}
+.price-wrap span{font-size:14px;color:#777}
+.price{width:85px;height:34px;border:1px solid #d2d8de;border-radius:8px;background:#fff;text-align:center;font-size:16px;font-weight:900}
+.qty-row{display:grid;grid-template-columns:42px 1fr 42px;gap:6px;margin-top:7px}
+.qty-btn{min-height:38px;background:#e8ecf0;font-size:25px}
+.qty{width:100%;height:38px;border:1px solid #d3d9df;border-radius:9px;background:#fff;text-align:center;font-size:18px;font-weight:900}
+.subtotal{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed #d8dde2;margin-top:7px;padding-top:6px;font-size:13px;color:#777}
+.subtotal strong{font-size:18px;color:#222}
+.other-row{background:#f8fafc;border:1px dashed #ccd4db;border-radius:11px;padding:7px;margin-bottom:6px}
+.other-grid{display:grid;grid-template-columns:1fr 110px;gap:6px}
+.other-grid input{width:100%;height:38px;border:1px solid #d2d8de;border-radius:8px;background:#fff;padding:0 8px;font-size:14px}
+.add-other{width:100%;min-height:39px;background:#e8f0ff;color:#3573ca}
+.income-box{background:#eef8f0;border:1px solid #b9dfc0;border-radius:13px;padding:9px;display:flex;justify-content:space-between;align-items:center}
+.income-label{font-size:17px;font-weight:900;color:#428c50}
+.big-money{font-size:27px;font-weight:900;color:#222}
+.take-box{background:#fff8ed;border:1px solid #efd39b;border-radius:13px;padding:9px;margin-top:7px}
+.take-box label{display:block;font-size:16px;font-weight:900;color:#916916;margin-bottom:5px}
+.take-input{width:100%;height:43px;border:2px solid #e5c67f;border-radius:10px;background:#fff;text-align:center;font-size:23px;font-weight:900}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.result{border-radius:13px;padding:10px;text-align:center}
+.result-title{font-size:13px;color:#666}
+.result-money{font-size:24px;font-weight:900;margin-top:2px}
+.profit{background:#edf9f0;border:1px solid #b7dfc0}
+.shortage{background:#fff0f0;border:1px solid #efbcbc}
+.profit .result-money{color:#37994b}
+.shortage .result-money{color:#d34a4a}
+.summary{background:#f7f8fa;border-radius:12px;padding:7px;margin-top:7px}
+.summary-row{display:flex;justify-content:space-between;padding:5px 2px;border-bottom:1px solid #e0e4e8;font-size:14px}
+.summary-row:last-child{border-bottom:0}
+.summary-row strong{font-size:16px}
+.history{overflow-x:auto}
+.history table{width:100%;border-collapse:collapse;min-width:570px}
+.history th,.history td{padding:7px 5px;border-bottom:1px solid #e0e4e8;text-align:center;font-size:12px}
+.history th{background:#f0f3f6;font-weight:900}
+.history button{min-height:30px;padding:3px 10px;font-size:12px;background:#e8f0ff;color:#3573ca}
+.auto-save{text-align:center;color:#888;font-size:11px;margin-top:5px}
+.danger{margin-top:7px;width:100%;background:#fff0f0;color:#c73d3d;border:1px solid #efb8b8}
 @media(max-width:600px){
-  body{
-    padding:10px 8px 40px;
-  }
-
-  h1{
-    font-size:28px;
-  }
-
-  .card{
-    padding:16px;
-    border-radius:22px;
-  }
-
-  .section-title{
-    font-size:25px;
-  }
-
-  .date-grid{
-    grid-template-columns:1fr;
-  }
-
-  .button-row{
-    grid-template-columns:1fr;
-  }
-
-  .item-top{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .price-wrap{
-    width:100%;
-  }
-
-  .price{
-    flex:1;
-    width:auto;
-  }
-
-  .qty-row{
-    grid-template-columns:70px 1fr 70px;
-  }
-
-  .other-grid{
-    grid-template-columns:1fr;
-  }
-
-  .result-grid{
-    grid-template-columns:1fr;
-  }
+body{padding:6px 6px 20px}
+h1{font-size:23px;margin:3px 0 7px}
+.card{padding:9px;margin-bottom:7px;border-radius:14px}
+.section-title{font-size:19px;margin-bottom:7px}
+.date-grid{grid-template-columns:1fr 1fr}
+.item{padding:8px;margin-bottom:6px}
+.item-name{font-size:17px}
+.item-note{font-size:10px}
+.price{width:78px;height:32px;font-size:15px}
+.qty-row{grid-template-columns:40px 1fr 40px;gap:5px;margin-top:6px}
+.qty-btn,.qty{min-height:36px;height:36px}
+.qty-btn{font-size:23px}
+.qty{font-size:17px}
+.subtotal{margin-top:5px;padding-top:5px}
+.subtotal strong{font-size:17px}
 }
 </style>
 </head>
-
 <body>
-
 <div class="container">
 
 <h1>🧾 每日收入・盈餘・差額</h1>
 
-<!-- 日期 -->
 <div class="card">
-  <div class="section-title">📅 日期</div>
-
-  <div class="date-grid">
-
-    <div class="date-box">
-      <label>選擇日期</label>
-      <input type="date" id="dateInput">
-    </div>
-
-    <div class="date-box">
-      <label>星期</label>
-      <div class="weekday" id="weekday">星期三</div>
-    </div>
-
-  </div>
-
-  <div class="button-row">
-    <button class="btn-today" id="todayBtn">今天</button>
-    <button class="btn-save" id="saveBtn">💾 儲存</button>
-    <button class="btn-clear" id="clearDayBtn">🗑️ 清除今天</button>
-  </div>
-
-  <div class="auto-save">
-    💾 每次修改會自動儲存目前日期資料
-  </div>
+<div class="section-title">📅 日期</div>
+<div class="date-grid">
+<div class="date-box">
+<label>選擇日期</label>
+<input type="date" id="dateInput">
+</div>
+<div class="date-box">
+<label>星期</label>
+<div class="weekday" id="weekday"></div>
+</div>
+</div>
+<div class="button-row">
+<button class="btn-today" id="todayBtn">今天</button>
+<button class="btn-save" id="saveBtn">💾 儲存</button>
+<button class="btn-clear" id="clearDayBtn">🗑️ 清除</button>
+</div>
+<div class="auto-save">💾 修改後自動儲存目前日期</div>
 </div>
 
-
-<!-- 固定收入 -->
 <div class="card">
+<div class="section-title">🍜 固定收入</div>
 
-  <div class="section-title">🍜 固定收入項目</div>
-
-  <!-- 麵線 -->
-  <div class="item">
-    <div class="item-top">
-      <div>
-        <div class="item-name">🍜 麵線</div>
-        <div class="item-note">單價可以直接修改</div>
-      </div>
-
-      <div class="price-wrap">
-        <span>$</span>
-        <input class="price" id="noodlePrice" type="number" min="0" step="1" value="850">
-      </div>
-    </div>
-
-    <div class="qty-row">
-      <button class="qty-btn" id="noodleMinus">−</button>
-      <input class="qty" id="noodleQty" type="number" min="0" step="1" value="1">
-      <button class="qty-btn" id="noodlePlus">＋</button>
-    </div>
-
-    <div class="subtotal">
-      <span>小計</span>
-      <strong id="noodleSubtotal">$850</strong>
-    </div>
-  </div>
-
-
-  <!-- 檸檬 -->
-  <div class="item">
-    <div class="item-top">
-      <div>
-        <div class="item-name">🍋 檸檬</div>
-        <div class="item-note">單價可以直接修改</div>
-      </div>
-
-      <div class="price-wrap">
-        <span>$</span>
-        <input class="price" id="lemonPrice" type="number" min="0" step="1" value="1200">
-      </div>
-    </div>
-
-    <div class="qty-row">
-      <button class="qty-btn" id="lemonMinus">−</button>
-      <input class="qty" id="lemonQty" type="number" min="0" step="1" value="1">
-      <button class="qty-btn" id="lemonPlus">＋</button>
-    </div>
-
-    <div class="subtotal">
-      <span>小計</span>
-      <strong id="lemonSubtotal">$1,200</strong>
-    </div>
-  </div>
-
-
-  <!-- 大腸 -->
-  <div class="item">
-    <div class="item-top">
-      <div>
-        <div class="item-name">🥣 大腸</div>
-        <div class="item-note">一包單價可以直接修改</div>
-      </div>
-
-      <div class="price-wrap">
-        <span>$</span>
-        <input class="price" id="intestinePrice" type="number" min="0" step="1" value="150">
-      </div>
-    </div>
-
-    <div class="qty-row">
-      <button class="qty-btn" id="intestineMinus">−</button>
-      <input class="qty" id="intestineQty" type="number" min="0" step="1" value="1">
-      <button class="qty-btn" id="intestinePlus">＋</button>
-    </div>
-
-    <div class="subtotal">
-      <span>小計</span>
-      <strong id="intestineSubtotal">$150</strong>
-    </div>
-  </div>
-
-
-  <!-- 蚵仔 -->
-  <div class="item">
-    <div class="item-top">
-      <div>
-        <div class="item-name">🦪 蚵仔</div>
-        <div class="item-note">一包單價可以直接修改</div>
-      </div>
-
-      <div class="price-wrap">
-        <span>$</span>
-        <input class="price" id="oysterPrice" type="number" min="0" step="1" value="150">
-      </div>
-    </div>
-
-    <div class="qty-row">
-      <button class="qty-btn" id="oysterMinus">−</button>
-      <input class="qty" id="oysterQty" type="number" min="0" step="1" value="1">
-      <button class="qty-btn" id="oysterPlus">＋</button>
-    </div>
-
-    <div class="subtotal">
-      <span>小計</span>
-      <strong id="oysterSubtotal">$150</strong>
-    </div>
-  </div>
-
+<div class="item">
+<div class="item-top">
+<div>
+<div class="item-name">🍜 麵線</div>
+<div class="item-note">單價可修改</div>
+</div>
+<div class="price-wrap"><span>$</span><input class="price" id="noodlePrice" type="number" min="0" value="850"></div>
+</div>
+<div class="qty-row">
+<button class="qty-btn" id="noodleMinus">−</button>
+<input class="qty" id="noodleQty" type="number" min="0" value="1">
+<button class="qty-btn" id="noodlePlus">＋</button>
+</div>
+<div class="subtotal"><span>小計</span><strong id="noodleSubtotal">$850</strong></div>
 </div>
 
+<div class="item">
+<div class="item-top">
+<div>
+<div class="item-name">🍋 檸檬</div>
+<div class="item-note">單價可修改</div>
+</div>
+<div class="price-wrap"><span>$</span><input class="price" id="lemonPrice" type="number" min="0" value="1200"></div>
+</div>
+<div class="qty-row">
+<button class="qty-btn" id="lemonMinus">−</button>
+<input class="qty" id="lemonQty" type="number" min="0" value="1">
+<button class="qty-btn" id="lemonPlus">＋</button>
+</div>
+<div class="subtotal"><span>小計</span><strong id="lemonSubtotal">$1,200</strong></div>
+</div>
 
-<!-- 其他收入 -->
+<div class="item">
+<div class="item-top">
+<div>
+<div class="item-name">🥣 大腸</div>
+<div class="item-note">一包 $150</div>
+</div>
+<div class="price-wrap"><span>$</span><input class="price" id="intestinePrice" type="number" min="0" value="150"></div>
+</div>
+<div class="qty-row">
+<button class="qty-btn" id="intestineMinus">−</button>
+<input class="qty" id="intestineQty" type="number" min="0" value="1">
+<button class="qty-btn" id="intestinePlus">＋</button>
+</div>
+<div class="subtotal"><span>小計</span><strong id="intestineSubtotal">$150</strong></div>
+</div>
+
+<div class="item">
+<div class="item-top">
+<div>
+<div class="item-name">🦪 蚵仔</div>
+<div class="item-note">一包 $150</div>
+</div>
+<div class="price-wrap"><span>$</span><input class="price" id="oysterPrice" type="number" min="0" value="150"></div>
+</div>
+<div class="qty-row">
+<button class="qty-btn" id="oysterMinus">−</button>
+<input class="qty" id="oysterQty" type="number" min="0" value="1">
+<button class="qty-btn" id="oysterPlus">＋</button>
+</div>
+<div class="subtotal"><span>小計</span><strong id="oysterSubtotal">$150</strong></div>
+</div>
+</div>
+
 <div class="card">
-
-  <div class="section-title">➕ 其他項目收入</div>
-
-  <div id="otherContainer">
-
-    <div class="other-box other-row">
-
-      <div class="other-grid">
-
-        <input
-          type="text"
-          class="otherName"
-          placeholder="項目名稱（可空白）"
-        >
-
-        <input
-          type="number"
-          class="otherAmount"
-          min="0"
-          step="1"
-          placeholder="金額"
-        >
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <button class="add-other" id="addOtherBtn">
-    ＋ 新增其他收入
-  </button>
-
+<div class="section-title">➕ 其他項目收入</div>
+<div id="otherContainer"></div>
+<button class="add-other" id="addOtherBtn">＋ 新增其他收入</button>
 </div>
 
-
-<!-- 收入 -->
 <div class="card">
-
-  <div class="income-box">
-
-    <div class="income-label">💵 收入</div>
-
-    <div class="big-money" id="totalIncome">
-      $2,350
-    </div>
-
-  </div>
-
-  <div class="take-box">
-
-    <label>💸 拿</label>
-
-    <input
-      class="take-input"
-      id="takeInput"
-      type="number"
-      min="0"
-      step="1"
-      placeholder="請輸入拿的金額"
-    >
-
-  </div>
-
+<div class="income-box">
+<div class="income-label">💵 收入</div>
+<div class="big-money" id="totalIncome">$2,350</div>
+</div>
+<div class="take-box">
+<label>💸 拿</label>
+<input class="take-input" id="takeInput" type="number" min="0" placeholder="請輸入拿的金額">
+</div>
 </div>
 
-
-<!-- 今日結果 -->
 <div class="card">
-
-  <div class="section-title">📊 今日結果</div>
-
-  <div class="result-grid">
-
-    <div class="result profit">
-      <div class="result-title">收入 − 拿</div>
-      <div class="result-money" id="dailyDifference">$2,350</div>
-    </div>
-
-    <div class="result shortage">
-      <div class="result-title">不足差額</div>
-      <div class="result-money" id="dailyShortage">$0</div>
-    </div>
-
-  </div>
-
-  <div class="summary">
-
-    <div class="summary-row">
-      <span>今日收入</span>
-      <strong id="summaryIncome">$2,350</strong>
-    </div>
-
-    <div class="summary-row">
-      <span>今日拿</span>
-      <strong id="summaryTake">$0</strong>
-    </div>
-
-    <div class="summary-row">
-      <span>今日盈餘</span>
-      <strong id="summaryProfit">$2,350</strong>
-    </div>
-
-    <div class="summary-row">
-      <span>今日差額</span>
-      <strong id="summaryShortage">$0</strong>
-    </div>
-
-  </div>
-
+<div class="section-title">📊 今日結果</div>
+<div class="result-grid">
+<div class="result profit">
+<div class="result-title">收入 − 拿</div>
+<div class="result-money" id="dailyDifference">$2,350</div>
+</div>
+<div class="result shortage">
+<div class="result-title">不足差額</div>
+<div class="result-money" id="dailyShortage">$0</div>
+</div>
+</div>
+<div class="summary">
+<div class="summary-row"><span>今日收入</span><strong id="summaryIncome">$2,350</strong></div>
+<div class="summary-row"><span>今日拿</span><strong id="summaryTake">$0</strong></div>
+<div class="summary-row"><span>今日盈餘</span><strong id="summaryProfit">$2,350</strong></div>
+<div class="summary-row"><span>今日差額</span><strong id="summaryShortage">$0</strong></div>
+</div>
 </div>
 
-
-<!-- 累加 -->
 <div class="card">
-
-  <div class="section-title">📈 累加統計</div>
-
-  <div class="result-grid">
-
-    <div class="result profit">
-      <div class="result-title">盈餘累加</div>
-      <div class="result-money" id="totalProfit">$0</div>
-    </div>
-
-    <div class="result shortage">
-      <div class="result-title">差額累加</div>
-      <div class="result-money" id="totalShortage">$0</div>
-    </div>
-
-  </div>
-
-  <button class="danger" id="clearAllBtn">
-    🗑️ 清除全部紀錄
-  </button>
-
+<div class="section-title">📈 累加統計</div>
+<div class="result-grid">
+<div class="result profit">
+<div class="result-title">盈餘累加</div>
+<div class="result-money" id="totalProfit">$0</div>
+</div>
+<div class="result shortage">
+<div class="result-title">差額累加</div>
+<div class="result-money" id="totalShortage">$0</div>
+</div>
+</div>
+<button class="danger" id="clearAllBtn">🗑️ 清除全部紀錄</button>
 </div>
 
-
-<!-- 歷史紀錄 -->
 <div class="card">
-
-  <div class="section-title">📚 每日紀錄</div>
-
-  <div class="history">
-
-    <table>
-
-      <thead>
-        <tr>
-          <th>日期</th>
-          <th>星期</th>
-          <th>收入</th>
-          <th>拿</th>
-          <th>盈餘</th>
-          <th>差額</th>
-          <th>操作</th>
-        </tr>
-      </thead>
-
-      <tbody id="historyBody"></tbody>
-
-    </table>
-
-  </div>
-
+<div class="section-title">📚 每日紀錄</div>
+<div class="history">
+<table>
+<thead>
+<tr>
+<th>日期</th>
+<th>星期</th>
+<th>收入</th>
+<th>拿</th>
+<th>盈餘</th>
+<th>差額</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody id="historyBody"></tbody>
+</table>
+</div>
 </div>
 
 </div>
-
 
 <script>
 (function(){
 
-  const STORAGE_KEY = "daily_income_profit_shortage_v3";
-
-  const $ = id => document.getElementById(id);
-
-  const ids = [
-    "dateInput",
-    "weekday",
-    "todayBtn",
-    "saveBtn",
-    "clearDayBtn",
-    "clearAllBtn",
-    "addOtherBtn",
-    "otherContainer",
-    "takeInput",
-    "totalIncome",
-    "dailyDifference",
-    "dailyShortage",
-    "summaryIncome",
-    "summaryTake",
-    "summaryProfit",
-    "summaryShortage",
-    "totalProfit",
-    "totalShortage",
-    "historyBody"
-  ];
-
-  function pad(n){
-    return String(n).padStart(2,"0");
-  }
-
-  function getToday(){
-    const d = new Date();
-    return d.getFullYear() + "-" +
-           pad(d.getMonth()+1) + "-" +
-           pad(d.getDate());
-  }
-
-  function getWeekday(dateString){
-    if(!dateString) return "";
-
-    const parts = dateString.split("-");
-    const d = new Date(
-      Number(parts[0]),
-      Number(parts[1])-1,
-      Number(parts[2])
-    );
-
-    const names = [
-      "星期日",
-      "星期一",
-      "星期二",
-      "星期三",
-      "星期四",
-      "星期五",
-      "星期六"
-    ];
-
-    return names[d.getDay()];
-  }
-
-  function money(value){
-    const n = Number(value) || 0;
-    return "$" + Math.round(n).toLocaleString("zh-TW");
-  }
+const STORAGE_KEY="daily_income_profit_shortage_compact_v1";
+
+const $=id=>document.getElementById(id);
+
+function pad(n){
+return String(n).padStart(2,"0");
+}
 
-  function loadDatabase(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return {};
-      const data = JSON.parse(raw);
-      return data && typeof data === "object" ? data : {};
-    }catch(e){
-      return {};
-    }
-  }
+function today(){
+const d=new Date();
+return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+}
 
-  function saveDatabase(db){
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-  }
+function weekday(date){
+if(!date)return"";
+const p=date.split("-");
+const d=new Date(Number(p[0]),Number(p[1])-1,Number(p[2]));
+return["星期日","星期一","星期二","星期三","星期四","星期五","星期六"][d.getDay()];
+}
 
-  function currentDate(){
-    return $("dateInput").value || getToday();
-  }
+function money(n){
+return"$"+Math.round(Number(n)||0).toLocaleString("zh-TW");
+}
+
+function loadDB(){
+try{
+return JSON.parse(localStorage.getItem(STORAGE_KEY)||"{}")||{};
+}catch(e){
+return{};
+}
+}
 
-  function getNumber(id){
-    const value = parseFloat($(id).value);
-    return Number.isFinite(value) ? value : 0;
-  }
+function saveDB(db){
+localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
+}
 
-  function getOtherData(){
-    const rows = [];
+function num(id){
+const n=parseFloat($(id).value);
+return Number.isFinite(n)?Math.max(0,n):0;
+}
 
-    document.querySelectorAll(".other-row").forEach(row => {
+function defaultData(){
+return{
+noodlePrice:850,noodleQty:1,
+lemonPrice:1200,lemonQty:1,
+intestinePrice:150,intestineQty:1,
+oysterPrice:150,oysterQty:1,
+other:[],
+take:0
+};
+}
 
-      const nameInput = row.querySelector(".otherName");
-      const amountInput = row.querySelector(".otherAmount");
+function addOtherRow(data){
 
-      const name = nameInput ? nameInput.value : "";
-      const amount = amountInput ? parseFloat(amountInput.value) || 0 : 0;
+const row=document.createElement("div");
+row.className="other-row";
 
-      if(name.trim() !== "" || amount !== 0){
-        rows.push({
-          name:name,
-          amount:amount
-        });
-      }
-    });
+row.innerHTML=`
+<div class="other-grid">
+<input class="otherName" type="text" placeholder="項目名稱（可空白）">
+<input class="otherAmount" type="number" min="0" placeholder="金額">
+</div>
+`;
 
-    return rows;
-  }
+$("otherContainer").appendChild(row);
 
-  function collectCurrentData(){
+if(data){
+row.querySelector(".otherName").value=data.name||"";
+if(Number(data.amount))row.querySelector(".otherAmount").value=data.amount;
+}
 
-    return {
+row.querySelectorAll("input").forEach(input=>{
+input.addEventListener("input",()=>{
+calculate();
+autoSave();
+});
+});
 
-      noodlePrice:getNumber("noodlePrice"),
-      noodleQty:getNumber("noodleQty"),
+}
 
-      lemonPrice:getNumber("lemonPrice"),
-      lemonQty:getNumber("lemonQty"),
+function renderOther(data){
 
-      intestinePrice:getNumber("intestinePrice"),
-      intestineQty:getNumber("intestineQty"),
+$("otherContainer").innerHTML="";
 
-      oysterPrice:getNumber("oysterPrice"),
-      oysterQty:getNumber("oysterQty"),
+if(data&&data.length){
+data.forEach(x=>addOtherRow(x));
+}else{
+addOtherRow();
+}
 
-      other:getOtherData(),
+}
 
-      take:getNumber("takeInput")
+function getOther(){
 
-    };
-  }
+const arr=[];
 
-  function defaultData(){
+document.querySelectorAll(".other-row").forEach(row=>{
 
-    return {
+const name=row.querySelector(".otherName").value;
+const amount=parseFloat(row.querySelector(".otherAmount").value)||0;
 
-      noodlePrice:850,
-      noodleQty:1,
+if(name.trim()!==""||amount!==0){
+arr.push({name,amount});
+}
 
-      lemonPrice:1200,
-      lemonQty:1,
+});
 
-      intestinePrice:150,
-      intestineQty:1,
+return arr;
 
-      oysterPrice:150,
-      oysterQty:1,
+}
 
-      other:[],
+function collect(){
 
-      take:0
+return{
+noodlePrice:num("noodlePrice"),
+noodleQty:num("noodleQty"),
+lemonPrice:num("lemonPrice"),
+lemonQty:num("lemonQty"),
+intestinePrice:num("intestinePrice"),
+intestineQty:num("intestineQty"),
+oysterPrice:num("oysterPrice"),
+oysterQty:num("oysterQty"),
+other:getOther(),
+take:num("takeInput")
+};
 
-    };
+}
 
-  }
+function income(data){
 
-  function setValue(id,value){
+let total=0;
 
-    const el = $(id);
+total+=data.noodlePrice*data.noodleQty;
+total+=data.lemonPrice*data.lemonQty;
+total+=data.intestinePrice*data.intestineQty;
+total+=data.oysterPrice*data.oysterQty;
 
-    if(!el) return;
+(data.other||[]).forEach(x=>{
+total+=Number(x.amount)||0;
+});
 
-    if(value === undefined || value === null){
-      el.value = "";
-    }else{
-      el.value = value;
-    }
-  }
+return total;
 
-  function clearOtherRows(){
+}
 
-    const container = $("otherContainer");
+function calculate(){
 
-    container.innerHTML = "";
+const d=collect();
 
-    addOtherRow();
+const noodle=d.noodlePrice*d.noodleQty;
+const lemon=d.lemonPrice*d.lemonQty;
+const intestine=d.intestinePrice*d.intestineQty;
+const oyster=d.oysterPrice*d.oysterQty;
 
-  }
+$("noodleSubtotal").textContent=money(noodle);
+$("lemonSubtotal").textContent=money(lemon);
+$("intestineSubtotal").textContent=money(intestine);
+$("oysterSubtotal").textContent=money(oyster);
 
-  function addOtherRow(data){
+const total=income(d);
+const diff=total-d.take;
+const profit=diff>0?diff:0;
+const shortage=diff<0?Math.abs(diff):0;
 
-    const container = $("otherContainer");
+$("totalIncome").textContent=money(total);
+$("dailyDifference").textContent=money(diff);
+$("dailyShortage").textContent=money(shortage);
 
-    const box = document.createElement("div");
+$("summaryIncome").textContent=money(total);
+$("summaryTake").textContent=money(d.take);
+$("summaryProfit").textContent=money(profit);
+$("summaryShortage").textContent=money(shortage);
 
-    box.className = "other-box other-row";
+updateTotals();
 
-    box.innerHTML = `
-      <div class="other-grid">
+return{...d,income:total,difference:diff};
 
-        <input
-          type="text"
-          class="otherName"
-          placeholder="項目名稱（可空白）"
-        >
+}
 
-        <input
-          type="number"
-          class="otherAmount"
-          min="0"
-          step="1"
-          placeholder="金額"
-        >
+function autoSave(){
 
-      </div>
-    `;
+const date=$("dateInput").value;
+if(!date)return;
 
-    container.appendChild(box);
+const db=loadDB();
+const d=calculate();
 
-    if(data){
+db[date]={
+...d,
+updatedAt:new Date().toISOString()
+};
 
-      const nameInput = box.querySelector(".otherName");
-      const amountInput = box.querySelector(".otherAmount");
+saveDB(db);
+renderHistory();
 
-      nameInput.value = data.name || "";
+}
 
-      if(Number(data.amount) !== 0){
-        amountInput.value = data.amount;
-      }
+function saveManual(){
 
-    }
+autoSave();
 
-    bindOtherRow(box);
+alert(
+"✅ 已儲存\n\n"+
+$("dateInput").value+" "+weekday($("dateInput").value)
+);
 
-  }
+}
 
-  function bindOtherRow(row){
+function loadDate(date){
 
-    const inputs = row.querySelectorAll("input");
+const db=loadDB();
+const d=db[date]||defaultData();
 
-    inputs.forEach(input => {
+$("noodlePrice").value=d.noodlePrice??850;
+$("noodleQty").value=d.noodleQty??1;
 
-      input.addEventListener("input", function(){
+$("lemonPrice").value=d.lemonPrice??1200;
+$("lemonQty").value=d.lemonQty??1;
 
-        calculate();
+$("intestinePrice").value=d.intestinePrice??150;
+$("intestineQty").value=d.intestineQty??1;
 
-        autoSave();
+$("oysterPrice").value=d.oysterPrice??150;
+$("oysterQty").value=d.oysterQty??1;
 
-      });
+$("takeInput").value=d.take||"";
 
-      input.addEventListener("change", function(){
+$("weekday").textContent=weekday(date);
 
-        calculate();
+renderOther(d.other||[]);
 
-        autoSave();
+calculate();
+renderHistory();
 
-      });
+}
 
-    });
+function updateTotals(){
 
-  }
+const db=loadDB();
 
-  function loadDate(date){
+let profit=0;
+let shortage=0;
 
-    const db = loadDatabase();
+Object.values(db).forEach(d=>{
 
-    const data = db[date] || defaultData();
+const inc=Number(d.income)||income(d);
+const take=Number(d.take)||0;
+const diff=inc-take;
 
-    setValue("noodlePrice",data.noodlePrice);
-    setValue("noodleQty",data.noodleQty);
+if(diff>0)profit+=diff;
+if(diff<0)shortage+=Math.abs(diff);
 
-    setValue("lemonPrice",data.lemonPrice);
-    setValue("lemonQty",data.lemonQty);
+});
 
-    setValue("intestinePrice",data.intestinePrice);
-    setValue("intestineQty",data.intestineQty);
+$("totalProfit").textContent=money(profit);
+$("totalShortage").textContent=money(shortage);
 
-    setValue("oysterPrice",data.oysterPrice);
-    setValue("oysterQty",data.oysterQty);
+}
 
-    setValue("take",data.take);
+function renderHistory(){
 
-    $("takeInput").value = data.take || "";
+const db=loadDB();
+const dates=Object.keys(db).sort().reverse();
+const body=$("historyBody");
 
-    clearOtherRows();
+body.innerHTML="";
 
-    if(Array.isArray(data.other) && data.other.length){
+if(!dates.length){
+body.innerHTML=`<tr><td colspan="7" style="padding:20px;color:#888">尚無儲存紀錄</td></tr>`;
+return;
+}
 
-      const container = $("otherContainer");
+dates.forEach(date=>{
 
-      container.innerHTML = "";
+const d=db[date];
+const inc=Number(d.income)||income(d);
+const take=Number(d.take)||0;
+const diff=inc-take;
+const p=diff>0?diff:0;
+const s=diff<0?Math.abs(diff):0;
 
-      data.other.forEach(item => {
-        addOtherRow(item);
-      });
+const tr=document.createElement("tr");
 
-    }
+tr.innerHTML=`
+<td>${date}</td>
+<td>${weekday(date)}</td>
+<td>${money(inc)}</td>
+<td>${money(take)}</td>
+<td style="color:#37994b;font-weight:900">${money(p)}</td>
+<td style="color:#d34a4a;font-weight:900">${money(s)}</td>
+<td><button class="loadBtn" data-date="${date}">查看</button></td>
+`;
 
-    $("weekday").textContent = getWeekday(date);
+body.appendChild(tr);
 
-    calculate();
+});
 
-    renderHistory();
+body.querySelectorAll(".loadBtn").forEach(btn=>{
+btn.addEventListener("click",()=>{
+$("dateInput").value=btn.dataset.date;
+loadDate(btn.dataset.date);
+window.scrollTo({top:0,behavior:"smooth"});
+});
+});
 
-  }
+}
 
-  function saveCurrent(showMessage){
+function changeQty(id,amount){
 
-    const date = currentDate();
+let v=parseInt($(id).value,10);
 
-    if(!date) return;
+if(!Number.isFinite(v))v=0;
 
-    const db = loadDatabase();
+v+=amount;
 
-    const data = collectCurrentData();
+if(v<0)v=0;
 
-    const income = calculateIncome(data);
+$(id).value=v;
 
-    const difference = income - data.take;
+calculate();
+autoSave();
 
-    db[date] = {
+}
 
-      ...data,
+function bindQty(minus,plus,input){
 
-      income:income,
+$(minus).addEventListener("click",()=>changeQty(input,-1));
+$(plus).addEventListener("click",()=>changeQty(input,1));
 
-      difference:difference,
+}
 
-      updatedAt:new Date().toISOString()
+function bindInput(id){
 
-    };
+$(id).addEventListener("input",()=>{
+calculate();
+autoSave();
+});
 
-    saveDatabase(db);
+}
 
-    if(showMessage){
+$("dateInput").value=today();
 
-      alert(
-        "已儲存！\n\n" +
-        date + " " + getWeekday(date) +
-        "\n收入：" + money(income) +
-        "\n拿：" + money(data.take) +
-        "\n結果：" + money(difference)
-      );
+bindQty("noodleMinus","noodlePlus","noodleQty");
+bindQty("lemonMinus","lemonPlus","lemonQty");
+bindQty("intestineMinus","intestinePlus","intestineQty");
+bindQty("oysterMinus","oysterPlus","oysterQty");
 
-    }
+[
+"noodlePrice","noodleQty",
+"lemonPrice","lemonQty",
+"intestinePrice","intestineQty",
+"oysterPrice","oysterQty",
+"takeInput"
+].forEach(bindInput);
 
-    renderHistory();
-    updateAccumulated();
+$("dateInput").addEventListener("change",()=>{
+loadDate($("dateInput").value);
+});
 
-  }
+$("todayBtn").addEventListener("click",()=>{
+const d=today();
+$("dateInput").value=d;
+loadDate(d);
+});
 
-  function autoSave(){
+$("saveBtn").addEventListener("click",saveManual);
 
-    saveCurrent(false);
+$("addOtherBtn").addEventListener("click",()=>{
+addOtherRow();
+autoSave();
+const inputs=document.querySelectorAll(".otherName");
+if(inputs.length)inputs[inputs.length-1].focus();
+});
 
-  }
+$("clearDayBtn").addEventListener("click",()=>{
 
-  function calculateIncome(data){
+const date=$("dateInput").value;
+const db=loadDB();
 
-    let total = 0;
+if(!db[date]){
+alert("這一天目前沒有儲存資料。");
+return;
+}
 
-    total += Number(data.noodlePrice || 0) *
-             Number(data.noodleQty || 0);
+if(!confirm(
+"⚠️ 確定要清除嗎？\n\n"+
+date+" "+weekday(date)+
+"\n\n只會清除目前選擇的日期。"
+))return;
 
-    total += Number(data.lemonPrice || 0) *
-             Number(data.lemonQty || 0);
+delete db[date];
+saveDB(db);
+loadDate(date);
 
-    total += Number(data.intestinePrice || 0) *
-             Number(data.intestineQty || 0);
+alert("✅ 已清除 "+date);
 
-    total += Number(data.oysterPrice || 0) *
-             Number(data.oysterQty || 0);
+});
 
-    if(Array.isArray(data.other)){
+$("clearAllBtn").addEventListener("click",()=>{
 
-      data.other.forEach(item => {
+const db=loadDB();
+const count=Object.keys(db).length;
 
-        total += Number(item.amount || 0);
+if(!count){
+alert("目前沒有紀錄。");
+return;
+}
 
-      });
+if(!confirm(
+"⚠️ 確定要清除全部資料嗎？\n\n"+
+"目前共有 "+count+" 天紀錄。\n\n"+
+"此操作無法復原！"
+))return;
 
-    }
+if(!confirm("再次確認：真的要全部刪除嗎？"))return;
 
-    return total;
+localStorage.removeItem(STORAGE_KEY);
 
-  }
+loadDate($("dateInput").value);
 
-  function calculate(){
+alert("✅ 全部紀錄已清除");
 
-    const data = collectCurrentData();
+});
 
-    const noodleSubtotal =
-      data.noodlePrice * data.noodleQty;
-
-    const lemonSubtotal =
-      data.lemonPrice * data.lemonQty;
-
-    const intestineSubtotal =
-      data.intestinePrice * data.intestineQty;
-
-    const oysterSubtotal =
-      data.oysterPrice * data.oysterQty;
-
-    const income = calculateIncome(data);
-
-    const difference = income - data.take;
-
-    const profit = difference > 0 ? difference : 0;
-
-    const shortage = difference < 0 ? Math.abs(difference) : 0;
-
-    $("noodleSubtotal").textContent = money(noodleSubtotal);
-    $("lemonSubtotal").textContent = money(lemonSubtotal);
-    $("intestineSubtotal").textContent = money(intestineSubtotal);
-    $("oysterSubtotal").textContent = money(oysterSubtotal);
-
-    $("totalIncome").textContent = money(income);
-
-    $("dailyDifference").textContent = money(difference);
-
-    $("dailyShortage").textContent = money(shortage);
-
-    $("summaryIncome").textContent = money(income);
-
-    $("summaryTake").textContent = money(data.take);
-
-    $("summaryProfit").textContent = money(profit);
-
-    $("summaryShortage").textContent = money(shortage);
-
-    updateAccumulated();
-
-    return {
-      income,
-      difference,
-      profit,
-      shortage
-    };
-
-  }
-
-  function updateAccumulated(){
-
-    const db = loadDatabase();
-
-    let profitTotal = 0;
-    let shortageTotal = 0;
-
-    Object.keys(db).forEach(date => {
-
-      const data = db[date];
-
-      const income =
-        Number(data.income) ||
-        calculateIncome(data);
-
-      const take =
-        Number(data.take) || 0;
-
-      const difference =
-        income - take;
-
-      if(difference > 0){
-
-        profitTotal += difference;
-
-      }else if(difference < 0){
-
-        shortageTotal += Math.abs(difference);
-
-      }
-
-    });
-
-    $("totalProfit").textContent = money(profitTotal);
-
-    $("totalShortage").textContent = money(shortageTotal);
-
-  }
-
-  function setQty(id,change){
-
-    const input = $(id);
-
-    let value = parseInt(input.value,10);
-
-    if(!Number.isFinite(value)){
-      value = 0;
-    }
-
-    value += change;
-
-    if(value < 0){
-      value = 0;
-    }
-
-    input.value = value;
-
-    calculate();
-
-    autoSave();
-
-  }
-
-  function bindQty(minusId,plusId,qtyId){
-
-    $(minusId).addEventListener("click",function(){
-      setQty(qtyId,-1);
-    });
-
-    $(plusId).addEventListener("click",function(){
-      setQty(qtyId,1);
-    });
-
-  }
-
-  function bindInput(id){
-
-    const el = $(id);
-
-    el.addEventListener("input",function(){
-
-      calculate();
-
-      autoSave();
-
-    });
-
-    el.addEventListener("change",function(){
-
-      calculate();
-
-      autoSave();
-
-    });
-
-  }
-
-  function renderHistory(){
-
-    const db = loadDatabase();
-
-    const dates = Object.keys(db).sort().reverse();
-
-    const body = $("historyBody");
-
-    body.innerHTML = "";
-
-    if(!dates.length){
-
-      body.innerHTML = `
-        <tr>
-          <td colspan="7" style="padding:25px;color:#888;">
-            尚無儲存紀錄
-          </td>
-        </tr>
-      `;
-
-      return;
-
-    }
-
-    dates.forEach(date => {
-
-      const data = db[date];
-
-      const income =
-        Number(data.income) ||
-        calculateIncome(data);
-
-      const take =
-        Number(data.take) || 0;
-
-      const difference =
-        income - take;
-
-      const profit =
-        difference > 0 ? difference : 0;
-
-      const shortage =
-        difference < 0 ? Math.abs(difference) : 0;
-
-      const tr = document.createElement("tr");
-
-      tr.innerHTML = `
-        <td>${date}</td>
-        <td>${getWeekday(date)}</td>
-        <td>${money(income)}</td>
-        <td>${money(take)}</td>
-        <td style="color:#37994b;font-weight:900;">
-          ${money(profit)}
-        </td>
-        <td style="color:#d34a4a;font-weight:900;">
-          ${money(shortage)}
-        </td>
-        <td>
-          <button data-date="${date}" class="load-record">
-            查看
-          </button>
-        </td>
-      `;
-
-      body.appendChild(tr);
-
-    });
-
-    body.querySelectorAll(".load-record").forEach(button => {
-
-      button.addEventListener("click",function(){
-
-        const date = this.dataset.date;
-
-        $("dateInput").value = date;
-
-        $("weekday").textContent = getWeekday(date);
-
-        loadDate(date);
-
-        window.scrollTo({
-          top:0,
-          behavior:"smooth"
-        });
-
-      });
-
-    });
-
-  }
-
-  function clearCurrentDate(){
-
-    const date = currentDate();
-
-    const db = loadDatabase();
-
-    const exists = Object.prototype.hasOwnProperty.call(db,date);
-
-    if(!exists){
-
-      alert(
-        date + " " + getWeekday(date) +
-        "\n目前沒有儲存紀錄。"
-      );
-
-      return;
-
-    }
-
-    const ok = confirm(
-      "⚠️ 確定要清除這一天嗎？\n\n" +
-      date + " " + getWeekday(date) +
-      "\n\n只會刪除目前選擇的日期，不會影響其他日期。"
-    );
-
-    if(!ok) return;
-
-    delete db[date];
-
-    saveDatabase(db);
-
-    loadDate(date);
-
-    alert("已清除 " + date + " 的紀錄。");
-
-  }
-
-  function clearAll(){
-
-    const db = loadDatabase();
-
-    const count = Object.keys(db).length;
-
-    if(count === 0){
-
-      alert("目前沒有任何紀錄。");
-
-      return;
-
-    }
-
-    const ok = confirm(
-      "⚠️ 確定要清除全部紀錄嗎？\n\n" +
-      "共有 " + count + " 天資料。\n\n" +
-      "此操作會刪除所有日期的記帳資料，無法復原！"
-    );
-
-    if(!ok) return;
-
-    const ok2 = confirm(
-      "再次確認：真的要全部刪除嗎？\n\n" +
-      "請按「確定」才會刪除。"
-    );
-
-    if(!ok2) return;
-
-    localStorage.removeItem(STORAGE_KEY);
-
-    loadDate(currentDate());
-
-    renderHistory();
-
-    updateAccumulated();
-
-    alert("全部紀錄已清除。");
-
-  }
-
-  function setToday(){
-
-    const oldDate = currentDate();
-
-    saveCurrent(false);
-
-    const today = getToday();
-
-    $("dateInput").value = today;
-
-    $("weekday").textContent = getWeekday(today);
-
-    loadDate(today);
-
-  }
-
-  function dateChanged(){
-
-    const newDate = $("dateInput").value;
-
-    if(!newDate) return;
-
-    $("weekday").textContent = getWeekday(newDate);
-
-    loadDate(newDate);
-
-  }
-
-  function setup(){
-
-    $("dateInput").value = getToday();
-
-    $("weekday").textContent = getWeekday(getToday());
-
-    bindQty(
-      "noodleMinus",
-      "noodlePlus",
-      "noodleQty"
-    );
-
-    bindQty(
-      "lemonMinus",
-      "lemonPlus",
-      "lemonQty"
-    );
-
-    bindQty(
-      "intestineMinus",
-      "intestinePlus",
-      "intestineQty"
-    );
-
-    bindQty(
-      "oysterMinus",
-      "oysterPlus",
-      "oysterQty"
-    );
-
-    bindInput("noodlePrice");
-    bindInput("noodleQty");
-
-    bindInput("lemonPrice");
-    bindInput("lemonQty");
-
-    bindInput("intestinePrice");
-    bindInput("intestineQty");
-
-    bindInput("oysterPrice");
-    bindInput("oysterQty");
-
-    bindInput("takeInput");
-
-    $("dateInput").addEventListener(
-      "change",
-      dateChanged
-    );
-
-    $("todayBtn").addEventListener(
-      "click",
-      setToday
-    );
-
-    $("saveBtn").addEventListener(
-      "click",
-      function(){
-        calculate();
-        saveCurrent(true);
-      }
-    );
-
-    $("clearDayBtn").addEventListener(
-      "click",
-      clearCurrentDate
-    );
-
-    $("clearAllBtn").addEventListener(
-      "click",
-      clearAll
-    );
-
-    $("addOtherBtn").addEventListener(
-      "click",
-      function(){
-
-        addOtherRow();
-
-        autoSave();
-
-      }
-    );
-
-    loadDate(getToday());
-
-  }
-
-  setup();
+loadDate(today());
 
 })();
 </script>
-
 </body>
 </html>
