@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>耗材訂單管理</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+body{
+  margin:0;
+  padding:15px;
+  background:#f4f6f8;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif;
+  color:#222;
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+}
+
+.header{
+  background:linear-gradient(135deg,#263238,#455a64);
+  color:white;
+  border-radius:18px;
+  padding:20px 15px;
+  text-align:center;
+  margin-bottom:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+
+#today{
+  font-size:27px;
+  font-weight:800;
+  letter-spacing:1px;
+}
+
+#clock{
+  margin-top:7px;
+  font-size:18px;
+  opacity:.9;
+}
+
+.card{
+  background:white;
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:15px;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+
+.card-title{
+  font-size:22px;
+  font-weight:800;
+  margin-bottom:14px;
+}
+
+.item{
+  border:1px solid #e0e0e0;
+  border-radius:15px;
+  padding:14px 10px;
+  margin-bottom:12px;
+  background:#fff;
+}
+
+.item:last-child{
+  margin-bottom:0;
+}
+
+.item-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.item-name{
+  font-size:20px;
+  font-weight:800;
+}
+
+.unit{
+  color:#666;
+  font-size:14px;
+  white-space:nowrap;
+}
+
+.control{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:6px;
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:11px 4px;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+  touch-action:manipulation;
+}
+
+.minus{
+  background:#ffebee;
+  color:#c62828;
+}
+
+.plus{
+  background:#e8f5e9;
+  color:#2e7d32;
+}
+
+.input-wrap{
+  margin-top:9px;
+}
+
+.qty{
+  width:100%;
+  height:48px;
+  border:2px solid #cfd8dc;
+  border-radius:11px;
+  text-align:center;
+  font-size:23px;
+  font-weight:800;
+  outline:none;
+}
+
+.qty:focus{
+  border-color:#455a64;
+}
+
+.total-box{
+  background:#eef3f5;
+  border-radius:15px;
+  padding:15px;
+  margin-top:15px;
+}
+
+.total-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:6px 0;
+  font-size:18px;
+}
+
+.total-number{
+  font-size:27px;
+  font-weight:900;
+}
+
+.order-preview{
+  white-space:pre-wrap;
+  background:#f8f9fa;
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:14px;
+  font-size:17px;
+  line-height:1.65;
+  min-height:100px;
+}
+
+.action-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
+
+.action{
+  color:white;
+  min-height:52px;
+  font-size:18px;
+}
+
+.copy{
+  background:#3949ab;
+}
+
+.share{
+  background:#00897b;
+}
+
+.clear{
+  background:#757575;
+}
+
+.save{
+  background:#ef6c00;
+}
+
+.notice{
+  text-align:center;
+  color:#666;
+  font-size:14px;
+  margin-top:12px;
+}
+
+@media(max-width:420px){
+  body{
+    padding:9px;
+  }
+
+  #today{
+    font-size:23px;
+  }
+
+  .item-name{
+    font-size:18px;
+  }
+
+  .control{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  button{
+    min-height:43px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div id="today">載入日期中...</div>
+    <div id="clock">載入時間中...</div>
+  </div>
+
+  <div class="card">
+
+    <div class="card-title">📦 耗材訂單</div>
+
+    <div class="item">
+      <div class="item-top">
+        <div class="item-name">90口徑紙杯500</div>
+        <div class="unit">一件 920 個</div>
+      </div>
+
+      <div class="control">
+        <button class="minus" onclick="changeQty('cup90',-3)">-3</button>
+        <button class="minus" onclick="changeQty('cup90',-2)">-2</button>
+        <button class="minus" onclick="changeQty('cup90',-1)">-1</button>
+        <button class="plus" onclick="changeQty('cup90',1)">+1</button>
+        <button class="plus" onclick="changeQty('cup90',2)">+2</button>
+        <button class="plus" onclick="changeQty('cup90',3)">+3</button>
+      </div>
+
+      <div class="input-wrap">
+        <input class="qty" id="cup90" type="number" inputmode="numeric" value="0"
+               oninput="updateAll()">
+      </div>
+    </div>
+
+
+    <div class="item">
+      <div class="item-top">
+        <div class="item-name">Y700</div>
+        <div class="unit">一件 1050 個</div>
+      </div>
+
+      <div class="control">
+        <button class="minus" onclick="changeQty('y700',-3)">-3</button>
+        <button class="minus" onclick="changeQty('y700',-2)">-2</button>
+        <button class="minus" onclick="changeQty('y700',-1)">-1</button>
+        <button class="plus" onclick="changeQty('y700',1)">+1</button>
+        <button class="plus" onclick="changeQty('y700',2)">+2</button>
+        <button class="plus" onclick="changeQty('y700',3)">+3</button>
+      </div>
+
+      <div class="input-wrap">
+        <input class="qty" id="y700" type="number" inputmode="numeric" value="0"
+               oninput="updateAll()">
+      </div>
+    </div>
+
+
+    <div class="item">
+      <div class="item-top">
+        <div class="item-name">一杯袋</div>
+        <div class="unit">一件 2520 個</div>
+      </div>
+
+      <div class="control">
+        <button class="minus" onclick="changeQty('bag1',-3)">-3</button>
+        <button class="minus" onclick="changeQty('bag1',-2)">-2</button>
+        <button class="minus" onclick="changeQty('bag1',-1)">-1</button>
+        <button class="plus" onclick="changeQty('bag1',1)">+1</button>
+        <button class="plus" onclick="changeQty('bag1',2)">+2</button>
+        <button class="plus" onclick="changeQty('bag1',3)">+3</button>
+      </div>
+
+      <div class="input-wrap">
+        <input class="qty" id="bag1" type="number" inputmode="numeric" value="0"
+               oninput="updateAll()">
+      </div>
+    </div>
+
+
+    <div class="item">
+      <div class="item-top">
+        <div class="item-name">兩杯袋</div>
+        <div class="unit">一件 2520 個</div>
+      </div>
+
+      <div class="control">
+        <button class="minus" onclick="changeQty('bag2',-3)">-3</button>
+        <button class="minus" onclick="changeQty('bag2',-2)">-2</button>
+        <button class="minus" onclick="changeQty('bag2',-1)">-1</button>
+        <button class="plus" onclick="changeQty('bag2',1)">+1</button>
+        <button class="plus" onclick="changeQty('bag2',2)">+2</button>
+        <button class="plus" onclick="changeQty('bag2',3)">+3</button>
+      </div>
+
+      <div class="input-wrap">
+        <input class="qty" id="bag2" type="number" inputmode="numeric" value="0"
+               oninput="updateAll()">
+      </div>
+    </div>
+
+
+    <div class="item">
+      <div class="item-top">
+        <div class="item-name">三杯袋</div>
+        <div class="unit">一件 2520 個</div>
+      </div>
+
+      <div class="control">
+        <button class="minus" onclick="changeQty('bag3',-3)">-3</button>
+        <button class="minus" onclick="changeQty('bag3',-2)">-2</button>
+        <button class="minus" onclick="changeQty('bag3',-1)">-1</button>
+        <button class="plus" onclick="changeQty('bag3',1)">+1</button>
+        <button class="plus" onclick="changeQty('bag3',2)">+2</button>
+        <button class="plus" onclick="changeQty('bag3',3)">+3</button>
+      </div>
+
+      <div class="input-wrap">
+        <input class="qty" id="bag3" type="number" inputmode="numeric" value="0"
+               oninput="updateAll()">
+      </div>
+    </div>
+
+
+    <div class="item">
+      <div class="item-top">
+        <div class="item-name">821吸管單支包</div>
+        <div class="unit">一件 750 支</div>
+      </div>
+
+      <div class="control">
+        <button class="minus" onclick="changeQty('straw',-3)">-3</button>
+        <button class="minus" onclick="changeQty('straw',-2)">-2</button>
+        <button class="minus" onclick="changeQty('straw',-1)">-1</button>
+        <button class="plus" onclick="changeQty('straw',1)">+1</button>
+        <button class="plus" onclick="changeQty('straw',2)">+2</button>
+        <button class="plus" onclick="changeQty('straw',3)">+3</button>
+      </div>
+
+      <div class="input-wrap">
+        <input class="qty" id="straw" type="number" inputmode="numeric" value="0"
+               oninput="updateAll()">
+      </div>
+    </div>
+
+
+    <div class="item">
+      <div class="item-top">
+        <div class="item-name">大湯匙</div>
+        <div class="unit">一件 530 支</div>
+      </div>
+
+      <div class="control">
+        <button class="minus" onclick="changeQty('spoon',-3)">-3</button>
+        <button class="minus" onclick="changeQty('spoon',-2)">-2</button>
+        <button class="minus" onclick="changeQty('spoon',-1)">-1</button>
+        <button class="plus" onclick="changeQty('spoon',1)">+1</button>
+        <button class="plus" onclick="changeQty('spoon',2)">+2</button>
+        <button class="plus" onclick="changeQty('spoon',3)">+3</button>
+      </div>
+
+      <div class="input-wrap">
+        <input class="qty" id="spoon" type="number" inputmode="numeric" value="0"
+               oninput="updateAll()">
+      </div>
+    </div>
+
+
+    <div class="total-box">
+      <div class="total-row">
+        <span>📦 訂購總件數</span>
+        <span class="total-number" id="totalQty">0</span>
+      </div>
+
+      <div class="total-row">
+        <span>🔢 訂購總數量</span>
+        <span class="total-number" id="totalUnits">0</span>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="card-title">📋 詳細訂單</div>
+
+    <div class="order-preview" id="orderPreview">
+尚未選擇訂購品項
+    </div>
+
+    <div class="action-grid">
+      <button class="action copy" onclick="copyOrder()">
+        📋 複製詳細訂單
+      </button>
+
+      <button class="action share" onclick="shareOrder()">
+        📤 分享訊息
+      </button>
+
+      <button class="action save" onclick="saveOrder()">
+        💾 自動儲存
+      </button>
+
+      <button class="action clear" onclick="clearOrder()">
+        🗑️ 清除訂單
+      </button>
+    </div>
+
+    <div class="notice" id="notice">
+      數量會自動儲存在本機
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const items = [
+  {
+    id:"cup90",
+    name:"90口徑紙杯500",
+    unit:920,
+    unitText:"個"
+  },
+  {
+    id:"y700",
+    name:"Y700",
+    unit:1050,
+    unitText:"個"
+  },
+  {
+    id:"bag1",
+    name:"一杯袋",
+    unit:2520,
+    unitText:"個"
+  },
+  {
+    id:"bag2",
+    name:"兩杯袋",
+    unit:2520,
+    unitText:"個"
+  },
+  {
+    id:"bag3",
+    name:"三杯袋",
+    unit:2520,
+    unitText:"個"
+  },
+  {
+    id:"straw",
+    name:"821吸管單支包",
+    unit:750,
+    unitText:"支"
+  },
+  {
+    id:"spoon",
+    name:"大湯匙",
+    unit:530,
+    unitText:"支"
+  }
+];
+
+
+function updateDateTime(){
+
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const date = now.getDate();
+
+  const week = [
+    "星期日",
+    "星期一",
+    "星期二",
+    "星期三",
+    "星期四",
+    "星期五",
+    "星期六"
+  ][now.getDay()];
+
+  const hh = String(now.getHours()).padStart(2,"0");
+  const mm = String(now.getMinutes()).padStart(2,"0");
+  const ss = String(now.getSeconds()).padStart(2,"0");
+
+  document.getElementById("today").textContent =
+    `${year}年${month}月${date}日（${week}）`;
+
+  document.getElementById("clock").textContent =
+    `${hh}:${mm}:${ss}`;
+}
+
+
+function changeQty(id,change){
+
+  const input = document.getElementById(id);
+
+  let value = parseInt(input.value,10);
+
+  if(isNaN(value)){
+    value = 0;
+  }
+
+  value += change;
+
+  if(value < 0){
+    value = 0;
+  }
+
+  input.value = value;
+
+  updateAll();
+}
+
+
+function getQty(id){
+
+  const value = parseInt(
+    document.getElementById(id).value,
+    10
+  );
+
+  return isNaN(value) ? 0 : Math.max(0,value);
+}
+
+
+function formatNumber(number){
+
+  return Number(number).toLocaleString("zh-TW");
+}
+
+
+function createOrderText(){
+
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = now.getMonth() + 1;
+  const date = now.getDate();
+
+  const week = [
+    "星期日",
+    "星期一",
+    "星期二",
+    "星期三",
+    "星期四",
+    "星期五",
+    "星期六"
+  ][now.getDay()];
+
+  let text = "";
+
+  text += "📦 詳細耗材訂單\n";
+  text += "━━━━━━━━━━━━━━\n";
+  text += `${year}年${month}月${date}日（${week}）\n\n`;
+
+  let hasOrder = false;
+  let totalQty = 0;
+  let totalUnits = 0;
+
+  items.forEach(item => {
+
+    const qty = getQty(item.id);
+
+    if(qty > 0){
+
+      hasOrder = true;
+
+      const units = qty * item.unit;
+
+      text += `📌 ${item.name}\n`;
+      text += `   ${qty} 件 × ${formatNumber(item.unit)} ${item.unitText}`;
+      text += ` = ${formatNumber(units)} ${item.unitText}\n`;
+
+      totalQty += qty;
+      totalUnits += units;
+    }
+  });
+
+  if(!hasOrder){
+    text += "目前沒有訂購品項\n";
+  }else{
+
+    text += "\n━━━━━━━━━━━━━━\n";
+    text += `📦 訂購總件數：${formatNumber(totalQty)} 件\n`;
+    text += `🔢 訂購總數量：${formatNumber(totalUnits)}\n`;
+  }
+
+  text += "\n━━━━━━━━━━━━━━\n";
+  text += "訂單管理";
+
+  return text;
+}
+
+
+function updateAll(){
+
+  let totalQty = 0;
+  let totalUnits = 0;
+
+  items.forEach(item => {
+
+    const qty = getQty(item.id);
+
+    totalQty += qty;
+    totalUnits += qty * item.unit;
+  });
+
+  document.getElementById("totalQty").textContent =
+    formatNumber(totalQty);
+
+  document.getElementById("totalUnits").textContent =
+    formatNumber(totalUnits);
+
+  document.getElementById("orderPreview").textContent =
+    createOrderText();
+
+  saveOrderSilently();
+}
+
+
+async function copyOrder(){
+
+  const text = createOrderText();
+
+  try{
+
+    await navigator.clipboard.writeText(text);
+
+    showNotice("✅ 詳細訂單已複製，可以直接貼到 LINE 或訊息");
+
+  }catch(error){
+
+    const textarea = document.createElement("textarea");
+
+    textarea.value = text;
+
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+
+    document.body.appendChild(textarea);
+
+    textarea.select();
+
+    document.execCommand("copy");
+
+    textarea.remove();
+
+    showNotice("✅ 詳細訂單已複製");
+  }
+}
+
+
+async function shareOrder(){
+
+  const text = createOrderText();
+
+  if(navigator.share){
+
+    try{
+
+      await navigator.share({
+        title:"詳細耗材訂單",
+        text:text
+      });
+
+      showNotice("✅ 分享完成");
+
+    }catch(error){
+
+      if(error.name !== "AbortError"){
+        showNotice("分享取消");
+      }
+
+    }
+
+  }else{
+
+    await copyOrder();
+
+    showNotice("📋 此裝置不支援直接分享，已先複製訂單");
+  }
+}
+
+
+function saveOrderSilently(){
+
+  const data = {};
+
+  items.forEach(item => {
+
+    data[item.id] = getQty(item.id);
+
+  });
+
+  localStorage.setItem(
+    "materialOrderData",
+    JSON.stringify(data)
+  );
+}
+
+
+function saveOrder(){
+
+  saveOrderSilently();
+
+  showNotice("💾 訂單已自動儲存");
+}
+
+
+function loadOrder(){
+
+  const saved =
+    localStorage.getItem("materialOrderData");
+
+  if(!saved){
+    updateAll();
+    return;
+  }
+
+  try{
+
+    const data = JSON.parse(saved);
+
+    items.forEach(item => {
+
+      const input =
+        document.getElementById(item.id);
+
+      if(data[item.id] !== undefined){
+
+        input.value =
+          Math.max(0,parseInt(data[item.id],10) || 0);
+      }
+
+    });
+
+  }catch(error){
+
+    console.log("讀取儲存資料失敗");
+  }
+
+  updateAll();
+}
+
+
+function clearOrder(){
+
+  const ok = confirm(
+    "確定要清除目前所有訂單數量嗎？"
+  );
+
+  if(!ok){
+    return;
+  }
+
+  items.forEach(item => {
+
+    document.getElementById(item.id).value = 0;
+
+  });
+
+  localStorage.removeItem("materialOrderData");
+
+  updateAll();
+
+  showNotice("🗑️ 訂單已清除");
+}
+
+
+function showNotice(message){
+
+  const notice =
+    document.getElementById("notice");
+
+  notice.textContent = message;
+
+  clearTimeout(window.noticeTimer);
+
+  window.noticeTimer = setTimeout(() => {
+
+    notice.textContent =
+      "數量會自動儲存在本機";
+
+  },3000);
+}
+
+
+setInterval(updateDateTime,1000);
+
+updateDateTime();
+
+loadOrder();
+
+</script>
+
+</body>
+</html>
