@@ -1,176 +1,1662 @@
-from pathlib import Path
-
-html = r'''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>我的睡眠冥想</title>
+<title>我的睡眠冥想 V2</title>
+
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif;background:linear-gradient(180deg,#11152d,#283052);color:#fff;min-height:100vh}
-.wrap{max-width:520px;margin:auto;padding:28px 18px 40px}
-h1{text-align:center;font-size:30px;margin:12px 0 6px}
-.sub{text-align:center;opacity:.8;margin-bottom:26px}
-.card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:20px;margin:14px 0;backdrop-filter:blur(8px)}
-button{width:100%;border:0;border-radius:18px;padding:17px;margin:7px 0;font-size:18px;font-weight:700;background:#fff;color:#202542}
-button:active{transform:scale(.98)}
-.primary{background:#dfe7ff}
-.row{display:flex;gap:10px}.row button{flex:1}
-.time{text-align:center;font-size:54px;font-weight:700;letter-spacing:2px;margin:10px 0}
-.breath{width:150px;height:150px;border-radius:50%;margin:20px auto;background:rgba(220,230,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform 4s ease}
-.breath.in{transform:scale(1.35)}.breath.out{transform:scale(.8)}
-.hidden{display:none!important}
-label{display:block;margin:12px 0 6px;opacity:.9}
-input,select{width:100%;padding:14px;border-radius:14px;border:0;font-size:17px}
-.note{text-align:center;line-height:1.8;opacity:.85}
-.small{text-align:center;font-size:14px;opacity:.7;margin-top:12px}
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,
+    "PingFang TC","Noto Sans TC",sans-serif;
+    background:linear-gradient(
+        180deg,
+        #0d1330,
+        #27345a 60%,
+        #11172b
+    );
+    color:#fff;
+}
+
+.wrap{
+    max-width:540px;
+    margin:auto;
+    padding:24px 16px 45px;
+}
+
+h1{
+    text-align:center;
+    font-size:29px;
+    margin:7px 0;
+}
+
+h2{
+    margin-top:0;
+}
+
+.sub{
+    text-align:center;
+    opacity:.78;
+    margin-bottom:20px;
+}
+
+.card{
+    background:rgba(255,255,255,.095);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:24px;
+    padding:19px;
+    margin:13px 0;
+    box-shadow:0 12px 35px rgba(0,0,0,.12);
+}
+
+button{
+    width:100%;
+    border:0;
+    border-radius:17px;
+    padding:15px;
+    margin:6px 0;
+    font-size:17px;
+    font-weight:700;
+    color:#202640;
+    background:#fff;
+}
+
+button:active{
+    transform:scale(.98);
+}
+
+.primary{
+    background:#e2e9ff;
+}
+
+.danger{
+    background:#ffdede;
+}
+
+.row{
+    display:flex;
+    gap:8px;
+}
+
+.row button{
+    flex:1;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.time{
+    text-align:center;
+    font-size:50px;
+    font-weight:750;
+    letter-spacing:2px;
+    margin:8px;
+}
+
+.status{
+    text-align:center;
+    font-weight:700;
+    margin:10px 0;
+    line-height:1.6;
+}
+
+.note{
+    text-align:center;
+    line-height:1.8;
+    opacity:.86;
+}
+
+.small{
+    text-align:center;
+    font-size:13px;
+    opacity:.62;
+    margin-top:14px;
+}
+
+.breath{
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    margin:18px auto;
+    background:rgba(225,232,255,.16);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    transition:
+        transform 4s ease,
+        opacity 4s ease;
+}
+
+.breath.in{
+    transform:scale(1.3);
+}
+
+.breath.out{
+    transform:scale(.78);
+    opacity:.7;
+}
+
+.sound-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.sound-grid button{
+    margin:0;
+}
+
+label{
+    display:block;
+    margin:13px 0 6px;
+}
+
+input[type=time]{
+    width:100%;
+    padding:14px;
+    border:0;
+    border-radius:14px;
+    font-size:18px;
+}
+
+input[type=range]{
+    width:100%;
+}
+
+.record-dot{
+    display:inline-block;
+    width:11px;
+    height:11px;
+    border-radius:50%;
+    background:#ff5b5b;
+    margin-right:6px;
+}
+
+.recording{
+    animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+    50%{
+        opacity:.35;
+    }
+}
+
+audio{
+    width:100%;
+    margin-top:10px;
+}
+
+.info-box{
+    background:rgba(255,255,255,.07);
+    border-radius:16px;
+    padding:13px;
+    margin-top:10px;
+    line-height:1.7;
+    font-size:14px;
+}
 </style>
 </head>
+
 <body>
+
 <div class="wrap">
-  <h1>🌙 我的睡眠冥想</h1>
-  <div class="sub">今天辛苦了，現在可以慢慢放鬆了 ❤️</div>
 
-  <div id="home">
-    <div class="card">
-      <div class="note">每日睡覺提醒</div>
-      <div class="time" id="alarmShow">01:39</div>
-      <button class="primary" onclick="show('meditation')">🧘 開始冥想</button>
-      <button onclick="show('alarm')">⏰ 設定睡覺提醒</button>
-      <button onclick="show('sleep')">😴 開始睡眠</button>
-    </div>
-    <div class="card">
-      <div class="note">睡前小語</div>
-      <p class="note">吸氣……慢慢呼氣……<br>今天發生的事情先放下。<br>你已經很努力了，現在好好休息吧。🌙</p>
-    </div>
-  </div>
+<!-- =========================
+     首頁
+========================= -->
 
-  <div id="meditation" class="hidden">
-    <div class="card">
-      <h2>🧘 睡前冥想</h2>
-      <div class="time" id="timer">10:00</div>
-      <div class="breath" id="breath">準備</div>
-      <div class="row">
-        <button onclick="startMeditation()">開始</button>
-        <button onclick="resetMeditation()">重來</button>
-      </div>
-      <div class="row">
-        <button onclick="setMinutes(5)">5 分鐘</button>
-        <button onclick="setMinutes(10)">10 分鐘</button>
-        <button onclick="setMinutes(15)">15 分鐘</button>
-      </div>
-      <p class="note" id="guide">準備好後按「開始」，跟著圓圈慢慢呼吸。</p>
-      <button onclick="show('home')">← 回首頁</button>
-    </div>
-  </div>
+<section id="home">
 
-  <div id="alarm" class="hidden">
-    <div class="card">
-      <h2>⏰ 睡覺提醒</h2>
-      <label>每天提醒時間</label>
-      <input id="alarmInput" type="time" value="01:39">
-      <button class="primary" onclick="saveAlarm()">儲存提醒</button>
-      <p class="note">注意：網頁本身無法在完全關閉後保證準時發出系統通知；最穩定的方法是同時在 iPhone「時鐘」App 設定 01:39 鬧鐘。</p>
-      <button onclick="show('home')">← 回首頁</button>
-    </div>
-  </div>
+<h1>🌙 我的睡眠冥想</h1>
 
-  <div id="sleep" class="hidden">
-    <div class="card">
-      <h2>😴 準備睡覺</h2>
-      <p class="note">現在把手機亮度調低，音量關小。<br>做 3 次慢慢的深呼吸。</p>
-      <button class="primary" onclick="show('meditation')">🧘 先冥想 10 分鐘</button>
-      <button onclick="goodnight()">❤️ 我準備睡覺了</button>
-      <button onclick="show('home')">← 回首頁</button>
-    </div>
-  </div>
-
-  <div id="goodnight" class="hidden">
-    <div class="card">
-      <h1>🌙 晚安</h1>
-      <p class="note">今天辛苦了。<br>不用再想明天的事情。<br><br>放下手機，安心睡覺吧。❤️</p>
-    </div>
-  </div>
-
-  <div class="small">睡眠冥想小工具 · 為自己留一點休息時間</div>
+<div class="sub">
+每天留一點時間，好好照顧自己 ❤️
 </div>
 
-<script>
-let minutes=10, seconds=0, timerId=null, breathId=null, alarm="01:39";
+<div class="card">
 
-function show(id){
-  document.querySelectorAll(".wrap>div:not(.small)").forEach(x=>x.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-}
-function updateTimer(){
-  document.getElementById("timer").textContent =
-    String(minutes).padStart(2,"0")+":"+String(seconds).padStart(2,"0");
-}
-function setMinutes(m){
-  stopTimers(); minutes=m; seconds=0; updateTimer();
-  document.getElementById("guide").textContent="已選擇 "+m+" 分鐘，按「開始」進入冥想。";
-}
-function startMeditation(){
-  if(timerId) return;
-  document.getElementById("guide").textContent="吸氣 4 秒……保持放鬆……慢慢呼氣 4 秒。";
-  breathCycle();
-  timerId=setInterval(()=>{
-    if(seconds===0){
-      if(minutes===0){finishMeditation();return}
-      minutes--; seconds=59;
-    }else seconds--;
-    updateTimer();
-  },1000);
-}
-function breathCycle(){
-  const b=document.getElementById("breath");
-  let inhale=true;
-  b.textContent="吸氣";
-  b.classList.add("in"); b.classList.remove("out");
-  breathId=setInterval(()=>{
-    inhale=!inhale;
-    b.textContent=inhale?"吸氣":"呼氣";
-    b.classList.toggle("in",inhale); b.classList.toggle("out",!inhale);
-  },4000);
-}
-function stopTimers(){
-  clearInterval(timerId); clearInterval(breathId); timerId=null; breathId=null;
-}
-function resetMeditation(){stopTimers();minutes=10;seconds=0;updateTimer();document.getElementById("breath").textContent="準備";document.getElementById("breath").className="breath"}
-function finishMeditation(){
-  stopTimers(); minutes=0;seconds=0;updateTimer();
-  document.getElementById("breath").textContent="完成 ❤️";
-  document.getElementById("guide").textContent="今天辛苦了。現在放下手機，好好睡一覺吧。";
-}
-function saveAlarm(){
-  alarm=document.getElementById("alarmInput").value||"01:39";
-  localStorage.setItem("sleepAlarm",alarm);
-  document.getElementById("alarmShow").textContent=alarm;
-  alert("已儲存睡覺時間："+alarm+"\\n\\n若要讓 iPhone 準時響鈴，請再到「時鐘」App 設定同一時間。");
-  show("home");
-}
-function goodnight(){show("goodnight")}
-(function(){
-  const saved=localStorage.getItem("sleepAlarm");
-  if(saved){alarm=saved;document.getElementById("alarmInput").value=saved;document.getElementById("alarmShow").textContent=saved}
-  updateTimer();
-})();
-</script>
-</body>
-</html>'''
+<div class="status">
+⏰ 每天睡覺提醒：
+<span id="alarmShow">01:39</span>
+</div>
 
-path = Path("/mnt/data/我的睡眠冥想.html")
-path.write_text(html, encoding="utf-8")
-print(f"已完成：{path}")
+<button
+class="primary"
+onclick="openPage('meditation');unlockAudio();">
+🧘 開始冥想
+</button>
 
-🌙 我的睡眠冥想
-今天辛苦了，現在可以慢慢放鬆了 ❤️
-每日睡覺提醒
+<button
+onclick="openPage('sounds');unlockAudio();">
+🌧️ 睡眠聲音
+</button>
+
+<button
+onclick="openPage('record');">
+🎙️ 睡眠錄音
+</button>
+
+<button
+onclick="openPage('sleep');">
+😴 開始睡眠
+</button>
+
+<button
+onclick="openPage('alarm');">
+⏰ 設定提醒
+</button>
+
+</div>
+
+<div class="card">
+
+<p class="note">
+吸氣……慢慢呼氣……<br>
+今天的事情先放下。<br>
+🌙 好好休息，明天再慢慢來。
+</p>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     冥想
+========================= -->
+
+<section id="meditation" class="hidden">
+
+<h1>🧘 睡前冥想</h1>
+
+<div class="card">
+
+<div
+class="time"
+id="timer">
+10:00
+</div>
+
+<div
+class="breath"
+id="breath">
+準備
+</div>
+
+<div
+class="status"
+id="guide">
+按開始後，跟著圓圈慢慢呼吸。
+</div>
+
+<div class="row">
+
+<button onclick="setMinutes(5)">
+5 分
+</button>
+
+<button onclick="setMinutes(10)">
+10 分
+</button>
+
+<button onclick="setMinutes(15)">
+15 分
+</button>
+
+</div>
+
+<button
+class="primary"
+onclick="startMeditation();unlockAudio();">
+▶️ 開始
+</button>
+
+<button
+onclick="pauseMeditation();">
+⏸️ 暫停
+</button>
+
+<button
+onclick="resetMeditation();">
+↺ 重來
+</button>
+
+<button
+onclick="openPage('sounds');unlockAudio();">
+🌧️ 播放睡眠聲音
+</button>
+
+<button
+onclick="openPage('record');">
+🎙️ 開始睡眠錄音
+</button>
+
+<button
+onclick="openPage('home');">
+← 回首頁
+</button>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     睡眠聲音
+========================= -->
+
+<section id="sounds" class="hidden">
+
+<h1>🌧️ 睡眠聲音</h1>
+
+<div class="card">
+
+<div
+class="status"
+id="soundStatus">
+聲音已停止
+</div>
+
+<div class="sound-grid">
+
+<button
+onclick="playSound('rain');">
+🌧️ 雨聲
+</button>
+
+<button
+onclick="playSound('ocean');">
+🌊 海浪
+</button>
+
+<button
+onclick="playSound('forest');">
+🌲 森林
+</button>
+
+<button
+onclick="playSound('noise');">
+☁️ 白噪音
+</button>
+
+</div>
+
+<label>
+🔊 音量
+<span id="volText">
+35%
+</span>
+</label>
+
+<input
+id="volume"
+type="range"
+min="0"
+max="100"
+value="35"
+oninput="setVolume(this.value);">
+
+<div class="row">
+
+<button onclick="setSoundTimer(30)">
+30 分
+</button>
+
+<button onclick="setSoundTimer(60)">
+60 分
+</button>
+
+<button onclick="setSoundTimer(90)">
+90 分
+</button>
+
+</div>
+
+<button
+class="danger"
+onclick="stopSound();">
+🔇 停止
+</button>
+
+<div class="info-box">
+
+第一次播放請先點聲音按鈕。
+
+iPhone Safari 需要使用者操作後，
+才能允許網頁播放聲音。
+
+</div>
+
+<button
+onclick="openPage('home');">
+← 回首頁
+</button>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     睡眠錄音
+========================= -->
+
+<section id="record" class="hidden">
+
+<h1>🎙️ 睡眠錄音</h1>
+
+<div class="card">
+
+<div
+class="status"
+id="recordStatus">
+尚未錄音
+</div>
+
+<button
+class="primary"
+id="recordBtn"
+onclick="toggleRecording();">
+🎙️ 開始錄音
+</button>
+
+<button
+class="danger"
+onclick="stopRecording();">
+⏹️ 停止錄音
+</button>
+
+<div
+id="recordTime"
+class="time">
+00:00
+</div>
+
+<div id="audioBox"></div>
+
+<div class="info-box">
+
+🎙️ 可以記錄睡覺時的：
+
+<br>😴 打呼聲
+<br>🗣️ 睡夢中的說話聲
+<br>🌙 半夜環境聲
+<br>💤 翻身或其他聲音
+
+</div>
+
+<p class="note">
+
+第一次使用會詢問麥克風權限。<br>
+請選擇「允許」。
+
+</p>
+
+<p class="note">
+
+⚠️ 網頁版受到 iPhone Safari
+背景執行限制，手機鎖定或切換到背景後，
+不保證能整晚持續錄音。
+
+</p>
+
+<button
+onclick="openPage('home');">
+← 回首頁
+</button>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     鬧鐘
+========================= -->
+
+<section id="alarm" class="hidden">
+
+<h1>⏰ 睡覺提醒</h1>
+
+<div class="card">
+
+<label>
+每天提醒時間
+</label>
+
+<input
+id="alarmInput"
+type="time"
+value="01:39">
+
+<button
+class="primary"
+onclick="saveAlarm();">
+💾 儲存提醒
+</button>
+
+<div class="info-box">
+
+目前設定：
+<strong id="alarmConfirm">
 01:39
-🧘 開始冥想 ⏰ 設定睡覺提醒 😴 開始睡眠
-睡前小語
-吸氣……慢慢呼氣…… 今天發生的事情先放下。 你已經很努力了，現在好好休息吧。🌙
-睡眠冥想小工具 · 為自己留一點休息時間
+</strong>
+
+<br><br>
+
+⚠️ 如果要讓 iPhone 在網頁完全關閉後
+仍然準時響鈴，
+請同時在 iPhone「時鐘」App
+設定每日 01:39 鬧鐘。
+
+</div>
+
+<button
+onclick="openPage('home');">
+← 回首頁
+</button>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     睡眠模式
+========================= -->
+
+<section id="sleep" class="hidden">
+
+<h1>😴 開始睡眠</h1>
+
+<div class="card">
+
+<p class="note">
+
+現在把亮度調低。<br>
+做三次慢慢的深呼吸。
+
+</p>
+
+<button
+class="primary"
+onclick="openPage('meditation');unlockAudio();">
+🧘 先冥想 10 分鐘
+</button>
+
+<button
+onclick="openPage('sounds');unlockAudio();">
+🌧️ 播放睡眠聲音
+</button>
+
+<button
+onclick="openPage('record');">
+🎙️ 開始睡眠錄音
+</button>
+
+<button
+onclick="goodnight();">
+❤️ 我準備睡覺了
+</button>
+
+<button
+onclick="openPage('home');">
+← 回首頁
+</button>
+
+</div>
+
+</section>
+
+
+<!-- =========================
+     晚安
+========================= -->
+
+<section id="goodnight" class="hidden">
+
+<div class="card">
+
+<h1>
+🌙 晚安
+</h1>
+
+<p class="note">
+
+今天辛苦了。<br>
+
+不用再想明天的事情。<br><br>
+
+放下手機，安心睡覺吧。❤️
+
+</p>
+
+<button
+onclick="openPage('home');">
+回首頁
+</button>
+
+</div>
+
+</section>
+
+
+<div class="small">
+睡眠冥想 V2 · 冥想＋睡眠聲音＋睡眠錄音
+</div>
+
+</div>
+
+
+<script>
+
+/* ==================================================
+   頁面切換
+================================================== */
+
+function openPage(id){
+
+    document
+    .querySelectorAll("section")
+    .forEach(function(section){
+
+        section.classList.add("hidden");
+
+    });
+
+    document
+    .getElementById(id)
+    .classList.remove("hidden");
+}
+
+
+/* ==================================================
+   Audio
+================================================== */
+
+let audioCtx = null;
+let master = null;
+
+let sourceNodes = [];
+let soundTimer = null;
+let currentSound = null;
+
+
+function unlockAudio(){
+
+    if(!audioCtx){
+
+        audioCtx =
+        new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+
+        master =
+        audioCtx.createGain();
+
+        master.gain.value = 0.35;
+
+        master.connect(
+            audioCtx.destination
+        );
+
+    }
+
+    if(
+        audioCtx.state === "suspended"
+    ){
+
+        audioCtx.resume();
+
+    }
+
+}
+
+
+/* ==================================================
+   音量
+================================================== */
+
+function setVolume(value){
+
+    document
+    .getElementById("volText")
+    .textContent =
+    value + "%";
+
+    if(master){
+
+        master.gain.setTargetAtTime(
+            Number(value) / 100,
+            audioCtx.currentTime,
+            0.05
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   產生睡眠聲音
+================================================== */
+
+function makeNoise(type){
+
+    unlockAudio();
+
+    const bufferSize =
+        audioCtx.sampleRate * 2;
+
+    const buffer =
+        audioCtx.createBuffer(
+            1,
+            bufferSize,
+            audioCtx.sampleRate
+        );
+
+    const data =
+        buffer.getChannelData(0);
+
+    let last = 0;
+
+    for(
+        let i = 0;
+        i < bufferSize;
+        i++
+    ){
+
+        const random =
+            Math.random() * 2 - 1;
+
+
+        if(type === "rain"){
+
+            data[i] =
+                random * 0.16;
+
+        }
+
+
+        else if(type === "ocean"){
+
+            data[i] =
+                random * 0.08 +
+                Math.sin(
+                    i /
+                    audioCtx.sampleRate *
+                    0.45
+                ) * 0.055;
+
+        }
+
+
+        else if(type === "forest"){
+
+            data[i] =
+                random * 0.045 +
+                Math.sin(
+                    i /
+                    audioCtx.sampleRate *
+                    2.1
+                ) * 0.018;
+
+        }
+
+
+        else{
+
+            last =
+                0.98 * last +
+                0.02 * random;
+
+            data[i] =
+                last * 0.75;
+
+        }
+
+    }
+
+
+    const source =
+        audioCtx.createBufferSource();
+
+    source.buffer = buffer;
+
+    source.loop = true;
+
+
+    const gain =
+        audioCtx.createGain();
+
+    gain.gain.value = 1;
+
+
+    source.connect(gain);
+
+    gain.connect(master);
+
+    source.start();
+
+
+    sourceNodes.push(source);
+
+}
+
+
+/* ==================================================
+   播放聲音
+================================================== */
+
+function playSound(type){
+
+    unlockAudio();
+
+    stopSound();
+
+    currentSound = type;
+
+    makeNoise(type);
+
+
+    const names = {
+
+        rain:
+        "🌧️ 雨聲播放中",
+
+        ocean:
+        "🌊 海浪播放中",
+
+        forest:
+        "🌲 森林播放中",
+
+        noise:
+        "☁️ 白噪音播放中"
+
+    };
+
+
+    document
+    .getElementById("soundStatus")
+    .textContent =
+    names[type];
+
+}
+
+
+/* ==================================================
+   停止聲音
+================================================== */
+
+function stopSound(){
+
+    sourceNodes.forEach(
+        function(node){
+
+            try{
+
+                node.stop();
+
+            }
+            catch(e){}
+
+        }
+    );
+
+
+    sourceNodes = [];
+
+    clearTimeout(
+        soundTimer
+    );
+
+    soundTimer = null;
+
+    currentSound = null;
+
+
+    const status =
+        document
+        .getElementById(
+            "soundStatus"
+        );
+
+    if(status){
+
+        status.textContent =
+            "聲音已停止";
+
+    }
+
+}
+
+
+/* ==================================================
+   聲音自動停止
+================================================== */
+
+function setSoundTimer(minutes){
+
+    if(!currentSound){
+
+        playSound("rain");
+
+    }
+
+
+    clearTimeout(
+        soundTimer
+    );
+
+
+    soundTimer =
+        setTimeout(
+            function(){
+
+                stopSound();
+
+            },
+            minutes * 60 * 1000
+        );
+
+
+    document
+    .getElementById("soundStatus")
+    .textContent +=
+    " · " +
+    minutes +
+    " 分鐘後停止";
+
+}
+
+
+/* ==================================================
+   冥想計時
+================================================== */
+
+let meditationMinutes = 10;
+let meditationSeconds = 0;
+
+let meditationTimer = null;
+let breathTimer = null;
+
+
+function updateTimer(){
+
+    document
+    .getElementById("timer")
+    .textContent =
+        String(
+            meditationMinutes
+        ).padStart(2,"0")
+        +
+        ":"
+        +
+        String(
+            meditationSeconds
+        ).padStart(2,"0");
+
+}
+
+
+function setMinutes(minutes){
+
+    pauseMeditation();
+
+    meditationMinutes =
+        minutes;
+
+    meditationSeconds =
+        0;
+
+    updateTimer();
+
+
+    document
+    .getElementById("guide")
+    .textContent =
+        "已選擇 " +
+        minutes +
+        " 分鐘。";
+
+}
+
+
+function startMeditation(){
+
+    unlockAudio();
+
+    if(meditationTimer){
+
+        return;
+
+    }
+
+
+    document
+    .getElementById("guide")
+    .textContent =
+        "吸氣 4 秒……慢慢呼氣 4 秒。";
+
+
+    startBreath();
+
+
+    meditationTimer =
+        setInterval(
+            function(){
+
+                if(
+                    meditationSeconds === 0
+                ){
+
+                    if(
+                        meditationMinutes === 0
+                    ){
+
+                        finishMeditation();
+
+                        return;
+
+                    }
+
+
+                    meditationMinutes--;
+
+                    meditationSeconds =
+                        59;
+
+                }
+
+                else{
+
+                    meditationSeconds--;
+
+                }
+
+
+                updateTimer();
+
+            },
+            1000
+        );
+
+}
+
+
+function pauseMeditation(){
+
+    clearInterval(
+        meditationTimer
+    );
+
+    meditationTimer = null;
+
+
+    clearInterval(
+        breathTimer
+    );
+
+    breathTimer = null;
+
+
+    document
+    .getElementById("guide")
+    .textContent =
+        "已暫停，準備好後按開始。";
+
+
+    document
+    .getElementById("breath")
+    .textContent =
+        "暫停";
+
+
+    document
+    .getElementById("breath")
+    .className =
+        "breath";
+
+}
+
+
+function startBreath(){
+
+    const breath =
+        document
+        .getElementById("breath");
+
+
+    let inhale = true;
+
+
+    breath.textContent =
+        "吸氣";
+
+    breath.className =
+        "breath in";
+
+
+    breathTimer =
+        setInterval(
+            function(){
+
+                inhale =
+                    !inhale;
+
+
+                breath.textContent =
+                    inhale
+                    ? "吸氣"
+                    : "呼氣";
+
+
+                breath.classList.toggle(
+                    "in",
+                    inhale
+                );
+
+
+                breath.classList.toggle(
+                    "out",
+                    !inhale
+                );
+
+            },
+            4000
+        );
+
+}
+
+
+function resetMeditation(){
+
+    pauseMeditation();
+
+    meditationMinutes =
+        10;
+
+    meditationSeconds =
+        0;
+
+
+    updateTimer();
+
+
+    document
+    .getElementById("breath")
+    .textContent =
+        "準備";
+
+
+    document
+    .getElementById("guide")
+    .textContent =
+        "按開始後，跟著圓圈慢慢呼吸。";
+
+}
+
+
+function finishMeditation(){
+
+    pauseMeditation();
+
+
+    meditationMinutes =
+        0;
+
+    meditationSeconds =
+        0;
+
+
+    updateTimer();
+
+
+    document
+    .getElementById("breath")
+    .textContent =
+        "完成 ❤️";
+
+
+    document
+    .getElementById("guide")
+    .textContent =
+        "今天辛苦了。現在放下手機，好好睡一覺吧。";
+
+}
+
+
+/* ==================================================
+   睡眠錄音
+================================================== */
+
+let mediaRecorder = null;
+let recordChunks = [];
+
+let recordStart = 0;
+let recordTimer = null;
+
+
+async function toggleRecording(){
+
+    if(
+        mediaRecorder &&
+        mediaRecorder.state === "recording"
+    ){
+
+        stopRecording();
+
+        return;
+
+    }
+
+
+    try{
+
+        const stream =
+            await navigator
+            .mediaDevices
+            .getUserMedia({
+                audio:true
+            });
+
+
+        recordChunks = [];
+
+
+        let options = {};
+
+
+        if(
+            MediaRecorder
+            .isTypeSupported(
+                "audio/mp4"
+            )
+        ){
+
+            options.mimeType =
+                "audio/mp4";
+
+        }
+
+
+        else if(
+            MediaRecorder
+            .isTypeSupported(
+                "audio/webm"
+            )
+        ){
+
+            options.mimeType =
+                "audio/webm";
+
+        }
+
+
+        mediaRecorder =
+            new MediaRecorder(
+                stream,
+                options
+            );
+
+
+        mediaRecorder
+        .ondataavailable =
+            function(event){
+
+                if(
+                    event.data &&
+                    event.data.size
+                ){
+
+                    recordChunks.push(
+                        event.data
+                    );
+
+                }
+
+            };
+
+
+        mediaRecorder.onstop =
+            function(){
+
+                stream
+                .getTracks()
+                .forEach(
+                    function(track){
+
+                        track.stop();
+
+                    }
+                );
+
+
+                const mime =
+                    recordChunks[0]
+                    ?
+                    recordChunks[0].type
+                    :
+                    "audio/webm";
+
+
+                const blob =
+                    new Blob(
+                        recordChunks,
+                        {
+                            type:mime
+                        }
+                    );
+
+
+                const url =
+                    URL.createObjectURL(
+                        blob
+                    );
+
+
+                document
+                .getElementById(
+                    "audioBox"
+                )
+                .innerHTML =
+
+                '<audio controls src="' +
+                url +
+                '"></audio>' +
+
+                '<button onclick="downloadRecording(\'' +
+                url +
+                '\')">' +
+                '💾 儲存這段錄音' +
+                '</button>';
+
+
+                document
+                .getElementById(
+                    "recordStatus"
+                )
+                .textContent =
+                    "錄音完成，可以播放或儲存。";
+
+            };
+
+
+        mediaRecorder.start();
+
+
+        recordStart =
+            Date.now();
+
+
+        recordTimer =
+            setInterval(
+                updateRecordTime,
+                1000
+            );
+
+
+        document
+        .getElementById(
+            "recordStatus"
+        )
+        .innerHTML =
+        '<span class="record-dot recording"></span>' +
+        '錄音中…';
+
+
+        document
+        .getElementById(
+            "recordBtn"
+        )
+        .textContent =
+            "⏹️ 錄音中（點此停止）";
+
+
+    }
+
+    catch(error){
+
+        alert(
+            "無法使用麥克風。\n\n" +
+            "請確認 Safari 已允許此網站使用麥克風，" +
+            "再重新嘗試。"
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   停止錄音
+================================================== */
+
+function stopRecording(){
+
+    if(
+        mediaRecorder &&
+        mediaRecorder.state === "recording"
+    ){
+
+        mediaRecorder.stop();
+
+    }
+
+
+    clearInterval(
+        recordTimer
+    );
+
+    recordTimer = null;
+
+
+    document
+    .getElementById(
+        "recordBtn"
+    )
+    .textContent =
+        "🎙️ 開始錄音";
+
+}
+
+
+/* ==================================================
+   錄音時間
+================================================== */
+
+function updateRecordTime(){
+
+    const seconds =
+        Math.floor(
+            (
+                Date.now() -
+                recordStart
+            ) / 1000
+        );
+
+
+    document
+    .getElementById(
+        "recordTime"
+    )
+    .textContent =
+
+        String(
+            Math.floor(
+                seconds / 60
+            )
+        ).padStart(2,"0")
+
+        +
+
+        ":"
+
+        +
+
+        String(
+            seconds % 60
+        ).padStart(2,"0");
+
+}
+
+
+/* ==================================================
+   儲存錄音
+================================================== */
+
+function downloadRecording(url){
+
+    const link =
+        document.createElement("a");
+
+
+    link.href = url;
+
+
+    link.download =
+        "睡眠錄音-" +
+        new Date()
+        .toISOString()
+        .slice(0,10)
+        +
+        ".webm";
+
+
+    document
+    .body
+    .appendChild(link);
+
+
+    link.click();
+
+
+    link.remove();
+
+}
+
+
+/* ==================================================
+   鬧鐘設定
+================================================== */
+
+function saveAlarm(){
+
+    const value =
+        document
+        .getElementById(
+            "alarmInput"
+        )
+        .value
+        ||
+        "01:39";
+
+
+    localStorage.setItem(
+        "sleepAlarm",
+        value
+    );
+
+
+    document
+    .getElementById(
+        "alarmShow"
+    )
+    .textContent =
+        value;
+
+
+    document
+    .getElementById(
+        "alarmConfirm"
+    )
+    .textContent =
+        value;
+
+
+    alert(
+        "已儲存每天 " +
+        value +
+        " 的睡覺提醒 ❤️"
+    );
+
+
+    openPage("home");
+
+}
+
+
+/* ==================================================
+   晚安
+================================================== */
+
+function goodnight(){
+
+    stopSound();
+
+    openPage(
+        "goodnight"
+    );
+
+}
+
+
+/* ==================================================
+   初始化
+================================================== */
+
+(function(){
+
+    const savedAlarm =
+        localStorage.getItem(
+            "sleepAlarm"
+        )
+        ||
+        "01:39";
+
+
+    document
+    .getElementById(
+        "alarmInput"
+    )
+    .value =
+        savedAlarm;
+
+
+    document
+    .getElementById(
+        "alarmShow"
+    )
+    .textContent =
+        savedAlarm;
+
+
+    document
+    .getElementById(
+        "alarmConfirm"
+    )
+    .textContent =
+        savedAlarm;
+
+
+    updateTimer();
+
+})();
+
+</script>
+
+</body>
+</html>
