@@ -1,0 +1,176 @@
+from pathlib import Path
+
+html = r'''<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>我的睡眠冥想</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif;background:linear-gradient(180deg,#11152d,#283052);color:#fff;min-height:100vh}
+.wrap{max-width:520px;margin:auto;padding:28px 18px 40px}
+h1{text-align:center;font-size:30px;margin:12px 0 6px}
+.sub{text-align:center;opacity:.8;margin-bottom:26px}
+.card{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:24px;padding:20px;margin:14px 0;backdrop-filter:blur(8px)}
+button{width:100%;border:0;border-radius:18px;padding:17px;margin:7px 0;font-size:18px;font-weight:700;background:#fff;color:#202542}
+button:active{transform:scale(.98)}
+.primary{background:#dfe7ff}
+.row{display:flex;gap:10px}.row button{flex:1}
+.time{text-align:center;font-size:54px;font-weight:700;letter-spacing:2px;margin:10px 0}
+.breath{width:150px;height:150px;border-radius:50%;margin:20px auto;background:rgba(220,230,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;transition:transform 4s ease}
+.breath.in{transform:scale(1.35)}.breath.out{transform:scale(.8)}
+.hidden{display:none!important}
+label{display:block;margin:12px 0 6px;opacity:.9}
+input,select{width:100%;padding:14px;border-radius:14px;border:0;font-size:17px}
+.note{text-align:center;line-height:1.8;opacity:.85}
+.small{text-align:center;font-size:14px;opacity:.7;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🌙 我的睡眠冥想</h1>
+  <div class="sub">今天辛苦了，現在可以慢慢放鬆了 ❤️</div>
+
+  <div id="home">
+    <div class="card">
+      <div class="note">每日睡覺提醒</div>
+      <div class="time" id="alarmShow">01:39</div>
+      <button class="primary" onclick="show('meditation')">🧘 開始冥想</button>
+      <button onclick="show('alarm')">⏰ 設定睡覺提醒</button>
+      <button onclick="show('sleep')">😴 開始睡眠</button>
+    </div>
+    <div class="card">
+      <div class="note">睡前小語</div>
+      <p class="note">吸氣……慢慢呼氣……<br>今天發生的事情先放下。<br>你已經很努力了，現在好好休息吧。🌙</p>
+    </div>
+  </div>
+
+  <div id="meditation" class="hidden">
+    <div class="card">
+      <h2>🧘 睡前冥想</h2>
+      <div class="time" id="timer">10:00</div>
+      <div class="breath" id="breath">準備</div>
+      <div class="row">
+        <button onclick="startMeditation()">開始</button>
+        <button onclick="resetMeditation()">重來</button>
+      </div>
+      <div class="row">
+        <button onclick="setMinutes(5)">5 分鐘</button>
+        <button onclick="setMinutes(10)">10 分鐘</button>
+        <button onclick="setMinutes(15)">15 分鐘</button>
+      </div>
+      <p class="note" id="guide">準備好後按「開始」，跟著圓圈慢慢呼吸。</p>
+      <button onclick="show('home')">← 回首頁</button>
+    </div>
+  </div>
+
+  <div id="alarm" class="hidden">
+    <div class="card">
+      <h2>⏰ 睡覺提醒</h2>
+      <label>每天提醒時間</label>
+      <input id="alarmInput" type="time" value="01:39">
+      <button class="primary" onclick="saveAlarm()">儲存提醒</button>
+      <p class="note">注意：網頁本身無法在完全關閉後保證準時發出系統通知；最穩定的方法是同時在 iPhone「時鐘」App 設定 01:39 鬧鐘。</p>
+      <button onclick="show('home')">← 回首頁</button>
+    </div>
+  </div>
+
+  <div id="sleep" class="hidden">
+    <div class="card">
+      <h2>😴 準備睡覺</h2>
+      <p class="note">現在把手機亮度調低，音量關小。<br>做 3 次慢慢的深呼吸。</p>
+      <button class="primary" onclick="show('meditation')">🧘 先冥想 10 分鐘</button>
+      <button onclick="goodnight()">❤️ 我準備睡覺了</button>
+      <button onclick="show('home')">← 回首頁</button>
+    </div>
+  </div>
+
+  <div id="goodnight" class="hidden">
+    <div class="card">
+      <h1>🌙 晚安</h1>
+      <p class="note">今天辛苦了。<br>不用再想明天的事情。<br><br>放下手機，安心睡覺吧。❤️</p>
+    </div>
+  </div>
+
+  <div class="small">睡眠冥想小工具 · 為自己留一點休息時間</div>
+</div>
+
+<script>
+let minutes=10, seconds=0, timerId=null, breathId=null, alarm="01:39";
+
+function show(id){
+  document.querySelectorAll(".wrap>div:not(.small)").forEach(x=>x.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+}
+function updateTimer(){
+  document.getElementById("timer").textContent =
+    String(minutes).padStart(2,"0")+":"+String(seconds).padStart(2,"0");
+}
+function setMinutes(m){
+  stopTimers(); minutes=m; seconds=0; updateTimer();
+  document.getElementById("guide").textContent="已選擇 "+m+" 分鐘，按「開始」進入冥想。";
+}
+function startMeditation(){
+  if(timerId) return;
+  document.getElementById("guide").textContent="吸氣 4 秒……保持放鬆……慢慢呼氣 4 秒。";
+  breathCycle();
+  timerId=setInterval(()=>{
+    if(seconds===0){
+      if(minutes===0){finishMeditation();return}
+      minutes--; seconds=59;
+    }else seconds--;
+    updateTimer();
+  },1000);
+}
+function breathCycle(){
+  const b=document.getElementById("breath");
+  let inhale=true;
+  b.textContent="吸氣";
+  b.classList.add("in"); b.classList.remove("out");
+  breathId=setInterval(()=>{
+    inhale=!inhale;
+    b.textContent=inhale?"吸氣":"呼氣";
+    b.classList.toggle("in",inhale); b.classList.toggle("out",!inhale);
+  },4000);
+}
+function stopTimers(){
+  clearInterval(timerId); clearInterval(breathId); timerId=null; breathId=null;
+}
+function resetMeditation(){stopTimers();minutes=10;seconds=0;updateTimer();document.getElementById("breath").textContent="準備";document.getElementById("breath").className="breath"}
+function finishMeditation(){
+  stopTimers(); minutes=0;seconds=0;updateTimer();
+  document.getElementById("breath").textContent="完成 ❤️";
+  document.getElementById("guide").textContent="今天辛苦了。現在放下手機，好好睡一覺吧。";
+}
+function saveAlarm(){
+  alarm=document.getElementById("alarmInput").value||"01:39";
+  localStorage.setItem("sleepAlarm",alarm);
+  document.getElementById("alarmShow").textContent=alarm;
+  alert("已儲存睡覺時間："+alarm+"\\n\\n若要讓 iPhone 準時響鈴，請再到「時鐘」App 設定同一時間。");
+  show("home");
+}
+function goodnight(){show("goodnight")}
+(function(){
+  const saved=localStorage.getItem("sleepAlarm");
+  if(saved){alarm=saved;document.getElementById("alarmInput").value=saved;document.getElementById("alarmShow").textContent=saved}
+  updateTimer();
+})();
+</script>
+</body>
+</html>'''
+
+path = Path("/mnt/data/我的睡眠冥想.html")
+path.write_text(html, encoding="utf-8")
+print(f"已完成：{path}")
+
+🌙 我的睡眠冥想
+今天辛苦了，現在可以慢慢放鬆了 ❤️
+每日睡覺提醒
+01:39
+🧘 開始冥想 ⏰ 設定睡覺提醒 😴 開始睡眠
+睡前小語
+吸氣……慢慢呼氣…… 今天發生的事情先放下。 你已經很努力了，現在好好休息吧。🌙
+睡眠冥想小工具 · 為自己留一點休息時間
