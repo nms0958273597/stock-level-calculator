@@ -1118,6 +1118,13 @@ type="button">
 <script>
 "use strict";
 
+/* =========================================================
+   V10 FIX
+   ① 修正即時行情取得與非交易時間顯示
+   ② 修正第一／第二壓力永遠顯示 —
+   ③ 修正「無即時價卻顯示突破確認」問題
+   ========================================================= */
+
 const FINMIND="https://api.finmindtrade.com/api/v4/data";
 const MIS="https://mis.twse.com.tw/stock/api/getStockInfo.jsp";
 
@@ -1133,6 +1140,11 @@ let currentData=null;
 let refreshTimer=null;
 let searchSeq=0;
 let scanSeq=0;
+
+
+/* =========================================================
+   已知股票／ETF
+   ========================================================= */
 
 const KNOWN={
 
@@ -1361,6 +1373,11 @@ Object.keys(KNOWN).forEach(code=>{
 ALIAS[KNOWN[code].name]=code
 });
 
+
+/* =========================================================
+   工具
+   ========================================================= */
+
 function $(id){
 return document.getElementById(id)
 }
@@ -1384,7 +1401,7 @@ return String(v??"")
 
 function n(v){
 
-if(v===null||v===undefined||v==="")
+if(v===null||v===undefined||v===""||v==="-"||v==="—")
 return null;
 
 const x=Number(
@@ -1465,6 +1482,15 @@ return s.slice(0,4)+"-"+s.slice(4,6)+"-"+s.slice(6);
 return s
 }
 
+function sleep(ms){
+return new Promise(resolve=>setTimeout(resolve,ms))
+}
+
+
+/* =========================================================
+   fetch JSON
+   ========================================================= */
+
 async function fetchJSON(url,timeout=15000){
 
 const controller=new AbortController();
@@ -1534,7 +1560,13 @@ timeout
 return Array.isArray(data.data)
 ?data.data
 :[]
+
 }
+
+
+/* =========================================================
+   股票資料庫
+   ========================================================= */
 
 async function loadStockInfo(){
 
@@ -1567,8 +1599,7 @@ String(x.type||"")
 return{
 
 stock_id:
-String(x.stock_id||"")
-.toUpperCase(),
+String(x.stock_id||"").toUpperCase(),
 
 stock_name:
 String(x.stock_name||""),
@@ -1775,6 +1806,12 @@ raw+
 
 }
 
+
+/* =========================================================
+   即時行情
+   FIX ①
+   ========================================================= */
+
 function parseRealtime(r,stock,source){
 
 if(!r)
@@ -1782,9 +1819,6 @@ return null;
 
 const price=n(r.z);
 const previous=n(r.y);
-
-if(price===null||previous===null)
-return null;
 
 function firstPrice(v){
 
@@ -1794,6 +1828,15 @@ return String(v||"")
 .find(x=>x!==null)
 
 }
+
+/*
+   重要：
+   TWSE MIS 在非交易時間可能沒有 z，
+   所以這裡不能把歷史收盤硬塞成 realtime。
+*/
+
+if(price===null||previous===null)
+return null;
 
 return{
 
@@ -1840,20 +1883,29 @@ lower:n(r.w)
 
 async function getRealtime(stock){
 
-const code=stock.stock_id;
+const code=
+String(stock.stock_id||"")
+.toUpperCase();
 
-const markets=
+const market=
 stock.market==="otc"
-?["otc","tse"]
-:["tse","otc"];
+?"otc"
+:"tse";
 
-const exchs=[];
+/*
+   第一順位：
+   指定市場。
 
-markets.forEach(m=>{
-exchs.push(
-m+"_"+code+".tw"
-)
-});
+   第二順位：
+   另一市場。
+
+   這可避免部分 ETF／資料庫市場分類錯誤。
+*/
+
+const exchs=[
+market+"_"+code+".tw",
+(market==="tse"?"otc":"tse")+"_"+code+".tw"
+];
 
 const base=
 MIS+
@@ -1885,7 +1937,7 @@ try{
 const data=
 await fetchJSON(
 item.url,
-7000
+8000
 );
 
 const arr=
@@ -1897,7 +1949,7 @@ const row=
 arr.find(x=>
 String(x.c||"")
 .toUpperCase()===
-code.toUpperCase()
+code
 );
 
 const parsed=
@@ -1925,6 +1977,11 @@ e
 
 return null
 }
+
+
+/* =========================================================
+   歷史價格
+   ========================================================= */
 
 async function getPrices(code){
 
@@ -2025,7 +2082,14 @@ return(
 )
 }
 
+
+/* =========================================================
+   技術分析
+   ========================================================= */
+
 function technical(rows,price){
+
+const sr=sorted(rows);
 
 const c=closes(rows);
 
@@ -2077,21 +2141,83 @@ trend="中性"
 
 }
 
-const recent=
+/*
+   20日近期高低點：
+   排除最後一根，
+   避免把今天的價格自己拿來當突破基準。
+*/
+
+const recent20=
 c.slice(-21);
 
-const before=
-recent.slice(0,-1);
+const before20=
+recent20.slice(0,-1);
 
 const recentHigh=
-before.length
-?Math.max(...before)
+before20.length
+?Math.max(...before20)
 :null;
 
 const recentLow=
-before.length
-?Math.min(...before)
+before20.length
+?Math.min(...before20)
 :null;
+
+
+/*
+   多層級歷史壓力／支撐資料
+*/
+
+function highestHigh(period){
+
+const part=
+sr.slice(-period);
+
+const vals=
+part
+.map(x=>
+n(
+x.max??
+x.high??
+x.close
+)
+)
+.filter(x=>x!==null);
+
+return vals.length
+?Math.max(...vals)
+:null
+}
+
+function lowestLow(period){
+
+const part=
+sr.slice(-period);
+
+const vals=
+part
+.map(x=>
+n(
+x.min??
+x.low??
+x.close
+)
+)
+.filter(x=>x!==null);
+
+return vals.length
+?Math.min(...vals)
+:null
+}
+
+const high20=highestHigh(20);
+const high60=highestHigh(60);
+const high120=highestHigh(120);
+const high240=highestHigh(240);
+
+const low20=lowestLow(20);
+const low60=lowestLow(60);
+const low120=lowestLow(120);
 
 const last5=
 c.slice(-5);
@@ -2101,8 +2227,7 @@ let avgRange=null;
 if(last5.length>=3){
 
 const ranges=
-sorted(rows)
-.slice(-5)
+sr.slice(-5)
 .map(x=>{
 
 const hi=n(
@@ -2142,7 +2267,7 @@ recentHigh!==null&&
 price>=recentHigh*.96&&
 price<=recentHigh*1.02;
 
-const breakout=
+const historicalBreakout=
 price!==null&&
 recentHigh!==null&&
 price>recentHigh;
@@ -2158,11 +2283,12 @@ ma[20]!==null&&
 ma[60]!==null&&
 ma[5]>ma[20]&&
 ma[20]>=ma[60]&&
+sl[20]!==null&&
 sl[20]>0;
 
 const consolidation=
 c.length>=15&&
-recent.length>=10&&
+recent20.length>=10&&
 recentHigh!==null&&
 recentLow!==null&&
 recentLow>0&&
@@ -2175,6 +2301,7 @@ const longBull=
 ma[60]!==null&&
 ma[120]!==null&&
 ma[60]>ma[120]&&
+sl[60]!==null&&
 sl[60]>0;
 
 return{
@@ -2183,11 +2310,31 @@ ma,
 sl,
 bi,
 trend,
+
 recentHigh,
 recentLow,
+
+high20,
+high60,
+high120,
+high240,
+
+low20,
+low60,
+low120,
+
 nearHigh,
-breakout,
+
+/*
+   保留歷史突破判斷。
+   render 時會再要求 realtime，
+   避免沒有盤中價卻寫「突破確認」。
+*/
+
+breakout:historicalBreakout,
+
 breakdown,
+
 maTurnStrong,
 consolidation,
 avgRange,
@@ -2196,6 +2343,11 @@ longBull
 }
 
 }
+
+
+/* =========================================================
+   法人
+   ========================================================= */
 
 function blankLaw(){
 
@@ -2456,6 +2608,11 @@ data[data.length-1]
 
 }
 
+
+/* =========================================================
+   PE / 財報
+   ========================================================= */
+
 async function getPER(code){
 
 try{
@@ -2646,6 +2803,11 @@ date:r.date
 
 return null
 }
+
+
+/* =========================================================
+   估值
+   ========================================================= */
 
 function valuation(
 price,
@@ -2897,10 +3059,29 @@ highPE:high
 
 }
 
+
+/* =========================================================
+   FIX ②
+   壓力／支撐重新計算
+   ========================================================= */
+
 function levels(
 price,
 tech
 ){
+
+/*
+   即使股價已經突破近期高點，
+   也不能讓「第一壓力／第二壓力」直接變成 —。
+
+   新邏輯：
+
+   1. 先找 20 / 60 / 120 / 240 日歷史高點
+   2. 找高於現價的最近兩個價格作為壓力
+   3. 如果所有歷史高點都被突破，
+      使用現價上方 3% / 6% 作為「突破後參考壓力」
+   4. 支撐則優先找低於現價的 MA20 / MA60 / 歷史低點
+*/
 
 if(price===null){
 
@@ -2909,60 +3090,148 @@ return{
 breakout:tech.recentHigh,
 breakdown:tech.recentLow,
 
-support:null,
-support2:null,
+support:tech.recentLow,
+support2:tech.low60,
 
-resistance:null,
-resistance2:null,
+resistance:
+tech.high20??
+tech.recentHigh,
 
-stop:null,
+resistance2:
+tech.high60??
+null,
+
+stop:
+tech.recentLow!==null
+?tech.recentLow*.985
+:null,
+
 tp1:null,
-tp2:null
+tp2:null,
+
+resistanceEstimated:false,
+resistance2Estimated:false
 
 }
 
 }
 
-const support=
-tech.ma[20]!==null&&
-tech.ma[20]<price
-?tech.ma[20]
-:tech.recentLow;
 
-const support2=
-tech.ma[60]!==null&&
-tech.ma[60]<price
-?tech.ma[60]
+/* -------------------------
+   壓力候選
+   ------------------------- */
+
+const resistanceCandidates=[
+tech.high20,
+tech.high60,
+tech.high120,
+tech.high240
+]
+.filter(x=>x!==null)
+.filter(x=>x>price)
+.sort((a,b)=>a-b);
+
+
+/*
+   如果沒有歷史壓力在現價上方，
+   表示已突破所有目前資料中的高點。
+
+   此時使用突破後參考壓力。
+*/
+
+let resistance=
+resistanceCandidates.length
+?resistanceCandidates[0]
+:price*1.03;
+
+let resistance2=
+resistanceCandidates.length>=2
+?resistanceCandidates[1]
 :null;
 
-const resistance=
-tech.recentHigh!==null&&
-tech.recentHigh>price
-?tech.recentHigh
-:null;
+let resistanceEstimated=
+resistanceCandidates.length===0;
 
-const resistance2=
-tech.ma[60]!==null&&
-tech.ma[60]>price
-?tech.ma[60]
-:null;
+let resistance2Estimated=false;
 
-const stop=
+if(resistance2===null){
+
+/*
+   第二壓力一定要有，
+   所以使用第一壓力上方約 3%。
+*/
+
+resistance2=
+Math.max(
+price*1.06,
+resistance*1.03
+);
+
+resistance2Estimated=true;
+
+}
+
+
+/* -------------------------
+   支撐候選
+   ------------------------- */
+
+const supportCandidates=[
+tech.ma[20],
+tech.ma[60],
+tech.ma[120],
+tech.low20,
+tech.low60,
+tech.low120,
+tech.recentLow
+]
+.filter(x=>x!==null)
+.filter(x=>x<price)
+.sort((a,b)=>b-a);
+
+
+/*
+   第一支撐：
+   最靠近現價的下方價格。
+
+   第二支撐：
+   第二個下方價格。
+*/
+
+let support=
+supportCandidates.length
+?supportCandidates[0]
+:price*.94;
+
+let support2=
+supportCandidates.length>=2
+?supportCandidates[1]
+:price*.90;
+
+
+/* -------------------------
+   止損
+   ------------------------- */
+
+let stop=
 support!==null
 ?support*.985
 :price*.94;
 
+
+/* -------------------------
+   止盈
+   ------------------------- */
+
 const tp1=
-resistance!==null&&
 resistance>price
 ?resistance
-:price*1.05;
+:price*1.03;
 
 const tp2=
-resistance2!==null&&
 resistance2>tp1
 ?resistance2
-:price*1.10;
+:price*1.06;
 
 return{
 
@@ -2977,11 +3246,19 @@ resistance2,
 
 stop,
 tp1,
-tp2
+tp2,
+
+resistanceEstimated,
+resistance2Estimated
 
 }
 
 }
+
+
+/* =========================================================
+   多空訊號
+   ========================================================= */
 
 function signal(
 tech,
@@ -2991,6 +3268,12 @@ price,
 target,
 realtime
 ){
+
+/*
+   FIX ③
+   沒有 realtime 時，
+   不允許使用歷史價格產生「今日突破確認」。
+*/
 
 if(!realtime){
 
@@ -3003,7 +3286,8 @@ cls:"yellow",
 
 reasons:[
 "目前沒有可靠盤中即時價格",
-"不使用歷史價格冒充現價"
+"不使用歷史價格冒充今日現價",
+"今日突破需等盤中價格確認"
 ]
 
 }
@@ -3052,7 +3336,7 @@ if(tech.breakout){
 
 score+=15;
 reasons.push(
-"突破近期高點"
+"盤中價格突破近期高點"
 );
 
 }
@@ -3061,7 +3345,7 @@ if(tech.breakdown){
 
 score-=20;
 reasons.push(
-"跌破近期低點"
+"盤中價格跌破近期低點"
 );
 
 }
@@ -3190,6 +3474,11 @@ reasons
 
 }
 
+
+/* =========================================================
+   突破模型
+   ========================================================= */
+
 function breakoutModel(
 tech,
 inst20,
@@ -3230,11 +3519,19 @@ reasons.push(
 
 }
 
-if(tech.breakout){
+/*
+   只有有即時價格時，
+   才把今天視為「已突破」。
+*/
+
+if(
+rt&&
+tech.breakout
+){
 
 score+=25;
 reasons.push(
-"已突破近期高點"
+"盤中價格突破近期高點"
 );
 
 }
@@ -3263,7 +3560,10 @@ reasons.push(
 
 if(tech.breakdown){
 
-score-=35
+score-=35;
+reasons.push(
+"價格跌破近期低點"
+);
 
 }
 
@@ -3277,12 +3577,38 @@ Math.round(score)
 
 let state="條件不足";
 
-if(score>=75)
+if(
+rt&&
+tech.breakout&&
+score>=75
+){
+
+state="🚀 突破確認";
+
+}
+else if(
+rt&&
+tech.breakout
+){
+
+state="🚀 已突破";
+
+}
+else if(score>=75){
+
 state="🔥 強力突破候選";
-else if(score>=60)
+
+}
+else if(score>=60){
+
 state="🟢 突破候選";
-else if(score>=45)
+
+}
+else if(score>=45){
+
 state="🟡 整理觀察";
+
+}
 
 return{
 
@@ -3293,6 +3619,11 @@ reasons
 }
 
 }
+
+
+/* =========================================================
+   假反彈
+   ========================================================= */
 
 function fakeRebound(
 tech,
@@ -3325,6 +3656,11 @@ range;
 return pos>.55&&pos<.82
 }
 
+
+/* =========================================================
+   建立資料
+   ========================================================= */
+
 async function buildData(stock){
 
 const[
@@ -3353,6 +3689,15 @@ sortedPrices.length-1
 ]?.close
 :null
 );
+
+/*
+   技術分析價格：
+   有即時 → 即時
+   無即時 → 歷史收盤
+
+   但 render 時會區分，
+   絕不把 historicalClose 當作 realtime。
+*/
 
 const analysisPrice=
 rt?.price??
@@ -3458,6 +3803,11 @@ stock,
 realtime:rt,
 rows:prices,
 historicalClose,
+latestHistory:
+sortedPrices.length
+?sortedPrices[sortedPrices.length-1]
+:null,
+
 tech,
 inst20,
 
@@ -3484,6 +3834,11 @@ breakout
 }
 
 }
+
+
+/* =========================================================
+   顯示工具
+   ========================================================= */
 
 function iconFor(stock){
 
@@ -3737,6 +4092,11 @@ ${integer(x.total.net)}
 `
 }
 
+
+/* =========================================================
+   render
+   ========================================================= */
+
 function renderData(data){
 
 currentData=data;
@@ -3752,6 +4112,9 @@ const br=data.breakout;
 
 const price=
 rt?.price??null;
+
+const history=
+data.latestHistory;
 
 const change=
 rt&&rt.previous!==null
@@ -3773,30 +4136,148 @@ change>0
 const fake=data.fake;
 const trend=tech.trend;
 
+
+/*
+   FIX ③：
+   「突破確認」必須有 realtime。
+*/
+
+const realtimeBreakout=
+!!rt&&
+!!tech.breakout;
+
+const realtimeBreakdown=
+!!rt&&
+!!tech.breakdown;
+
+
+/*
+   盤後時不要寫「目前沒有資料」，
+   而是清楚說：
+   「目前非盤中，以下顯示最近交易日資料」。
+*/
+
 const statusText=
-price!==null
-?"🟢 盤中即時"
-:"🔴 無盤中即時價";
+rt
+?"🟢 盤中即時價格"
+:"🕘 目前非盤中｜以下顯示最近交易日資料";
 
-const breakState=
-br.score>=75
-?"盤整後突破"
-:tech.breakout
-?"已突破"
-:tech.nearHigh
-?"接近突破"
-:"整理中";
 
-const mainState=
-fake
-?"⚠️ 假反彈警戒"
-:tech.breakout
-?"🚀 突破確認"
-:sig.state.includes("多")
-?"🟢 "+sig.state.replace("🟢 ","")
-:sig.state.includes("空")
-?"🔴 "+sig.state.replace("🔴 ","")
-:"🟡 中性";
+/*
+   突破狀態
+*/
+
+let breakState="整理中";
+
+if(rt&&tech.breakout){
+
+breakState="🚀 已突破";
+
+}
+else if(rt&&tech.nearHigh){
+
+breakState="🔥 接近突破";
+
+}
+else if(!rt){
+
+breakState="⏳ 等待盤中";
+
+}
+else{
+
+breakState="整理中";
+
+}
+
+
+/*
+   今日主要判斷
+*/
+
+let mainState="🟡 中性";
+
+if(!rt){
+
+mainState="⚪ 等待即時價格";
+
+}
+else if(fake){
+
+mainState="⚠️ 假反彈警戒";
+
+}
+else if(realtimeBreakout){
+
+mainState="🚀 突破確認";
+
+}
+else if(realtimeBreakdown){
+
+mainState="🔻 跌破警戒";
+
+}
+else if(sig.state.includes("多")){
+
+mainState=
+"🟢 "+
+sig.state.replace("🟢 ","");
+
+}
+else if(sig.state.includes("空")){
+
+mainState=
+"🔴 "+
+sig.state.replace("🔴 ","");
+
+}
+
+
+/*
+   即時行情區：
+   有 realtime → 真正即時資料
+   無 realtime → 最近交易日資料
+*/
+
+const rtOpen=
+rt?.open??
+n(history?.open);
+
+const rtHigh=
+rt?.high??
+n(history?.max??history?.high);
+
+const rtLow=
+rt?.low??
+n(history?.min??history?.low);
+
+const rtPrevious=
+rt?.previous??
+n(history?.close);
+
+const rtVolume=
+rt?.volume??
+n(history?.Trading_Volume??history?.volume);
+
+
+/*
+   盤後提示
+*/
+
+const marketNotice=
+rt
+?`
+資料狀態：
+<b class="green">盤中即時</b>
+`
+:`
+資料狀態：
+<b class="yellow">目前非盤中</b>
+<br>
+以下開高低收／成交量為最近交易日資料，
+<b>不是目前可成交價格</b>。
+`;
+
 
 $("result").innerHTML=`
 
@@ -3830,7 +4311,11 @@ ${s.market==="otc"
 
 更新時間<br>
 
-${esc(rt?.time||"—")}
+${esc(
+rt?.time||
+history?.date||
+"—"
+)}
 
 </div>
 
@@ -3865,7 +4350,7 @@ ${esc(val.state)}
 <div class="box">
 
 <div class="boxMain ${
-br.score>=60
+br.score>=60&&rt
 ?"green"
 :"orange"
 }">
@@ -3885,7 +4370,7 @@ ${esc(breakState)}
 <div class="priceCell">
 
 <div class="priceLabel">
-${rt?"現價":"最新收盤"}
+${rt?"現價":"最近收盤"}
 </div>
 
 <div class="priceValue ${
@@ -3979,7 +4464,14 @@ ${money(Math.abs(change))}
 </span>
 
 `
-:"⚠️ 目前沒有盤中即時價格，以上使用最新交易日收盤價。"
+:`
+最近交易日收盤：
+<b>${money(data.historicalClose)}</b>
+
+<br>
+
+⚠️ 不使用歷史收盤冒充目前即時價格。
+`
 }
 
 </div>
@@ -3987,6 +4479,11 @@ ${money(Math.abs(change))}
 </div>
 
 </div>
+
+
+<!-- =========================
+     盤整後突破
+     ========================= -->
 
 <div class="card">
 
@@ -4017,8 +4514,8 @@ tech.nearHigh,
 )}
 
 ${checkLine(
-tech.breakout,
-"④ 突破近期高點"
+realtimeBreakout,
+"④ 今日盤中突破"
 )}
 
 ${checkLine(
@@ -4039,9 +4536,17 @@ ${checkLine(
 <div class="dataRow">
 <span>突破確認</span>
 <b>
-${tech.breakout
+
+${
+rt
+?(
+tech.breakout
 ?"🚀 已突破"
-:"⏳ 尚未突破"}
+:"⏳ 尚未突破"
+)
+:"⚪ 等待盤中價格"
+}
+
 </b>
 </div>
 
@@ -4109,9 +4614,25 @@ x=>"• "+esc(x)
 
 </div>
 
+${
+!rt
+?`
+<div class="notice yellow">
+⚠️ 現在不是盤中交易時間，
+「今日突破」必須等下一個交易日盤中價格確認。
+</div>
+`
+:""
+}
+
 </div>
 
 </div>
+
+
+<!-- =========================
+     一眼看懂
+     ========================= -->
 
 <div class="card">
 
@@ -4129,11 +4650,13 @@ ${esc(mainState)}
 
 ${
 !rt
-?"目前沒有盤中即時價格。"
+?"目前非盤中，無法確認今日是否突破。"
 :fake
 ?"趨勢仍偏弱，反彈暫不視為反轉。"
-:tech.breakout
-?"已突破近期高點，觀察能否站穩。"
+:realtimeBreakout
+?"盤中已突破近期高點，觀察能否站穩。"
+:realtimeBreakdown
+?"盤中跌破近期低點，注意支撐失守。"
 :sig.state.includes("多")
 ?"目前偏多，等待突破或回踩支撐。"
 :sig.state.includes("空")
@@ -4178,6 +4701,11 @@ x=>"• "+esc(x)
 
 </div>
 
+
+<!-- =========================
+     價格與重要關卡
+     ========================= -->
+
 <div class="card">
 
 <div class="title orange">
@@ -4199,7 +4727,9 @@ lv.breakdown,
 )}
 
 ${levelHTML(
-"📈 第一壓力",
+lv.resistanceEstimated
+?"📈 第一壓力＊"
+:"📈 第一壓力",
 lv.resistance,
 "orange"
 )}
@@ -4235,7 +4765,9 @@ lv.support2,
 )}
 
 ${levelHTML(
-"📈 第二壓力",
+lv.resistance2Estimated
+?"📈 第二壓力＊"
+:"📈 第二壓力",
 lv.resistance2,
 "orange"
 )}
@@ -4247,12 +4779,27 @@ lv.resistance2,
 ${
 rt
 ?"突破後不要盲目追高，優先觀察突破是否守住。"
-:"目前沒有盤中即時價，關卡僅供技術分析。"
+:"目前非盤中，以上關卡為技術分析參考，並非今日即時突破結果。"
+}
+
+<br>
+
+${
+lv.resistanceEstimated||
+lv.resistance2Estimated
+?"＊突破所有近期歷史高點後，壓力採用上方參考區間估算。"
+:"第一／第二壓力優先使用歷史高點計算。"
 }
 
 </div>
 
 </div>
+
+
+<!-- =========================
+     即時行情
+     FIX ①
+     ========================= -->
 
 <div class="card">
 
@@ -4263,63 +4810,75 @@ rt
 <div class="sectionGrid">
 
 ${rtItem(
-"開盤",
-money(rt?.open)
+rt?"開盤":"最近交易日開盤",
+money(rtOpen)
 )}
 
 ${rtItem(
-"最高",
-money(rt?.high),
+rt?"最高":"最近交易日最高",
+money(rtHigh),
 "red"
 )}
 
 ${rtItem(
-"最低",
-money(rt?.low),
+rt?"最低":"最近交易日最低",
+money(rtLow),
 "green"
 )}
 
 ${rtItem(
-"昨收",
-money(rt?.previous)
+rt?"昨收":"最近交易日收盤",
+money(rtPrevious)
 )}
 
 ${rtItem(
 "買一",
-money(rt?.bid),
+rt
+?money(rt.bid)
+:"—",
 "green"
 )}
 
 ${rtItem(
 "賣一",
-money(rt?.ask),
+rt
+?money(rt.ask)
+:"—",
 "red"
 )}
 
 ${rtItem(
 "買一量",
-integer(rt?.bidVol)
+rt
+?integer(rt.bidVol)
+:"—"
 )}
 
 ${rtItem(
 "賣一量",
-integer(rt?.askVol)
+rt
+?integer(rt.askVol)
+:"—"
 )}
 
 ${rtItem(
-"成交量",
-integer(rt?.volume)
+rt?"成交量":"最近交易日成交量",
+integer(rtVolume)
 )}
 
 ${rtItem(
 "漲停",
-money(rt?.upper),
+rt
+?money(rt.upper)
+:"—",
 "red"
 )}
 
 ${rtItem(
 "跌停",
-money(rt?.lower),
+rt
+?money(rt.lower)
+:"—",
 "green"
 )}
 
@@ -4327,25 +4886,43 @@ money(rt?.lower),
 
 <div class="notice">
 
+${marketNotice}
+
+<br>
+
 資料來源：
 <b>
-${esc(rt?.source||"尚未取得")}
+${esc(
+rt?.source||
+"歷史公開資料"
+)}
 </b>
 
 <br>
 
-歷史最新收盤：
+資料日期：
 <b>
-${money(data.historicalClose)}
+${esc(
+rt?.date||
+history?.date||
+"—"
+)}
 </b>
 
 <br>
 
-⚠️ 歷史收盤不代表目前可成交價格。
+⚠️ 買一／賣一只有盤中即時行情才會顯示。
+<br>
+⚠️ 非盤中時間不會用歷史價格冒充買賣盤。
 
 </div>
 
 </div>
+
+
+<!-- =========================
+     基本資料／估值
+     ========================= -->
 
 <div class="card">
 
@@ -4362,7 +4939,7 @@ rt
 :money(data.historicalClose),
 rt
 ?"盤中即時"
-:"最新交易日收盤",
+:"最近交易日收盤",
 rt
 ?"green"
 :"yellow"
@@ -4470,6 +5047,11 @@ data.target.high,
 
 </div>
 
+
+<!-- =========================
+     最新法人
+     ========================= -->
+
 <div class="card">
 
 <div class="title green">
@@ -4538,6 +5120,11 @@ data.inst.total
 
 </div>
 
+
+<!-- =========================
+     法人 1／5／20
+     ========================= -->
+
 <div class="card">
 
 <div class="title yellow">
@@ -4592,6 +5179,11 @@ data.inst20.periods[20]
 }
 
 </div>
+
+
+<!-- =========================
+     均線
+     ========================= -->
 
 <div class="card">
 
@@ -4690,6 +5282,11 @@ ${esc(trend)}
 
 </div>
 
+
+<!-- =========================
+     最終判斷
+     ========================= -->
+
 <div class="card">
 
 <div class="title orange">
@@ -4717,8 +5314,10 @@ val.cls
 ${metricHTML(
 "突破",
 breakState,
-"突破模型",
-br.score>=60
+rt
+?"突破模型"
+:"等待盤中",
+rt&&br.score>=60
 ?"green"
 :"yellow"
 )}
@@ -4736,7 +5335,14 @@ sig.cls
 
 <div class="notice">
 
-⚠️ 以上為模型判斷，不代表保證上漲或下跌。
+${
+!rt
+?"⚠️ 目前非盤中，今天的突破／跌破尚未確認。"
+:"⚠️ 以上為模型判斷，不代表保證上漲或下跌。"
+}
+
+<br>
+
 請搭配成交量、新聞、產業基本面及自己的風險承受能力判斷。
 
 </div>
@@ -4746,6 +5352,11 @@ sig.cls
 `;
 
 }
+
+
+/* =========================================================
+   搜尋結果
+   ========================================================= */
 
 async function showSearchCandidates(query){
 
@@ -4870,6 +5481,11 @@ searchStock(code);
 
 }
 
+
+/* =========================================================
+   搜尋股票
+   ========================================================= */
+
 async function searchStock(query){
 
 const token=++searchSeq;
@@ -4934,11 +5550,11 @@ data.realtime
 ?"✅ "+esc(stock.stock_name)+
 "｜即時價格 "+
 money(data.realtime.price)
-:"⚠️ "+esc(stock.stock_name)+
-"｜目前沒有盤中即時價格",
+:"🕘 "+esc(stock.stock_name)+
+"｜目前非盤中｜顯示最近交易日資料",
 data.realtime
 ?"ok"
-:"error"
+:"loading"
 );
 
 scrollToResult();
@@ -4977,6 +5593,11 @@ e.message||
 
 }
 
+
+/* =========================================================
+   每10秒更新
+   ========================================================= */
+
 async function refreshPrice(stock){
 
 try{
@@ -4984,10 +5605,70 @@ try{
 const rt=
 await getRealtime(stock);
 
-if(!rt||!currentData)
+if(!currentData)
 return;
 
+/*
+   如果交易時間結束，
+   rt 可能變成 null。
+   此時保留原本畫面，不把所有數值清掉。
+*/
+
+if(!rt){
+
+setStatus(
+"🕘 目前非盤中｜保留最近一次即時資料",
+"loading"
+);
+
+return
+
+}
+
 currentData.realtime=rt;
+
+/*
+   即時價格改變後，
+   必須重新計算：
+   技術位置、壓力、支撐、突破。
+*/
+
+const analysisPrice=rt.price;
+
+currentData.tech=
+technical(
+currentData.rows,
+analysisPrice
+);
+
+currentData.lv=
+levels(
+analysisPrice,
+currentData.tech
+);
+
+currentData.sig=
+signal(
+currentData.tech,
+currentData.inst20,
+currentData.val,
+rt.price,
+currentData.target,
+true
+);
+
+currentData.fake=
+fakeRebound(
+currentData.tech,
+rt.price
+);
+
+currentData.breakout=
+breakoutModel(
+currentData.tech,
+currentData.inst20,
+rt
+);
 
 renderData(currentData);
 
@@ -5012,6 +5693,11 @@ e
 }
 
 }
+
+
+/* =========================================================
+   掃描股票
+   ========================================================= */
 
 const SCAN_CODES=[
 
@@ -5421,6 +6107,11 @@ btn.textContent=
 
 }
 
+
+/* =========================================================
+   功能分類
+   ========================================================= */
+
 async function runFeature(action){
 
 if(action==="quick"){
@@ -5731,7 +6422,7 @@ ${esc(x.tech.trend)}
 <div class="recSmall">
 
 ${
-x.tech.breakout
+x.realtime&&x.tech.breakout
 ?"🚀突破"
 :x.tech.nearHigh
 ?"🔥接近"
@@ -5802,6 +6493,11 @@ title+
 )
 
 }
+
+
+/* =========================================================
+   導覽
+   ========================================================= */
 
 function setActiveNav(nav){
 
@@ -6150,6 +6846,11 @@ return
 
 }
 
+
+/* =========================================================
+   綁定事件
+   ========================================================= */
+
 function bindEvents(){
 
 const searchBtn=
@@ -6330,6 +7031,11 @@ this.getAttribute("data-nav")
 
 }
 
+
+/* =========================================================
+   啟動
+   ========================================================= */
+
 function boot(){
 
 try{
@@ -6355,7 +7061,7 @@ setStatus(
 );
 
 console.log(
-"V10 READY"
+"V10 READY｜FIX ①②③"
 );
 
 }
@@ -6412,4 +7118,4 @@ boot();
 </script>
 
 </body>
-</html> 
+</html>
