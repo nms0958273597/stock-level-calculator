@@ -4,130 +4,650 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101214">
-<title>台股法人籌碼與估值分析 V6｜即時行情實戰版</title>
+<title>台股法人籌碼與估值分析 V7｜即時行情實戰版</title>
+
 <style>
 *{box-sizing:border-box}
-:root{--bg:#101214;--panel:#292929;--panel2:#191919;--panel3:#111;--border:#474747;--text:#f7f7f7;--muted:#9d9d9d;--orange:#ff9f24;--red:#ff5364;--green:#48df70;--blue:#39baff;--yellow:#ffd34d;--purple:#bd8cff}
+
+:root{
+--bg:#101214;
+--panel:#292929;
+--panel2:#191919;
+--panel3:#111;
+--border:#474747;
+--text:#f7f7f7;
+--muted:#9d9d9d;
+--orange:#ff9f24;
+--red:#ff5364;
+--green:#48df70;
+--blue:#39baff;
+--yellow:#ffd34d;
+--purple:#bd8cff;
+}
+
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",Arial,sans-serif}
+
+body{
+margin:0;
+background:var(--bg);
+color:var(--text);
+font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",Arial,sans-serif
+}
+
 button,input{font:inherit}
 button{touch-action:manipulation}
-.wrap{max-width:1050px;margin:auto;padding:10px 13px 80px}
-.search{display:flex;gap:9px;position:sticky;top:0;z-index:100;padding:8px 0 12px;background:rgba(16,18,20,.97);backdrop-filter:blur(12px)}
-.search input{flex:1;min-width:0;height:58px;border:2px solid #555;border-radius:20px;background:#1b1b1b;color:#fff;padding:0 17px;font-size:20px;outline:none}
+
+.wrap{
+max-width:1050px;
+margin:auto;
+padding:10px 13px 80px
+}
+
+.search{
+display:flex;
+gap:9px;
+position:sticky;
+top:0;
+z-index:100;
+padding:8px 0 12px;
+background:rgba(16,18,20,.97);
+backdrop-filter:blur(12px)
+}
+
+.search input{
+flex:1;
+min-width:0;
+height:58px;
+border:2px solid #555;
+border-radius:20px;
+background:#1b1b1b;
+color:#fff;
+padding:0 17px;
+font-size:20px;
+outline:none
+}
+
 .search input:focus{border-color:var(--orange)}
-.search button{width:110px;border:0;border-radius:20px;background:var(--orange);color:#111;font-size:21px;font-weight:900;cursor:pointer}
-.hint{color:#999;font-size:15px;line-height:1.7;margin-bottom:8px}
-.status{display:none;padding:13px 15px;border-radius:15px;background:#1b1b1b;border:1px solid #444;margin:10px 0;line-height:1.7}
+
+.search button{
+width:110px;
+border:0;
+border-radius:20px;
+background:var(--orange);
+color:#111;
+font-size:21px;
+font-weight:900;
+cursor:pointer
+}
+
+.hint{
+color:#999;
+font-size:15px;
+line-height:1.7;
+margin-bottom:8px
+}
+
+.status{
+display:none;
+padding:13px 15px;
+border-radius:15px;
+background:#1b1b1b;
+border:1px solid #444;
+margin:10px 0;
+line-height:1.7
+}
+
 .status.show{display:block}
 .status.loading{color:var(--yellow);border-color:#66511e}
 .status.ok{color:#8cffaa;border-color:#2b6b3d}
 .status.error{color:#ff9ca6;border-color:#76323c}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:23px;padding:20px;margin-top:16px}
-.card h2{margin:0 0 16px;font-size:28px}
-.hero{background:#292929;border:1px solid #4b4b4b;border-radius:25px;padding:22px;margin-top:12px}
-.titleRow{display:flex;justify-content:space-between;gap:18px}
-.stockName{font-size:38px;font-weight:900}
-.stockCode{color:#aaa;margin-top:5px;font-size:18px}
+
+.card{
+background:var(--panel);
+border:1px solid var(--border);
+border-radius:23px;
+padding:20px;
+margin-top:16px
+}
+
+.card h2{
+margin:0 0 16px;
+font-size:28px
+}
+
+.hero{
+background:#292929;
+border:1px solid #4b4b4b;
+border-radius:25px;
+padding:22px;
+margin-top:12px
+}
+
+.titleRow{
+display:flex;
+justify-content:space-between;
+gap:18px
+}
+
+.stockName{
+font-size:38px;
+font-weight:900
+}
+
+.stockCode{
+color:#aaa;
+margin-top:5px;
+font-size:18px
+}
+
 .priceBox{text-align:right}
-.price{font-size:58px;line-height:1;font-weight:900}
-.change{font-size:20px;margin-top:9px}
+
+.price{
+font-size:58px;
+line-height:1;
+font-weight:900
+}
+
+.priceUnavailable{
+font-size:25px;
+line-height:1.2;
+font-weight:900;
+color:var(--red)
+}
+
+.change{
+font-size:20px;
+margin-top:9px
+}
+
 .up{color:var(--red)}
 .down{color:var(--green)}
 .neutral{color:#ddd}
-.tags{display:flex;flex-wrap:wrap;gap:9px;margin-top:19px}
-.tag{border:1px solid #666;border-radius:999px;padding:8px 13px;font-size:16px}
+
+.tags{
+display:flex;
+flex-wrap:wrap;
+gap:9px;
+margin-top:19px
+}
+
+.tag{
+border:1px solid #666;
+border-radius:999px;
+padding:8px 13px;
+font-size:16px
+}
+
 .tag.green{color:var(--green);border-color:#2c8c48}
 .tag.red{color:var(--red);border-color:#a3323d}
 .tag.orange{color:var(--orange);border-color:#9e6a1c}
 .tag.blue{color:var(--blue);border-color:#287fa9}
 .tag.purple{color:var(--purple);border-color:#684a91}
-.dateBox{background:#171717;border-radius:14px;padding:13px 14px;margin-top:16px;color:#ccc;font-size:15px;line-height:1.8}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.metric{background:var(--panel2);border-radius:18px;padding:17px;min-height:105px}
-.metric .label{color:#999;font-size:16px}
-.metric .value{font-size:29px;font-weight:900;margin-top:7px}
-.metric .sub{color:#888;font-size:14px;margin-top:5px}
+.tag.yellow{color:var(--yellow);border-color:#8c741c}
+
+.dateBox{
+background:#171717;
+border-radius:14px;
+padding:13px 14px;
+margin-top:16px;
+color:#ccc;
+font-size:15px;
+line-height:1.8
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:12px
+}
+
+.metric{
+background:var(--panel2);
+border-radius:18px;
+padding:17px;
+min-height:105px
+}
+
+.metric .label{
+color:#999;
+font-size:16px
+}
+
+.metric .value{
+font-size:29px;
+font-weight:900;
+margin-top:7px
+}
+
+.metric .sub{
+color:#888;
+font-size:14px;
+margin-top:5px
+}
+
 .greenText{color:var(--green)}
 .redText{color:var(--red)}
 .blueText{color:var(--blue)}
 .orangeText{color:var(--orange)}
 .yellowText{color:var(--yellow)}
 .purpleText{color:var(--purple)}
-.realtime{background:#101010;border:1px solid #444;border-radius:18px;padding:17px;margin-top:16px}
-.realtimeTitle{font-size:20px;font-weight:900;margin-bottom:12px}
-.rtGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.rtItem{background:#1b1b1b;border-radius:14px;padding:13px}
-.rtLabel{color:#888;font-size:14px}
-.rtValue{font-size:22px;font-weight:900;margin-top:5px}
-.apiDot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:#777}
-.apiDot.ok{background:#48df70;box-shadow:0 0 8px rgba(67,223,107,.6)}
+
+.realtime{
+background:#101010;
+border:1px solid #444;
+border-radius:18px;
+padding:17px;
+margin-top:16px
+}
+
+.realtimeTitle{
+font-size:20px;
+font-weight:900;
+margin-bottom:12px
+}
+
+.rtGrid{
+display:grid;
+grid-template-columns:repeat(4,minmax(0,1fr));
+gap:10px
+}
+
+.rtItem{
+background:#1b1b1b;
+border-radius:14px;
+padding:13px
+}
+
+.rtLabel{
+color:#888;
+font-size:14px
+}
+
+.rtValue{
+font-size:22px;
+font-weight:900;
+margin-top:5px
+}
+
+.apiDot{
+display:inline-block;
+width:9px;
+height:9px;
+border-radius:50%;
+margin-right:6px;
+background:#777
+}
+
+.apiDot.ok{
+background:#48df70;
+box-shadow:0 0 8px rgba(67,223,107,.6)
+}
+
 .apiDot.bad{background:var(--red)}
-.signal{padding:20px;border-radius:20px;border:1px solid #444;background:#191919}
-.signalTitle{font-size:23px;font-weight:900}
-.signalState{font-size:40px;font-weight:900;margin-top:8px}
-.signalReasons{color:#aaa;line-height:1.9;margin-top:10px}
-.bar{height:12px;background:#333;border-radius:999px;overflow:hidden;margin-top:13px}
-.bar span{display:block;height:100%;background:var(--orange)}
-.levelGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.level{background:#191919;border:1px solid #444;border-radius:18px;padding:16px}
+
+.signal{
+padding:20px;
+border-radius:20px;
+border:1px solid #444;
+background:#191919
+}
+
+.signalTitle{
+font-size:23px;
+font-weight:900
+}
+
+.signalState{
+font-size:40px;
+font-weight:900;
+margin-top:8px
+}
+
+.signalReasons{
+color:#aaa;
+line-height:1.9;
+margin-top:10px
+}
+
+.bar{
+height:12px;
+background:#333;
+border-radius:999px;
+overflow:hidden;
+margin-top:13px
+}
+
+.bar span{
+display:block;
+height:100%;
+background:var(--orange)
+}
+
+.levelGrid{
+display:grid;
+grid-template-columns:repeat(3,minmax(0,1fr));
+gap:12px
+}
+
+.level{
+background:#191919;
+border:1px solid #444;
+border-radius:18px;
+padding:16px
+}
+
 .level .small{color:#999}
-.level .big{font-size:29px;font-weight:900;margin-top:5px}
+
+.level .big{
+font-size:29px;
+font-weight:900;
+margin-top:5px
+}
+
 .level.break .big{color:var(--green)}
 .level.fail .big{color:var(--red)}
 .level.tp .big{color:var(--orange)}
 .level.sl .big{color:var(--red)}
-.strategy{margin-top:14px;background:#171717;border-radius:18px;padding:17px;line-height:1.9;color:#ccc}
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{padding:11px 5px;border-bottom:1px solid #393939;text-align:center}
-.table th{color:#aaa;font-weight:500}
+
+.strategy{
+margin-top:14px;
+background:#171717;
+border-radius:18px;
+padding:17px;
+line-height:1.9;
+color:#ccc
+}
+
+.table{
+width:100%;
+border-collapse:collapse
+}
+
+.table th,
+.table td{
+padding:11px 5px;
+border-bottom:1px solid #393939;
+text-align:center
+}
+
+.table th{
+color:#aaa;
+font-weight:500
+}
+
 .positive{color:var(--green)}
 .negative{color:var(--red)}
 .zero{color:#aaa}
-.periodBox{margin-top:14px;overflow:auto}
-.periodTable{width:100%;min-width:850px;border-collapse:collapse}
-.periodTable th,.periodTable td{padding:12px 7px;border-bottom:1px solid #393939;text-align:center}
+
+.periodBox{
+margin-top:14px;
+overflow:auto
+}
+
+.periodTable{
+width:100%;
+min-width:850px;
+border-collapse:collapse
+}
+
+.periodTable th,
+.periodTable td{
+padding:12px 7px;
+border-bottom:1px solid #393939;
+text-align:center
+}
+
 .periodTable th{color:#aaa}
-.targetGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.target{background:#1a1a1a;border-radius:17px;padding:17px}
+
+.targetGrid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:12px
+}
+
+.target{
+background:#1a1a1a;
+border-radius:17px;
+padding:17px
+}
+
 .targetLabel{color:#999}
-.targetValue{color:var(--orange);font-size:30px;font-weight:900;margin-top:5px}
-.actionGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.action{background:#1b1b1b;border:1px solid #444;color:#fff;border-radius:17px;padding:17px;text-align:left;cursor:pointer}
+
+.targetValue{
+color:var(--orange);
+font-size:30px;
+font-weight:900;
+margin-top:5px
+}
+
+.actionGrid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:10px
+}
+
+.action{
+background:#1b1b1b;
+border:1px solid #444;
+color:#fff;
+border-radius:17px;
+padding:17px;
+text-align:left;
+cursor:pointer
+}
+
 .action:active{transform:scale(.98)}
 .action:hover{border-color:var(--orange)}
-.action strong{display:block;font-size:19px}
-.action span{display:block;color:#999;margin-top:5px}
-.notice{color:#999;line-height:1.8;font-size:15px;margin-top:12px}
-.recommendGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.recommendBox{background:#181818;border:1px solid #444;border-radius:19px;padding:16px}
-.recommendTitle{font-size:22px;font-weight:900;margin-bottom:12px}
-.recStock{background:#202020;border:1px solid #3d3d3d;border-radius:15px;padding:13px;margin-top:8px;cursor:pointer}
-.recStock:hover{border-color:var(--orange)}
-.recName{font-size:19px;font-weight:900}
-.recMeta{font-size:13px;color:#999;margin-top:4px}
-.scanButton{width:100%;border:1px solid #555;background:#151515;color:#fff;border-radius:16px;padding:14px;font-weight:900;cursor:pointer;margin-top:8px}
-.scanButton:hover{border-color:var(--orange)}
-.loadingBox{padding:20px;text-align:center;color:var(--yellow);background:#181818;border-radius:18px}
-.footer{text-align:center;color:#666;font-size:13px;line-height:1.7;margin-top:30px}
-@media(max-width:650px){
-.wrap{padding:9px 10px 60px}
-.search input{font-size:18px}
-.search button{width:95px;font-size:19px}
-.titleRow{display:block}
-.stockName{font-size:31px}
-.priceBox{text-align:left;margin-top:15px}
-.price{font-size:50px}
-.grid,.targetGrid,.actionGrid,.recommendGrid{grid-template-columns:1fr}
-.levelGrid{grid-template-columns:1fr}
-.rtGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
-.card{padding:17px}
-.card h2{font-size:24px}
-.table{font-size:14px}
-.table th,.table td{padding:9px 3px}
+
+.action strong{
+display:block;
+font-size:19px
 }
-button:focus-visible,input:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
-button:disabled{opacity:.6;cursor:not-allowed}
+
+.action span{
+display:block;
+color:#999;
+margin-top:5px
+}
+
+.notice{
+color:#999;
+line-height:1.8;
+font-size:15px;
+margin-top:12px
+}
+
+.recommendGrid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:12px
+}
+
+.recommendBox{
+background:#181818;
+border:1px solid #444;
+border-radius:19px;
+padding:16px
+}
+
+.recommendTitle{
+font-size:22px;
+font-weight:900;
+margin-bottom:12px
+}
+
+.recStock{
+background:#202020;
+border:1px solid #3d3d3d;
+border-radius:15px;
+padding:13px;
+margin-top:8px;
+cursor:pointer
+}
+
+.recStock:hover{border-color:var(--orange)}
+
+.recName{
+font-size:19px;
+font-weight:900
+}
+
+.recMeta{
+font-size:13px;
+color:#999;
+margin-top:4px
+}
+
+.scanButton{
+width:100%;
+border:1px solid #555;
+background:#151515;
+color:#fff;
+border-radius:16px;
+padding:14px;
+font-weight:900;
+cursor:pointer;
+margin-top:8px
+}
+
+.scanButton:hover{border-color:var(--orange)}
+
+.loadingBox{
+padding:20px;
+text-align:center;
+color:var(--yellow);
+background:#181818;
+border-radius:18px
+}
+
+.bigConclusion{
+padding:22px;
+border-radius:22px;
+background:#151515;
+border:2px solid #555
+}
+
+.conclusionMain{
+font-size:34px;
+font-weight:900;
+margin-bottom:12px
+}
+
+.conclusionLine{
+font-size:18px;
+line-height:1.9;
+color:#ccc
+}
+
+.conclusionWarn{
+margin-top:13px;
+padding:13px;
+border-radius:14px;
+background:#21181a;
+border:1px solid #6d3037;
+color:#ffb0b7;
+line-height:1.7
+}
+
+.yuantaBox{
+background:#151515;
+border:1px solid #5a4a28;
+border-radius:20px;
+padding:18px
+}
+
+.yuantaTitle{
+font-size:23px;
+font-weight:900;
+color:var(--yellow)
+}
+
+.yuantaState{
+font-size:31px;
+font-weight:900;
+margin-top:8px
+}
+
+.dataBadge{
+display:inline-block;
+border:1px solid #555;
+border-radius:999px;
+padding:5px 10px;
+font-size:13px;
+color:#aaa;
+margin:5px 5px 0 0
+}
+
+.footer{
+text-align:center;
+color:#666;
+font-size:13px;
+line-height:1.7;
+margin-top:30px
+}
+
+@media(max-width:650px){
+
+.wrap{
+padding:9px 10px 60px
+}
+
+.search input{font-size:18px}
+.search button{
+width:95px;
+font-size:19px
+}
+
+.titleRow{display:block}
+
+.stockName{font-size:31px}
+
+.priceBox{
+text-align:left;
+margin-top:15px
+}
+
+.price{font-size:50px}
+
+.grid,
+.targetGrid,
+.actionGrid,
+.recommendGrid{
+grid-template-columns:1fr
+}
+
+.levelGrid{grid-template-columns:1fr}
+
+.rtGrid{
+grid-template-columns:repeat(2,minmax(0,1fr))
+}
+
+.card{padding:17px}
+
+.card h2{font-size:24px}
+
+.table{font-size:14px}
+
+.table th,
+.table td{
+padding:9px 3px
+}
+
+.conclusionMain{
+font-size:28px
+}
+}
+
+button:focus-visible,
+input:focus-visible{
+outline:3px solid var(--orange);
+outline-offset:2px
+}
+
+button:disabled{
+opacity:.6;
+cursor:not-allowed
+}
 </style>
 </head>
 
@@ -136,7 +656,8 @@ button:disabled{opacity:.6;cursor:not-allowed}
 <div class="wrap">
 
 <div class="search">
-<input id="searchInput"
+<input
+id="searchInput"
 aria-label="搜尋股票、ETF或代號"
 placeholder="搜尋股票／ETF／代號，例如：台化、1326、台積電、2330、0050"
 autocomplete="off"
@@ -146,14 +667,18 @@ spellcheck="false">
 </div>
 
 <div class="hint">
-搜尋後分析：即時價、漲跌%、買賣價量、EPS、本益比、每股淨值、PBR、殖利率、法人籌碼、均線、突破／跌破、支撐壓力、止盈止損與多空情境。即時資料抓不到時，不會拿歷史收盤價冒充即時價。
+搜尋後分析：即時價、漲跌%、買賣價量、EPS、本益比、每股淨值、PBR、殖利率、法人籌碼、均線、突破／跌破、支撐壓力、止盈止損與多空情境。
+<br>
+<b>V7 校正：</b>即時行情取得失敗時，歷史收盤價不再冒充目前價格；交易訊號會明確標示資料狀態。
 </div>
 
 <div id="status" class="status" role="status" aria-live="polite"></div>
 
 <div id="result">
+
 <div class="card">
-<h2>📊 台股法人籌碼與估值分析 V6</h2>
+<h2>📊 台股法人籌碼與估值分析 V7</h2>
+
 <div class="notice">
 請搜尋股票或 ETF。
 <br><br>
@@ -170,9 +695,11 @@ spellcheck="false">
 <b>00631L</b>
 </div>
 </div>
+
 </div>
 
 <div id="quick" class="card">
+
 <h2>📌 快速查詢</h2>
 
 <div class="actionGrid">
@@ -270,6 +797,8 @@ spellcheck="false">
 <div class="footer">
 即時行情優先使用 TWSE MIS；歷史／基本面／法人資料使用公開資料與 FinMind。
 <br>
+「元大法人」區塊不把三大法人資料冒充成元大投信資料；若公開資料無法確認元大投信持股，會明確顯示資料不足。
+<br>
 本頁為規則模型參考，不代表未來一定上漲或適合任何個人。
 </div>
 
@@ -329,6 +858,7 @@ const STOCKS={
 
 const ALIASES={
 "台灣化學纖維":"1326",
+"台化":"1326",
 "台積":"2330",
 "TSMC":"2330",
 "中國信託":"2891",
@@ -455,7 +985,6 @@ u.searchParams.set(k,v)
 const j=await fetchJSON(u.toString(),timeout);
 
 return Array.isArray(j.data)?j.data:[]
-
 }
 
 async function findStock(q){
@@ -524,7 +1053,9 @@ const rows=await finmind({
 dataset:"TaiwanStockInfo"
 },25000);
 
-const h=rows.find(x=>clean(x.stock_name)===key);
+const h=rows.find(x=>
+clean(x.stock_name)===key
+);
 
 if(h)
 
@@ -539,7 +1070,9 @@ market:String(h.type||"").toLowerCase()==="tpex"
 
 }catch(e){}
 
-throw new Error("找不到「"+raw+"」，請輸入股票代號試試。")
+throw new Error(
+"找不到「"+raw+"」，請輸入股票代號試試。"
+)
 
 }
 
@@ -673,7 +1206,6 @@ e
 }
 
 return null
-
 }
 
 async function getPrices(id){
@@ -909,7 +1441,6 @@ String(r.origin_name||"")
 
 return a.includes("EPS")||
 a.includes("每股盈餘")
-
 })
 .map(r=>({
 value:num(r.value),
@@ -1011,17 +1542,14 @@ source:"財報每股淨值"
 }
 
 return null
-
 }
 
 function blankLaw(){
-
 return{
 buy:0,
 sell:0,
 net:0
 }
-
 }
 
 function addLaw(x,b,s){
@@ -1029,7 +1557,6 @@ function addLaw(x,b,s){
 x.buy+=num(b)||0;
 x.sell+=num(s)||0;
 x.net=x.buy-x.sell
-
 }
 
 function aggregateLaw(rows){
@@ -1097,7 +1624,6 @@ r.total.buy-
 r.total.sell;
 
 return r
-
 }
 
 async function getInstitution(id){
@@ -1220,7 +1746,6 @@ o[k].net/=1000;
 });
 
 return o
-
 }
 
 return{
@@ -1237,6 +1762,64 @@ periods:{
 
 return null
 
+}
+
+}
+
+/*
+==========================================================
+V7 元大法人資料校正
+==========================================================
+
+FinMind 的三大法人資料可以分辨：
+外資／投信／自營商。
+
+但是「元大法人」如果沒有明確的元大投信基金持股資料，
+不能把整體投信買賣超直接稱為「元大法人」。
+
+因此本版本：
+1. 不冒充資料。
+2. 顯示「元大投信／元大相關籌碼」專區。
+3. 若公開資料無法確認，明確顯示「目前無法確認」。
+4. 同時顯示投信整體資料供參考。
+
+後續若接入元大官方 ETF／基金 API，
+可以再把這裡升級成真正的元大投信持股資料。
+==========================================================
+*/
+
+async function getYuantaInfo(stock){
+
+const code=stock.stock_id;
+
+const knownYuantaETF=[
+"0050",
+"00631L",
+"0056"
+];
+
+if(knownYuantaETF.includes(code)){
+
+return{
+available:true,
+type:"元大系列 ETF",
+state:"🟢 元大系列 ETF",
+detail:
+"此標的是元大系列 ETF，可進一步查看其官方基金持股資料。",
+date:"",
+source:"元大 ETF 公開資料"
+}
+
+}
+
+return{
+available:false,
+type:"元大投信",
+state:"⚪ 目前無法確認",
+detail:
+"目前使用的公開法人 API 無法可靠辨識「元大投信」單一機構對此股票的買賣，因此不把投信整體買賣超冒充成元大法人。",
+date:"",
+source:"資料來源限制"
 }
 
 }
@@ -1388,7 +1971,6 @@ peState,
 pbrState,
 reasons
 }
-
 }
 
 function targetRange(eps,industry){
@@ -1442,15 +2024,29 @@ lowPE:l,
 basePE:b,
 highPE:h
 }
-
 }
 
 function levels(price,tech){
 
+if(price===null){
+
+return{
+support:null,
+support2:null,
+resistance:null,
+resistance2:null,
+breakout:null,
+breakdown:null,
+stop:null,
+tp1:null,
+tp2:null
+}
+
+}
+
 const ma20=tech.ma[20];
 const ma60=tech.ma[60];
 const ma120=tech.ma[120];
-const ma240=tech.ma[240];
 
 const support=
 ma20&&ma20<price
@@ -1517,7 +2113,6 @@ stop,
 tp1,
 tp2
 }
-
 }
 
 function signal(
@@ -1525,8 +2120,25 @@ tech,
 inst20,
 val,
 price,
-target
+target,
+realtime
 ){
+
+if(!realtime){
+
+return{
+score:null,
+state:"⚪ 無法判斷",
+cls:"neutral",
+reasons:[
+"目前沒有盤中即時價格",
+"不使用歷史收盤價冒充目前價格",
+"請重新整理或稍後再查",
+"交易訊號暫停，避免誤判"
+]
+}
+
+}
 
 let s=0;
 let r=[];
@@ -1640,12 +2252,43 @@ state,
 cls,
 reasons:r
 }
+}
 
+function getFakeRebound(tech,price,lv){
+
+if(price===null)return false;
+
+if(
+tech.recentLow!==null&&
+lv.resistance!==null&&
+price<lv.resistance&&
+price>tech.recentLow
+){
+
+const range=
+lv.resistance-tech.recentLow;
+
+if(range>0){
+
+const position=
+(price-tech.recentLow)/range;
+
+if(position>.55&&position<.8&&
+tech.trend.includes("空")
+)
+return true;
+
+}
+
+}
+
+return false
 }
 
 function lawRow(label,x){
 
 if(!x)
+
 return`
 <tr>
 <td>${label}</td>
@@ -1672,12 +2315,12 @@ ${x.net>0?"+":""}${integer(x.net)}
 </td>
 </tr>
 `
-
 }
 
 function periodRows(data){
 
 if(!data)
+
 return`
 <tr>
 <td colspan="11">
@@ -1733,10 +2376,207 @@ return`
 
 </tr>
 `
-
 })
 .join("")
+}
 
+function yuantaHTML(yuanta,inst20){
+
+let trustNet=
+inst20?.periods?.[20]?.trust?.net;
+
+let trustState=
+trustNet===null||
+trustNet===undefined
+?"⚪ 投信資料不足"
+:
+trustNet>0
+?"🟢 投信整體偏買"
+:
+trustNet<0
+?"🔴 投信整體偏賣"
+:"🟡 投信整體中性";
+
+return`
+
+<div class="yuantaBox">
+
+<div class="yuantaTitle">
+🏦 元大法人／元大投信動向
+</div>
+
+<div class="yuantaState">
+${yuanta?.state||"⚪ 目前無法確認"}
+</div>
+
+<div class="notice">
+${esc(yuanta?.detail||"目前無法取得資料。")}
+</div>
+
+<div style="margin-top:10px">
+<span class="dataBadge">
+資料：${esc(yuanta?.source||"公開資料")}
+</span>
+
+<span class="dataBadge">
+投信整體：${esc(trustState)}
+</span>
+</div>
+
+<div class="notice">
+
+<b>⚠️ 資料校正：</b>
+「投信」是全部投信的合計，
+不能直接等同「元大投信」。
+只有取得可辨識的元大投信／元大基金資料時，
+才會標示為元大法人。
+
+</div>
+
+</div>
+`
+}
+
+function conclusionHTML(
+rt,
+tech,
+sig,
+lv,
+fake
+){
+
+if(!rt){
+
+return`
+
+<div class="bigConclusion">
+
+<div class="conclusionMain neutral">
+⚪ 暫停交易判斷
+</div>
+
+<div class="conclusionLine">
+目前沒有可靠的盤中即時價格。
+<br>
+歷史收盤價只能用來做技術分析參考，
+<strong>不能當成現在可以買進或賣出的價格。</strong>
+</div>
+
+<div class="conclusionWarn">
+🔴 即時行情失敗 → 不追價、不用歷史價直接進場。
+<br>
+請重新整理或稍後再次查詢。
+</div>
+
+</div>
+`
+}
+
+let main="🟡 等待突破";
+let cls="yellowText";
+
+if(fake){
+
+main="⚠️ 假反彈警戒";
+cls="redText";
+
+}else if(tech.breakout){
+
+main="🚀 突破確認";
+cls="greenText";
+
+}else if(tech.breakdown){
+
+main="🔴 跌破警戒";
+cls="redText";
+
+}else if(sig.state.includes("偏多")){
+
+main="🟢 偏多觀察";
+cls="greenText";
+
+}else if(sig.state.includes("偏空")){
+
+main="🟠 偏弱觀察";
+cls="redText";
+
+}
+
+return`
+
+<div class="bigConclusion">
+
+<div class="conclusionMain ${cls}">
+${main}
+</div>
+
+<div class="conclusionLine">
+
+${
+tech.breakout
+?
+"已突破近期高點，但仍要注意追高風險，優先觀察突破後是否守住。"
+:
+tech.breakdown
+?
+"已跌破近期低點，偏弱，優先等待重新站回關鍵價。"
+:
+fake
+?
+"價格出現反彈，但趨勢／壓力條件仍不理想，先不要把反彈當成反轉。"
+:
+sig.state.includes("偏多")
+?
+"目前偏多，可等待突破或回踩支撐後再評估。"
+:
+"目前尚未確認多頭，等待突破或重新站回關鍵均線。"
+}
+
+</div>
+
+<div class="conclusionLine" style="margin-top:10px">
+
+🚀 突破：
+<b>${money(lv.breakout)}</b>
+
+<br>
+
+🔻 跌破：
+<b>${money(lv.breakdown)}</b>
+
+<br>
+
+🛑 止損：
+<b>${money(lv.stop)}</b>
+
+<br>
+
+🎯 止盈①：
+<b>${money(lv.tp1)}</b>
+
+<br>
+
+🎯 止盈②：
+<b>${money(lv.tp2)}</b>
+
+</div>
+
+${
+fake
+?
+`
+<div class="conclusionWarn">
+⚠️ 假反彈：
+目前反彈尚未完成趨勢反轉確認。
+不要只因為價格上漲就追進。
+</div>
+`
+:
+""
+}
+
+</div>
+`
 }
 
 function render(data){
@@ -1745,12 +2585,19 @@ currentData=data;
 currentStock=data.stock;
 
 const stock=data.stock;
-const rows=data.rows;
+const rows=data.rows||[];
 const rt=data.realtime;
 const last=latest(rows);
 
+/*
+V7 核心校正：
+price 只有在真的取得 realtime 時才可以當「目前價格」。
+沒有 realtime 時，price=null。
+*/
 const price=
-rt?.price??
+rt?.price??null;
+
+const historicalClose=
 num(last?.close);
 
 const prev=
@@ -1762,19 +2609,36 @@ rows.length>1
 );
 
 const change=
-price!==null&&prev!==null
+rt
+?
+(
+price!==null&&
+prev!==null
 ?price-prev
+:null
+)
 :null;
 
 const rate=
-change!==null&&prev
+change!==null&&
+prev
 ?change/prev*100
 :null;
+
+/*
+技術分析若沒有即時價，
+可以使用最新歷史收盤作為「歷史分析基準」，
+但不會拿它當現價。
+*/
+const analysisPrice=
+price!==null
+?price
+:historicalClose;
 
 const tech=
 technical(
 rows,
-price
+analysisPrice
 );
 
 const epsD=data.epsData;
@@ -1798,8 +2662,9 @@ const pbr=
 pbr0>0
 ?pbr0
 :(
-net?.value>0&&price>0
-?price/net.value
+net?.value>0&&
+analysisPrice>0
+?analysisPrice/net.value
 :null
 );
 
@@ -1809,7 +2674,7 @@ data.perRow?.dividend_yield
 
 const val=
 valuation(
-price,
+analysisPrice,
 eps,
 pbr,
 per
@@ -1823,7 +2688,7 @@ stock.industry_category
 
 const lv=
 levels(
-price,
+analysisPrice,
 tech
 );
 
@@ -1833,7 +2698,15 @@ tech,
 data.inst20,
 val,
 price,
-target
+target,
+!!rt
+);
+
+const fake=
+getFakeRebound(
+tech,
+price,
+lv
 );
 
 const cc=
@@ -1850,6 +2723,20 @@ tech.trend.includes("多")
 ?"red"
 :"orange";
 
+const currentPriceHTML=
+rt
+?
+`<div class="price ${cc}">${money(price)}</div>`
+:
+`
+<div class="priceUnavailable">
+無即時價
+</div>
+<div style="color:#999;margin-top:8px;font-size:14px">
+歷史收盤 ${money(historicalClose)}
+</div>
+`;
+
 $("result").innerHTML=`
 
 <div class="hero">
@@ -1857,6 +2744,7 @@ $("result").innerHTML=`
 <div class="titleRow">
 
 <div>
+
 <div class="stockName">
 ${esc(stock.stock_name)}
 </div>
@@ -1865,16 +2753,20 @@ ${esc(stock.stock_name)}
 ${esc(stock.stock_id)} ·
 ${esc(stock.industry_category)}
 </div>
+
 </div>
 
 <div class="priceBox">
 
-<div class="price ${cc}">
-${money(price)}
-</div>
+${currentPriceHTML}
 
 <div class="change ${cc}">
+
 ${
+!rt
+?
+"⚠️ 目前無法計算即時漲跌"
+:
 change===null
 ?"—"
 :
@@ -1893,9 +2785,11 @@ money(Math.abs(change))
 money(rate)+
 "%)"
 }
+
 </div>
 
 </div>
+
 </div>
 
 <div class="tags">
@@ -1904,23 +2798,52 @@ money(rate)+
 趨勢：${esc(tech.trend)}
 </span>
 
-<span class="tag ${tech.breakout?"green":"orange"}">
-${tech.breakout
+<span class="tag ${
+tech.breakout
+?"green"
+:"orange"
+}">
+${
+tech.breakout
 ?"🚀 突破向上"
-:"⏳ 等待突破"}
+:"⏳ 等待突破"
+}
 </span>
 
-<span class="tag ${tech.breakdown?"red":"green"}">
-${tech.breakdown
+<span class="tag ${
+tech.breakdown
+?"red"
+:"green"
+}">
+${
+tech.breakdown
 ?"🔻 跌破警示"
-:"💎 長期結構"}
+:"💎 長期結構"
+}
 </span>
 
-<span class="tag ${rt?"blue":"red"}">
-${rt
+<span class="tag ${
+rt
+?"blue"
+:"red"
+}">
+${
+rt
 ?"🟢 盤中即時"
-:"🔴 非即時"}
+:"🔴 無盤中即時價"
+}
 </span>
+
+${
+fake
+?
+`
+<span class="tag red">
+⚠️ 假反彈
+</span>
+`
+:""
+}
 
 </div>
 
@@ -1932,8 +2855,10 @@ ${rt
 
 ${
 rt
-?"盤中即時行情已取得"
-:"目前沒有取得盤中即時行情；下方歷史價僅供參考"
+?
+"盤中即時行情已取得"
+:
+"🔴 目前沒有取得盤中即時行情"
 }
 
 </div>
@@ -1984,13 +2909,13 @@ rt
 
 <div class="dateBox">
 
-<b>行情日期：</b>
-${esc(rt?.date||last?.date||"—")}
+<b>即時行情日期：</b>
+${esc(rt?.date||"—")}
 
 <br>
 
-<b>行情來源：</b>
-${esc(rt?.source||"FinMind歷史資料")}
+<b>即時行情來源：</b>
+${esc(rt?.source||"目前未取得")}
 
 ${
 rt?.time
@@ -2009,9 +2934,33 @@ integer(rt.volume)+
 :""
 }
 
+<br>
+
+<b>歷史收盤：</b>
+${money(historicalClose)}
+<span style="color:#777">
+（僅供技術分析參考，不是目前價格）
+</span>
+
 </div>
 
 </div>
+
+</div>
+
+<div class="card">
+
+<h2 class="${sig.cls}">
+⭐ 一眼看懂｜今日交易判斷
+</h2>
+
+${conclusionHTML(
+rt,
+tech,
+sig,
+lv,
+fake
+)}
 
 </div>
 
@@ -2031,6 +2980,16 @@ integer(rt.volume)+
 ${sig.state}
 </div>
 
+${
+sig.score===null
+?
+`
+<div class="notice">
+目前沒有即時價格，因此交易模型暫停評分。
+</div>
+`
+:
+`
 <div class="bar">
 <span style="width:${sig.score}%"></span>
 </div>
@@ -2039,11 +2998,15 @@ ${sig.state}
 模型分數：
 <b>${sig.score}/100</b>
 </div>
+`
+}
 
 <div class="signalReasons">
+
 ${sig.reasons
 .map(x=>"• "+esc(x))
 .join("<br>")}
+
 </div>
 
 </div>
@@ -2059,12 +3022,12 @@ ${sig.reasons
 <div class="levelGrid">
 
 <div class="level break">
-<div class="small">🚀 突破價</div>
+<div class="small">🚀 確認突破價</div>
 <div class="big">${money(lv.breakout)}</div>
 </div>
 
 <div class="level fail">
-<div class="small">🔻 跌破價</div>
+<div class="small">🔻 跌破警戒價</div>
 <div class="big">${money(lv.breakdown)}</div>
 </div>
 
@@ -2110,21 +3073,39 @@ ${sig.reasons
 <b>策略：</b>
 
 ${
+!rt
+?
+"目前無即時價格，暫停進場判斷。"
+:
+fake
+?
+"⚠️ 假反彈警戒，先觀察，不把反彈直接當成反轉。"
+:
 tech.breakout
-?"已突破近期高點，避免追高，優先觀察突破後回踩是否守住。"
+?
+"已突破近期高點，避免追高，優先觀察突破後回踩是否守住。"
 :
 tech.breakdown
-?"已跌破近期低點，偏弱，先觀察止跌與重新站回關卡。"
+?
+"已跌破近期低點，偏弱，先觀察止跌與重新站回關卡。"
 :
 sig.state.includes("多")
-?"偏多，等待突破或回踩支撐再評估。"
-:"中性／偏空，未突破前不宜急追。"
+?
+"偏多，等待突破或回踩支撐再評估。"
+:
+"中性／偏空，未突破前不宜急追。"
 }
 
 <br>
 
 <b>防守：</b>
-跌破第一支撐後轉弱；跌破跌破價則模型轉為更保守。
+${
+!rt
+?
+"目前無法用即時價確認停損。"
+:
+"跌破第一支撐後轉弱；跌破跌破價則模型轉為更保守。"
+}
 
 </div>
 
@@ -2139,50 +3120,131 @@ sig.state.includes("多")
 <div class="grid">
 
 <div class="metric">
-<div class="label">💰 目前價格</div>
-<div class="value">${money(price)}</div>
-<div class="sub">
-${rt?"盤中即時":"歷史收盤"}
+
+<div class="label">
+💰 目前價格
 </div>
+
+<div class="value">
+${
+rt
+?money(price)
+:"—"
+}
+</div>
+
+<div class="sub">
+${
+rt
+?"盤中即時"
+:"無即時價"
+}
+</div>
+
 </div>
 
 <div class="metric">
-<div class="label">📊 EPS</div>
-<div class="value blueText">${money(eps)}</div>
+
+<div class="label">
+📊 歷史收盤
+</div>
+
+<div class="value blueText">
+${money(historicalClose)}
+</div>
+
+<div class="sub">
+僅供歷史分析
+</div>
+
+</div>
+
+<div class="metric">
+
+<div class="label">
+📊 EPS
+</div>
+
+<div class="value blueText">
+${money(eps)}
+</div>
+
 <div class="sub">
 ${esc(epsD?.basis||"資料不足")}
 </div>
+
 </div>
 
 <div class="metric">
-<div class="label">📈 PE</div>
-<div class="value">${money(val.pe)}</div>
-<div class="sub">${esc(val.peState)}</div>
+
+<div class="label">
+📈 PE
 </div>
 
-<div class="metric">
-<div class="label">📚 每股淨值</div>
-<div class="value blueText">${money(net?.value)}</div>
-<div class="sub">
-${net
-?"資料日期 "+esc(net.date)
-:"資料不足"}
-</div>
-</div>
-
-<div class="metric">
-<div class="label">📊 PBR</div>
-<div class="value">${money(pbr)}</div>
-<div class="sub">${esc(val.pbrState)}</div>
-</div>
-
-<div class="metric">
-<div class="label">💵 殖利率</div>
 <div class="value">
-${div===null
-?"—"
-:money(div)+"%"}
+${money(val.pe)}
 </div>
+
+<div class="sub">
+${esc(val.peState)}
+</div>
+
+</div>
+
+<div class="metric">
+
+<div class="label">
+📚 每股淨值
+</div>
+
+<div class="value blueText">
+${money(net?.value)}
+</div>
+
+<div class="sub">
+${
+net
+?
+"資料日期 "+esc(net.date)
+:
+"資料不足"
+}
+</div>
+
+</div>
+
+<div class="metric">
+
+<div class="label">
+📊 PBR
+</div>
+
+<div class="value">
+${money(pbr)}
+</div>
+
+<div class="sub">
+${esc(val.pbrState)}
+</div>
+
+</div>
+
+<div class="metric">
+
+<div class="label">
+💵 殖利率
+</div>
+
+<div class="value">
+${
+div===null
+?
+"—"
+:
+money(div)+"%"
+}
+</div>
+
 </div>
 
 </div>
@@ -2198,6 +3260,7 @@ ${val.state}
 </div>
 
 <div class="notice">
+
 ${
 val.reasons.length
 ?
@@ -2207,6 +3270,7 @@ val.reasons
 :
 "估值資料不足"
 }
+
 </div>
 
 </div>
@@ -2246,7 +3310,8 @@ ${money(target.high)}
 
 </div>
 `
-:""
+:
+""
 }
 
 </div>
@@ -2269,12 +3334,14 @@ data.inst
 <table class="table">
 
 <thead>
+
 <tr>
 <th>法人</th>
 <th>買進</th>
 <th>賣出</th>
 <th>買賣超</th>
 </tr>
+
 </thead>
 
 <tbody>
@@ -2311,6 +3378,19 @@ data.inst.total
 
 <div class="card">
 
+<h2 class="yellowText">
+🏦 元大法人／元大投信
+</h2>
+
+${yuantaHTML(
+data.yuanta,
+data.inst20
+)}
+
+</div>
+
+<div class="card">
+
 <h2 class="purpleText">
 📈 均線與趨勢
 </h2>
@@ -2318,12 +3398,14 @@ data.inst.total
 <table class="table">
 
 <thead>
+
 <tr>
 <th>均線</th>
 <th>數值</th>
 <th>乖離</th>
 <th>方向</th>
 </tr>
+
 </thead>
 
 <tbody>
@@ -2336,6 +3418,7 @@ const b=tech.bi[p];
 const s=tech.sl[p];
 
 return`
+
 <tr>
 
 <td>MA${p}</td>
@@ -2344,26 +3427,44 @@ return`
 ${money(tech.ma[p])}
 </td>
 
-<td class="${b>=0?"positive":"negative"}">
+<td class="${
+b===null
+?"zero"
+:b>=0
+?"positive"
+:"negative"
+}">
+
 ${
 b===null
-?"—"
+?
+"—"
 :
 (b>=0?"+":"")+
 money(b)+
 "%"
 }
+
 </td>
 
-<td class="${s>=0?"positive":"negative"}">
+<td class="${
+s===null
+?"zero"
+:s>=0
+?"positive"
+:"negative"
+}">
+
 ${
 s===null
-?"—"
+?
+"—"
 :
 (s>=0?"↑":"↓")+
 money(Math.abs(s))+
 "%"
 }
+
 </td>
 
 </tr>
@@ -2376,6 +3477,26 @@ money(Math.abs(s))+
 </tbody>
 
 </table>
+
+<div class="notice">
+
+技術分析基準：
+<b>
+${
+rt
+?
+"盤中即時價格"
+:
+"最新歷史收盤價"
+}
+</b>
+
+<br>
+
+⚠️ 沒有即時行情時，只作歷史技術分析，
+不作為即時進出場訊號。
+
+</div>
 
 </div>
 
@@ -2456,40 +3577,63 @@ ${periodRows(data.inst20)}
 <div class="targetGrid">
 
 <div class="target">
-<div class="targetLabel">現價</div>
-<div class="targetValue">${money(price)}</div>
+<div class="targetLabel">目前即時價</div>
+<div class="targetValue">
+${rt?money(price):"—"}
+</div>
+</div>
+
+<div class="target">
+<div class="targetLabel">歷史收盤</div>
+<div class="targetValue">
+${money(historicalClose)}
+</div>
 </div>
 
 <div class="target">
 <div class="targetLabel">突破</div>
-<div class="targetValue">${money(lv.breakout)}</div>
+<div class="targetValue">
+${money(lv.breakout)}
+</div>
 </div>
 
 <div class="target">
 <div class="targetLabel">跌破</div>
-<div class="targetValue">${money(lv.breakdown)}</div>
+<div class="targetValue">
+${money(lv.breakdown)}
+</div>
 </div>
 
 <div class="target">
 <div class="targetLabel">止損</div>
-<div class="targetValue">${money(lv.stop)}</div>
+<div class="targetValue">
+${money(lv.stop)}
+</div>
 </div>
 
 <div class="target">
 <div class="targetLabel">止盈1</div>
-<div class="targetValue">${money(lv.tp1)}</div>
+<div class="targetValue">
+${money(lv.tp1)}
+</div>
 </div>
 
 <div class="target">
 <div class="targetLabel">止盈2</div>
-<div class="targetValue">${money(lv.tp2)}</div>
+<div class="targetValue">
+${money(lv.tp2)}
+</div>
 </div>
 
 </div>
 
 <div class="notice">
 
-以上為歷史價格、均線、近期高低點與模型條件計算的參考關卡，不是保證成交價。
+以上關卡由歷史價格、均線、近期高低點與規則模型計算。
+<br>
+<strong>
+沒有盤中即時價格時，不代表目前可以在上述價格成交。
+</strong>
 
 </div>
 
@@ -2513,7 +3657,6 @@ setStatus(
 );
 
 return
-
 }
 
 try{
@@ -2576,37 +3719,54 @@ volume:rt.volume
 ];
 
 setStatus(
-"🏦 正在取得法人、EPS、淨值與估值……",
+"🏦 正在取得法人、EPS、淨值、元大相關資料……",
 "loading"
 );
 
-const rr=
+const[
+perResult,
+finResult,
+instResult,
+inst20Result,
+yuantaResult
+]=
 await Promise.allSettled([
 getPER(stock.stock_id),
 getFinancial(stock.stock_id),
 getInstitution(stock.stock_id),
-getInstitution20(stock.stock_id)
+getInstitution20(stock.stock_id),
+getYuantaInfo(stock)
 ]);
 
 const per=
-rr[0].status==="fulfilled"
-?rr[0].value
+perResult.status==="fulfilled"
+?perResult.value
 :null;
 
 const fin=
-rr[1].status==="fulfilled"
-?rr[1].value
+finResult.status==="fulfilled"
+?finResult.value
 :[];
 
 const inst=
-rr[2].status==="fulfilled"
-?rr[2].value
+instResult.status==="fulfilled"
+?instResult.value
 :null;
 
 const inst20=
-rr[3].status==="fulfilled"
-?rr[3].value
+inst20Result.status==="fulfilled"
+?inst20Result.value
 :null;
+
+const yuanta=
+yuantaResult.status==="fulfilled"
+?yuantaResult.value
+:{
+available:false,
+state:"⚪ 目前無法確認",
+detail:"資料取得失敗",
+source:"公開資料"
+};
 
 const epsData=
 getEPS(fin);
@@ -2625,7 +3785,8 @@ perRow:per,
 epsData,
 netAsset,
 inst,
-inst20
+inst20,
+yuanta
 });
 
 setStatus(
@@ -2633,12 +3794,14 @@ rt
 ?
 "✅ "+
 esc(stock.stock_name)+
-"｜盤中即時行情已取得"
+"｜盤中即時行情已取得｜每10秒更新"
 :
 "⚠️ "+
 esc(stock.stock_name)+
-"｜即時行情取得失敗，畫面未把歷史收盤冒充成即時價",
-"ok"
+"｜即時行情取得失敗｜歷史價格未冒充即時價",
+rt
+?"ok"
+:"error"
 );
 
 window.scrollTo({
@@ -2776,7 +3939,8 @@ const box=$(targetId);
 
 const btn=[
 ...document.querySelectorAll(".scanButton")
-].find(
+]
+.find(
 x=>x.dataset.scan===type
 );
 
@@ -2820,8 +3984,12 @@ continue;
 const tech=
 technical(
 rows.length
-?rows
-:[{close:price}],
+?
+rows
+:
+[
+{close:price}
+],
 price
 );
 
@@ -2875,6 +4043,7 @@ out.push({
 code,
 st,
 price,
+realtime:!!rt,
 tech,
 i20,
 score,
@@ -2907,7 +4076,10 @@ data-rec-code="${esc(x.code)}"
 ${
 x.tech.trend.includes("多")
 ?"🟢 "
-:""
+:
+x.tech.trend.includes("空")
+?"🔴 "
+:"🟡 "
 }
 
 ${esc(x.st.stock_name)}
@@ -2917,15 +4089,26 @@ ${esc(x.code)}
 
 <div class="recMeta">
 
-現價 ${money(x.price)}
+${
+x.realtime
+?
+"即時 "+money(x.price)
+:
+"歷史 "+money(x.price)
+}
+
 ｜
 ${esc(x.tech.trend)}
 ｜
 ${
 x.tech.breakout
 ?"🚀突破"
-:"⏳等待突破"
+:
+x.tech.breakdown
+?"🔻跌破"
+:"⏳等待"
 }
+
 ｜
 模型
 ${Math.max(
@@ -2969,6 +4152,7 @@ el.addEventListener(
 ()=>{
 $("searchInput").value=
 el.dataset.recCode;
+
 searchStock(
 el.dataset.recCode
 )
@@ -2999,12 +4183,17 @@ $("searchInput")
 .addEventListener(
 "keydown",
 e=>{
+
 if(e.key==="Enter"){
+
 e.preventDefault();
+
 searchStock(
 $("searchInput").value
 )
+
 }
+
 }
 );
 
@@ -3013,9 +4202,11 @@ document
 ".action[data-code]"
 )
 .forEach(b=>
+
 b.addEventListener(
 "click",
 e=>{
+
 e.preventDefault();
 
 $("searchInput").value=
@@ -3034,9 +4225,11 @@ document
 ".scanButton[data-scan]"
 )
 .forEach(b=>
+
 b.addEventListener(
 "click",
 e=>{
+
 e.preventDefault();
 
 scanStocks(
@@ -3056,10 +4249,11 @@ document.readyState==="loading"
 document.addEventListener(
 "DOMContentLoaded",
 ()=>{
+
 bindEvents();
 
 setStatus(
-"🟢 V6 已啟動｜可輸入 1326 測試台化。",
+"🟢 V7 已啟動｜即時行情校正完成｜可輸入 1326 測試台化。",
 "ok"
 )
 
@@ -3070,10 +4264,11 @@ setStatus(
 
 (
 ()=>{
+
 bindEvents();
 
 setStatus(
-"🟢 V6 已啟動｜可輸入 1326 測試台化。",
+"🟢 V7 已啟動｜即時行情校正完成｜可輸入 1326 測試台化。",
 "ok"
 )
 
