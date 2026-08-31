@@ -37,13 +37,13 @@ background:var(--bg);
 color:var(--text);
 font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",
 "Microsoft JhengHei",Arial,sans-serif;
-padding-bottom:92px
+padding-bottom:100px
 }
 
 .wrap{
 max-width:920px;
 margin:auto;
-padding:8px 12px 110px
+padding:8px 12px 120px
 }
 
 .search{
@@ -664,7 +664,7 @@ display:none!important
 @media(max-width:650px){
 
 .wrap{
-padding:7px 10px 110px
+padding:7px 10px 120px
 }
 
 .search button{
@@ -702,21 +702,12 @@ min-height:91px
 font-size:15px
 }
 
-.levelGrid{
-grid-template-columns:repeat(2,1fr)
-}
-
 }
 
 @media(max-width:420px){
 
 .grid3{
 grid-template-columns:1fr
-}
-
-.statusBox{
-display:flex;
-justify-content:space-between
 }
 
 .priceValue{
@@ -1127,15 +1118,8 @@ type="button">
 <script>
 "use strict";
 
-/* =====================================================
-   V10 核心
-   ===================================================== */
-
-const FINMIND=
-"https://api.finmindtrade.com/api/v4/data";
-
-const MIS=
-"https://mis.twse.com.tw/stock/api/getStockInfo.jsp";
+const FINMIND="https://api.finmindtrade.com/api/v4/data";
+const MIS="https://mis.twse.com.tw/stock/api/getStockInfo.jsp";
 
 const PROXIES=[
 u=>"https://api.allorigins.win/raw?url="+encodeURIComponent(u),
@@ -1149,10 +1133,6 @@ let currentData=null;
 let refreshTimer=null;
 let searchSeq=0;
 let scanSeq=0;
-
-/* =====================================================
-   股票資料
-   ===================================================== */
 
 const KNOWN={
 
@@ -1338,9 +1318,7 @@ const ALIAS={
 "南亞":"1303",
 "台化":"1326",
 "台灣化學纖維":"1326",
-
 "中鋼":"2002",
-
 "聯電":"2303",
 "台達":"2308",
 "台達電":"2308",
@@ -1351,7 +1329,6 @@ const ALIAS={
 "台積":"2330",
 "台積電":"2330",
 "tsmc":"2330",
-
 "燿華":"2367",
 "裕民":"2606",
 "長榮航":"2618",
@@ -1365,24 +1342,17 @@ const ALIAS={
 "茂迪":"6244",
 "力積電":"6770",
 "南電":"8046",
-
 "元大台灣50":"0050",
 "台灣50":"0050",
 "0050":"0050",
-
 "元大高股息":"0056",
 "高股息":"0056",
-
 "台灣50正2":"00631L",
 "元大台灣50正2":"00631L",
-
 "群益臺灣加權正2":"00685L",
-
 "中信關鍵半導體":"00891",
-
 "群益台灣精選高息":"00919",
 "高息":"00919",
-
 "主動統一台股增長":"00981A"
 
 };
@@ -1390,10 +1360,6 @@ const ALIAS={
 Object.keys(KNOWN).forEach(code=>{
 ALIAS[KNOWN[code].name]=code
 });
-
-/* =====================================================
-   工具
-   ===================================================== */
 
 function $(id){
 return document.getElementById(id)
@@ -1499,10 +1465,6 @@ return s.slice(0,4)+"-"+s.slice(4,6)+"-"+s.slice(6);
 return s
 }
 
-/* =====================================================
-   網路
-   ===================================================== */
-
 async function fetchJSON(url,timeout=15000){
 
 const controller=new AbortController();
@@ -1514,7 +1476,8 @@ timeout
 
 try{
 
-const response=await fetch(
+const response=
+await fetch(
 url,
 {
 cache:"no-store",
@@ -1572,10 +1535,6 @@ return Array.isArray(data.data)
 ?data.data
 :[]
 }
-
-/* =====================================================
-   股票搜尋
-   ===================================================== */
 
 async function loadStockInfo(){
 
@@ -1739,14 +1698,22 @@ throw new Error(
 "請輸入股票代號、名稱或關鍵字。"
 );
 
-if(KNOWN[q]){
+const exactCode=
+Object.keys(KNOWN)
+.find(
+code=>clean(code)===q
+);
+
+if(exactCode){
+
+const x=KNOWN[exactCode];
 
 return{
 
-stock_id:q,
-stock_name:KNOWN[q].name,
-industry_category:KNOWN[q].industry,
-market:KNOWN[q].market
+stock_id:exactCode,
+stock_name:x.name,
+industry_category:x.industry,
+market:x.market
 
 }
 
@@ -1807,10 +1774,6 @@ raw+
 )
 
 }
-
-/* =====================================================
-   即時行情
-   ===================================================== */
 
 function parseRealtime(r,stock,source){
 
@@ -1963,10 +1926,6 @@ e
 return null
 }
 
-/* =====================================================
-   歷史
-   ===================================================== */
-
 async function getPrices(code){
 
 try{
@@ -2065,10 +2024,6 @@ return(
 (price-ma)/ma*100
 )
 }
-
-/* =====================================================
-   技術分析
-   ===================================================== */
 
 function technical(rows,price){
 
@@ -2241,10 +2196,6 @@ longBull
 }
 
 }
-
-/* =====================================================
-   法人
-   ===================================================== */
 
 function blankLaw(){
 
@@ -2505,10 +2456,6 @@ data[data.length-1]
 
 }
 
-/* =====================================================
-   基本面
-   ===================================================== */
-
 async function getPER(code){
 
 try{
@@ -2700,10 +2647,6 @@ date:r.date
 return null
 }
 
-/* =====================================================
-   估值
-   ===================================================== */
-
 function valuation(
 price,
 eps,
@@ -2890,10 +2833,6 @@ reasons
 
 }
 
-/* =====================================================
-   EPS 目標
-   ===================================================== */
-
 function targetRange(
 eps,
 industry
@@ -2957,10 +2896,6 @@ highPE:high
 }
 
 }
-
-/* =====================================================
-   關卡
-   ===================================================== */
 
 function levels(
 price,
@@ -3047,10 +2982,6 @@ tp2
 }
 
 }
-
-/* =====================================================
-   多空訊號
-   ===================================================== */
 
 function signal(
 tech,
@@ -3259,10 +3190,6 @@ reasons
 
 }
 
-/* =====================================================
-   突破模型
-   ===================================================== */
-
 function breakoutModel(
 tech,
 inst20,
@@ -3367,10 +3294,6 @@ reasons
 
 }
 
-/* =====================================================
-   假反彈
-   ===================================================== */
-
 function fakeRebound(
 tech,
 price
@@ -3401,10 +3324,6 @@ range;
 
 return pos>.55&&pos<.82
 }
-
-/* =====================================================
-   建立資料
-   ===================================================== */
 
 async function buildData(stock){
 
@@ -3565,10 +3484,6 @@ breakout
 }
 
 }
-
-/* =====================================================
-   UI 工具
-   ===================================================== */
 
 function iconFor(stock){
 
@@ -3821,10 +3736,6 @@ ${integer(x.total.net)}
 
 `
 }
-
-/* =====================================================
-   完整分析
-   ===================================================== */
 
 function renderData(data){
 
@@ -4836,10 +4747,6 @@ sig.cls
 
 }
 
-/* =====================================================
-   搜尋結果
-   ===================================================== */
-
 async function showSearchCandidates(query){
 
 const box=$("searchResults");
@@ -4963,10 +4870,6 @@ searchStock(code);
 
 }
 
-/* =====================================================
-   搜尋股票
-   ===================================================== */
-
 async function searchStock(query){
 
 const token=++searchSeq;
@@ -5074,10 +4977,6 @@ e.message||
 
 }
 
-/* =====================================================
-   10秒即時更新
-   ===================================================== */
-
 async function refreshPrice(stock){
 
 try{
@@ -5114,10 +5013,6 @@ e
 
 }
 
-/* =====================================================
-   掃描股票
-   ===================================================== */
-
 const SCAN_CODES=[
 
 "1326",
@@ -5151,10 +5046,6 @@ const SCAN_CODES=[
 "00981A"
 
 ];
-
-/* =====================================================
-   掃描單一股票
-   ===================================================== */
 
 async function scanOne(code){
 
@@ -5224,10 +5115,6 @@ breakout
 }
 
 }
-
-/* =====================================================
-   掃描突破
-   ===================================================== */
 
 async function scanBreakout(){
 
@@ -5354,24 +5241,6 @@ results.sort(
 b.breakout.score-
 a.breakout.score
 );
-
-/*
-=====================================================
-重要修正
-
-原本：
-const top=results.slice(0,10);
-
-因此即使成功取得 18/29，
-畫面仍然只顯示 10 檔。
-
-現在：
-const top=results;
-
-所以成功取得幾檔，
-就完整顯示幾檔。
-=====================================================
-*/
 
 const top=results;
 
@@ -5551,10 +5420,6 @@ btn.textContent=
 }
 
 }
-
-/* =====================================================
-   分類
-   ===================================================== */
 
 async function runFeature(action){
 
@@ -5938,10 +5803,6 @@ title+
 
 }
 
-/* =====================================================
-   導覽
-   ===================================================== */
-
 function setActiveNav(nav){
 
 document.querySelectorAll(
@@ -6289,10 +6150,6 @@ return
 
 }
 
-/* =====================================================
-   事件
-   ===================================================== */
-
 function bindEvents(){
 
 const searchBtn=
@@ -6402,9 +6259,7 @@ function(e){
 e.preventDefault();
 
 const code=
-this.getAttribute(
-"data-code"
-);
+this.getAttribute("data-code");
 
 $("searchInput").value=code;
 
@@ -6427,9 +6282,7 @@ function(e){
 e.preventDefault();
 
 runFeature(
-this.getAttribute(
-"data-action"
-)
+this.getAttribute("data-action")
 );
 
 }
@@ -6467,9 +6320,7 @@ function(e){
 e.preventDefault();
 
 navAction(
-this.getAttribute(
-"data-nav"
-)
+this.getAttribute("data-nav")
 );
 
 }
@@ -6478,10 +6329,6 @@ this.getAttribute(
 });
 
 }
-
-/* =====================================================
-   啟動
-   ===================================================== */
 
 function boot(){
 
