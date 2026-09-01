@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#10141c">
-<title>ETF 3年定期投入試算器</title>
+<meta name="theme-color" content="#0b1118">
+<title>ETF 3年真實歷史回測｜定期定額・定期不定額・高少低多</title>
 
 <style>
 :root{
-  --bg:#0b0f15;
-  --card:#141a23;
-  --card2:#1a222e;
-  --line:#2b3544;
-  --text:#f5f7fa;
-  --muted:#9da9b8;
+  --bg:#080d13;
+  --card:#111923;
+  --card2:#17222e;
+  --line:#283746;
+  --text:#f4f7fa;
+  --muted:#91a0af;
   --green:#55d68b;
-  --blue:#64a8ff;
+  --blue:#69a9ff;
+  --purple:#b48cff;
   --yellow:#ffd166;
-  --red:#ff6b7a;
-  --purple:#b28cff;
+  --red:#ff7180;
 }
 
 *{box-sizing:border-box}
@@ -26,44 +26,47 @@
 body{
   margin:0;
   background:
-    radial-gradient(circle at top right,#172337 0,#0b0f15 45%);
+    radial-gradient(circle at 90% 0%,#172b42 0,#080d13 42%);
   color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",
-  "PingFang TC","Microsoft JhengHei",sans-serif;
+  font-family:
+    -apple-system,BlinkMacSystemFont,
+    "Segoe UI","PingFang TC",
+    "Microsoft JhengHei",sans-serif;
 }
 
 .container{
-  max-width:1100px;
+  width:min(1120px,100%);
   margin:auto;
-  padding:18px;
+  padding:14px;
 }
 
-.header{
-  padding:18px 4px 12px;
+header{
+  padding:14px 4px 18px;
 }
 
-.header h1{
+h1{
   margin:0;
-  font-size:28px;
+  font-size:27px;
+  line-height:1.3;
 }
 
-.header p{
+.sub{
   color:var(--muted);
-  margin:8px 0 0;
+  margin-top:7px;
+  font-size:14px;
 }
 
 .card{
-  background:rgba(20,26,35,.95);
+  background:rgba(17,25,35,.97);
   border:1px solid var(--line);
   border-radius:18px;
-  padding:18px;
-  margin-bottom:16px;
-  box-shadow:0 10px 30px rgba(0,0,0,.18);
+  padding:17px;
+  margin-bottom:15px;
 }
 
-.section-title{
+.title{
   font-size:19px;
-  font-weight:800;
+  font-weight:900;
   margin-bottom:14px;
 }
 
@@ -75,19 +78,19 @@ body{
 
 .field label{
   display:block;
-  font-size:13px;
   color:var(--muted);
+  font-size:13px;
   margin-bottom:6px;
 }
 
 input,select{
   width:100%;
   min-height:46px;
+  padding:10px 12px;
   border-radius:11px;
   border:1px solid var(--line);
-  background:#0f141c;
+  background:#0b1118;
   color:var(--text);
-  padding:10px 12px;
   font-size:16px;
   outline:none;
 }
@@ -96,38 +99,39 @@ input:focus,select:focus{
   border-color:var(--blue);
 }
 
-.etf-list{
+.etfs{
   display:grid;
   grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:10px;
+  gap:9px;
+  margin-bottom:14px;
 }
 
-.etf-btn{
-  background:#101620;
-  border:1px solid var(--line);
-  color:var(--text);
-  border-radius:12px;
-  padding:12px 10px;
+.etf{
+  min-height:67px;
+  padding:10px;
   text-align:left;
+  background:#0c131b;
+  border:1px solid var(--line);
+  border-radius:12px;
+  color:white;
   cursor:pointer;
-  min-height:65px;
 }
 
-.etf-btn:hover{
+.etf:hover{
   border-color:var(--blue);
 }
 
-.etf-btn.active{
+.etf.active{
   border-color:var(--green);
-  background:#12241c;
+  background:#10231a;
 }
 
-.etf-code{
+.code{
   font-weight:900;
   font-size:17px;
 }
 
-.etf-name{
+.ename{
   color:var(--muted);
   font-size:12px;
   margin-top:4px;
@@ -135,45 +139,74 @@ input:focus,select:focus{
 
 .actions{
   display:flex;
-  gap:10px;
   flex-wrap:wrap;
-  margin-top:16px;
+  gap:9px;
+  margin-top:14px;
 }
 
 button{
-  border:0;
-  border-radius:12px;
-  padding:13px 18px;
   min-height:46px;
-  font-size:15px;
-  font-weight:800;
+  padding:11px 17px;
+  border:0;
+  border-radius:11px;
+  font-weight:900;
   cursor:pointer;
+  font-size:15px;
 }
 
 .primary{
   background:var(--green);
-  color:#07110b;
+  color:#06110a;
 }
 
 .secondary{
-  background:#273141;
+  background:#293746;
   color:white;
 }
 
-.danger{
-  background:#3a2025;
-  color:#ffb2bb;
+.yellow{
+  background:#4a4022;
+  color:#ffe59a;
 }
 
-.notice{
-  background:#101923;
-  border:1px solid #263548;
-  border-radius:12px;
-  padding:12px;
-  color:#b9c5d4;
+.danger{
+  background:#41242a;
+  color:#ffb5be;
+}
+
+.status{
+  margin-top:12px;
+  padding:11px 13px;
+  border-radius:11px;
+  background:#0b131c;
+  border:1px solid var(--line);
+  color:#aebac7;
   font-size:13px;
   line-height:1.7;
-  margin-top:12px;
+}
+
+.status.ok{
+  border-color:#286a49;
+}
+
+.status.err{
+  border-color:#7a343e;
+  color:#ffb5bd;
+}
+
+.preset{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:11px;
+}
+
+.preset button{
+  min-height:40px;
+  padding:8px 12px;
+  background:#202c39;
+  color:#dbe3eb;
+  font-size:13px;
 }
 
 .results{
@@ -191,22 +224,26 @@ button{
 
 .strategy.best{
   border-color:var(--green);
+  box-shadow:0 0 0 1px rgba(85,214,139,.15);
 }
 
 .strategy h3{
-  margin:0 0 6px;
+  margin:0;
+  font-size:18px;
 }
 
-.strategy .desc{
-  font-size:12px;
+.desc{
   color:var(--muted);
-  min-height:36px;
+  font-size:12px;
+  line-height:1.5;
+  min-height:38px;
+  margin-top:5px;
 }
 
 .big{
-  font-size:27px;
-  font-weight:900;
-  margin:12px 0;
+  font-size:28px;
+  font-weight:950;
+  margin:13px 0;
 }
 
 .row{
@@ -214,7 +251,8 @@ button{
   justify-content:space-between;
   gap:10px;
   padding:8px 0;
-  border-bottom:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,255,255,.055);
+  font-size:14px;
 }
 
 .row:last-child{
@@ -226,30 +264,78 @@ button{
 }
 
 .value{
-  font-weight:800;
+  font-weight:900;
 }
 
-.chart-wrap{
-  overflow-x:auto;
+.green{color:var(--green)}
+.red{color:var(--red)}
+.blue{color:var(--blue)}
+.purple{color:var(--purple)}
+.yellowText{color:var(--yellow)}
+
+.summary{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-top:13px;
+}
+
+.stat{
+  background:#0c131b;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+}
+
+.stat .slabel{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.stat .svalue{
+  margin-top:5px;
+  font-size:19px;
+  font-weight:900;
 }
 
 canvas{
+  display:block;
   width:100%;
-  min-width:650px;
-  height:330px;
-  background:#0d131b;
-  border-radius:14px;
+  height:350px;
+  background:#0b1118;
   border:1px solid var(--line);
+  border-radius:14px;
+}
+
+.chartScroll{
+  overflow-x:auto;
+}
+
+.legend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+  margin-top:10px;
+  font-size:13px;
+  color:#bdc8d4;
+}
+
+.dot{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  margin-right:5px;
+}
+
+.tableScroll{
+  overflow-x:auto;
 }
 
 table{
   width:100%;
+  min-width:900px;
   border-collapse:collapse;
-  min-width:760px;
-}
-
-.table-wrap{
-  overflow-x:auto;
 }
 
 th,td{
@@ -257,75 +343,102 @@ th,td{
   border-bottom:1px solid var(--line);
   text-align:right;
   white-space:nowrap;
+  font-size:13px;
 }
 
-th:first-child,td:first-child{
+th:first-child,
+td:first-child{
   text-align:left;
 }
 
 th{
-  color:#b8c3d1;
-  font-size:13px;
+  color:#aeb9c6;
 }
 
-td{
-  font-size:13px;
-}
-
-.green{color:var(--green)}
-.red{color:var(--red)}
-.yellow{color:var(--yellow)}
-.blue{color:var(--blue)}
-
-.badge{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:20px;
-  font-size:11px;
-  background:#263141;
-}
-
-.footer{
-  color:#748092;
+.note{
+  color:#7e8b99;
   font-size:12px;
-  line-height:1.7;
-  padding:5px;
+  line-height:1.75;
+  margin-top:12px;
 }
 
-@media(max-width:800px){
+.small{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.rank{
+  display:grid;
+  gap:8px;
+}
+
+.rankItem{
+  display:grid;
+  grid-template-columns:35px 90px 1fr 100px;
+  align-items:center;
+  gap:8px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#0d151e;
+}
+
+.bar{
+  height:8px;
+  background:#243241;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.bar span{
+  display:block;
+  height:100%;
+  background:var(--green);
+  border-radius:10px;
+}
+
+@media(max-width:850px){
   .grid{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
-  .etf-list{
-    grid-template-columns:repeat(2,minmax(0,1fr));
+  .etfs{
+    grid-template-columns:repeat(3,minmax(0,1fr));
   }
 
   .results{
     grid-template-columns:1fr;
   }
 
-  .header h1{
-    font-size:23px;
+  .summary{
+    grid-template-columns:repeat(2,minmax(0,1fr));
   }
 }
 
-@media(max-width:480px){
+@media(max-width:560px){
   .container{
     padding:10px;
+  }
+
+  h1{
+    font-size:23px;
+  }
+
+  .card{
+    padding:14px;
+    border-radius:15px;
   }
 
   .grid{
     grid-template-columns:1fr;
   }
 
-  .etf-list{
+  .etfs{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
 
-  .card{
-    padding:14px;
-    border-radius:15px;
+  .summary{
+    grid-template-columns:1fr 1fr;
   }
 }
 </style>
@@ -335,768 +448,163 @@ td{
 
 <div class="container">
 
-  <div class="header">
-    <h1>📊 ETF 3年定期投入試算器</h1>
-    <p>固定投入 vs 定期不定額 vs 高少低多，一次測試 36 個月</p>
+<header>
+  <h1>📊 ETF 3年真實歷史回測</h1>
+  <div class="sub">
+    定期定額 × 定期不定額 × 高少低多｜使用歷史行情逐月模擬
+  </div>
+</header>
+
+<!-- ETF -->
+<section class="card">
+
+  <div class="title">① 選擇熱門 ETF</div>
+
+  <div class="etfs" id="etfList"></div>
+
+  <div class="grid">
+
+    <div class="field">
+      <label>ETF 代號</label>
+      <input id="code" value="0050">
+    </div>
+
+    <div class="field">
+      <label>ETF 名稱</label>
+      <input id="name" value="元大台灣50">
+    </div>
+
+    <div class="field">
+      <label>查詢開始日期</label>
+      <input id="startDate" type="date" value="2022-01-01">
+    </div>
+
+    <div class="field">
+      <label>查詢結束日期</label>
+      <input id="endDate" type="date" value="2024-12-31">
+    </div>
+
   </div>
 
-  <!-- ETF -->
-  <div class="card">
-    <div class="section-title">① 選擇 ETF</div>
-
-    <div class="etf-list" id="etfList"></div>
-
-    <div class="grid" style="margin-top:14px">
-      <div class="field">
-        <label>ETF 代號</label>
-        <input id="code" value="0050">
-      </div>
-
-      <div class="field">
-        <label>ETF 名稱</label>
-        <input id="name" value="元大台灣50">
-      </div>
-
-      <div class="field">
-        <label>模擬起始價格</label>
-        <input id="startPrice" type="number" value="200">
-      </div>
-
-      <div class="field">
-        <label>3年後預估價格</label>
-        <input id="endPrice" type="number" value="260">
-      </div>
-    </div>
-
-    <div class="notice">
-      ETF 價格可以自己修改。這個工具是「投資策略試算」，不是預測未來價格。
-    </div>
+  <div class="preset">
+    <button type="button" data-period="2019">2019～2021</button>
+    <button type="button" data-period="2020">2020～2022</button>
+    <button type="button" data-period="2021">2021～2023</button>
+    <button type="button" data-period="2022">2022～2024</button>
+    <button type="button" data-period="2023">2023～2025</button>
+    <button type="button" data-period="2024">2024～2026</button>
   </div>
 
-  <!-- 基本設定 -->
-  <div class="card">
-    <div class="section-title">② 投資設定</div>
+</section>
 
-    <div class="grid">
+<!-- 投資設定 -->
+<section class="card">
 
-      <div class="field">
-        <label>投資期間（月）</label>
-        <input id="months" type="number" value="36" min="1" max="120">
-      </div>
+  <div class="title">② 投資設定</div>
 
-      <div class="field">
-        <label>每月基本投入</label>
-        <input id="monthly" type="number" value="10000" min="0">
-      </div>
+  <div class="grid">
 
-      <div class="field">
-        <label>高點少買幅度</label>
-        <input id="highReduce" type="number" value="40" min="0" max="90">
-      </div>
-
-      <div class="field">
-        <label>低點多買幅度</label>
-        <input id="lowIncrease" type="number" value="60" min="0" max="200">
-      </div>
-
+    <div class="field">
+      <label>每月投入金額</label>
+      <input id="monthly" type="number" value="10000" min="0" step="100">
     </div>
 
-    <div class="notice">
-      <b>高少低多：</b>
-      價格高於基準時降低投入；價格低於基準時增加投入。
-      例如基本投入 $10,000，低點最多可提高到 $16,000。
+    <div class="field">
+      <label>高點少買</label>
+      <input id="highReduce" type="number" value="40" min="0" max="90">
     </div>
 
-    <div class="actions">
-      <button class="primary" id="calculate">🚀 開始三種策略測試</button>
-      <button class="secondary" id="randomPrices">🎲 模擬36個月行情</button>
-      <button class="danger" id="reset">↻ 重設</button>
+    <div class="field">
+      <label>低點多買</label>
+      <input id="lowIncrease" type="number" value="60" min="0" max="300">
     </div>
+
+    <div class="field">
+      <label>資料模式</label>
+      <select id="dataMode">
+        <option value="real">真實歷史行情</option>
+        <option value="demo">模擬行情</option>
+      </select>
+    </div>
+
   </div>
 
-  <!-- 結果 -->
-  <div class="card">
-    <div class="section-title">③ 三種投資策略比較</div>
+  <div class="actions">
+    <button class="primary" id="run">🚀 開始歷史回測</button>
+    <button class="secondary" id="demo">🎲 測試模擬行情</button>
+    <button class="yellow" id="sample">📅 使用目前日期</button>
+    <button class="danger" id="reset">↻ 重設</button>
+  </div>
 
-    <div class="results">
+  <div id="status" class="status">
+    尚未開始回測。
+  </div>
 
-      <div class="strategy" id="boxFixed">
-        <h3>① 定期定額</h3>
-        <div class="desc">每個月固定投入相同金額</div>
-        <div class="big" id="fixedValue">$0</div>
+</section>
 
-        <div class="row">
-          <span class="label">總投入</span>
-          <span class="value" id="fixedInvest">$0</span>
-        </div>
+<!-- 結果 -->
+<section class="card">
 
-        <div class="row">
-          <span class="label">累積股數</span>
-          <span class="value" id="fixedShares">0</span>
-        </div>
+  <div class="title">③ 三種策略結果</div>
 
-        <div class="row">
-          <span class="label">平均成本</span>
-          <span class="value" id="fixedAvg">$0</span>
-        </div>
+  <div class="results">
 
-        <div class="row">
-          <span class="label">報酬</span>
-          <span class="value" id="fixedProfit">$0</span>
-        </div>
+    <div class="strategy" id="fixedBox">
 
-        <div class="row">
-          <span class="label">報酬率</span>
-          <span class="value" id="fixedReturn">0%</span>
-        </div>
+      <h3>① 定期定額</h3>
+
+      <div class="desc">
+        每月固定投入相同金額。
       </div>
 
-      <div class="strategy" id="boxVariable">
-        <h3>② 定期不定額</h3>
-        <div class="desc">每月投入金額可隨價格調整</div>
-        <div class="big" id="variableValue">$0</div>
+      <div class="big" id="fixedValue">$0</div>
 
-        <div class="row">
-          <span class="label">總投入</span>
-          <span class="value" id="variableInvest">$0</span>
-        </div>
-
-        <div class="row">
-          <span class="label">累積股數</span>
-          <span class="value" id="variableShares">0</span>
-        </div>
-
-        <div class="row">
-          <span class="label">平均成本</span>
-          <span class="value" id="variableAvg">$0</span>
-        </div>
-
-        <div class="row">
-          <span class="label">報酬</span>
-          <span class="value" id="variableProfit">$0</span>
-        </div>
-
-        <div class="row">
-          <span class="label">報酬率</span>
-          <span class="value" id="variableReturn">0%</span>
-        </div>
+      <div class="row">
+        <span class="label">總投入</span>
+        <span class="value" id="fixedInvest">$0</span>
       </div>
 
-      <div class="strategy" id="boxSmart">
-        <h3>③ 高少低多 ⭐</h3>
-        <div class="desc">價格高少買、價格低多買</div>
-        <div class="big" id="smartValue">$0</div>
+      <div class="row">
+        <span class="label">累積股數</span>
+        <span class="value" id="fixedShares">0</span>
+      </div>
 
-        <div class="row">
-          <span class="label">總投入</span>
-          <span class="value" id="smartInvest">$0</span>
-        </div>
+      <div class="row">
+        <span class="label">平均成本</span>
+        <span class="value" id="fixedAvg">$0</span>
+      </div>
 
-        <div class="row">
-          <span class="label">累積股數</span>
-          <span class="value" id="smartShares">0</span>
-        </div>
+      <div class="row">
+        <span class="label">期末市值</span>
+        <span class="value" id="fixedEnd">$0</span>
+      </div>
 
-        <div class="row">
-          <span class="label">平均成本</span>
-          <span class="value" id="smartAvg">$0</span>
-        </div>
+      <div class="row">
+        <span class="label">獲利</span>
+        <span class="value" id="fixedProfit">$0</span>
+      </div>
 
-        <div class="row">
-          <span class="label">報酬</span>
-          <span class="value" id="smartProfit">$0</span>
-        </div>
-
-        <div class="row">
-          <span class="label">報酬率</span>
-          <span class="value" id="smartReturn">0%</span>
-        </div>
+      <div class="row">
+        <span class="label">報酬率</span>
+        <span class="value" id="fixedReturn">0%</span>
       </div>
 
     </div>
-  </div>
 
-  <!-- 圖表 -->
-  <div class="card">
-    <div class="section-title">④ 三年累積資產比較</div>
-    <div class="chart-wrap">
-      <canvas id="chart" width="1000" height="330"></canvas>
-    </div>
-  </div>
+    <div class="strategy" id="variableBox">
 
-  <!-- 每月 -->
-  <div class="card">
-    <div class="section-title">⑤ 36 個月投資明細</div>
+      <h3>② 定期不定額</h3>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>月份</th>
-            <th>模擬價格</th>
-            <th>定期定額</th>
-            <th>不定額</th>
-            <th>高少低多</th>
-            <th>高少低多投入</th>
-            <th>累積股數</th>
-          </tr>
-        </thead>
-        <tbody id="detail"></tbody>
-      </table>
-    </div>
-  </div>
+      <div class="desc">
+        根據價格相對於歷史平均價格調整投入。
+      </div>
 
-  <div class="footer">
-    ⚠️ 本工具僅供投資策略模擬，不代表實際報酬，也不構成投資建議。
-    ETF 實際價格、配息、交易成本、稅費與折溢價均可能影響結果。
-  </div>
+      <div class="big" id="variableValue">$0</div>
 
-</div>
+      <div class="row">
+        <span class="label">總投入</span>
+        <span class="value" id="variableInvest">$0</span>
+      </div>
 
-<script>
-const ETF_DATA = [
-  ["0050","元大台灣50"],
-  ["006208","富邦台50"],
-  ["0056","元大高股息"],
-  ["00878","國泰永續高股息"],
-  ["00919","群益台灣精選高息"],
-  ["00713","元大台灣高息低波"],
-  ["00929","復華台灣科技優息"],
-  ["00940","元大台灣價值高息"],
-  ["00939","統一台灣高息動能"],
-  ["0052","富邦科技"],
-  ["00891","中信關鍵半導體"],
-  ["00915","凱基優選高股息30"]
-];
-
-let prices = [];
-let lastResult = null;
-
-const $ = id => document.getElementById(id);
-
-function money(v){
-  return "$" + Math.round(v || 0).toLocaleString("zh-TW");
-}
-
-function num(v,d=2){
-  return Number(v || 0).toLocaleString("zh-TW",{
-    minimumFractionDigits:d,
-    maximumFractionDigits:d
-  });
-}
-
-function pct(v){
-  return (v || 0).toFixed(2) + "%";
-}
-
-function buildETFList(){
-
-  const box = $("etfList");
-  box.innerHTML = "";
-
-  ETF_DATA.forEach((e,i)=>{
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "etf-btn" + (i===0 ? " active" : "");
-
-    btn.innerHTML =
-      `<div class="etf-code">${e[0]}</div>
-       <div class="etf-name">${e[1]}</div>`;
-
-    btn.addEventListener("click",()=>{
-
-      document.querySelectorAll(".etf-btn")
-        .forEach(x=>x.classList.remove("active"));
-
-      btn.classList.add("active");
-
-      $("code").value = e[0];
-      $("name").value = e[1];
-
-      setDefaultPrice(e[0]);
-
-      calculate();
-    });
-
-    box.appendChild(btn);
-  });
-}
-
-function setDefaultPrice(code){
-
-  const defaults = {
-    "0050":200,
-    "006208":120,
-    "0056":40,
-    "00878":25,
-    "00919":24,
-    "00713":55,
-    "00929":22,
-    "00940":10,
-    "00939":16,
-    "0052":45,
-    "00891":25,
-    "00915":25
-  };
-
-  $("startPrice").value = defaults[code] || 50;
-}
-
-function createPrices(){
-
-  const months = Math.max(
-    1,
-    Math.min(120,Number($("months").value)||36)
-  );
-
-  const start = Math.max(
-    0.01,
-    Number($("startPrice").value)||100
-  );
-
-  const end = Math.max(
-    0.01,
-    Number($("endPrice").value)||start
-  );
-
-  const arr=[];
-
-  let price=start;
-
-  for(let i=0;i<months;i++){
-
-    const progress =
-      months===1 ? 1 : i/(months-1);
-
-    const trend =
-      start + (end-start)*progress;
-
-    const wave =
-      Math.sin(i*0.82)*0.075 +
-      Math.sin(i*0.31)*0.045;
-
-    const p =
-      Math.max(0.01,trend*(1+wave));
-
-    arr.push(p);
-  }
-
-  return arr;
-}
-
-function randomizePrices(){
-
-  const months = Math.max(
-    1,
-    Math.min(120,Number($("months").value)||36)
-  );
-
-  const start = Math.max(
-    0.01,
-    Number($("startPrice").value)||100
-  );
-
-  const arr=[start];
-  let price=start;
-
-  for(let i=1;i<months;i++){
-
-    const change =
-      (Math.random()-0.5)*0.18;
-
-    price *= 1+change;
-
-    price=Math.max(
-      start*0.55,
-      Math.min(start*1.55,price)
-    );
-
-    arr.push(price);
-  }
-
-  $("endPrice").value =
-    Math.round(arr[arr.length-1]*100)/100;
-
-  prices=arr;
-
-  calculate();
-}
-
-function strategyResult(type){
-
-  const monthly =
-    Math.max(0,Number($("monthly").value)||10000);
-
-  const highReduce =
-    Math.max(0,Math.min(90,
-      Number($("highReduce").value)||40
-    ))/100;
-
-  const lowIncrease =
-    Math.max(0,
-      Number($("lowIncrease").value)||60
-    )/100;
-
-  let invested=0;
-  let shares=0;
-
-  const rows=[];
-
-  const avgPrice =
-    prices.reduce((a,b)=>a+b,0)/prices.length;
-
-  prices.forEach((price,i)=>{
-
-    let amount=monthly;
-
-    if(type==="variable"){
-
-      const ratio=price/avgPrice;
-
-      if(ratio>1){
-        amount=monthly *
-          (1-(Math.min(1.5,ratio-1)*highReduce));
-      }else{
-        amount=monthly *
-          (1+(1-ratio)*lowIncrease);
-      }
-    }
-
-    if(type==="smart"){
-
-      const ratio=price/avgPrice;
-
-      if(ratio>=1){
-        const highRatio=Math.min(1,ratio-1);
-        amount=monthly*(1-highRatio*highReduce);
-      }else{
-        const lowRatio=Math.min(1,1-ratio);
-        amount=monthly*(1+lowRatio*lowIncrease);
-      }
-    }
-
-    amount=Math.max(0,amount);
-
-    const bought=amount/price;
-
-    invested+=amount;
-    shares+=bought;
-
-    rows.push({
-      month:i+1,
-      price,
-      amount,
-      bought,
-      shares
-    });
-  });
-
-  const finalPrice =
-    prices[prices.length-1];
-
-  const value=shares*finalPrice;
-  const profit=value-invested;
-  const ret=invested>0
-    ? profit/invested*100
-    : 0;
-
-  return {
-    invested,
-    shares,
-    avg:shares>0?invested/shares:0,
-    value,
-    profit,
-    ret,
-    rows
-  };
-}
-
-function calculate(){
-
-  if(!prices.length){
-    prices=createPrices();
-  }
-
-  const fixed=strategyResult("fixed");
-  const variable=strategyResult("variable");
-  const smart=strategyResult("smart");
-
-  lastResult={fixed,variable,smart};
-
-  renderStrategy("fixed",fixed);
-  renderStrategy("variable",variable);
-  renderStrategy("smart",smart);
-
-  renderTable(
-    fixed,
-    variable,
-    smart
-  );
-
-  drawChart(
-    fixed,
-    variable,
-    smart
-  );
-
-  highlightBest(
-    fixed,
-    variable,
-    smart
-  );
-}
-
-function renderStrategy(id,r){
-
-  $(id+"Value").textContent=money(r.value);
-  $(id+"Invest").textContent=money(r.invested);
-  $(id+"Shares").textContent=num(r.shares,2);
-  $(id+"Avg").textContent=money(r.avg);
-  $(id+"Profit").textContent=money(r.profit);
-  $(id+"Return").textContent=pct(r.ret);
-
-  $(id+"Profit").className =
-    "value " + (r.profit>=0?"green":"red");
-
-  $(id+"Return").className =
-    "value " + (r.ret>=0?"green":"red");
-}
-
-function renderTable(fixed,variable,smart){
-
-  const body=$("detail");
-  body.innerHTML="";
-
-  for(let i=0;i<prices.length;i++){
-
-    const f=fixed.rows[i];
-    const v=variable.rows[i];
-    const s=smart.rows[i];
-
-    const tr=document.createElement("tr");
-
-    tr.innerHTML=`
-      <td>第 ${i+1} 月</td>
-      <td>${money(prices[i])}</td>
-      <td>${money(f.amount)}</td>
-      <td>${money(v.amount)}</td>
-      <td>${money(s.amount)}</td>
-      <td>${money(s.amount)}</td>
-      <td>${num(s.shares,2)}</td>
-    `;
-
-    body.appendChild(tr);
-  }
-}
-
-function highlightBest(a,b,c){
-
-  ["boxFixed","boxVariable","boxSmart"]
-    .forEach(id=>$(id).classList.remove("best"));
-
-  const arr=[
-    {id:"boxFixed",v:a.value},
-    {id:"boxVariable",v:b.value},
-    {id:"boxSmart",v:c.value}
-  ];
-
-  arr.sort((x,y)=>y.v-x.v);
-
-  $(arr[0].id).classList.add("best");
-}
-
-function drawChart(fixed,variable,smart){
-
-  const canvas=$("chart");
-  const ctx=canvas.getContext("2d");
-
-  const W=canvas.width;
-  const H=canvas.height;
-
-  ctx.clearRect(0,0,W,H);
-
-  const series=[
-    {
-      name:"定期定額",
-      data:fixed.rows.map(r=>r.shares*prices[r.month-1]),
-      color:"#64a8ff"
-    },
-    {
-      name:"定期不定額",
-      data:variable.rows.map(r=>r.shares*prices[r.month-1]),
-      color:"#b28cff"
-    },
-    {
-      name:"高少低多",
-      data:smart.rows.map(r=>r.shares*prices[r.month-1]),
-      color:"#55d68b"
-    }
-  ];
-
-  let max=0;
-
-  series.forEach(s=>{
-    s.data.forEach(v=>{
-      max=Math.max(max,v);
-    });
-  });
-
-  max=Math.max(max,1);
-
-  const left=65;
-  const right=25;
-  const top=25;
-  const bottom=45;
-
-  const chartW=W-left-right;
-  const chartH=H-top-bottom;
-
-  ctx.strokeStyle="#26313f";
-  ctx.lineWidth=1;
-
-  for(let i=0;i<=5;i++){
-
-    const y=
-      top+chartH-(chartH*i/5);
-
-    ctx.beginPath();
-    ctx.moveTo(left,y);
-    ctx.lineTo(W-right,y);
-    ctx.stroke();
-
-    const val=max*i/5;
-
-    ctx.fillStyle="#8290a1";
-    ctx.font="12px sans-serif";
-    ctx.textAlign="right";
-
-    ctx.fillText(
-      "$"+Math.round(val).toLocaleString(),
-      left-8,
-      y+4
-    );
-  }
-
-  series.forEach(s=>{
-
-    ctx.strokeStyle=s.color;
-    ctx.lineWidth=3;
-    ctx.beginPath();
-
-    s.data.forEach((v,i)=>{
-
-      const x=
-        left+(chartW*(i/(s.data.length-1||1)));
-
-      const y=
-        top+chartH-(v/max*chartH);
-
-      if(i===0)ctx.moveTo(x,y);
-      else ctx.lineTo(x,y);
-    });
-
-    ctx.stroke();
-
-    const last=s.data[s.data.length-1];
-
-    const x=W-right;
-
-    const y=
-      top+chartH-(last/max*chartH);
-
-    ctx.fillStyle=s.color;
-    ctx.beginPath();
-    ctx.arc(x,y,4,0,Math.PI*2);
-    ctx.fill();
-  });
-
-  ctx.fillStyle="#aab5c4";
-  ctx.font="12px sans-serif";
-  ctx.textAlign="center";
-
-  const step=Math.max(
-    1,
-    Math.floor(prices.length/6)
-  );
-
-  for(let i=0;i<prices.length;i+=step){
-
-    const x=
-      left+(chartW*(i/(prices.length-1||1)));
-
-    ctx.fillText(
-      "M"+(i+1),
-      x,
-      H-18
-    );
-  }
-
-  // legend
-  let lx=left;
-
-  series.forEach(s=>{
-
-    ctx.fillStyle=s.color;
-    ctx.fillRect(lx,8,12,12);
-
-    ctx.fillStyle="#c8d0da";
-    ctx.textAlign="left";
-    ctx.fillText(s.name,lx+17,18);
-
-    lx+=105;
-  });
-}
-
-function reset(){
-
-  $("code").value="0050";
-  $("name").value="元大台灣50";
-  $("startPrice").value=200;
-  $("endPrice").value=260;
-  $("months").value=36;
-  $("monthly").value=10000;
-  $("highReduce").value=40;
-  $("lowIncrease").value=60;
-
-  prices=[];
-  calculate();
-}
-
-$("calculate").addEventListener("click",()=>{
-  prices=createPrices();
-  calculate();
-});
-
-$("randomPrices").addEventListener(
-  "click",
-  randomizePrices
-);
-
-$("reset").addEventListener(
-  "click",
-  reset
-);
-
-$("months").addEventListener("change",()=>{
-  prices=[];
-  calculate();
-});
-
-$("startPrice").addEventListener("change",()=>{
-  prices=[];
-  calculate();
-});
-
-$("endPrice").addEventListener("change",()=>{
-  prices=[];
-  calculate();
-});
-
-buildETFList();
-prices=createPrices();
-calculate();
-</script>
-
-</body>
-</html>
+      <div class="row">
+        <span
