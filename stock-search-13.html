@@ -1,0 +1,2309 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>股票搜尋器 13｜台股・ETF・關鍵字</title>
+
+<style>
+:root{
+  --bg:#0b0f14;
+  --panel:#121821;
+  --panel2:#18212c;
+  --line:#263241;
+  --text:#f4f7fb;
+  --muted:#8f9bab;
+  --accent:#4da3ff;
+  --green:#36d17d;
+  --red:#ff5d6c;
+  --gold:#f5c451;
+  --blue:#4da3ff;
+  --shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "PingFang TC",
+    "Noto Sans TC",
+    "Microsoft JhengHei",
+    sans-serif;
+}
+
+body{
+  min-height:100vh;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.app{
+  width:100%;
+  max-width:900px;
+  margin:auto;
+  min-height:100vh;
+  padding-bottom:90px;
+}
+
+/* =========================
+   Header
+========================= */
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  padding:
+    calc(env(safe-area-inset-top) + 18px)
+    16px
+    14px;
+  background:rgba(11,15,20,.94);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.header-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.logo-icon{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#247cff,#63b5ff);
+  font-size:22px;
+  box-shadow:0 8px 20px rgba(77,163,255,.25);
+}
+
+.logo-title{
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:.3px;
+}
+
+.logo-sub{
+  color:var(--muted);
+  font-size:12px;
+  margin-top:2px;
+}
+
+.data-status{
+  text-align:right;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.data-status strong{
+  display:block;
+  color:var(--green);
+  font-size:13px;
+}
+
+/* =========================
+   Search
+========================= */
+
+.search-area{
+  padding:18px 16px 8px;
+}
+
+.search-box{
+  position:relative;
+}
+
+.search-box input{
+  width:100%;
+  height:58px;
+  padding:0 52px 0 50px;
+  border:1px solid var(--line);
+  border-radius:18px;
+  outline:none;
+  background:var(--panel);
+  color:var(--text);
+  font-size:17px;
+  box-shadow:var(--shadow);
+}
+
+.search-box input:focus{
+  border-color:var(--accent);
+  box-shadow:
+    0 0 0 3px rgba(77,163,255,.12),
+    var(--shadow);
+}
+
+.search-icon{
+  position:absolute;
+  left:17px;
+  top:17px;
+  font-size:22px;
+  pointer-events:none;
+}
+
+.clear-search{
+  position:absolute;
+  right:12px;
+  top:11px;
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:50%;
+  background:#28313d;
+  color:#fff;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+}
+
+.clear-search.show{
+  display:flex;
+}
+
+.search-hint{
+  margin-top:9px;
+  padding:0 5px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* =========================
+   Quick keywords
+========================= */
+
+.quick-wrap{
+  padding:8px 16px 4px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.quick-wrap::-webkit-scrollbar{
+  display:none;
+}
+
+.quick{
+  display:flex;
+  gap:8px;
+  min-width:max-content;
+}
+
+.quick button{
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:#dce4ee;
+  padding:8px 13px;
+  border-radius:999px;
+  white-space:nowrap;
+}
+
+.quick button:active{
+  transform:scale(.97);
+}
+
+/* =========================
+   Filter
+========================= */
+
+.filter-area{
+  padding:10px 16px 4px;
+}
+
+.filter-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+}
+
+.filter-row select{
+  width:100%;
+  height:42px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--text);
+  outline:none;
+}
+
+/* =========================
+   Summary
+========================= */
+
+.summary{
+  margin:12px 16px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:17px;
+  background:linear-gradient(
+    135deg,
+    rgba(77,163,255,.10),
+    rgba(255,255,255,.025)
+  );
+}
+
+.summary-main{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.summary-count{
+  font-size:22px;
+  font-weight:850;
+}
+
+.summary-label{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.summary-right{
+  text-align:right;
+}
+
+.summary-right strong{
+  display:block;
+  color:var(--green);
+  font-size:14px;
+}
+
+.summary-right span{
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* =========================
+   Sections
+========================= */
+
+.section{
+  padding:4px 16px;
+}
+
+.section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:12px 2px 10px;
+}
+
+.section-title h2{
+  margin:0;
+  font-size:16px;
+}
+
+.section-title span{
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* =========================
+   Results
+========================= */
+
+.results{
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+}
+
+.stock-card{
+  position:relative;
+  padding:15px;
+  border:1px solid var(--line);
+  border-radius:17px;
+  background:var(--panel);
+  box-shadow:0 6px 20px rgba(0,0,0,.12);
+  transition:.18s ease;
+}
+
+.stock-card:active{
+  transform:scale(.985);
+  background:var(--panel2);
+}
+
+.stock-main{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.stock-left{
+  min-width:0;
+}
+
+.stock-code{
+  font-size:18px;
+  font-weight:850;
+  letter-spacing:.4px;
+}
+
+.stock-name{
+  margin-top:3px;
+  font-size:16px;
+  font-weight:700;
+}
+
+.stock-full{
+  margin-top:4px;
+  color:var(--muted);
+  font-size:11px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.stock-right{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:6px;
+  flex-shrink:0;
+}
+
+.badge{
+  padding:5px 9px;
+  border-radius:999px;
+  background:#26313d;
+  color:#dce5ef;
+  font-size:11px;
+  white-space:nowrap;
+}
+
+.badge.etf{
+  background:rgba(245,196,81,.14);
+  color:var(--gold);
+}
+
+.badge.stock{
+  background:rgba(77,163,255,.12);
+  color:#76bbff;
+}
+
+.badge.otc{
+  background:rgba(54,209,125,.12);
+  color:#66df9a;
+}
+
+.badge.emerging{
+  background:rgba(180,125,255,.13);
+  color:#c89cff;
+}
+
+.stock-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:12px;
+}
+
+.meta{
+  padding:5px 8px;
+  border-radius:8px;
+  background:#1a232e;
+  color:#aeb9c7;
+  font-size:11px;
+}
+
+.keywords{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-top:10px;
+}
+
+.keyword{
+  color:#86bfff;
+  background:rgba(77,163,255,.08);
+  border:1px solid rgba(77,163,255,.15);
+  border-radius:7px;
+  padding:4px 7px;
+  font-size:10px;
+}
+
+.card-actions{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+
+.card-actions button{
+  flex:1;
+  height:36px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#1a222d;
+  color:#dce4ee;
+}
+
+.card-actions button.favorite.active{
+  color:var(--gold);
+  border-color:rgba(245,196,81,.35);
+  background:rgba(245,196,81,.08);
+}
+
+/* =========================
+   Empty / Loading
+========================= */
+
+.state{
+  margin:30px 16px;
+  padding:32px 20px;
+  border:1px dashed var(--line);
+  border-radius:18px;
+  text-align:center;
+  color:var(--muted);
+  background:rgba(255,255,255,.015);
+}
+
+.state-icon{
+  font-size:38px;
+  margin-bottom:10px;
+}
+
+.state strong{
+  display:block;
+  color:var(--text);
+  font-size:16px;
+  margin-bottom:6px;
+}
+
+/* =========================
+   Recent / Favorites
+========================= */
+
+.simple-list{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.simple-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:11px 13px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:var(--panel);
+}
+
+.simple-item-left{
+  min-width:0;
+}
+
+.simple-code{
+  font-weight:800;
+}
+
+.simple-name{
+  color:var(--muted);
+  font-size:12px;
+  margin-left:6px;
+}
+
+.simple-item button{
+  width:34px;
+  height:34px;
+  border:0;
+  border-radius:9px;
+  background:#222b36;
+  color:#fff;
+}
+
+/* =========================
+   Detail modal
+========================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  display:none;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(8px);
+  padding:18px;
+}
+
+.modal.show{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
+
+.modal-panel{
+  width:100%;
+  max-width:700px;
+  max-height:88vh;
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:24px 24px 18px 18px;
+  background:#10161f;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+  padding:20px;
+  animation:slideUp .2s ease;
+}
+
+@keyframes slideUp{
+  from{
+    transform:translateY(30px);
+    opacity:0;
+  }
+  to{
+    transform:translateY(0);
+    opacity:1;
+  }
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.modal-title{
+  font-size:22px;
+  font-weight:850;
+}
+
+.modal-sub{
+  color:var(--muted);
+  margin-top:4px;
+  font-size:13px;
+}
+
+.close-modal{
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:50%;
+  background:#252f3b;
+  color:#fff;
+  font-size:20px;
+}
+
+.detail-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin-top:18px;
+}
+
+.detail-box{
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:#151d27;
+}
+
+.detail-label{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.detail-value{
+  margin-top:4px;
+  font-size:15px;
+  font-weight:700;
+  word-break:break-word;
+}
+
+.detail-keywords{
+  margin-top:15px;
+}
+
+.detail-keywords h3{
+  margin:0 0 9px;
+  font-size:14px;
+}
+
+.detail-keyword-wrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
+.detail-keyword{
+  padding:7px 9px;
+  border-radius:9px;
+  background:#192536;
+  color:#86bfff;
+  font-size:12px;
+}
+
+/* =========================
+   Bottom navigation
+========================= */
+
+.bottom-nav{
+  position:fixed;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  z-index:30;
+  width:min(900px,100%);
+  padding:
+    8px
+    10px
+    calc(8px + env(safe-area-inset-bottom));
+  background:rgba(15,20,27,.96);
+  backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,.07);
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+}
+
+.nav-btn{
+  height:54px;
+  border:0;
+  border-radius:13px;
+  background:transparent;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.nav-btn span{
+  display:block;
+  font-size:20px;
+  margin-bottom:2px;
+}
+
+.nav-btn.active{
+  color:#fff;
+  background:#1d2732;
+}
+
+/* =========================
+   Desktop
+========================= */
+
+@media(min-width:700px){
+  .app{
+    padding-bottom:20px;
+  }
+
+  .bottom-nav{
+    position:static;
+    transform:none;
+    width:100%;
+    max-width:900px;
+    margin:20px auto 0;
+    border:1px solid var(--line);
+    border-radius:16px;
+  }
+
+  .results{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .modal.show{
+    align-items:center;
+  }
+
+  .modal-panel{
+    border-radius:24px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-top">
+
+      <div class="logo">
+        <div class="logo-icon">📈</div>
+
+        <div>
+          <div class="logo-title">股票搜尋器</div>
+          <div class="logo-sub">台股・ETF・關鍵字關聯</div>
+        </div>
+      </div>
+
+      <div class="data-status">
+        <strong id="dataStatus">讀取中…</strong>
+        <span id="updateTime">stocks.json</span>
+      </div>
+
+    </div>
+  </header>
+
+
+  <!-- Search -->
+  <section class="search-area">
+
+    <div class="search-box">
+
+      <div class="search-icon">🔎</div>
+
+      <input
+        id="searchInput"
+        type="search"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        placeholder="輸入代號、名稱、產業或關鍵字"
+      >
+
+      <button
+        id="clearSearch"
+        class="clear-search"
+        aria-label="清除搜尋"
+      >×</button>
+
+    </div>
+
+    <div class="search-hint">
+      例如：1326、台化、塑膠、半導體、0050、台灣50
+    </div>
+
+  </section>
+
+
+  <!-- Quick search -->
+  <div class="quick-wrap">
+
+    <div class="quick">
+
+      <button data-search="1326">1326 台化</button>
+      <button data-search="台化">台化</button>
+      <button data-search="台積電">台積電</button>
+      <button data-search="0050">0050</button>
+      <button data-search="台灣50">台灣50</button>
+      <button data-search="半導體">半導體</button>
+      <button data-search="塑膠">塑膠</button>
+      <button data-search="金融">金融</button>
+
+    </div>
+
+  </div>
+
+
+  <!-- Filters -->
+  <section class="filter-area">
+
+    <div class="filter-row">
+
+      <select id="marketFilter">
+        <option value="">全部市場</option>
+        <option value="上市">上市</option>
+        <option value="上櫃">上櫃</option>
+        <option value="興櫃">興櫃</option>
+      </select>
+
+      <select id="typeFilter">
+        <option value="">全部類型</option>
+        <option value="股票">股票</option>
+        <option value="ETF">ETF</option>
+        <option value="興櫃股票">興櫃股票</option>
+      </select>
+
+    </div>
+
+  </section>
+
+
+  <!-- Summary -->
+  <section class="summary">
+
+    <div class="summary-main">
+
+      <div>
+        <div class="summary-label">目前資料庫</div>
+        <div class="summary-count">
+          <span id="totalCount">0</span> 筆
+        </div>
+      </div>
+
+      <div class="summary-right">
+        <strong id="sourceText">本機資料</strong>
+        <span>搜尋不使用 API</span>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Search results -->
+  <section class="section">
+
+    <div class="section-title">
+      <h2 id="resultTitle">搜尋結果</h2>
+      <span id="resultCount">0 筆</span>
+    </div>
+
+    <div id="results" class="results"></div>
+
+  </section>
+
+
+  <!-- Recent -->
+  <section class="section" id="recentSection">
+
+    <div class="section-title">
+      <h2>🕘 最近搜尋</h2>
+      <span id="recentCount">0</span>
+    </div>
+
+    <div id="recentList" class="simple-list"></div>
+
+  </section>
+
+
+  <!-- Favorites -->
+  <section class="section" id="favoriteSection">
+
+    <div class="section-title">
+      <h2>⭐ 我的自選</h2>
+      <span id="favoriteCount">0</span>
+    </div>
+
+    <div id="favoriteList" class="simple-list"></div>
+
+  </section>
+
+
+  <!-- State -->
+  <div id="state" class="state" style="display:none;">
+    <div class="state-icon">🔎</div>
+    <strong id="stateTitle">找不到資料</strong>
+    <div id="stateText">
+      請換一個代號、名稱或關鍵字試試看。
+    </div>
+  </div>
+
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+
+    <button class="nav-btn active" data-nav="search">
+      <span>🔎</span>
+      搜尋
+    </button>
+
+    <button class="nav-btn" data-nav="favorite">
+      <span>⭐</span>
+      自選股
+    </button>
+
+    <button class="nav-btn" data-nav="recent">
+      <span>🕘</span>
+      最近搜尋
+    </button>
+
+  </nav>
+
+</div>
+
+
+<!-- Detail Modal -->
+<div id="detailModal" class="modal">
+
+  <div class="modal-panel">
+
+    <div class="modal-head">
+
+      <div>
+        <div id="modalTitle" class="modal-title">—</div>
+        <div id="modalSub" class="modal-sub">—</div>
+      </div>
+
+      <button
+        id="closeModal"
+        class="close-modal"
+      >×</button>
+
+    </div>
+
+
+    <div id="detailGrid" class="detail-grid"></div>
+
+
+    <div class="detail-keywords">
+
+      <h3>🔗 關聯關鍵字</h3>
+
+      <div
+        id="detailKeywords"
+        class="detail-keyword-wrap"
+      ></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+"use strict";
+
+/* =========================================================
+   股票搜尋器 13
+   資料來源：
+   ../stock-data/stocks.json
+   ========================================================= */
+
+const DATA_URL = "stock-data/stocks.json";
+
+let stockData = [];
+let filteredData = [];
+let currentQuery = "";
+
+const searchInput = document.getElementById("searchInput");
+const clearSearch = document.getElementById("clearSearch");
+
+const marketFilter = document.getElementById("marketFilter");
+const typeFilter = document.getElementById("typeFilter");
+
+const results = document.getElementById("results");
+const resultTitle = document.getElementById("resultTitle");
+const resultCount = document.getElementById("resultCount");
+
+const totalCount = document.getElementById("totalCount");
+const dataStatus = document.getElementById("dataStatus");
+const updateTime = document.getElementById("updateTime");
+
+const state = document.getElementById("state");
+const stateTitle = document.getElementById("stateTitle");
+const stateText = document.getElementById("stateText");
+
+const recentList = document.getElementById("recentList");
+const favoriteList = document.getElementById("favoriteList");
+
+const recentCount = document.getElementById("recentCount");
+const favoriteCount = document.getElementById("favoriteCount");
+
+const detailModal = document.getElementById("detailModal");
+const closeModal = document.getElementById("closeModal");
+
+const modalTitle = document.getElementById("modalTitle");
+const modalSub = document.getElementById("modalSub");
+const detailGrid = document.getElementById("detailGrid");
+const detailKeywords = document.getElementById("detailKeywords");
+
+
+/* =========================================================
+   LocalStorage
+   ========================================================= */
+
+function getJSON(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+
+    if(!raw){
+      return fallback;
+    }
+
+    return JSON.parse(raw);
+
+  }catch(error){
+    return fallback;
+  }
+}
+
+function setJSON(key, value){
+  try{
+    localStorage.setItem(
+      key,
+      JSON.stringify(value)
+    );
+  }catch(error){
+    console.warn("LocalStorage error:", error);
+  }
+}
+
+function getFavorites(){
+  return getJSON(
+    "stock-search-13-favorites",
+    []
+  );
+}
+
+function saveFavorites(list){
+  setJSON(
+    "stock-search-13-favorites",
+    list
+  );
+}
+
+function getRecent(){
+  return getJSON(
+    "stock-search-13-recent",
+    []
+  );
+}
+
+function saveRecent(list){
+  setJSON(
+    "stock-search-13-recent",
+    list
+  );
+}
+
+
+/* =========================================================
+   Normalize
+   ========================================================= */
+
+function normalizeText(value){
+  return String(value ?? "")
+    .trim()
+    .toLowerCase();
+}
+
+function toArray(value){
+
+  if(Array.isArray(value)){
+    return value
+      .map(x => String(x ?? "").trim())
+      .filter(Boolean);
+  }
+
+  if(typeof value === "string"){
+    return value
+      .split(/[、,，;；|\/]/)
+      .map(x => x.trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function normalizeStock(item){
+
+  const stock = {
+    code: String(
+      item.code ??
+      item.stockCode ??
+      item.symbol ??
+      ""
+    ).trim(),
+
+    name: String(
+      item.name ??
+      item.shortName ??
+      ""
+    ).trim(),
+
+    fullName: String(
+      item.fullName ??
+      item.companyName ??
+      ""
+    ).trim(),
+
+    market: String(
+      item.market ??
+      ""
+    ).trim(),
+
+    type: String(
+      item.type ??
+      ""
+    ).trim(),
+
+    industry: String(
+      item.industry ??
+      ""
+    ).trim(),
+
+    keywords: toArray(item.keywords)
+  };
+
+  const extraKeywords = [
+    stock.code,
+    stock.name,
+    stock.fullName,
+    stock.industry,
+    stock.type
+  ];
+
+  for(const key of extraKeywords){
+
+    if(
+      key &&
+      !stock.keywords.includes(key)
+    ){
+      stock.keywords.push(key);
+    }
+  }
+
+  return stock;
+}
+
+
+/* =========================================================
+   Load data
+   ========================================================= */
+
+async function loadStockData(){
+
+  dataStatus.textContent = "讀取中…";
+  dataStatus.style.color = "#f5c451";
+
+  try{
+
+    const response = await fetch(
+      DATA_URL + "?v=" + Date.now(),
+      {
+        cache:"no-store"
+      }
+    );
+
+    if(!response.ok){
+      throw new Error(
+        "HTTP " + response.status
+      );
+    }
+
+    const json = await response.json();
+
+    let rawStocks = [];
+
+    if(Array.isArray(json)){
+      rawStocks = json;
+    }else if(Array.isArray(json.stocks)){
+      rawStocks = json.stocks;
+    }else if(Array.isArray(json.data)){
+      rawStocks = json.data;
+    }
+
+    stockData = rawStocks
+      .map(normalizeStock)
+      .filter(item => item.code);
+
+    totalCount.textContent =
+      stockData.length.toLocaleString();
+
+    if(json.updatedAt){
+
+      let dateText = json.updatedAt;
+
+      try{
+        dateText =
+          new Date(
+            json.updatedAt
+          ).toLocaleString(
+            "zh-TW",
+            {
+              year:"numeric",
+              month:"2-digit",
+              day:"2-digit",
+              hour:"2-digit",
+              minute:"2-digit"
+            }
+          );
+      }catch(e){}
+
+      updateTime.textContent =
+        "更新：" + dateText;
+
+    }else{
+      updateTime.textContent =
+        "stock-data/stocks.json";
+    }
+
+    dataStatus.textContent =
+      "資料正常";
+
+    dataStatus.style.color =
+      "var(--green)";
+
+    if(stockData.length === 0){
+
+      showState(
+        "資料庫是空的",
+        "請確認 stock-data/stocks.json 裡面有 stocks 資料。"
+      );
+
+      return;
+    }
+
+    runSearch();
+
+    renderRecent();
+
+    renderFavorites();
+
+  }catch(error){
+
+    console.error(error);
+
+    dataStatus.textContent =
+      "讀取失敗";
+
+    dataStatus.style.color =
+      "var(--red)";
+
+    totalCount.textContent = "0";
+
+    showState(
+      "無法讀取股票資料",
+      "請確認此檔案與 stock-data 資料夾在同一個 GitHub 專案中。"
+    );
+
+  }
+}
+
+
+/* =========================================================
+   Search scoring
+   ========================================================= */
+
+function scoreStock(stock, query){
+
+  if(!query){
+    return 0;
+  }
+
+  const q = normalizeText(query);
+
+  const code = normalizeText(stock.code);
+  const name = normalizeText(stock.name);
+  const fullName = normalizeText(stock.fullName);
+  const industry = normalizeText(stock.industry);
+  const type = normalizeText(stock.type);
+
+  const keywords = stock.keywords
+    .map(normalizeText);
+
+  let score = 0;
+
+  /* 1. 完全代號 */
+  if(code === q){
+    score += 10000;
+  }
+
+  /* 2. 完全名稱 */
+  if(name === q){
+    score += 9000;
+  }
+
+  /* 3. 完整公司名稱 */
+  if(fullName === q){
+    score += 8500;
+  }
+
+  /* 4. 名稱開頭 */
+  if(name.startsWith(q)){
+    score += 7000;
+  }
+
+  /* 5. 代號開頭 */
+  if(code.startsWith(q)){
+    score += 6500;
+  }
+
+  /* 6. 名稱包含 */
+  if(name.includes(q)){
+    score += 5000;
+  }
+
+  /* 7. 完整公司名稱包含 */
+  if(fullName.includes(q)){
+    score += 4500;
+  }
+
+  /* 8. 關鍵字完全符合 */
+  if(
+    keywords.some(
+      keyword => keyword === q
+    )
+  ){
+    score += 4200;
+  }
+
+  /* 9. 關鍵字包含 */
+  if(
+    keywords.some(
+      keyword => keyword.includes(q)
+    )
+  ){
+    score += 3200;
+  }
+
+  /* 10. 產業 */
+  if(industry === q){
+    score += 3000;
+  }
+
+  if(industry.includes(q)){
+    score += 2000;
+  }
+
+  /* 11. 類型 */
+  if(type.includes(q)){
+    score += 1000;
+  }
+
+  return score;
+}
+
+
+/* =========================================================
+   Search
+   ========================================================= */
+
+function runSearch(){
+
+  currentQuery =
+    searchInput.value.trim();
+
+  const market =
+    marketFilter.value;
+
+  const type =
+    typeFilter.value;
+
+  let list = stockData.slice();
+
+  if(market){
+
+    list = list.filter(
+      item =>
+        item.market === market
+    );
+
+  }
+
+  if(type){
+
+    list = list.filter(
+      item =>
+        item.type === type
+    );
+
+  }
+
+  if(currentQuery){
+
+    const scored = list
+      .map(item => ({
+        item,
+        score: scoreStock(
+          item,
+          currentQuery
+        )
+      }))
+      .filter(x => x.score > 0);
+
+    scored.sort(
+      (a,b) => {
+
+        if(b.score !== a.score){
+          return b.score - a.score;
+        }
+
+        return a.item.code.localeCompare(
+          b.item.code
+        );
+      }
+    );
+
+    filteredData =
+      scored.map(x => x.item);
+
+  }else{
+
+    /* 沒輸入時只顯示前 30 筆 */
+    filteredData =
+      list
+        .slice()
+        .sort(
+          (a,b) =>
+            a.code.localeCompare(b.code)
+        );
+
+  }
+
+  renderResults();
+
+}
+
+
+/* =========================================================
+   Render results
+   ========================================================= */
+
+function renderResults(){
+
+  results.innerHTML = "";
+
+  let displayList =
+    filteredData.slice(0, 100);
+
+  resultCount.textContent =
+    filteredData.length.toLocaleString() +
+    " 筆";
+
+  if(currentQuery){
+
+    resultTitle.textContent =
+      "🔎 搜尋結果";
+
+  }else{
+
+    resultTitle.textContent =
+      "📋 股票資料";
+
+  }
+
+  if(displayList.length === 0){
+
+    results.style.display = "none";
+
+    showState(
+      "找不到符合資料",
+      "可以試試股票代號、中文名稱、產業或關鍵字。"
+    );
+
+    return;
+
+  }
+
+  hideState();
+
+  results.style.display =
+    "flex";
+
+  for(const stock of displayList){
+
+    results.appendChild(
+      createStockCard(stock)
+    );
+
+  }
+
+  if(filteredData.length > 100){
+
+    const more = document.createElement("div");
+
+    more.className = "state";
+
+    more.style.margin =
+      "8px 0 0";
+
+    more.innerHTML = `
+      <strong>目前顯示前 100 筆</strong>
+      共找到 ${filteredData.length.toLocaleString()} 筆
+      <div style="margin-top:6px;font-size:12px;">
+        請增加搜尋條件，可以更快找到目標股票。
+      </div>
+    `;
+
+    results.appendChild(more);
+
+  }
+
+}
+
+
+/* =========================================================
+   Create card
+   ========================================================= */
+
+function createStockCard(stock){
+
+  const card =
+    document.createElement("article");
+
+  card.className =
+    "stock-card";
+
+  const isFavorite =
+    getFavorites().some(
+      item =>
+        item.code === stock.code &&
+        item.market === stock.market
+    );
+
+  const badgeClass =
+    stock.type === "ETF"
+      ? "etf"
+      : stock.market === "上櫃"
+        ? "otc"
+        : stock.market === "興櫃"
+          ? "emerging"
+          : "stock";
+
+  const keywords =
+    stock.keywords
+      .filter(
+        x =>
+          x &&
+          x !== stock.code &&
+          x !== stock.name &&
+          x !== stock.fullName &&
+          x !== stock.type
+      )
+      .slice(0,8);
+
+  card.innerHTML = `
+
+    <div class="stock-main">
+
+      <div class="stock-left">
+
+        <div class="stock-code">
+          ${escapeHTML(stock.code)}
+        </div>
+
+        <div class="stock-name">
+          ${escapeHTML(stock.name || "—")}
+        </div>
+
+        ${
+          stock.fullName
+            ? `
+              <div class="stock-full">
+                ${escapeHTML(stock.fullName)}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+      <div class="stock-right">
+
+        <div class="badge ${badgeClass}">
+          ${escapeHTML(stock.type || "證券")}
+        </div>
+
+        ${
+          stock.market
+            ? `
+              <div class="badge">
+                ${escapeHTML(stock.market)}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+    </div>
+
+
+    <div class="stock-meta">
+
+      ${
+        stock.industry
+          ? `
+            <div class="meta">
+              🏭 ${escapeHTML(stock.industry)}
+            </div>
+          `
+          : ""
+      }
+
+    </div>
+
+
+    ${
+      keywords.length
+        ? `
+          <div class="keywords">
+
+            ${keywords
+              .map(
+                key =>
+                  `<span class="keyword">
+                    ${escapeHTML(key)}
+                  </span>`
+              )
+              .join("")
+            }
+
+          </div>
+        `
+        : ""
+    }
+
+
+    <div class="card-actions">
+
+      <button
+        class="detail-button"
+        type="button"
+      >
+        📋 詳細
+      </button>
+
+      <button
+        class="favorite ${isFavorite ? "active" : ""}"
+        type="button"
+      >
+        ${isFavorite ? "⭐ 已自選" : "☆ 加自選"}
+      </button>
+
+    </div>
+
+  `;
+
+
+  card
+    .querySelector(".detail-button")
+    .addEventListener(
+      "click",
+      () => openDetail(stock)
+    );
+
+
+  card
+    .querySelector(".favorite")
+    .addEventListener(
+      "click",
+      () => {
+
+        toggleFavorite(stock);
+
+        renderResults();
+
+        renderFavorites();
+
+      }
+    );
+
+
+  return card;
+
+}
+
+
+/* =========================================================
+   Favorite
+   ========================================================= */
+
+function toggleFavorite(stock){
+
+  let list =
+    getFavorites();
+
+  const index =
+    list.findIndex(
+      item =>
+        item.code === stock.code &&
+        item.market === stock.market
+    );
+
+  if(index >= 0){
+
+    list.splice(index,1);
+
+  }else{
+
+    list.unshift({
+      code:stock.code,
+      name:stock.name,
+      fullName:stock.fullName,
+      market:stock.market,
+      type:stock.type,
+      industry:stock.industry
+    });
+
+    if(list.length > 100){
+      list = list.slice(0,100);
+    }
+
+  }
+
+  saveFavorites(list);
+
+}
+
+
+/* =========================================================
+   Recent
+   ========================================================= */
+
+function addRecent(stock){
+
+  let list =
+    getRecent();
+
+  list =
+    list.filter(
+      item =>
+        !(
+          item.code === stock.code &&
+          item.market === stock.market
+        )
+    );
+
+  list.unshift({
+    code:stock.code,
+    name:stock.name,
+    market:stock.market,
+    type:stock.type
+  });
+
+  list =
+    list.slice(0,20);
+
+  saveRecent(list);
+
+  renderRecent();
+
+}
+
+function renderRecent(){
+
+  const list =
+    getRecent();
+
+  recentCount.textContent =
+    list.length;
+
+  recentList.innerHTML = "";
+
+  if(!list.length){
+
+    recentList.innerHTML = `
+      <div style="
+        color:var(--muted);
+        font-size:12px;
+        padding:10px 2px;
+      ">
+        尚無最近搜尋
+      </div>
+    `;
+
+    return;
+  }
+
+  for(const item of list){
+
+    const row =
+      document.createElement("div");
+
+    row.className =
+      "simple-item";
+
+    row.innerHTML = `
+
+      <div class="simple-item-left">
+
+        <span class="simple-code">
+          ${escapeHTML(item.code)}
+        </span>
+
+        <span class="simple-name">
+          ${escapeHTML(item.name || "")}
+        </span>
+
+      </div>
+
+      <button
+        type="button"
+        aria-label="搜尋"
+      >
+        🔎
+      </button>
+
+    `;
+
+    row
+      .querySelector("button")
+      .addEventListener(
+        "click",
+        () => {
+
+          searchInput.value =
+            item.code;
+
+          updateClearButton();
+
+          runSearch();
+
+          window.scrollTo({
+            top:0,
+            behavior:"smooth"
+          });
+
+        }
+      );
+
+    recentList.appendChild(row);
+
+  }
+
+}
+
+
+/* =========================================================
+   Favorites list
+   ========================================================= */
+
+function renderFavorites(){
+
+  const list =
+    getFavorites();
+
+  favoriteCount.textContent =
+    list.length;
+
+  favoriteList.innerHTML = "";
+
+  if(!list.length){
+
+    favoriteList.innerHTML = `
+      <div style="
+        color:var(--muted);
+        font-size:12px;
+        padding:10px 2px;
+      ">
+        尚未加入自選股
+      </div>
+    `;
+
+    return;
+  }
+
+  for(const item of list){
+
+    const row =
+      document.createElement("div");
+
+    row.className =
+      "simple-item";
+
+    row.innerHTML = `
+
+      <div class="simple-item-left">
+
+        <span class="simple-code">
+          ${escapeHTML(item.code)}
+        </span>
+
+        <span class="simple-name">
+          ${escapeHTML(item.name || "")}
+        </span>
+
+      </div>
+
+      <button
+        type="button"
+        aria-label="搜尋"
+      >
+        📈
+      </button>
+
+    `;
+
+    row
+      .querySelector("button")
+      .addEventListener(
+        "click",
+        () => {
+
+          searchInput.value =
+            item.code;
+
+          updateClearButton();
+
+          runSearch();
+
+          window.scrollTo({
+            top:0,
+            behavior:"smooth"
+          });
+
+        }
+      );
+
+    favoriteList.appendChild(row);
+
+  }
+
+}
+
+
+/* =========================================================
+   Detail
+   ========================================================= */
+
+function openDetail(stock){
+
+  addRecent(stock);
+
+  modalTitle.textContent =
+    `${stock.code} ${stock.name}`;
+
+  modalSub.textContent =
+    stock.fullName ||
+    "股票資料";
+
+  const fields = [
+
+    ["股票代號",stock.code],
+
+    ["中文名稱",stock.name],
+
+    ["完整名稱",stock.fullName],
+
+    ["市場",stock.market],
+
+    ["類型",stock.type],
+
+    ["產業",stock.industry]
+
+  ];
+
+  detailGrid.innerHTML =
+    fields
+      .map(
+        ([label,value]) => `
+
+          <div class="detail-box">
+
+            <div class="detail-label">
+              ${escapeHTML(label)}
+            </div>
+
+            <div class="detail-value">
+              ${escapeHTML(value || "—")}
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+  detailKeywords.innerHTML =
+    stock.keywords.length
+      ? stock.keywords
+          .map(
+            key =>
+              `<span class="detail-keyword">
+                ${escapeHTML(key)}
+              </span>`
+          )
+          .join("")
+      : `
+          <span
+            style="
+              color:var(--muted);
+              font-size:12px;
+            "
+          >
+            尚無關聯關鍵字
+          </span>
+        `;
+
+
+  detailModal.classList.add(
+    "show"
+  );
+
+  document.body.style.overflow =
+    "hidden";
+
+}
+
+
+function closeDetail(){
+
+  detailModal.classList.remove(
+    "show"
+  );
+
+  document.body.style.overflow =
+    "";
+
+}
+
+
+/* =========================================================
+   State
+   ========================================================= */
+
+function showState(title,text){
+
+  stateTitle.textContent =
+    title;
+
+  stateText.textContent =
+    text;
+
+  state.style.display =
+    "block";
+
+}
+
+function hideState(){
+
+  state.style.display =
+    "none";
+
+}
+
+
+/* =========================================================
+   Escape HTML
+   ========================================================= */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* =========================================================
+   Clear button
+   ========================================================= */
+
+function updateClearButton(){
+
+  if(searchInput.value.trim()){
+
+    clearSearch.classList.add(
+      "show"
+    );
+
+  }else{
+
+    clearSearch.classList.remove(
+      "show"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   Events
+   ========================================================= */
+
+searchInput.addEventListener(
+  "input",
+  () => {
+
+    updateClearButton();
+
+    runSearch();
+
+  }
+);
+
+
+clearSearch.addEventListener(
+  "click",
+  () => {
+
+    searchInput.value = "";
+
+    updateClearButton();
+
+    runSearch();
+
+    searchInput.focus();
+
+  }
+);
+
+
+marketFilter.addEventListener(
+  "change",
+  runSearch
+);
+
+
+typeFilter.addEventListener(
+  "change",
+  runSearch
+);
+
+
+document
+  .querySelectorAll(
+    "[data-search]"
+  )
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        const value =
+          button.dataset.search;
+
+        searchInput.value =
+          value;
+
+        updateClearButton();
+
+        runSearch();
+
+        window.scrollTo({
+          top:0,
+          behavior:"smooth"
+        });
+
+      }
+    );
+
+  });
+
+
+closeModal.addEventListener(
+  "click",
+  closeDetail
+);
+
+
+detailModal.addEventListener(
+  "click",
+  event => {
+
+    if(
+      event.target === detailModal
+    ){
+      closeDetail();
+    }
+
+  }
+);
+
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(event.key === "Escape"){
+      closeDetail();
+    }
+
+  }
+);
+
+
+/* =========================================================
+   Bottom navigation
+   ========================================================= */
+
+document
+  .querySelectorAll(".nav-btn")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach(
+            btn =>
+              btn.classList.remove(
+                "active"
+              )
+          );
+
+        button.classList.add(
+          "active"
+        );
+
+        const nav =
+          button.dataset.nav;
+
+        if(nav === "search"){
+
+          window.scrollTo({
+            top:0,
+            behavior:"smooth"
+          });
+
+        }
+
+        if(nav === "favorite"){
+
+          document
+            .getElementById(
+              "favoriteSection"
+            )
+            .scrollIntoView({
+              behavior:"smooth"
+            });
+
+        }
+
+        if(nav === "recent"){
+
+          document
+            .getElementById(
+              "recentSection"
+            )
+            .scrollIntoView({
+              behavior:"smooth"
+            });
+
+        }
+
+      }
+    );
+
+  });
+
+
+/* =========================================================
+   Start
+   ========================================================= */
+
+loadStockData();
+
+</script>
+
+</body>
+</html>
