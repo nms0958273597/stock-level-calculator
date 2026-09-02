@@ -1,0 +1,4079 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#0b1016">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>股票搜尋器 14｜行情分析</title>
+
+<style>
+:root{
+  --bg:#0b1016;
+  --panel:#121922;
+  --panel2:#18222d;
+  --panel3:#1d2935;
+  --line:#293746;
+  --text:#f4f7fb;
+  --muted:#91a0b0;
+  --blue:#4da3ff;
+  --cyan:#55d6ff;
+  --green:#35d27c;
+  --red:#ff5e6c;
+  --yellow:#f5c451;
+  --purple:#b28cff;
+  --orange:#ff9d52;
+  --shadow:0 10px 30px rgba(0,0,0,.24);
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "PingFang TC",
+    "Noto Sans TC",
+    "Microsoft JhengHei",
+    sans-serif;
+}
+
+body{
+  min-height:100vh;
+}
+
+button,input,select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.app{
+  width:100%;
+  max-width:980px;
+  margin:auto;
+  min-height:100vh;
+  padding-bottom:100px;
+}
+
+/* ==============================
+   Header
+============================== */
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:30;
+  padding:
+    calc(env(safe-area-inset-top) + 15px)
+    15px
+    13px;
+  background:rgba(11,16,22,.95);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.header-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.brand-icon{
+  width:43px;
+  height:43px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#247cff,#65b9ff);
+  font-size:22px;
+  box-shadow:0 8px 24px rgba(77,163,255,.25);
+}
+
+.brand-title{
+  font-size:19px;
+  font-weight:850;
+}
+
+.brand-sub{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:2px;
+}
+
+.data-status{
+  text-align:right;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.data-status strong{
+  display:block;
+  color:var(--green);
+  font-size:12px;
+}
+
+/* ==============================
+   Search
+============================== */
+
+.search-area{
+  padding:16px 15px 8px;
+}
+
+.search-box{
+  position:relative;
+}
+
+.search-box input{
+  width:100%;
+  height:57px;
+  border-radius:17px;
+  border:1px solid var(--line);
+  outline:none;
+  background:var(--panel);
+  color:var(--text);
+  padding:0 52px 0 49px;
+  font-size:16px;
+  box-shadow:var(--shadow);
+}
+
+.search-box input:focus{
+  border-color:var(--blue);
+  box-shadow:
+    0 0 0 3px rgba(77,163,255,.12),
+    var(--shadow);
+}
+
+.search-icon{
+  position:absolute;
+  left:16px;
+  top:16px;
+  font-size:21px;
+  pointer-events:none;
+}
+
+.clear-btn{
+  display:none;
+  position:absolute;
+  right:10px;
+  top:10px;
+  width:37px;
+  height:37px;
+  border:0;
+  border-radius:50%;
+  background:#293440;
+  color:#fff;
+  font-size:20px;
+  align-items:center;
+  justify-content:center;
+}
+
+.clear-btn.show{
+  display:flex;
+}
+
+.search-hint{
+  color:var(--muted);
+  font-size:11px;
+  margin:8px 4px 0;
+}
+
+/* ==============================
+   Quick
+============================== */
+
+.quick-wrap{
+  padding:5px 15px 7px;
+  overflow-x:auto;
+  scrollbar-width:none;
+}
+
+.quick-wrap::-webkit-scrollbar{
+  display:none;
+}
+
+.quick{
+  display:flex;
+  gap:7px;
+  min-width:max-content;
+}
+
+.quick button{
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:#dce6ef;
+  border-radius:999px;
+  padding:8px 12px;
+  white-space:nowrap;
+  font-size:12px;
+}
+
+/* ==============================
+   Filters
+============================== */
+
+.filters{
+  padding:6px 15px;
+}
+
+.filter-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+}
+
+.filter-grid select{
+  width:100%;
+  height:40px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:var(--panel);
+  color:var(--text);
+  padding:0 9px;
+  outline:none;
+  font-size:12px;
+}
+
+/* ==============================
+   Database status
+============================== */
+
+.database{
+  margin:9px 15px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(77,163,255,.10),
+      rgba(255,255,255,.025)
+    );
+}
+
+.database-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.database-count{
+  font-size:23px;
+  font-weight:850;
+}
+
+.database-label{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.database-info{
+  text-align:right;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.database-info strong{
+  display:block;
+  color:var(--green);
+  font-size:12px;
+}
+
+/* ==============================
+   Section
+============================== */
+
+.section{
+  padding:4px 15px;
+}
+
+.section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:14px 2px 9px;
+}
+
+.section-head h2{
+  margin:0;
+  font-size:16px;
+}
+
+.section-head span{
+  color:var(--muted);
+  font-size:11px;
+}
+
+/* ==============================
+   Stock cards
+============================== */
+
+.results{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.stock-card{
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:var(--panel);
+  padding:15px;
+  box-shadow:0 7px 22px rgba(0,0,0,.12);
+}
+
+.stock-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.stock-code{
+  font-size:19px;
+  font-weight:900;
+  letter-spacing:.4px;
+}
+
+.stock-name{
+  margin-top:3px;
+  font-size:16px;
+  font-weight:750;
+}
+
+.stock-full{
+  margin-top:3px;
+  color:var(--muted);
+  font-size:10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.stock-badges{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:5px;
+}
+
+.badge{
+  padding:5px 8px;
+  border-radius:999px;
+  font-size:10px;
+  white-space:nowrap;
+  background:#26323e;
+}
+
+.badge.market{
+  color:#dce7f2;
+}
+
+.badge.type{
+  color:var(--yellow);
+  background:rgba(245,196,81,.11);
+}
+
+/* ==============================
+   Quote
+============================== */
+
+.quote{
+  margin-top:13px;
+  padding:13px;
+  border-radius:14px;
+  background:#151e28;
+  border:1px solid rgba(255,255,255,.045);
+}
+
+.quote-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:10px;
+}
+
+.price{
+  font-size:27px;
+  font-weight:900;
+  letter-spacing:.3px;
+}
+
+.change{
+  text-align:right;
+  font-size:14px;
+  font-weight:800;
+}
+
+.change.up{
+  color:var(--red);
+}
+
+.change.down{
+  color:var(--green);
+}
+
+.change.flat{
+  color:var(--muted);
+}
+
+.quote-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin-top:12px;
+}
+
+.quote-item{
+  min-width:0;
+  padding:8px;
+  border-radius:10px;
+  background:#1b2530;
+}
+
+.quote-label{
+  color:var(--muted);
+  font-size:9px;
+}
+
+.quote-value{
+  margin-top:3px;
+  font-size:12px;
+  font-weight:700;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* ==============================
+   MA
+============================== */
+
+.analysis-box{
+  margin-top:10px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:#121a23;
+  padding:13px;
+}
+
+.analysis-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.analysis-title strong{
+  font-size:14px;
+}
+
+.analysis-title span{
+  color:var(--muted);
+  font-size:10px;
+}
+
+.ma-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
+}
+
+.ma-item{
+  padding:9px;
+  border-radius:10px;
+  background:#19232d;
+  border:1px solid rgba(255,255,255,.035);
+}
+
+.ma-name{
+  color:var(--muted);
+  font-size:9px;
+}
+
+.ma-price{
+  font-size:13px;
+  font-weight:800;
+  margin-top:3px;
+}
+
+.ma-gap{
+  font-size:10px;
+  margin-top:3px;
+}
+
+.gap-positive{
+  color:var(--red);
+}
+
+.gap-negative{
+  color:var(--green);
+}
+
+.gap-neutral{
+  color:var(--muted);
+}
+
+/* ==============================
+   Trend
+============================== */
+
+.trend-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:9px;
+}
+
+.trend-card{
+  padding:11px;
+  border-radius:12px;
+  background:#18222c;
+  border:1px solid rgba(255,255,255,.035);
+}
+
+.trend-label{
+  color:var(--muted);
+  font-size:10px;
+}
+
+.trend-value{
+  margin-top:4px;
+  font-size:14px;
+  font-weight:850;
+}
+
+.trend-bull{
+  color:var(--red);
+}
+
+.trend-bear{
+  color:var(--green);
+}
+
+.trend-normal{
+  color:var(--yellow);
+}
+
+/* ==============================
+   Buttons
+============================== */
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:11px;
+}
+
+.actions button{
+  height:38px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#1b2530;
+  color:#e5edf5;
+}
+
+.actions button.primary{
+  border-color:rgba(77,163,255,.35);
+  color:#8bc7ff;
+  background:rgba(77,163,255,.08);
+}
+
+.actions button.favorite.active{
+  color:var(--yellow);
+  background:rgba(245,196,81,.08);
+}
+
+/* ==============================
+   Empty
+============================== */
+
+.state{
+  margin:25px 15px;
+  padding:30px 18px;
+  border:1px dashed var(--line);
+  border-radius:17px;
+  text-align:center;
+  color:var(--muted);
+}
+
+.state-icon{
+  font-size:38px;
+  margin-bottom:8px;
+}
+
+.state strong{
+  display:block;
+  color:var(--text);
+  font-size:16px;
+  margin-bottom:6px;
+}
+
+/* ==============================
+   Modal
+============================== */
+
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:rgba(0,0,0,.74);
+  backdrop-filter:blur(7px);
+  padding:16px;
+}
+
+.modal.show{
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+}
+
+.modal-panel{
+  width:100%;
+  max-width:720px;
+  max-height:90vh;
+  overflow:auto;
+  background:#101720;
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:18px;
+  box-shadow:0 25px 70px rgba(0,0,0,.45);
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.modal-title{
+  font-size:23px;
+  font-weight:900;
+}
+
+.modal-sub{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px;
+}
+
+.close{
+  width:38px;
+  height:38px;
+  border:0;
+  border-radius:50%;
+  background:#27323e;
+  color:#fff;
+  font-size:20px;
+}
+
+.detail-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:15px;
+}
+
+.detail-box{
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#17212b;
+}
+
+.detail-label{
+  color:var(--muted);
+  font-size:10px;
+}
+
+.detail-value{
+  margin-top:4px;
+  font-size:14px;
+  font-weight:750;
+  word-break:break-word;
+}
+
+.notice{
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+  background:rgba(245,196,81,.07);
+  border:1px solid rgba(245,196,81,.16);
+  color:#d8c890;
+  font-size:11px;
+  line-height:1.6;
+}
+
+/* ==============================
+   Recent / Favorite
+============================== */
+
+.simple-list{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+.simple-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:var(--panel);
+}
+
+.simple-code{
+  font-weight:850;
+}
+
+.simple-name{
+  color:var(--muted);
+  font-size:11px;
+  margin-left:5px;
+}
+
+.simple-item button{
+  width:34px;
+  height:34px;
+  border:0;
+  border-radius:9px;
+  background:#222d39;
+  color:#fff;
+}
+
+/* ==============================
+   Bottom
+============================== */
+
+.bottom-nav{
+  position:fixed;
+  z-index:50;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:min(980px,100%);
+  padding:
+    7px 9px
+    calc(7px + env(safe-area-inset-bottom));
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+  background:rgba(14,20,27,.97);
+  backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,.07);
+}
+
+.nav-btn{
+  height:51px;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:var(--muted);
+  font-size:10px;
+}
+
+.nav-btn span{
+  display:block;
+  font-size:19px;
+  margin-bottom:2px;
+}
+
+.nav-btn.active{
+  color:#fff;
+  background:#1c2732;
+}
+
+/* ==============================
+   Desktop
+============================== */
+
+@media(min-width:700px){
+
+  .app{
+    padding-bottom:25px;
+  }
+
+  .results{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+  }
+
+  .bottom-nav{
+    position:static;
+    transform:none;
+    margin:18px auto 0;
+    border:1px solid var(--line);
+    border-radius:15px;
+  }
+
+  .modal.show{
+    align-items:center;
+  }
+}
+
+@media(max-width:420px){
+
+  .quote-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .ma-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .filter-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .filter-grid select:last-child{
+    grid-column:1 / -1;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- ==========================
+     HEADER
+========================== -->
+
+<header class="header">
+
+  <div class="header-top">
+
+    <div class="brand">
+
+      <div class="brand-icon">📈</div>
+
+      <div>
+        <div class="brand-title">
+          股票搜尋器 14
+        </div>
+
+        <div class="brand-sub">
+          股票・ETF・行情分析
+        </div>
+      </div>
+
+    </div>
+
+    <div class="data-status">
+
+      <strong id="dataStatus">
+        讀取中…
+      </strong>
+
+      <span id="updateTime">
+        stock-data
+      </span>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<!-- ==========================
+     SEARCH
+========================== -->
+
+<section class="search-area">
+
+  <div class="search-box">
+
+    <div class="search-icon">
+      🔎
+    </div>
+
+    <input
+      id="searchInput"
+      type="search"
+      autocomplete="off"
+      autocapitalize="off"
+      spellcheck="false"
+      placeholder="輸入代號、名稱、產業、關鍵字"
+    >
+
+    <button
+      id="clearBtn"
+      class="clear-btn"
+    >
+      ×
+    </button>
+
+  </div>
+
+  <div class="search-hint">
+    例如：1326、台化、0050、台灣50、塑膠、半導體
+  </div>
+
+</section>
+
+
+<!-- ==========================
+     QUICK
+========================== -->
+
+<div class="quick-wrap">
+
+  <div class="quick">
+
+    <button data-search="1326">
+      1326 台化
+    </button>
+
+    <button data-search="台化">
+      台化
+    </button>
+
+    <button data-search="2330">
+      2330 台積電
+    </button>
+
+    <button data-search="0050">
+      0050
+    </button>
+
+    <button data-search="台灣50">
+      台灣50
+    </button>
+
+    <button data-search="半導體">
+      半導體
+    </button>
+
+    <button data-search="塑膠">
+      塑膠
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ==========================
+     FILTER
+========================== -->
+
+<section class="filters">
+
+  <div class="filter-grid">
+
+    <select id="marketFilter">
+
+      <option value="">
+        全部市場
+      </option>
+
+      <option value="上市">
+        上市
+      </option>
+
+      <option value="上櫃">
+        上櫃
+      </option>
+
+      <option value="興櫃">
+        興櫃
+      </option>
+
+    </select>
+
+
+    <select id="typeFilter">
+
+      <option value="">
+        全部類型
+      </option>
+
+      <option value="股票">
+        股票
+      </option>
+
+      <option value="ETF">
+        ETF
+      </option>
+
+      <option value="興櫃股票">
+        興櫃股票
+      </option>
+
+    </select>
+
+
+    <select id="sortFilter">
+
+      <option value="relevance">
+        搜尋相關度
+      </option>
+
+      <option value="code">
+        代號排序
+      </option>
+
+      <option value="name">
+        名稱排序
+      </option>
+
+    </select>
+
+  </div>
+
+</section>
+
+
+<!-- ==========================
+     DATABASE
+========================== -->
+
+<section class="database">
+
+  <div class="database-row">
+
+    <div>
+
+      <div class="database-label">
+        本機股票資料庫
+      </div>
+
+      <div class="database-count">
+        <span id="totalCount">0</span>
+        筆
+      </div>
+
+    </div>
+
+    <div class="database-info">
+
+      <strong>
+        0 API 搜尋
+      </strong>
+
+      <span>
+        讀取 stock-data/stocks.json
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ==========================
+     RESULTS
+========================== -->
+
+<section class="section">
+
+  <div class="section-head">
+
+    <h2 id="resultTitle">
+      🔎 搜尋結果
+    </h2>
+
+    <span id="resultCount">
+      0 筆
+    </span>
+
+  </div>
+
+  <div
+    id="results"
+    class="results"
+  ></div>
+
+</section>
+
+
+<!-- ==========================
+     RECENT
+========================== -->
+
+<section
+  class="section"
+  id="recentSection"
+>
+
+  <div class="section-head">
+
+    <h2>
+      🕘 最近搜尋
+    </h2>
+
+    <span id="recentCount">
+      0
+    </span>
+
+  </div>
+
+  <div
+    id="recentList"
+    class="simple-list"
+  ></div>
+
+</section>
+
+
+<!-- ==========================
+     FAVORITES
+========================== -->
+
+<section
+  class="section"
+  id="favoriteSection"
+>
+
+  <div class="section-head">
+
+    <h2>
+      ⭐ 我的自選
+    </h2>
+
+    <span id="favoriteCount">
+      0
+    </span>
+
+  </div>
+
+  <div
+    id="favoriteList"
+    class="simple-list"
+  ></div>
+
+</section>
+
+
+<!-- ==========================
+     EMPTY STATE
+========================== -->
+
+<div
+  id="state"
+  class="state"
+  style="display:none;"
+>
+
+  <div class="state-icon">
+    🔎
+  </div>
+
+  <strong id="stateTitle">
+    找不到資料
+  </strong>
+
+  <div id="stateText">
+    請換代號、名稱或關鍵字。
+  </div>
+
+</div>
+
+
+<!-- ==========================
+     BOTTOM NAV
+========================== -->
+
+<nav class="bottom-nav">
+
+  <button
+    class="nav-btn active"
+    data-nav="search"
+  >
+    <span>🔎</span>
+    搜尋
+  </button>
+
+  <button
+    class="nav-btn"
+    data-nav="favorite"
+  >
+    <span>⭐</span>
+    自選股
+  </button>
+
+  <button
+    class="nav-btn"
+    data-nav="recent"
+  >
+    <span>🕘</span>
+    最近
+  </button>
+
+  <button
+    class="nav-btn"
+    data-nav="top"
+  >
+    <span>📈</span>
+    行情
+  </button>
+
+</nav>
+
+</div>
+
+
+<!-- ==========================
+     DETAIL MODAL
+========================== -->
+
+<div
+  id="detailModal"
+  class="modal"
+>
+
+  <div class="modal-panel">
+
+    <div class="modal-head">
+
+      <div>
+
+        <div
+          id="modalTitle"
+          class="modal-title"
+        >
+          —
+        </div>
+
+        <div
+          id="modalSub"
+          class="modal-sub"
+        >
+          —
+        </div>
+
+      </div>
+
+      <button
+        id="closeModal"
+        class="close"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div
+      id="detailGrid"
+      class="detail-grid"
+    ></div>
+
+
+    <div class="analysis-box">
+
+      <div class="analysis-title">
+
+        <strong>
+          📊 行情分析
+        </strong>
+
+        <span>
+          本版行情資料欄位
+        </span>
+
+      </div>
+
+      <div
+        id="modalAnalysis"
+      ></div>
+
+    </div>
+
+
+    <div class="notice">
+      ℹ️ 14 版目前負責「股票資料＋行情分析介面」。
+      行情欄位會優先使用後續建立的本機行情資料；
+      沒有行情資料時，不會自行捏造價格。
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+"use strict";
+
+/* =========================================================
+   股票搜尋器 14
+   ========================================================= */
+
+const DATA_URL =
+  "stock-data/stocks.json";
+
+
+let stockData = [];
+let filteredData = [];
+let currentQuery = "";
+
+
+/* ==============================
+   DOM
+============================== */
+
+const searchInput =
+  document.getElementById(
+    "searchInput"
+  );
+
+const clearBtn =
+  document.getElementById(
+    "clearBtn"
+  );
+
+const marketFilter =
+  document.getElementById(
+    "marketFilter"
+  );
+
+const typeFilter =
+  document.getElementById(
+    "typeFilter"
+  );
+
+const sortFilter =
+  document.getElementById(
+    "sortFilter"
+  );
+
+const results =
+  document.getElementById(
+    "results"
+  );
+
+const resultTitle =
+  document.getElementById(
+    "resultTitle"
+  );
+
+const resultCount =
+  document.getElementById(
+    "resultCount"
+  );
+
+const totalCount =
+  document.getElementById(
+    "totalCount"
+  );
+
+const dataStatus =
+  document.getElementById(
+    "dataStatus"
+  );
+
+const updateTime =
+  document.getElementById(
+    "updateTime"
+  );
+
+const state =
+  document.getElementById(
+    "state"
+  );
+
+const stateTitle =
+  document.getElementById(
+    "stateTitle"
+  );
+
+const stateText =
+  document.getElementById(
+    "stateText"
+  );
+
+const recentList =
+  document.getElementById(
+    "recentList"
+  );
+
+const favoriteList =
+  document.getElementById(
+    "favoriteList"
+  );
+
+const recentCount =
+  document.getElementById(
+    "recentCount"
+  );
+
+const favoriteCount =
+  document.getElementById(
+    "favoriteCount"
+  );
+
+const detailModal =
+  document.getElementById(
+    "detailModal"
+  );
+
+const closeModal =
+  document.getElementById(
+    "closeModal"
+  );
+
+const modalTitle =
+  document.getElementById(
+    "modalTitle"
+  );
+
+const modalSub =
+  document.getElementById(
+    "modalSub"
+  );
+
+const detailGrid =
+  document.getElementById(
+    "detailGrid"
+  );
+
+const modalAnalysis =
+  document.getElementById(
+    "modalAnalysis"
+  );
+
+
+/* ==============================
+   Storage
+============================== */
+
+function getJSON(
+  key,
+  fallback
+){
+
+  try{
+
+    const raw =
+      localStorage.getItem(key);
+
+    if(!raw){
+      return fallback;
+    }
+
+    return JSON.parse(raw);
+
+  }catch(e){
+
+    return fallback;
+
+  }
+
+}
+
+
+function setJSON(
+  key,
+  value
+){
+
+  try{
+
+    localStorage.setItem(
+      key,
+      JSON.stringify(value)
+    );
+
+  }catch(e){
+
+    console.warn(
+      "Storage error",
+      e
+    );
+
+  }
+
+}
+
+
+function getFavorites(){
+
+  return getJSON(
+    "stock-search-14-favorites",
+    []
+  );
+
+}
+
+
+function saveFavorites(
+  list
+){
+
+  setJSON(
+    "stock-search-14-favorites",
+    list
+  );
+
+}
+
+
+function getRecent(){
+
+  return getJSON(
+    "stock-search-14-recent",
+    []
+  );
+
+}
+
+
+function saveRecent(
+  list
+){
+
+  setJSON(
+    "stock-search-14-recent",
+    list
+  );
+
+}
+
+
+/* ==============================
+   Text
+============================== */
+
+function normalizeText(
+  value
+){
+
+  return String(
+    value ?? ""
+  )
+    .trim()
+    .toLowerCase();
+
+}
+
+
+function escapeHTML(
+  value
+){
+
+  return String(
+    value ?? ""
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+
+}
+
+
+function toArray(
+  value
+){
+
+  if(Array.isArray(value)){
+
+    return value
+      .map(
+        x =>
+          String(
+            x ?? ""
+          ).trim()
+      )
+      .filter(Boolean);
+
+  }
+
+  if(typeof value === "string"){
+
+    return value
+      .split(
+        /[、,，;；|\/]/
+      )
+      .map(
+        x => x.trim()
+      )
+      .filter(Boolean);
+
+  }
+
+  return [];
+
+}
+
+
+/* ==============================
+   Normalize stock
+============================== */
+
+function normalizeStock(
+  item
+){
+
+  const stock = {
+
+    code:String(
+      item.code ??
+      item.stockCode ??
+      item.symbol ??
+      ""
+    ).trim(),
+
+    name:String(
+      item.name ??
+      item.shortName ??
+      ""
+    ).trim(),
+
+    fullName:String(
+      item.fullName ??
+      item.companyName ??
+      ""
+    ).trim(),
+
+    market:String(
+      item.market ??
+      ""
+    ).trim(),
+
+    type:String(
+      item.type ??
+      ""
+    ).trim(),
+
+    industry:String(
+      item.industry ??
+      ""
+    ).trim(),
+
+    keywords:toArray(
+      item.keywords
+    ),
+
+    /* 行情欄位 */
+    price:toNumber(
+      item.price ??
+      item.currentPrice
+    ),
+
+    change:toNumber(
+      item.change ??
+      item.priceChange
+    ),
+
+    changePct:toNumber(
+      item.changePct ??
+      item.changePercent
+    ),
+
+    open:toNumber(
+      item.open
+    ),
+
+    high:toNumber(
+      item.high
+    ),
+
+    low:toNumber(
+      item.low
+    ),
+
+    prev:toNumber(
+      item.prev ??
+      item.previousClose
+    ),
+
+    volume:toNumber(
+      item.volume
+    ),
+
+    amount:toNumber(
+      item.amount ??
+      item.turnover
+    ),
+
+    bid:toNumber(
+      item.bid ??
+      item.bestBid
+    ),
+
+    ask:toNumber(
+      item.ask ??
+      item.bestAsk
+    ),
+
+    bidVolume:toNumber(
+      item.bidVolume
+    ),
+
+    askVolume:toNumber(
+      item.askVolume
+    ),
+
+    inner:toNumber(
+      item.inner
+    ),
+
+    outer:toNumber(
+      item.outer
+    ),
+
+    upperLimit:toNumber(
+      item.upperLimit
+    ),
+
+    lowerLimit:toNumber(
+      item.lowerLimit
+    ),
+
+    amplitude:toNumber(
+      item.amplitude
+    ),
+
+    /* 均線 */
+    ma5:toNumber(item.ma5),
+    ma11:toNumber(item.ma11),
+    ma31:toNumber(item.ma31),
+    ma62:toNumber(item.ma62),
+    ma122:toNumber(item.ma122),
+    ma242:toNumber(item.ma242)
+
+  };
+
+
+  const extra = [
+    stock.code,
+    stock.name,
+    stock.fullName,
+    stock.industry,
+    stock.type
+  ];
+
+
+  for(
+    const value of extra
+  ){
+
+    if(
+      value &&
+      !stock.keywords.includes(value)
+    ){
+
+      stock.keywords.push(
+        value
+      );
+
+    }
+
+  }
+
+
+  return stock;
+
+}
+
+
+/* ==============================
+   Number
+============================== */
+
+function toNumber(
+  value
+){
+
+  if(
+    value === null ||
+    value === undefined ||
+    value === ""
+  ){
+    return null;
+  }
+
+  const cleaned =
+    String(value)
+      .replaceAll(
+        ",",
+        ""
+      )
+      .replace(
+        "%",
+        ""
+      )
+      .trim();
+
+  const number =
+    Number(cleaned);
+
+  return Number.isFinite(number)
+    ? number
+    : null;
+
+}
+
+
+/* ==============================
+   Load
+============================== */
+
+async function loadData(){
+
+  dataStatus.textContent =
+    "讀取中…";
+
+  dataStatus.style.color =
+    "var(--yellow)";
+
+
+  try{
+
+    const response =
+      await fetch(
+        DATA_URL +
+        "?v=" +
+        Date.now(),
+        {
+          cache:"no-store"
+        }
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "HTTP " +
+        response.status
+      );
+
+    }
+
+
+    const json =
+      await response.json();
+
+
+    let raw = [];
+
+
+    if(
+      Array.isArray(json)
+    ){
+
+      raw = json;
+
+    }else if(
+      Array.isArray(
+        json.stocks
+      )
+    ){
+
+      raw =
+        json.stocks;
+
+    }else if(
+      Array.isArray(
+        json.data
+      )
+    ){
+
+      raw =
+        json.data;
+
+    }
+
+
+    stockData =
+      raw
+        .map(
+          normalizeStock
+        )
+        .filter(
+          item =>
+            item.code
+        );
+
+
+    totalCount.textContent =
+      stockData.length.toLocaleString();
+
+
+    if(
+      json.updatedAt
+    ){
+
+      let text =
+        json.updatedAt;
+
+      try{
+
+        text =
+          new Date(
+            json.updatedAt
+          ).toLocaleString(
+            "zh-TW",
+            {
+              year:"numeric",
+              month:"2-digit",
+              day:"2-digit",
+              hour:"2-digit",
+              minute:"2-digit"
+            }
+          );
+
+      }catch(e){}
+
+
+      updateTime.textContent =
+        "更新：" +
+        text;
+
+    }
+
+
+    dataStatus.textContent =
+      "資料正常";
+
+    dataStatus.style.color =
+      "var(--green)";
+
+
+    if(
+      stockData.length === 0
+    ){
+
+      showState(
+        "資料庫沒有股票",
+        "請確認 stock-data/stocks.json"
+      );
+
+      return;
+
+    }
+
+
+    runSearch();
+
+    renderRecent();
+
+    renderFavorites();
+
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+
+    dataStatus.textContent =
+      "讀取失敗";
+
+    dataStatus.style.color =
+      "var(--red)";
+
+
+    showState(
+      "無法讀取資料",
+      "請確認 stock-data/stocks.json 路徑是否正確。"
+    );
+
+  }
+
+}
+
+
+/* ==============================
+   Search score
+============================== */
+
+function scoreStock(
+  stock,
+  query
+){
+
+  const q =
+    normalizeText(
+      query
+    );
+
+  if(!q){
+    return 0;
+  }
+
+
+  const code =
+    normalizeText(
+      stock.code
+    );
+
+  const name =
+    normalizeText(
+      stock.name
+    );
+
+  const fullName =
+    normalizeText(
+      stock.fullName
+    );
+
+  const industry =
+    normalizeText(
+      stock.industry
+    );
+
+  const keywords =
+    stock.keywords
+      .map(
+        normalizeText
+      );
+
+
+  let score = 0;
+
+
+  if(code === q){
+    score += 10000;
+  }
+
+  if(name === q){
+    score += 9000;
+  }
+
+  if(fullName === q){
+    score += 8500;
+  }
+
+  if(code.startsWith(q)){
+    score += 7000;
+  }
+
+  if(name.startsWith(q)){
+    score += 6800;
+  }
+
+  if(name.includes(q)){
+    score += 5000;
+  }
+
+  if(fullName.includes(q)){
+    score += 4500;
+  }
+
+  if(
+    keywords.some(
+      x => x === q
+    )
+  ){
+    score += 4300;
+  }
+
+  if(
+    keywords.some(
+      x => x.includes(q)
+    )
+  ){
+    score += 3200;
+  }
+
+  if(
+    industry === q
+  ){
+    score += 3000;
+  }
+
+  if(
+    industry.includes(q)
+  ){
+    score += 2200;
+  }
+
+
+  return score;
+
+}
+
+
+/* ==============================
+   Search
+============================== */
+
+function runSearch(){
+
+  currentQuery =
+    searchInput.value.trim();
+
+
+  const market =
+    marketFilter.value;
+
+  const type =
+    typeFilter.value;
+
+
+  let list =
+    stockData.slice();
+
+
+  if(market){
+
+    list =
+      list.filter(
+        item =>
+          item.market ===
+          market
+      );
+
+  }
+
+
+  if(type){
+
+    list =
+      list.filter(
+        item =>
+          item.type ===
+          type
+      );
+
+  }
+
+
+  if(currentQuery){
+
+    const scored =
+      list
+        .map(
+          item => ({
+            item,
+            score:
+              scoreStock(
+                item,
+                currentQuery
+              )
+          })
+        )
+        .filter(
+          x =>
+            x.score > 0
+        );
+
+
+    scored.sort(
+      (a,b) => {
+
+        if(
+          b.score !==
+          a.score
+        ){
+
+          return (
+            b.score -
+            a.score
+          );
+
+        }
+
+        return a.item.code
+          .localeCompare(
+            b.item.code
+          );
+
+      }
+    );
+
+
+    filteredData =
+      scored.map(
+        x => x.item
+      );
+
+
+  }else{
+
+    filteredData =
+      list.slice();
+
+  }
+
+
+  sortResults();
+
+  renderResults();
+
+}
+
+
+/* ==============================
+   Sort
+============================== */
+
+function sortResults(){
+
+  const mode =
+    sortFilter.value;
+
+
+  if(
+    mode === "code"
+  ){
+
+    filteredData.sort(
+      (a,b) =>
+        a.code.localeCompare(
+          b.code
+        )
+    );
+
+  }
+
+
+  if(
+    mode === "name"
+  ){
+
+    filteredData.sort(
+      (a,b) =>
+        a.name.localeCompare(
+          b.name
+        )
+    );
+
+  }
+
+}
+
+
+/* ==============================
+   Render results
+============================== */
+
+function renderResults(){
+
+  results.innerHTML = "";
+
+  resultCount.textContent =
+    filteredData.length
+      .toLocaleString() +
+    " 筆";
+
+
+  resultTitle.textContent =
+    currentQuery
+      ? "🔎 搜尋結果"
+      : "📋 股票資料";
+
+
+  const list =
+    filteredData.slice(
+      0,
+      100
+    );
+
+
+  if(!list.length){
+
+    results.style.display =
+      "none";
+
+    showState(
+      "找不到符合資料",
+      "請試試代號、名稱、產業或關鍵字。"
+    );
+
+    return;
+
+  }
+
+
+  hideState();
+
+  results.style.display =
+    "flex";
+
+
+  for(
+    const stock of list
+  ){
+
+    results.appendChild(
+      createStockCard(
+        stock
+      )
+    );
+
+  }
+
+
+  if(
+    filteredData.length >
+    100
+  ){
+
+    const more =
+      document.createElement(
+        "div"
+      );
+
+    more.className =
+      "state";
+
+    more.style.margin =
+      "5px 0 0";
+
+    more.innerHTML = `
+      <strong>
+        目前顯示前 100 筆
+      </strong>
+      共找到
+      ${filteredData.length.toLocaleString()}
+      筆
+    `;
+
+    results.appendChild(
+      more
+    );
+
+  }
+
+}
+
+
+/* ==============================
+   Format number
+============================== */
+
+function formatNumber(
+  value,
+  digits = 2
+){
+
+  if(
+    value === null ||
+    value === undefined ||
+    !Number.isFinite(value)
+  ){
+
+    return "—";
+
+  }
+
+
+  return value.toLocaleString(
+    "zh-TW",
+    {
+      minimumFractionDigits:
+        digits,
+      maximumFractionDigits:
+        digits
+    }
+  );
+
+}
+
+
+/* ==============================
+   Change class
+============================== */
+
+function changeClass(
+  value
+){
+
+  if(
+    value === null ||
+    !Number.isFinite(value)
+  ){
+
+    return "flat";
+
+  }
+
+  if(value > 0){
+    return "up";
+  }
+
+  if(value < 0){
+    return "down";
+  }
+
+  return "flat";
+
+}
+
+
+/* ==============================
+   MA deviation
+============================== */
+
+function maGap(
+  price,
+  ma
+){
+
+  if(
+    price === null ||
+    ma === null ||
+    ma === 0
+  ){
+
+    return null;
+
+  }
+
+  return (
+    (price - ma) /
+    ma
+  ) * 100;
+
+}
+
+
+/* ==============================
+   MA item
+============================== */
+
+function maItem(
+  name,
+  ma,
+  price
+){
+
+  const gap =
+    maGap(
+      price,
+      ma
+    );
+
+
+  let cls =
+    "gap-neutral";
+
+
+  if(
+    gap !== null
+  ){
+
+    if(gap > 0){
+      cls = "gap-positive";
+    }
+
+    if(gap < 0){
+      cls = "gap-negative";
+    }
+
+  }
+
+
+  return `
+
+    <div class="ma-item">
+
+      <div class="ma-name">
+        ${name}
+      </div>
+
+      <div class="ma-price">
+        ${formatNumber(ma)}
+      </div>
+
+      <div class="ma-gap ${cls}">
+        ${
+          gap === null
+            ? "乖離 —"
+            : (
+                gap > 0
+                  ? "+"
+                  : ""
+              ) +
+              formatNumber(
+                gap,
+                2
+              ) +
+              "%"
+        }
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ==============================
+   Trend analysis
+============================== */
+
+function getTrend(
+  stock
+){
+
+  const values = [
+    stock.ma5,
+    stock.ma11,
+    stock.ma31,
+    stock.ma62,
+    stock.ma122,
+    stock.ma242
+  ];
+
+
+  const valid =
+    values.filter(
+      Number.isFinite
+    );
+
+
+  if(
+    valid.length <
+    3
+  ){
+
+    return {
+      text:"等待均線資料",
+      class:"trend-normal"
+    };
+
+  }
+
+
+  let bullish = true;
+  let bearish = true;
+
+
+  for(
+    let i = 0;
+    i < valid.length - 1;
+    i++
+  ){
+
+    if(
+      valid[i] <=
+      valid[i+1]
+    ){
+
+      bullish = false;
+
+    }
+
+    if(
+      valid[i] >=
+      valid[i+1]
+    ){
+
+      bearish = false;
+
+    }
+
+  }
+
+
+  if(
+    bullish
+  ){
+
+    return {
+      text:"多頭排列",
+      class:"trend-bull"
+    };
+
+  }
+
+
+  if(
+    bearish
+  ){
+
+    return {
+      text:"空頭排列",
+      class:"trend-bear"
+    };
+
+  }
+
+
+  return {
+    text:"均線整理",
+    class:"trend-normal"
+  };
+
+}
+
+
+/* ==============================
+   Analysis HTML
+============================== */
+
+function buildAnalysis(
+  stock
+){
+
+  const trend =
+    getTrend(
+      stock
+    );
+
+
+  const price =
+    stock.price;
+
+
+  const ma5gap =
+    maGap(
+      price,
+      stock.ma5
+    );
+
+
+  const ma20 =
+    null;
+
+
+  let position =
+    "等待行情資料";
+
+
+  if(
+    price !== null &&
+    stock.ma5 !== null
+  ){
+
+    if(
+      price >
+      stock.ma5
+    ){
+
+      position =
+        "股價在 MA5 之上";
+
+    }else if(
+      price <
+      stock.ma5
+    ){
+
+      position =
+        "股價在 MA5 之下";
+
+    }else{
+
+      position =
+        "股價接近 MA5";
+
+    }
+
+  }
+
+
+  return `
+
+    <div class="ma-grid">
+
+      ${maItem(
+        "MA5",
+        stock.ma5,
+        price
+      )}
+
+      ${maItem(
+        "MA11",
+        stock.ma11,
+        price
+      )}
+
+      ${maItem(
+        "MA31",
+        stock.ma31,
+        price
+      )}
+
+      ${maItem(
+        "MA62",
+        stock.ma62,
+        price
+      )}
+
+      ${maItem(
+        "MA122",
+        stock.ma122,
+        price
+      )}
+
+      ${maItem(
+        "MA242",
+        stock.ma242,
+        price
+      )}
+
+    </div>
+
+
+    <div class="trend-row">
+
+      <div class="trend-card">
+
+        <div class="trend-label">
+          均線排列
+        </div>
+
+        <div class="trend-value ${trend.class}">
+          ${trend.text}
+        </div>
+
+      </div>
+
+
+      <div class="trend-card">
+
+        <div class="trend-label">
+          股價位置
+        </div>
+
+        <div class="trend-value">
+          ${position}
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ==============================
+   Quote HTML
+============================== */
+
+function buildQuote(
+  stock
+){
+
+  const hasPrice =
+    stock.price !== null;
+
+
+  if(!hasPrice){
+
+    return `
+
+      <div class="quote">
+
+        <div class="quote-top">
+
+          <div>
+
+            <div
+              class="database-label"
+            >
+              最新行情
+            </div>
+
+            <div class="price">
+              —
+            </div>
+
+          </div>
+
+          <div class="change flat">
+            尚無行情資料
+          </div>
+
+        </div>
+
+        <div class="quote-grid">
+
+          ${quoteItem(
+            "開盤",
+            stock.open
+          )}
+
+          ${quoteItem(
+            "最高",
+            stock.high
+          )}
+
+          ${quoteItem(
+            "最低",
+            stock.low
+          )}
+
+          ${quoteItem(
+            "昨收",
+            stock.prev
+          )}
+
+          ${quoteItem(
+            "成交量",
+            stock.volume,
+            0
+          )}
+
+          ${quoteItem(
+            "成交金額",
+            stock.amount,
+            0
+          )}
+
+          ${quoteItem(
+            "買價",
+            stock.bid
+          )}
+
+          ${quoteItem(
+            "賣價",
+            stock.ask
+          )}
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+
+  const cls =
+    changeClass(
+      stock.change
+    );
+
+
+  const changeText =
+    stock.change === null
+      ? "—"
+      :
+        (
+          stock.change > 0
+            ? "+"
+            : ""
+        ) +
+        formatNumber(
+          stock.change
+        );
+
+
+  const pctText =
+    stock.changePct === null
+      ? ""
+      :
+        " " +
+        (
+          stock.changePct > 0
+            ? "+"
+            : ""
+        ) +
+        formatNumber(
+          stock.changePct
+        ) +
+        "%";
+
+
+  return `
+
+    <div class="quote">
+
+      <div class="quote-top">
+
+        <div>
+
+          <div class="database-label">
+            最新行情
+          </div>
+
+          <div class="price">
+            ${formatNumber(
+              stock.price
+            )}
+          </div>
+
+        </div>
+
+
+        <div class="change ${cls}">
+
+          ${changeText}
+
+          <br>
+
+          ${pctText}
+
+        </div>
+
+      </div>
+
+
+      <div class="quote-grid">
+
+        ${quoteItem(
+          "開盤",
+          stock.open
+        )}
+
+        ${quoteItem(
+          "最高",
+          stock.high
+        )}
+
+        ${quoteItem(
+          "最低",
+          stock.low
+        )}
+
+        ${quoteItem(
+          "昨收",
+          stock.prev
+        )}
+
+        ${quoteItem(
+          "振幅",
+          stock.amplitude,
+          2,
+          "%"
+        )}
+
+        ${quoteItem(
+          "成交量",
+          stock.volume,
+          0
+        )}
+
+        ${quoteItem(
+          "買價",
+          stock.bid
+        )}
+
+        ${quoteItem(
+          "賣價",
+          stock.ask
+        )}
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+function quoteItem(
+  label,
+  value,
+  digits = 2,
+  suffix = ""
+){
+
+  return `
+
+    <div class="quote-item">
+
+      <div class="quote-label">
+        ${label}
+      </div>
+
+      <div class="quote-value">
+        ${
+          value === null
+            ? "—"
+            :
+              formatNumber(
+                value,
+                digits
+              ) +
+              suffix
+        }
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+/* ==============================
+   Stock card
+============================== */
+
+function createStockCard(
+  stock
+){
+
+  const card =
+    document.createElement(
+      "article"
+    );
+
+  card.className =
+    "stock-card";
+
+
+  const favorites =
+    getFavorites();
+
+
+  const isFavorite =
+    favorites.some(
+      item =>
+        item.code ===
+          stock.code &&
+        item.market ===
+          stock.market
+    );
+
+
+  const quote =
+    buildQuote(
+      stock
+    );
+
+
+  const analysis =
+    buildAnalysis(
+      stock
+    );
+
+
+  card.innerHTML = `
+
+    <div class="stock-head">
+
+      <div>
+
+        <div class="stock-code">
+          ${escapeHTML(
+            stock.code
+          )}
+        </div>
+
+        <div class="stock-name">
+          ${escapeHTML(
+            stock.name ||
+            "—"
+          )}
+        </div>
+
+        ${
+          stock.fullName
+            ? `
+              <div class="stock-full">
+                ${escapeHTML(
+                  stock.fullName
+                )}
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+
+      <div class="stock-badges">
+
+        <div class="badge market">
+          ${escapeHTML(
+            stock.market ||
+            "—"
+          )}
+        </div>
+
+        <div class="badge type">
+          ${escapeHTML(
+            stock.type ||
+            "證券"
+          )}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    ${
+      stock.industry
+        ? `
+          <div
+            style="
+              margin-top:8px;
+              color:var(--muted);
+              font-size:11px;
+            "
+          >
+            🏭
+            ${escapeHTML(
+              stock.industry
+            )}
+          </div>
+        `
+        : ""
+    }
+
+
+    ${quote}
+
+
+    <div class="analysis-box">
+
+      <div class="analysis-title">
+
+        <strong>
+          📊 技術分析
+        </strong>
+
+        <span>
+          MA5・11・31・62・122・242
+        </span>
+
+      </div>
+
+      ${analysis}
+
+    </div>
+
+
+    <div class="actions">
+
+      <button
+        class="primary detail-btn"
+        type="button"
+      >
+        📋 完整資料
+      </button>
+
+      <button
+        class="favorite ${
+          isFavorite
+            ? "active"
+            : ""
+        }"
+        type="button"
+      >
+        ${
+          isFavorite
+            ? "⭐ 已自選"
+            : "☆ 加入自選"
+        }
+      </button>
+
+    </div>
+
+  `;
+
+
+  card
+    .querySelector(
+      ".detail-btn"
+    )
+    .addEventListener(
+      "click",
+      () =>
+        openDetail(
+          stock
+        )
+    );
+
+
+  card
+    .querySelector(
+      ".favorite"
+    )
+    .addEventListener(
+      "click",
+      () => {
+
+        toggleFavorite(
+          stock
+        );
+
+        renderResults();
+
+        renderFavorites();
+
+      }
+    );
+
+
+  return card;
+
+}
+
+
+/* ==============================
+   Favorite
+============================== */
+
+function toggleFavorite(
+  stock
+){
+
+  let list =
+    getFavorites();
+
+
+  const index =
+    list.findIndex(
+      item =>
+        item.code ===
+          stock.code &&
+        item.market ===
+          stock.market
+    );
+
+
+  if(index >= 0){
+
+    list.splice(
+      index,
+      1
+    );
+
+  }else{
+
+    list.unshift({
+
+      code:
+        stock.code,
+
+      name:
+        stock.name,
+
+      fullName:
+        stock.fullName,
+
+      market:
+        stock.market,
+
+      type:
+        stock.type,
+
+      industry:
+        stock.industry
+
+    });
+
+
+    if(
+      list.length > 100
+    ){
+
+      list =
+        list.slice(
+          0,
+          100
+        );
+
+    }
+
+  }
+
+
+  saveFavorites(
+    list
+  );
+
+}
+
+
+/* ==============================
+   Recent
+============================== */
+
+function addRecent(
+  stock
+){
+
+  let list =
+    getRecent();
+
+
+  list =
+    list.filter(
+      item =>
+        !(
+          item.code ===
+            stock.code &&
+          item.market ===
+            stock.market
+        )
+    );
+
+
+  list.unshift({
+
+    code:
+      stock.code,
+
+    name:
+      stock.name,
+
+    market:
+      stock.market,
+
+    type:
+      stock.type
+
+  });
+
+
+  list =
+    list.slice(
+      0,
+      20
+    );
+
+
+  saveRecent(
+    list
+  );
+
+  renderRecent();
+
+}
+
+
+function renderRecent(){
+
+  const list =
+    getRecent();
+
+
+  recentCount.textContent =
+    list.length;
+
+
+  recentList.innerHTML =
+    "";
+
+
+  if(!list.length){
+
+    recentList.innerHTML = `
+      <div
+        style="
+          color:var(--muted);
+          font-size:11px;
+          padding:8px 2px;
+        "
+      >
+        尚無最近搜尋
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  for(
+    const item of list
+  ){
+
+    const row =
+      document.createElement(
+        "div"
+      );
+
+    row.className =
+      "simple-item";
+
+
+    row.innerHTML = `
+
+      <div>
+
+        <span class="simple-code">
+          ${escapeHTML(
+            item.code
+          )}
+        </span>
+
+        <span class="simple-name">
+          ${escapeHTML(
+            item.name ||
+            ""
+          )}
+        </span>
+
+      </div>
+
+
+      <button
+        type="button"
+      >
+        🔎
+      </button>
+
+    `;
+
+
+    row
+      .querySelector(
+        "button"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          searchInput.value =
+            item.code;
+
+          updateClear();
+
+          runSearch();
+
+          window.scrollTo({
+            top:0,
+            behavior:"smooth"
+          });
+
+        }
+      );
+
+
+    recentList.appendChild(
+      row
+    );
+
+  }
+
+}
+
+
+/* ==============================
+   Favorites render
+============================== */
+
+function renderFavorites(){
+
+  const list =
+    getFavorites();
+
+
+  favoriteCount.textContent =
+    list.length;
+
+
+  favoriteList.innerHTML =
+    "";
+
+
+  if(!list.length){
+
+    favoriteList.innerHTML = `
+      <div
+        style="
+          color:var(--muted);
+          font-size:11px;
+          padding:8px 2px;
+        "
+      >
+        尚未加入自選股
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  for(
+    const item of list
+  ){
+
+    const row =
+      document.createElement(
+        "div"
+      );
+
+    row.className =
+      "simple-item";
+
+
+    row.innerHTML = `
+
+      <div>
+
+        <span class="simple-code">
+          ${escapeHTML(
+            item.code
+          )}
+        </span>
+
+        <span class="simple-name">
+          ${escapeHTML(
+            item.name ||
+            ""
+          )}
+        </span>
+
+      </div>
+
+
+      <button
+        type="button"
+      >
+        📈
+      </button>
+
+    `;
+
+
+    row
+      .querySelector(
+        "button"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          searchInput.value =
+            item.code;
+
+          updateClear();
+
+          runSearch();
+
+          window.scrollTo({
+            top:0,
+            behavior:"smooth"
+          });
+
+        }
+      );
+
+
+    favoriteList.appendChild(
+      row
+    );
+
+  }
+
+}
+
+
+/* ==============================
+   Detail modal
+============================== */
+
+function openDetail(
+  stock
+){
+
+  addRecent(
+    stock
+  );
+
+
+  modalTitle.textContent =
+    stock.code +
+    " " +
+    stock.name;
+
+
+  modalSub.textContent =
+    stock.fullName ||
+    "股票資料";
+
+
+  const fields = [
+
+    ["股票代號",
+      stock.code],
+
+    ["中文名稱",
+      stock.name],
+
+    ["完整名稱",
+      stock.fullName],
+
+    ["市場",
+      stock.market],
+
+    ["類型",
+      stock.type],
+
+    ["產業",
+      stock.industry],
+
+    ["現價",
+      formatNumber(
+        stock.price
+      )],
+
+    ["漲跌",
+      formatNumber(
+        stock.change
+      )],
+
+    ["漲跌幅",
+      stock.changePct === null
+        ? "—"
+        :
+          formatNumber(
+            stock.changePct
+          ) + "%"],
+
+    ["開盤",
+      formatNumber(
+        stock.open
+      )],
+
+    ["最高",
+      formatNumber(
+        stock.high
+      )],
+
+    ["最低",
+      formatNumber(
+        stock.low
+      )],
+
+    ["昨收",
+      formatNumber(
+        stock.prev
+      )],
+
+    ["成交量",
+      formatNumber(
+        stock.volume,
+        0
+      )],
+
+    ["成交金額",
+      formatNumber(
+        stock.amount,
+        0
+      )],
+
+    ["買價",
+      formatNumber(
+        stock.bid
+      )],
+
+    ["賣價",
+      formatNumber(
+        stock.ask
+      )],
+
+    ["買量",
+      formatNumber(
+        stock.bidVolume,
+        0
+      )],
+
+    ["賣量",
+      formatNumber(
+        stock.askVolume,
+        0
+      )],
+
+    ["內盤",
+      formatNumber(
+        stock.inner,
+        0
+      )],
+
+    ["外盤",
+      formatNumber(
+        stock.outer,
+        0
+      )],
+
+    ["漲停",
+      formatNumber(
+        stock.upperLimit
+      )],
+
+    ["跌停",
+      formatNumber(
+        stock.lowerLimit
+      )],
+
+    ["振幅",
+      stock.amplitude === null
+        ? "—"
+        :
+          formatNumber(
+            stock.amplitude
+          ) + "%"]
+
+  ];
+
+
+  detailGrid.innerHTML =
+    fields
+      .map(
+        ([label,value]) => `
+
+          <div class="detail-box">
+
+            <div class="detail-label">
+              ${escapeHTML(
+                label
+              )}
+            </div>
+
+            <div class="detail-value">
+              ${escapeHTML(
+                value || "—"
+              )}
+            </div>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+  modalAnalysis.innerHTML =
+    buildAnalysis(
+      stock
+    );
+
+
+  detailModal.classList.add(
+    "show"
+  );
+
+  document.body.style.overflow =
+    "hidden";
+
+}
+
+
+function closeDetail(){
+
+  detailModal.classList.remove(
+    "show"
+  );
+
+  document.body.style.overflow =
+    "";
+
+}
+
+
+/* ==============================
+   State
+============================== */
+
+function showState(
+  title,
+  text
+){
+
+  stateTitle.textContent =
+    title;
+
+  stateText.textContent =
+    text;
+
+  state.style.display =
+    "block";
+
+}
+
+
+function hideState(){
+
+  state.style.display =
+    "none";
+
+}
+
+
+/* ==============================
+   Clear
+============================== */
+
+function updateClear(){
+
+  if(
+    searchInput.value.trim()
+  ){
+
+    clearBtn.classList.add(
+      "show"
+    );
+
+  }else{
+
+    clearBtn.classList.remove(
+      "show"
+    );
+
+  }
+
+}
+
+
+/* ==============================
+   Events
+============================== */
+
+searchInput.addEventListener(
+  "input",
+  () => {
+
+    updateClear();
+
+    runSearch();
+
+  }
+);
+
+
+clearBtn.addEventListener(
+  "click",
+  () => {
+
+    searchInput.value =
+      "";
+
+    updateClear();
+
+    runSearch();
+
+    searchInput.focus();
+
+  }
+);
+
+
+marketFilter.addEventListener(
+  "change",
+  runSearch
+);
+
+
+typeFilter.addEventListener(
+  "change",
+  runSearch
+);
+
+
+sortFilter.addEventListener(
+  "change",
+  runSearch
+);
+
+
+document
+  .querySelectorAll(
+    "[data-search]"
+  )
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          searchInput.value =
+            button.dataset.search;
+
+          updateClear();
+
+          runSearch();
+
+          window.scrollTo({
+            top:0,
+            behavior:"smooth"
+          });
+
+        }
+      );
+
+    }
+  );
+
+
+closeModal.addEventListener(
+  "click",
+  closeDetail
+);
+
+
+detailModal.addEventListener(
+  "click",
+  event => {
+
+    if(
+      event.target ===
+      detailModal
+    ){
+
+      closeDetail();
+
+    }
+
+  }
+);
+
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key ===
+      "Escape"
+    ){
+
+      closeDetail();
+
+    }
+
+  }
+);
+
+
+/* ==============================
+   Bottom navigation
+============================== */
+
+document
+  .querySelectorAll(
+    ".nav-btn"
+  )
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(
+              ".nav-btn"
+            )
+            .forEach(
+              btn =>
+                btn.classList
+                  .remove(
+                    "active"
+                  )
+            );
+
+
+          button.classList.add(
+            "active"
+          );
+
+
+          const nav =
+            button.dataset.nav;
+
+
+          if(
+            nav === "search"
+          ){
+
+            window.scrollTo({
+              top:0,
+              behavior:"smooth"
+            });
+
+          }
+
+
+          if(
+            nav === "favorite"
+          ){
+
+            document
+              .getElementById(
+                "favoriteSection"
+              )
+              .scrollIntoView({
+                behavior:"smooth"
+              });
+
+          }
+
+
+          if(
+            nav === "recent"
+          ){
+
+            document
+              .getElementById(
+                "recentSection"
+              )
+              .scrollIntoView({
+                behavior:"smooth"
+              });
+
+          }
+
+
+          if(
+            nav === "top"
+          ){
+
+            window.scrollTo({
+              top:0,
+              behavior:"smooth"
+            });
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+/* ==============================
+   Start
+============================== */
+
+loadData();
+
+</script>
+
+</body>
+</html>
