@@ -22,101 +22,30 @@ jobs:
           python-version: "3.12"
 
       - name: Install requests
-        run: pip install requests
-
-      - name: Python Syntax Check
         run: |
-          python - <<'PY'
-          import ast
-          import pathlib
-
-          p = pathlib.Path(
-              ".github/workflows/update-latest.yml"
-          ).read_text(
-              encoding="utf-8"
-          )
-
-          marker = (
-              "      - name: "
-              "Update latest.json and history"
-          )
-
-          if marker not in p:
-              raise SystemExit(
-                  "找不到主要更新程式"
-              )
-
-          target = p.split(
-              marker,
-              1
-          )[1]
-
-          start = target.find(
-              "          python <<'PY'"
-          )
-
-          if start < 0:
-              raise SystemExit(
-                  "找不到主要 Python 程式"
-              )
-
-          start = target.find(
-              "\n",
-              start
-          ) + 1
-
-          end = target.find(
-              "\n          PY",
-              start
-          )
-
-          if end < 0:
-              raise SystemExit(
-                  "找不到 Python 程式結尾"
-              )
-
-          code = "\n".join(
-              line[10:]
-              if line.startswith("          ")
-              else line
-              for line in target[
-                  start:end
-              ].splitlines()
-          )
-
-          ast.parse(code)
-
-          print(
-              "OK：主要 Python 語法檢查通過"
-          )
-          PY
+          python -m pip install --upgrade pip
+          pip install requests
 
       - name: Update latest.json and history
+        env:
+          PYTHONUNBUFFERED: "1"
         run: |
-          python - <<'PY'
+          python <<'PY'
           import json
           import os
+          from datetime import datetime, timezone, timedelta
+
           import requests
 
-          from datetime import (
-              datetime,
-              timezone,
-              timedelta
-          )
+          # ============================================================
+          # 基本設定
+          # ============================================================
 
-          STOCK_FILE = (
-              "stock-data/stocks.json"
-          )
+          STOCK_FILE = "stock-data/stocks.json"
+          LATEST_FILE = "stock-data/latest.json"
+          HISTORY_DIR = "stock-data/history"
 
-          LATEST_FILE = (
-              "stock-data/latest.json"
-          )
-
-          HISTORY_DIR = (
-              "stock-data/history"
-          )
-
-          TZ = timezone(
+          TW_TZ = timezone(
               timedelta(hours=8)
           )
 
@@ -132,16 +61,18 @@ jobs:
               exist_ok=True
           )
 
+          # ============================================================
+          # 工具函式
+          # ============================================================
+
           def clean(value):
+
               if value is None:
                   return None
 
-              s = str(value).strip()
-
-              s = s.replace(
-                  ",",
-                  ""
-              )
+              s = str(
+                  value
+              ).strip()
 
               if s in (
                   "",
@@ -154,99 +85,153 @@ jobs:
               ):
                   return None
 
+              s = (
+                  s.replace(",", "")
+                   .replace(
+                       "<p style= color:red>",
+                       ""
+                   )
+                   .replace(
+                       "<p style= color:green>",
+                       ""
+                   )
+                   .replace(
+                       "</p>",
+                       ""
+                   )
+                   .replace(
+                       "<p>",
+                       ""
+                   )
+              )
+
               try:
+
                   if "." in s:
                       return float(s)
 
                   return int(s)
 
               except Exception:
+
                   return None
 
-          def get_json(
+          def request_json(
               url,
-              params=None
+              params=None,
+              timeout=40
           ):
-              r = requests.get(
+
+              response = requests.get(
                   url,
                   params=params,
                   headers=HEADERS,
-                  timeout=40
+                  timeout=timeout
               )
 
-              r.raise_for_status()
+              response.raise_for_status()
 
-              return r.json()
+              return response.json()
 
           def first(
               row,
-              names
+              keys
           ):
+
               if not isinstance(
                   row,
                   dict
               ):
                   return None
 
-              for name in names:
-                  if name in row:
-                      value = row.get(
-                          name
-                      )
+              for key in keys:
 
-                      if value not in (
-                          None,
-                          "",
-                          "-",
-                          "--",
-                          "—"
-                      ):
-                          return value
+                  if key not in row:
+                      continue
+
+                  value = row.get(
+                      key
+                  )
+
+                  if value not in (
+                      None,
+                      "",
+                      "-",
+                      "--",
+                      "—"
+                  ):
+                      return value
 
               return None
 
           def normalize_date(
               value
           ):
-              if not value:
+
+              if value is None:
                   return None
 
-              s = str(value).strip()
+              s = str(
+                  value
+              ).strip()
 
+              if not s:
+                  return None
+
+              # 民國日期，例如 1150902
               if (
                   len(s) == 7
                   and s.isdigit()
               ):
+
                   return (
                       f"{int(s[:3]) + 1911}-"
                       f"{s[3:5]}-"
                       f"{s[5:7]}"
                   )
 
+              # 西元日期，例如 20260902
               if (
                   len(s) == 8
                   and s.isdigit()
               ):
+
                   return (
                       f"{s[:4]}-"
                       f"{s[4:6]}-"
                       f"{s[6:8]}"
                   )
 
+              # 115/09/02 或 2026/09/02
               if "/" in s:
-                  a = s.split("/")
 
-                  if len(a) == 3:
+                  parts = s.split(
+                      "/"
+                  )
+
+                  if len(parts) == 3:
+
                       try:
-                          year = int(a[0])
+
+                          year = int(
+                              parts[0]
+                          )
+
+                          month = int(
+                              parts[1]
+                          )
+
+                          day = int(
+                              parts[2]
+                          )
 
                           if year < 1911:
                               year += 1911
 
                           return (
                               f"{year:04d}-"
-                              f"{int(a[1]):02d}-"
-                              f"{int(a[2]):02d}"
+                              f"{month:02d}-"
+                              f"{day:02d}"
                           )
 
                       except Exception:
@@ -254,81 +239,124 @@ jobs:
 
               return s
 
-          def weekdays(
-              count=10
+          def recent_weekdays(
+              days=300
           ):
+
               result = []
 
               today = datetime.now(
-                  TZ
+                  TW_TZ
               ).date()
 
-              for i in range(30):
+              for offset in range(
+                  days
+              ):
+
                   day = (
-                      today -
-                      timedelta(days=i)
+                      today
+                      -
+                      timedelta(
+                          days=offset
+                      )
                   )
 
                   if day.weekday() < 5:
+
                       result.append(
                           day.strftime(
                               "%Y%m%d"
                           )
                       )
 
-                      if len(result) >= count:
-                          break
-
               return result
 
-          def load(path):
-              try:
-                  with open(
-                      path,
-                      encoding="utf-8"
-                  ) as f:
-                      return json.load(f)
+          def load_json(
+              path
+          ):
 
-              except Exception:
+              if not os.path.exists(
+                  path
+              ):
                   return {}
 
-          def save(
+              try:
+
+                  with open(
+                      path,
+                      "r",
+                      encoding="utf-8"
+                  ) as file:
+
+                      return json.load(
+                          file
+                      )
+
+              except Exception:
+
+                  return {}
+
+          def save_json(
               path,
               data
           ):
-              os.makedirs(
-                  os.path.dirname(path)
-                  or ".",
-                  exist_ok=True
+
+              directory = os.path.dirname(
+                  path
               )
 
-              tmp = (
+              if directory:
+
+                  os.makedirs(
+                      directory,
+                      exist_ok=True
+                  )
+
+              temp_path = (
                   path +
                   ".tmp"
               )
 
               with open(
-                  tmp,
+                  temp_path,
                   "w",
                   encoding="utf-8"
-              ) as f:
+              ) as file:
+
                   json.dump(
                       data,
-                      f,
+                      file,
                       ensure_ascii=False,
                       indent=2
                   )
 
               os.replace(
-                  tmp,
+                  temp_path,
                   path
               )
 
-          print(
-              "開始更新最新股票資料"
-          )
+          # ============================================================
+          # 開始
+          # ============================================================
 
-          master = load(
+          print("")
+          print("=" * 60)
+          print("開始更新最新股票資料")
+          print("=" * 60)
+
+          # ============================================================
+          # 讀取股票搜尋資料庫
+          # ============================================================
+
+          if not os.path.exists(
+              STOCK_FILE
+          ):
+
+              raise Exception(
+                  f"找不到 {STOCK_FILE}"
+              )
+
+          master = load_json(
               STOCK_FILE
           )
 
@@ -336,6 +364,7 @@ jobs:
               master,
               dict
           ):
+
               stocks = (
                   master.get("data")
                   or master.get("stocks")
@@ -343,11 +372,13 @@ jobs:
               )
 
           else:
+
               stocks = master
 
-          info = {}
+          stock_info = {}
 
           for item in stocks:
+
               if not isinstance(
                   item,
                   dict
@@ -364,28 +395,34 @@ jobs:
               if not code:
                   continue
 
-              info[code] = {
+              stock_info[code] = {
                   "code": code,
+
                   "name": item.get(
                       "name",
                       ""
                   ),
+
                   "fullName": item.get(
                       "fullName",
                       ""
                   ),
+
                   "market": item.get(
                       "market",
                       ""
                   ),
+
                   "type": item.get(
                       "type",
                       ""
                   ),
+
                   "industry": item.get(
                       "industry",
                       ""
                   ),
+
                   "keywords": item.get(
                       "keywords",
                       []
@@ -393,100 +430,164 @@ jobs:
               }
 
           print(
-              "搜尋資料庫：",
-              len(info),
+              "股票／ETF 搜尋資料庫：",
+              len(stock_info),
               "檔"
           )
 
-          latest = {}
+          # ============================================================
+          # TWSE 最新交易日
+          # ============================================================
 
-          # ==========================================================
-          # TWSE
-          # ==========================================================
+          print("")
+          print(
+              "尋找 TWSE 最新交易日..."
+          )
 
           twse_url = (
               "https://www.twse.com.tw/"
               "rwd/zh/afterTrading/MI_INDEX"
           )
 
-          twse_date = None
+          twse_date_used = None
           twse_fields = []
           twse_rows = []
 
-          for ds in weekdays():
+          for date_string in recent_weekdays(
+              10
+          ):
 
               try:
-                  data = get_json(
+
+                  print(
+                      "嘗試 TWSE 日期：",
+                      date_string
+                  )
+
+                  data = request_json(
                       twse_url,
-                      {
-                          "response": "json",
-                          "date": ds,
-                          "type": "ALLBUT0999"
+                      params={
+                          "response":
+                              "json",
+
+                          "date":
+                              date_string,
+
+                          "type":
+                              "ALLBUT0999"
                       }
                   )
 
-                  if (
-                      data.get("stat") == "OK"
-                      and data.get("fields9")
-                      and data.get("data9")
+                  if not isinstance(
+                      data,
+                      dict
                   ):
-                      twse_fields = (
-                          data["fields9"]
-                      )
+                      continue
 
-                      twse_rows = (
-                          data["data9"]
-                      )
+                  if data.get(
+                      "stat"
+                  ) != "OK":
+                      continue
 
-                      twse_date = normalize_date(
-                          data.get("date")
-                          or ds
+                  fields = data.get(
+                      "fields9",
+                      []
+                  )
+
+                  rows = data.get(
+                      "data9",
+                      []
+                  )
+
+                  if (
+                      isinstance(
+                          fields,
+                          list
+                      )
+                      and isinstance(
+                          rows,
+                          list
+                      )
+                      and rows
+                  ):
+
+                      twse_fields = fields
+                      twse_rows = rows
+
+                      twse_date_used = normalize_date(
+                          data.get(
+                              "date"
+                          )
+                          or date_string
                       )
 
                       print(
                           "TWSE 最新交易日：",
-                          twse_date
+                          twse_date_used
                       )
 
                       break
 
-              except Exception as e:
+              except Exception as error:
+
                   print(
-                      "TWSE 失敗：",
-                      ds,
-                      repr(e)
+                      "TWSE 日期失敗：",
+                      date_string,
+                      repr(error)
                   )
 
           if not twse_rows:
-              raise SystemExit(
+
+              print(
                   "TWSE 無法取得最新行情"
               )
 
+          # ============================================================
+          # TWSE 欄位對應
+          # ============================================================
+
           twse_index = {
-              str(v).strip(): i
-              for i, v in enumerate(
+              str(field).strip(): index
+              for index, field
+              in enumerate(
                   twse_fields
               )
           }
 
-          def twse(
+          def twse_field(
               row,
               names
           ):
+
               for name in names:
-                  i = twse_index.get(
+
+                  index = twse_index.get(
                       name
                   )
 
-                  if (
-                      i is not None
-                      and i < len(row)
-                  ):
-                      return clean(
-                          row[i]
-                      )
+                  if index is not None:
+
+                      if index < len(
+                          row
+                      ):
+
+                          return clean(
+                              row[index]
+                          )
 
               return None
+
+          # ============================================================
+          # 建立最新資料
+          # ============================================================
+
+          latest = {}
+
+          # ============================================================
+          # TWSE 行情
+          # ============================================================
+
+          twse_count = 0
 
           for row in twse_rows:
 
@@ -497,127 +598,291 @@ jobs:
                   continue
 
               code = str(
-                  twse(
+                  twse_field(
                       row,
-                      ["證券代號"]
-                  )
-                  or ""
+                      [
+                          "證券代號"
+                      ]
+                  ) or ""
               ).strip()
 
-              if code not in info:
+              if not code:
                   continue
 
-              close = twse(
+              if code not in stock_info:
+                  continue
+
+              close = twse_field(
                   row,
-                  ["收盤價"]
+                  [
+                      "收盤價"
+                  ]
               )
 
-              change = twse(
+              change = twse_field(
                   row,
-                  ["漲跌價差"]
+                  [
+                      "漲跌價差"
+                  ]
               )
 
-              prev = (
-                  close - change
-                  if close is not None
+              prev = None
+
+              if (
+                  close is not None
                   and change is not None
-                  else None
-              )
+              ):
 
-              pct = (
-                  change / prev * 100
-                  if prev not in (
-                      None,
-                      0
+                  prev = (
+                      close -
+                      change
                   )
+
+              change_pct = None
+
+              if (
+                  prev is not None
+                  and prev != 0
                   and change is not None
-                  else None
-              )
+              ):
+
+                  change_pct = (
+                      change
+                      / prev
+                      * 100
+                  )
 
               latest[code] = {
-                  **info[code],
+                  **stock_info[code],
 
-                  "price": close,
-                  "prev": prev,
+                  "price":
+                      close,
 
-                  "open": twse(
-                      row,
-                      ["開盤價"]
-                  ),
+                  "prev":
+                      prev,
 
-                  "high": twse(
-                      row,
-                      ["最高價"]
-                  ),
+                  "open":
+                      twse_field(
+                          row,
+                          [
+                              "開盤價"
+                          ]
+                      ),
 
-                  "low": twse(
-                      row,
-                      ["最低價"]
-                  ),
+                  "high":
+                      twse_field(
+                          row,
+                          [
+                              "最高價"
+                          ]
+                      ),
 
-                  "change": change,
-                  "changePct": pct,
+                  "low":
+                      twse_field(
+                          row,
+                          [
+                              "最低價"
+                          ]
+                      ),
 
-                  "volume": twse(
-                      row,
-                      ["成交股數"]
-                  ),
+                  "change":
+                      change,
 
-                  "amount": twse(
-                      row,
-                      ["成交金額"]
-                  ),
+                  "changePct":
+                      change_pct,
 
-                  "transactions": twse(
-                      row,
-                      ["成交筆數"]
-                  ),
+                  "volume":
+                      twse_field(
+                          row,
+                          [
+                              "成交股數"
+                          ]
+                      ),
 
-                  "bid": twse(
-                      row,
-                      ["最後揭示買價"]
-                  ),
+                  "amount":
+                      twse_field(
+                          row,
+                          [
+                              "成交金額"
+                          ]
+                      ),
 
-                  "bidVolume": twse(
-                      row,
-                      ["最後揭示買量"]
-                  ),
+                  "transactions":
+                      twse_field(
+                          row,
+                          [
+                              "成交筆數"
+                          ]
+                      ),
 
-                  "ask": twse(
-                      row,
-                      ["最後揭示賣價"]
-                  ),
+                  "bid":
+                      twse_field(
+                          row,
+                          [
+                              "最後揭示買價"
+                          ]
+                      ),
 
-                  "askVolume": twse(
-                      row,
-                      ["最後揭示賣量"]
-                  ),
+                  "bidVolume":
+                      twse_field(
+                          row,
+                          [
+                              "最後揭示買量"
+                          ]
+                      ),
+
+                  "ask":
+                      twse_field(
+                          row,
+                          [
+                              "最後揭示賣價"
+                          ]
+                      ),
+
+                  "askVolume":
+                      twse_field(
+                          row,
+                          [
+                              "最後揭示賣量"
+                          ]
+                      ),
 
                   "tradeDate":
-                      twse_date,
+                      twse_date_used,
 
                   "source":
                       "TWSE",
 
                   "updatedAt":
                       datetime.now(
-                          TZ
-                      ).isoformat()
+                          TW_TZ
+                      ).isoformat(),
+
+                  "foreignBuy":
+                      None,
+
+                  "foreignSell":
+                      None,
+
+                  "foreignBalance":
+                      None,
+
+                  "trustBuy":
+                      None,
+
+                  "trustSell":
+                      None,
+
+                  "trustBalance":
+                      None,
+
+                  "dealerBuy":
+                      None,
+
+                  "dealerSell":
+                      None,
+
+                  "dealerBalance":
+                      None,
+
+                  "institutionTotal":
+                      None,
+
+                  "institutionDate":
+                      None,
+
+                  "institutionSource":
+                      None,
+
+                  "pe":
+                      None,
+
+                  "yield":
+                      None,
+
+                  "pbr":
+                      None,
+
+                  "ma5":
+                      None,
+
+                  "ma11":
+                      None,
+
+                  "ma31":
+                      None,
+
+                  "ma62":
+                      None,
+
+                  "ma122":
+                      None,
+
+                  "ma242":
+                      None,
+
+                  "ma5Deviation":
+                      None,
+
+                  "ma11Deviation":
+                      None,
+
+                  "ma31Deviation":
+                      None,
+
+                  "ma62Deviation":
+                      None,
+
+                  "ma122Deviation":
+                      None,
+
+                  "ma242Deviation":
+                      None,
+
+                  "foreign5":
+                      None,
+
+                  "foreign11":
+                      None,
+
+                  "foreign31":
+                      None,
+
+                  "trust5":
+                      None,
+
+                  "trust11":
+                      None,
+
+                  "trust31":
+                      None,
+
+                  "dealer5":
+                      None,
+
+                  "dealer11":
+                      None,
+
+                  "dealer31":
+                      None
               }
+
+              twse_count += 1
 
           print(
               "TWSE 行情：",
-              sum(
-                  1
-                  for x in latest.values()
-                  if x["source"] == "TWSE"
-              ),
+              twse_count,
               "檔"
           )
 
-          # ==========================================================
-          # TPEx
-          # ==========================================================
+          # ============================================================
+          # TPEx 最新行情
+          # ============================================================
+
+          print("")
+          print(
+              "讀取 TPEx 上櫃行情..."
+          )
 
           tpex_url = (
               "https://www.tpex.org.tw/"
@@ -625,30 +890,41 @@ jobs:
               "tpex_mainboard_daily_close_quotes"
           )
 
+          tpex_rows = []
+
           try:
-              tpex_data = get_json(
+
+              data = request_json(
                   tpex_url
               )
 
-          except Exception as e:
-              tpex_data = []
+              if isinstance(
+                  data,
+                  dict
+              ):
+
+                  tpex_rows = (
+                      data.get("data")
+                      or data.get("aaData")
+                      or []
+                  )
+
+              elif isinstance(
+                  data,
+                  list
+              ):
+
+                  tpex_rows = data
+
+          except Exception as error:
+
               print(
-                  "TPEx 失敗：",
-                  repr(e)
+                  "TPEx 行情失敗：",
+                  repr(error)
               )
 
-          if isinstance(
-              tpex_data,
-              dict
-          ):
-              tpex_rows = (
-                  tpex_data.get("data")
-                  or tpex_data.get("aaData")
-                  or []
-              )
-
-          else:
-              tpex_rows = tpex_data
+          tpex_count = 0
+          tpex_date_used = None
 
           for row in tpex_rows:
 
@@ -667,11 +943,13 @@ jobs:
                           "證券代號",
                           "代號"
                       ]
-                  )
-                  or ""
+                  ) or ""
               ).strip()
 
-              if code not in info:
+              if not code:
+                  continue
+
+              if code not in stock_info:
                   continue
 
               close = clean(
@@ -697,235 +975,450 @@ jobs:
                   )
               )
 
-              prev = (
-                  close - change
-                  if close is not None
+              prev = None
+
+              if (
+                  close is not None
                   and change is not None
-                  else None
+              ):
+
+                  prev = (
+                      close -
+                      change
+                  )
+
+              change_pct = None
+
+              if (
+                  prev is not None
+                  and prev != 0
+                  and change is not None
+              ):
+
+                  change_pct = (
+                      change
+                      / prev
+                      * 100
+                  )
+
+              row_date = normalize_date(
+                  first(
+                      row,
+                      [
+                          "Date",
+                          "日期",
+                          "交易日期"
+                      ]
+                  )
               )
 
-              pct = (
-                  change / prev * 100
-                  if prev not in (
-                      None,
-                      0
-                  )
-                  and change is not None
-                  else None
-              )
+              if row_date:
+                  tpex_date_used = row_date
 
               latest[code] = {
-                  **info[code],
+                  **stock_info[code],
 
-                  "price": close,
-                  "prev": prev,
+                  "price":
+                      close,
 
-                  "open": clean(
-                      first(
-                          row,
-                          [
-                              "Open",
-                              "OpeningPrice",
-                              "開盤"
-                          ]
-                      )
-                  ),
+                  "prev":
+                      prev,
 
-                  "high": clean(
-                      first(
-                          row,
-                          [
-                              "High",
-                              "HighestPrice",
-                              "最高"
-                          ]
-                      )
-                  ),
-
-                  "low": clean(
-                      first(
-                          row,
-                          [
-                              "Low",
-                              "LowestPrice",
-                              "最低"
-                          ]
-                      )
-                  ),
-
-                  "change": change,
-                  "changePct": pct,
-
-                  "volume": clean(
-                      first(
-                          row,
-                          [
-                              "TradingShares",
-                              "TradeVolume",
-                              "成交量",
-                              "Volume"
-                          ]
-                      )
-                  ),
-
-                  "amount": clean(
-                      first(
-                          row,
-                          [
-                              "Turnover",
-                              "TradeValue",
-                              "成交金額",
-                              "Amount"
-                          ]
-                      )
-                  ),
-
-                  "bid": clean(
-                      first(
-                          row,
-                          [
-                              "BestBidPrice",
-                              "BestBid",
-                              "最後揭示買價"
-                          ]
-                      )
-                  ),
-
-                  "ask": clean(
-                      first(
-                          row,
-                          [
-                              "BestAskPrice",
-                              "BestAsk",
-                              "最後揭示賣價"
-                          ]
-                      )
-                  ),
-
-                  "tradeDate":
-                      normalize_date(
+                  "open":
+                      clean(
                           first(
                               row,
                               [
-                                  "Date",
-                                  "日期",
-                                  "交易日期"
+                                  "Open",
+                                  "OpeningPrice",
+                                  "開盤"
                               ]
                           )
                       ),
+
+                  "high":
+                      clean(
+                          first(
+                              row,
+                              [
+                                  "High",
+                                  "HighestPrice",
+                                  "最高"
+                              ]
+                          )
+                      ),
+
+                  "low":
+                      clean(
+                          first(
+                              row,
+                              [
+                                  "Low",
+                                  "LowestPrice",
+                                  "最低"
+                              ]
+                          )
+                      ),
+
+                  "change":
+                      change,
+
+                  "changePct":
+                      change_pct,
+
+                  "volume":
+                      clean(
+                          first(
+                              row,
+                              [
+                                  "TradingShares",
+                                  "TradeVolume",
+                                  "成交量",
+                                  "Volume"
+                              ]
+                          )
+                      ),
+
+                  "amount":
+                      clean(
+                          first(
+                              row,
+                              [
+                                  "Turnover",
+                                  "TradeValue",
+                                  "成交金額",
+                                  "Amount"
+                              ]
+                          )
+                      ),
+
+                  "transactions":
+                      clean(
+                          first(
+                              row,
+                              [
+                                  "Transaction",
+                                  "Transactions",
+                                  "成交筆數"
+                              ]
+                          )
+                      ),
+
+                  "bid":
+                      clean(
+                          first(
+                              row,
+                              [
+                                  "BestBidPrice",
+                                  "BestBid",
+                                  "最後揭示買價"
+                              ]
+                          )
+                      ),
+
+                  "bidVolume":
+                      clean(
+                          first(
+                              row,
+                              [
+                                  "BestBidVolume",
+                                  "最後揭示買量"
+                              ]
+                          )
+                      ),
+
+                  "ask":
+                      clean(
+                          first(
+                              row,
+                              [
+                                  "BestAskPrice",
+                                  "BestAsk",
+                                  "最後揭示賣價"
+                              ]
+                          )
+                      ),
+
+                  "askVolume":
+                      clean(
+                          first(
+                              row,
+                              [
+                                  "BestAskVolume",
+                                  "最後揭示賣量"
+                              ]
+                          )
+                      ),
+
+                  "tradeDate":
+                      row_date
+                      or tpex_date_used,
 
                   "source":
                       "TPEx",
 
                   "updatedAt":
                       datetime.now(
-                          TZ
-                      ).isoformat()
+                          TW_TZ
+                      ).isoformat(),
+
+                  "foreignBuy":
+                      None,
+
+                  "foreignSell":
+                      None,
+
+                  "foreignBalance":
+                      None,
+
+                  "trustBuy":
+                      None,
+
+                  "trustSell":
+                      None,
+
+                  "trustBalance":
+                      None,
+
+                  "dealerBuy":
+                      None,
+
+                  "dealerSell":
+                      None,
+
+                  "dealerBalance":
+                      None,
+
+                  "institutionTotal":
+                      None,
+
+                  "institutionDate":
+                      None,
+
+                  "institutionSource":
+                      None,
+
+                  "pe":
+                      None,
+
+                  "yield":
+                      None,
+
+                  "pbr":
+                      None,
+
+                  "ma5":
+                      None,
+
+                  "ma11":
+                      None,
+
+                  "ma31":
+                      None,
+
+                  "ma62":
+                      None,
+
+                  "ma122":
+                      None,
+
+                  "ma242":
+                      None,
+
+                  "ma5Deviation":
+                      None,
+
+                  "ma11Deviation":
+                      None,
+
+                  "ma31Deviation":
+                      None,
+
+                  "ma62Deviation":
+                      None,
+
+                  "ma122Deviation":
+                      None,
+
+                  "ma242Deviation":
+                      None,
+
+                  "foreign5":
+                      None,
+
+                  "foreign11":
+                      None,
+
+                  "foreign31":
+                      None,
+
+                  "trust5":
+                      None,
+
+                  "trust11":
+                      None,
+
+                  "trust31":
+                      None,
+
+                  "dealer5":
+                      None,
+
+                  "dealer11":
+                      None,
+
+                  "dealer31":
+                      None
               }
+
+              tpex_count += 1
 
           print(
               "TPEx 行情：",
-              sum(
-                  1
-                  for x in latest.values()
-                  if x["source"] == "TPEx"
-              ),
+              tpex_count,
               "檔"
           )
 
-          # ==========================================================
+          # ============================================================
           # TWSE 三大法人
-          # ==========================================================
+          # ============================================================
+
+          print("")
+          print(
+              "讀取 TWSE 三大法人..."
+          )
 
           institution_url = (
               "https://www.twse.com.tw/"
               "rwd/zh/fund/T86"
           )
 
-          inst_rows = []
-          inst_fields = []
-          inst_date = None
+          institution_rows = []
+          institution_fields = []
+          institution_date = None
 
-          candidates = []
+          candidate_dates = []
 
-          if twse_date:
-              candidates.append(
-                  twse_date.replace(
+          if twse_date_used:
+
+              candidate_dates.append(
+                  twse_date_used.replace(
                       "-",
                       ""
                   )
               )
 
-          candidates += [
-              x
-              for x in weekdays()
-              if x not in candidates
-          ]
+          for date_string in recent_weekdays(
+              10
+          ):
 
-          for ds in candidates:
+              if date_string not in candidate_dates:
+
+                  candidate_dates.append(
+                      date_string
+                  )
+
+          for date_string in candidate_dates:
 
               try:
-                  data = get_json(
+
+                  print(
+                      "嘗試法人日期：",
+                      date_string
+                  )
+
+                  data = request_json(
                       institution_url,
-                      {
-                          "response": "json",
-                          "date": ds,
+                      params={
+                          "response":
+                              "json",
+
+                          "date":
+                              date_string,
+
                           "selectType":
                               "ALLBUT0999"
                       }
                   )
 
-                  if (
-                      data.get("stat") == "OK"
-                      and data.get("data")
-                      and data.get("fields")
+                  if not isinstance(
+                      data,
+                      dict
                   ):
-                      inst_rows = (
-                          data["data"]
-                      )
+                      continue
 
-                      inst_fields = (
-                          data["fields"]
-                      )
+                  if data.get(
+                      "stat"
+                  ) != "OK":
+                      continue
 
-                      inst_date = ds
+                  rows = data.get(
+                      "data"
+                  )
+
+                  fields = data.get(
+                      "fields"
+                  )
+
+                  if (
+                      isinstance(
+                          rows,
+                          list
+                      )
+                      and isinstance(
+                          fields,
+                          list
+                      )
+                      and rows
+                  ):
+
+                      institution_rows = rows
+                      institution_fields = fields
+                      institution_date = date_string
 
                       break
 
-              except Exception as e:
+              except Exception as error:
+
                   print(
-                      "法人失敗：",
-                      ds,
-                      repr(e)
+                      "法人讀取失敗：",
+                      repr(error)
                   )
 
-          inst_index = {
-              str(v).strip(): i
-              for i, v in enumerate(
-                  inst_fields
+          institution_index = {
+              str(field).strip(): index
+              for index, field
+              in enumerate(
+                  institution_fields
               )
           }
 
-          def inst(
+          def institution_field(
               row,
               names
           ):
+
               for name in names:
-                  i = inst_index.get(
+
+                  index = institution_index.get(
                       name
                   )
 
-                  if (
-                      i is not None
-                      and i < len(row)
-                  ):
-                      return clean(
-                          row[i]
-                      )
+                  if index is not None:
+
+                      if index < len(
+                          row
+                      ):
+
+                          return clean(
+                              row[index]
+                          )
 
               return None
 
-          for row in inst_rows:
+          institution_count = 0
+
+          for row in institution_rows:
 
               if not isinstance(
                   row,
@@ -934,19 +1427,21 @@ jobs:
                   continue
 
               code = str(
-                  inst(
+                  institution_field(
                       row,
-                      ["證券代號"]
-                  )
-                  or ""
+                      [
+                          "證券代號"
+                      ]
+                  ) or ""
               ).strip()
 
               if code not in latest:
                   continue
 
               latest[code].update({
+
                   "foreignBuy":
-                      inst(
+                      institution_field(
                           row,
                           [
                               "外陸資買進股數(不含外資自營商)"
@@ -954,7 +1449,7 @@ jobs:
                       ),
 
                   "foreignSell":
-                      inst(
+                      institution_field(
                           row,
                           [
                               "外陸資賣出股數(不含外資自營商)"
@@ -962,7 +1457,7 @@ jobs:
                       ),
 
                   "foreignBalance":
-                      inst(
+                      institution_field(
                           row,
                           [
                               "外陸資買賣超股數(不含外資自營商)"
@@ -970,7 +1465,7 @@ jobs:
                       ),
 
                   "trustBuy":
-                      inst(
+                      institution_field(
                           row,
                           [
                               "投信買進股數"
@@ -978,7 +1473,7 @@ jobs:
                       ),
 
                   "trustSell":
-                      inst(
+                      institution_field(
                           row,
                           [
                               "投信賣出股數"
@@ -986,7 +1481,7 @@ jobs:
                       ),
 
                   "trustBalance":
-                      inst(
+                      institution_field(
                           row,
                           [
                               "投信買賣超股數"
@@ -994,7 +1489,7 @@ jobs:
                       ),
 
                   "dealerBuy":
-                      inst(
+                      institution_field(
                           row,
                           [
                               "自營商買進股數"
@@ -1002,7 +1497,7 @@ jobs:
                       ),
 
                   "dealerSell":
-                      inst(
+                      institution_field(
                           row,
                           [
                               "自營商賣出股數"
@@ -1010,7 +1505,7 @@ jobs:
                       ),
 
                   "dealerBalance":
-                      inst(
+                      institution_field(
                           row,
                           [
                               "自營商買賣超股數"
@@ -1018,7 +1513,7 @@ jobs:
                       ),
 
                   "institutionTotal":
-                      inst(
+                      institution_field(
                           row,
                           [
                               "三大法人買賣超股數"
@@ -1027,29 +1522,55 @@ jobs:
 
                   "institutionDate":
                       normalize_date(
-                          inst_date
+                          institution_date
                       ),
 
                   "institutionSource":
                       "TWSE T86"
               })
 
-          # ==========================================================
-          # PE / 殖利率 / PBR
-          # ==========================================================
+              institution_count += 1
+
+          print(
+              "TWSE 法人資料：",
+              institution_count,
+              "檔"
+          )
+
+          # ============================================================
+          # TWSE PE / 殖利率 / PBR
+          # ============================================================
+
+          print("")
+          print(
+              "讀取 TWSE PE / 殖利率 / PBR..."
+          )
+
+          pe_url = (
+              "https://openapi.twse.com.tw/"
+              "v1/exchangeReport/BWIBBU_ALL"
+          )
 
           try:
-              rows = get_json(
-                  "https://openapi.twse.com.tw/"
-                  "v1/exchangeReport/BWIBBU_ALL"
+
+              pe_rows = request_json(
+                  pe_url
               )
 
               if isinstance(
-                  rows,
+                  pe_rows,
                   list
               ):
 
-                  for row in rows:
+                  pe_count = 0
+
+                  for row in pe_rows:
+
+                      if not isinstance(
+                          row,
+                          dict
+                      ):
+                          continue
 
                       code = str(
                           first(
@@ -1058,73 +1579,82 @@ jobs:
                                   "Code",
                                   "證券代號"
                               ]
-                          )
-                          or ""
+                          ) or ""
                       ).strip()
 
                       if code not in latest:
                           continue
 
-                      latest[code].update({
-                          "pe":
-                              clean(
-                                  first(
-                                      row,
-                                      [
-                                          "PEratio",
-                                          "本益比"
-                                      ]
-                                  )
-                              ),
+                      latest[code][
+                          "pe"
+                      ] = clean(
+                          first(
+                              row,
+                              [
+                                  "PEratio",
+                                  "本益比"
+                              ]
+                          )
+                      )
 
-                          "yield":
-                              clean(
-                                  first(
-                                      row,
-                                      [
-                                          "DividendYield",
-                                          "殖利率"
-                                      ]
-                                  )
-                              ),
+                      latest[code][
+                          "yield"
+                      ] = clean(
+                          first(
+                              row,
+                              [
+                                  "DividendYield",
+                                  "殖利率"
+                              ]
+                          )
+                      )
 
-                          "pbr":
-                              clean(
-                                  first(
-                                      row,
-                                      [
-                                          "PBratio",
-                                          "股價淨值比"
-                                      ]
-                                  )
-                              )
-                      })
+                      latest[code][
+                          "pbr"
+                      ] = clean(
+                          first(
+                              row,
+                              [
+                                  "PBratio",
+                                  "股價淨值比"
+                              ]
+                          )
+                      )
 
-          except Exception as e:
+                      pe_count += 1
+
+                  print(
+                      "TWSE PE/PBR：",
+                      pe_count,
+                      "檔"
+                  )
+
+          except Exception as error:
+
               print(
-                  "PE/PBR 失敗：",
-                  repr(e)
+                  "PE/PBR 讀取失敗：",
+                  repr(error)
               )
 
-          # ==========================================================
-          # 儲存今日歷史
-          # ==========================================================
+          # ============================================================
+          # 保存今日歷史資料
+          # ============================================================
 
-          if twse_date:
+          if twse_date_used:
 
-              path = os.path.join(
+              history_path = os.path.join(
                   HISTORY_DIR,
-                  twse_date + ".json"
+                  f"{twse_date_used}.json"
               )
 
-              history = {
+              history_data = {
                   "_meta": {
                       "date":
-                          twse_date,
+                          twse_date_used,
 
                       "updatedAt":
                           datetime.now(
-                              TZ
+                              TW_TZ
                           ).isoformat(),
 
                       "source":
@@ -1132,88 +1662,252 @@ jobs:
                   }
               }
 
-              fields = [
-                  "code",
-                  "name",
-                  "market",
-                  "type",
-                  "price",
-                  "prev",
-                  "open",
-                  "high",
-                  "low",
-                  "change",
-                  "changePct",
-                  "volume",
-                  "amount",
-                  "bid",
-                  "bidVolume",
-                  "ask",
-                  "askVolume",
-                  "foreignBuy",
-                  "foreignSell",
-                  "foreignBalance",
-                  "trustBuy",
-                  "trustSell",
-                  "trustBalance",
-                  "dealerBuy",
-                  "dealerSell",
-                  "dealerBalance",
-                  "institutionTotal",
-                  "pe",
-                  "yield",
-                  "pbr"
-              ]
-
               for code, item in latest.items():
 
-                  if item.get(
+                  trade_date = item.get(
+                      "tradeDate"
+                  )
+
+                  source = item.get(
                       "source"
-                  ) != "TWSE":
-                      continue
+                  )
 
-                  history[code] = {
-                      key:
-                          item.get(key)
-                      for key in fields
-                  }
+                  if (
+                      trade_date
+                      == twse_date_used
+                      or source
+                      == "TWSE"
+                  ):
 
-              save(
-                  path,
-                  history
+                      history_data[code] = {
+
+                          "code":
+                              item.get(
+                                  "code"
+                              ),
+
+                          "name":
+                              item.get(
+                                  "name"
+                              ),
+
+                          "market":
+                              item.get(
+                                  "market"
+                              ),
+
+                          "type":
+                              item.get(
+                                  "type"
+                              ),
+
+                          "price":
+                              item.get(
+                                  "price"
+                              ),
+
+                          "prev":
+                              item.get(
+                                  "prev"
+                              ),
+
+                          "open":
+                              item.get(
+                                  "open"
+                              ),
+
+                          "high":
+                              item.get(
+                                  "high"
+                              ),
+
+                          "low":
+                              item.get(
+                                  "low"
+                              ),
+
+                          "change":
+                              item.get(
+                                  "change"
+                              ),
+
+                          "changePct":
+                              item.get(
+                                  "changePct"
+                              ),
+
+                          "volume":
+                              item.get(
+                                  "volume"
+                              ),
+
+                          "amount":
+                              item.get(
+                                  "amount"
+                              ),
+
+                          "bid":
+                              item.get(
+                                  "bid"
+                              ),
+
+                          "bidVolume":
+                              item.get(
+                                  "bidVolume"
+                              ),
+
+                          "ask":
+                              item.get(
+                                  "ask"
+                              ),
+
+                          "askVolume":
+                              item.get(
+                                  "askVolume"
+                              ),
+
+                          "foreignBuy":
+                              item.get(
+                                  "foreignBuy"
+                              ),
+
+                          "foreignSell":
+                              item.get(
+                                  "foreignSell"
+                              ),
+
+                          "foreignBalance":
+                              item.get(
+                                  "foreignBalance"
+                              ),
+
+                          "trustBuy":
+                              item.get(
+                                  "trustBuy"
+                              ),
+
+                          "trustSell":
+                              item.get(
+                                  "trustSell"
+                              ),
+
+                          "trustBalance":
+                              item.get(
+                                  "trustBalance"
+                              ),
+
+                          "dealerBuy":
+                              item.get(
+                                  "dealerBuy"
+                              ),
+
+                          "dealerSell":
+                              item.get(
+                                  "dealerSell"
+                              ),
+
+                          "dealerBalance":
+                              item.get(
+                                  "dealerBalance"
+                              ),
+
+                          "institutionTotal":
+                              item.get(
+                                  "institutionTotal"
+                              ),
+
+                          "pe":
+                              item.get(
+                                  "pe"
+                              ),
+
+                          "yield":
+                              item.get(
+                                  "yield"
+                              ),
+
+                          "pbr":
+                              item.get(
+                                  "pbr"
+                              )
+                      }
+
+              save_json(
+                  history_path,
+                  history_data
               )
 
-          # ==========================================================
-          # 讀取歷史
-          # ==========================================================
+              print(
+                  "已保存歷史資料：",
+                  history_path
+              )
 
-          history_files = sorted(
-              [
-                  f
-                  for f in os.listdir(
-                      HISTORY_DIR
-                  )
+          # ============================================================
+          # 讀取歷史資料
+          # ============================================================
+
+          history_files = []
+
+          if os.path.exists(
+              HISTORY_DIR
+          ):
+
+              for filename in os.listdir(
+                  HISTORY_DIR
+              ):
+
                   if (
-                      f.endswith(".json")
-                      and f[:4].isdigit()
-                  )
-              ],
+                      filename.endswith(
+                          ".json"
+                      )
+                      and len(filename) >= 8
+                      and filename[:4].isdigit()
+                  ):
+
+                      history_files.append(
+                          filename
+                      )
+
+          history_files.sort(
               reverse=True
           )
 
-          def history_rows(
-              code
+          print("")
+          print(
+              "目前歷史資料天數：",
+              len(history_files)
+          )
+
+          # ============================================================
+          # 讀取某股票歷史資料
+          # ============================================================
+
+          def get_history_rows(
+              code,
+              limit=242
           ):
-              result = []
 
-              for filename in history_files[:242]:
+              rows = []
 
-                  data = load(
-                      os.path.join(
-                          HISTORY_DIR,
-                          filename
-                      )
+              for filename in sorted(
+                  history_files,
+                  reverse=True
+              ):
+
+                  path = os.path.join(
+                      HISTORY_DIR,
+                      filename
                   )
+
+                  data = load_json(
+                      path
+                  )
+
+                  if not isinstance(
+                      data,
+                      dict
+                  ):
+                      continue
 
                   item = data.get(
                       code
@@ -1234,7 +1928,15 @@ jobs:
                   if price is None:
                       continue
 
-                  result.append({
+                  rows.append({
+                      "date":
+                          data.get(
+                              "_meta",
+                              {}
+                          ).get(
+                              "date"
+                          ),
+
                       "price":
                           price,
 
@@ -1260,41 +1962,60 @@ jobs:
                           )
                   })
 
-              return result
+                  if len(rows) >= limit:
+                      break
+
+              return rows
 
           def average(
               values
           ):
+
+              valid = [
+                  value
+                  for value in values
+                  if value is not None
+              ]
+
+              if not valid:
+                  return None
+
               return (
-                  sum(values) /
-                  len(values)
-                  if values
-                  else None
+                  sum(valid)
+                  /
+                  len(valid)
               )
 
-          # ==========================================================
-          # MA + 法人累計
-          # ==========================================================
+          # ============================================================
+          # 計算 MA / 偏離率 / 法人累計
+          # ============================================================
 
           for code, item in latest.items():
 
-              rows = history_rows(
-                  code
+              rows = get_history_rows(
+                  code,
+                  242
               )
 
               prices = [
-                  r["price"]
-                  for r in rows
+                  row["price"]
+                  for row in rows
               ]
 
-              for period in (
-                  5,
-                  11,
-                  31,
-                  62,
-                  122,
-                  242
-              ):
+              # --------------------------------------------------------
+              # 均線
+              # --------------------------------------------------------
+
+              periods = [
+                  (5, "ma5"),
+                  (11, "ma11"),
+                  (31, "ma31"),
+                  (62, "ma62"),
+                  (122, "ma122"),
+                  (242, "ma242")
+              ]
+
+              for period, field in periods:
 
                   if len(prices) >= period:
 
@@ -1304,75 +2025,123 @@ jobs:
                           ]
                       )
 
-                      field = (
-                          "ma" +
-                          str(period)
-                      )
+                      if ma is not None:
 
-                      item[field] = round(
-                          ma,
-                          4
-                      )
+                          item[field] = round(
+                              ma,
+                              4
+                          )
 
-                      if (
-                          item.get("price")
-                          is not None
-                          and ma
-                      ):
+                          price = item.get(
+                              "price"
+                          )
 
-                          item[
-                              field +
-                              "Deviation"
-                          ] = round(
-                              (
+                          if (
+                              price is not None
+                              and ma != 0
+                          ):
+
+                              deviation = (
                                   (
-                                      item["price"]
+                                      price
                                       - ma
                                   )
                                   / ma
                                   * 100
-                              ),
-                              2
-                          )
+                              )
 
-              for who in (
-                  "foreign",
-                  "trust",
-                  "dealer"
-              ):
+                              item[
+                                  field
+                                  + "Deviation"
+                              ] = round(
+                                  deviation,
+                                  2
+                              )
 
-                  for period in (
-                      5,
-                      11,
-                      31
-                  ):
+              # --------------------------------------------------------
+              # 外資 5 / 11 / 31 日
+              # --------------------------------------------------------
 
-                      values = [
-                          r[who]
-                          for r in rows[
-                              :period
-                          ]
-                          if r[who]
-                          is not None
+              for period, field in [
+                  (5, "foreign5"),
+                  (11, "foreign11"),
+                  (31, "foreign31")
+              ]:
+
+                  values = [
+                      row["foreign"]
+                      for row in rows[
+                          :period
                       ]
+                      if row["foreign"]
+                      is not None
+                  ]
 
-                      field = (
-                          who +
-                          str(period)
+                  if len(values) == period:
+
+                      item[field] = sum(
+                          values
                       )
 
-                      item[field] = (
-                          sum(values)
-                          if len(values)
-                          == period
-                          else None
+              # --------------------------------------------------------
+              # 投信 5 / 11 / 31 日
+              # --------------------------------------------------------
+
+              for period, field in [
+                  (5, "trust5"),
+                  (11, "trust11"),
+                  (31, "trust31")
+              ]:
+
+                  values = [
+                      row["trust"]
+                      for row in rows[
+                          :period
+                      ]
+                      if row["trust"]
+                      is not None
+                  ]
+
+                  if len(values) == period:
+
+                      item[field] = sum(
+                          values
                       )
 
-          # ==========================================================
-          # 輸出 latest.json
-          # ==========================================================
+              # --------------------------------------------------------
+              # 自營商 5 / 11 / 31 日
+              # --------------------------------------------------------
 
-          dates = [
+              for period, field in [
+                  (5, "dealer5"),
+                  (11, "dealer11"),
+                  (31, "dealer31")
+              ]:
+
+                  values = [
+                      row["dealer"]
+                      for row in rows[
+                          :period
+                      ]
+                      if row["dealer"]
+                      is not None
+                  ]
+
+                  if len(values) == period:
+
+                      item[field] = sum(
+                          values
+                      )
+
+          # ============================================================
+          # 產生 latest.json
+          # ============================================================
+
+          run_time = datetime.now(
+              TW_TZ
+          ).isoformat()
+
+          trade_dates = [
               item.get(
                   "tradeDate"
               )
@@ -1382,22 +2151,22 @@ jobs:
               )
           ]
 
+          latest_trade_date = max(
+              trade_dates,
+              default=twse_date_used
+          )
+
           output = {
               "_meta": {
+
                   "updatedAt":
-                      datetime.now(
-                          TZ
-                      ).isoformat(),
+                      run_time,
 
                   "count":
                       len(latest),
 
                   "tradeDate":
-                      max(
-                          dates
-                      )
-                      if dates
-                      else twse_date,
+                      latest_trade_date,
 
                   "source": [
                       "TWSE official",
@@ -1412,8 +2181,8 @@ jobs:
 
                   "note":
                       (
-                          "官方收盤資料；"
-                          "前端不直接呼叫 API；"
+                          "官方收盤資料。"
+                          "前端不直接呼叫 API。"
                           "歷史資料由 GitHub Actions "
                           "持續累積。"
                       )
@@ -1423,105 +2192,629 @@ jobs:
           for code in sorted(
               latest
           ):
-              output[code] = (
-                  latest[code]
-              )
 
-          save(
+              output[code] = latest[
+                  code
+              ]
+
+          save_json(
               LATEST_FILE,
               output
           )
 
+          # ============================================================
+          # 重要股票檢查
+          # ============================================================
+
           print("")
-          print("=" * 50)
+          print("=" * 60)
+          print("重要股票檢查")
+          print("=" * 60)
+
+          check_codes = [
+              "1301",
+              "1326",
+              "2330",
+              "0050",
+              "0056",
+              "00631L",
+              "00919",
+              "00981A"
+          ]
+
+          for code in check_codes:
+
+              print("")
+              print(
+                  "檢查：",
+                  code
+              )
+
+              if code not in output:
+
+                  print(
+                      code,
+                      "搜尋資料庫存在，但目前沒有最新行情"
+                  )
+
+                  continue
+
+              item = output[
+                  code
+              ]
+
+              print(
+                  json.dumps(
+                      {
+                          "code":
+                              item.get(
+                                  "code"
+                              ),
+
+                          "name":
+                              item.get(
+                                  "name"
+                              ),
+
+                          "price":
+                              item.get(
+                                  "price"
+                              ),
+
+                          "prev":
+                              item.get(
+                                  "prev"
+                              ),
+
+                          "open":
+                              item.get(
+                                  "open"
+                              ),
+
+                          "high":
+                              item.get(
+                                  "high"
+                              ),
+
+                          "low":
+                              item.get(
+                                  "low"
+                              ),
+
+                          "change":
+                              item.get(
+                                  "change"
+                              ),
+
+                          "changePct":
+                              item.get(
+                                  "changePct"
+                              ),
+
+                          "tradeDate":
+                              item.get(
+                                  "tradeDate"
+                              ),
+
+                          "foreignBuy":
+                              item.get(
+                                  "foreignBuy"
+                              ),
+
+                          "foreignSell":
+                              item.get(
+                                  "foreignSell"
+                              ),
+
+                          "foreignBalance":
+                              item.get(
+                                  "foreignBalance"
+                              ),
+
+                          "trustBuy":
+                              item.get(
+                                  "trustBuy"
+                              ),
+
+                          "trustSell":
+                              item.get(
+                                  "trustSell"
+                              ),
+
+                          "trustBalance":
+                              item.get(
+                                  "trustBalance"
+                              ),
+
+                          "dealerBuy":
+                              item.get(
+                                  "dealerBuy"
+                              ),
+
+                          "dealerSell":
+                              item.get(
+                                  "dealerSell"
+                              ),
+
+                          "dealerBalance":
+                              item.get(
+                                  "dealerBalance"
+                              ),
+
+                          "institutionTotal":
+                              item.get(
+                                  "institutionTotal"
+                              ),
+
+                          "institutionDate":
+                              item.get(
+                                  "institutionDate"
+                              ),
+
+                          "pe":
+                              item.get(
+                                  "pe"
+                              ),
+
+                          "yield":
+                              item.get(
+                                  "yield"
+                              ),
+
+                          "pbr":
+                              item.get(
+                                  "pbr"
+                              ),
+
+                          "ma5":
+                              item.get(
+                                  "ma5"
+                              ),
+
+                          "ma11":
+                              item.get(
+                                  "ma11"
+                              ),
+
+                          "ma31":
+                              item.get(
+                                  "ma31"
+                              ),
+
+                          "ma62":
+                              item.get(
+                                  "ma62"
+                              ),
+
+                          "ma122":
+                              item.get(
+                                  "ma122"
+                              ),
+
+                          "ma242":
+                              item.get(
+                                  "ma242"
+                              ),
+
+                          "foreign5":
+                              item.get(
+                                  "foreign5"
+                              ),
+
+                          "foreign11":
+                              item.get(
+                                  "foreign11"
+                              ),
+
+                          "foreign31":
+                              item.get(
+                                  "foreign31"
+                              ),
+
+                          "trust5":
+                              item.get(
+                                  "trust5"
+                              ),
+
+                          "trust11":
+                              item.get(
+                                  "trust11"
+                              ),
+
+                          "trust31":
+                              item.get(
+                                  "trust31"
+                              ),
+
+                          "dealer5":
+                              item.get(
+                                  "dealer5"
+                              ),
+
+                          "dealer11":
+                              item.get(
+                                  "dealer11"
+                              ),
+
+                          "dealer31":
+                              item.get(
+                                  "dealer31"
+                              )
+                      },
+                      ensure_ascii=False
+                  )
+              )
+
+          # ============================================================
+          # 完成
+          # ============================================================
+
+          print("")
+          print("=" * 60)
           print("完成")
-          print("=" * 50)
+          print("=" * 60)
+
           print(
               "latest.json：",
               LATEST_FILE
           )
+
           print(
               "資料筆數：",
               len(latest)
           )
+
           print(
               "最新交易日：",
-              output["_meta"]["tradeDate"]
+              latest_trade_date
           )
+
           print(
               "歷史資料天數：",
               len(history_files)
+          )
+
+          print(
+              "更新時間：",
+              run_time
           )
 
           PY
 
       - name: Validate latest.json
         run: |
-          python - <<'PY'
+          python <<'PY'
           import json
           import os
 
-          path = (
+          latest_path = (
               "stock-data/latest.json"
           )
 
           if not os.path.exists(
-              path
+              latest_path
           ):
+
               raise SystemExit(
                   "找不到 latest.json"
               )
 
           with open(
-              path,
+              latest_path,
+              "r",
               encoding="utf-8"
-          ) as f:
-              data = json.load(f)
+          ) as file:
+
+              data = json.load(
+                  file
+              )
 
           if not isinstance(
               data,
               dict
           ):
+
               raise SystemExit(
                   "latest.json 格式錯誤"
               )
 
-          count = len([
-              x
-              for x in data
-              if x != "_meta"
-          ])
+          codes = [
+              code
+              for code in data
+              if code != "_meta"
+          ]
+
+          count = len(
+              codes
+          )
 
           print(
               "latest.json 資料筆數：",
               count
           )
 
+          if count < 100:
+
+              raise SystemExit(
+                  "資料少於 100 檔，停止提交"
+              )
+
+          meta = data.get(
+              "_meta",
+              {}
+          )
+
           print(
               "最新交易日：",
-              data.get(
-                  "_meta",
-                  {}
-              ).get(
+              meta.get(
                   "tradeDate"
               )
           )
 
           print(
               "歷史資料天數：",
-              data.get(
-                  "_meta",
-                  {}
-              ).get(
+              meta.get(
                   "historyDays"
               )
           )
 
-          if count < 100:
-              raise SystemExit(
-                  "資料少於 100 檔，停止提交"
+          check_codes = [
+              "1301",
+              "1326",
+              "2330",
+              "0050",
+              "0056",
+              "00631L",
+              "00919",
+              "00981A"
+          ]
+
+          for code in check_codes:
+
+              print("")
+              print(
+                  "==========",
+                  code,
+                  "=========="
               )
 
+              if code not in data:
+
+                  print(
+                      "搜尋資料庫存在，但目前沒有最新行情"
+                  )
+
+                  continue
+
+              item = data[
+                  code
+              ]
+
+              print(
+                  "名稱：",
+                  item.get(
+                      "name"
+                  )
+              )
+
+              print(
+                  "價格：",
+                  item.get(
+                      "price"
+                  )
+              )
+
+              print(
+                  "昨收：",
+                  item.get(
+                      "prev"
+                  )
+              )
+
+              print(
+                  "開盤：",
+                  item.get(
+                      "open"
+                  )
+              )
+
+              print(
+                  "最高：",
+                  item.get(
+                      "high"
+                  )
+              )
+
+              print(
+                  "最低：",
+                  item.get(
+                      "low"
+                  )
+              )
+
+              print(
+                  "漲跌：",
+                  item.get(
+                      "change"
+                  )
+              )
+
+              print(
+                  "漲跌幅：",
+                  item.get(
+                      "changePct"
+                  )
+              )
+
+              print(
+                  "交易日期：",
+                  item.get(
+                      "tradeDate"
+                  )
+              )
+
+              print(
+                  "外資：",
+                  item.get(
+                      "foreignBalance"
+                  )
+              )
+
+              print(
+                  "投信：",
+                  item.get(
+                      "trustBalance"
+                  )
+              )
+
+              print(
+                  "自營商：",
+                  item.get(
+                      "dealerBalance"
+                  )
+              )
+
+              print(
+                  "三大法人：",
+                  item.get(
+                      "institutionTotal"
+                  )
+              )
+
+              print(
+                  "法人日期：",
+                  item.get(
+                      "institutionDate"
+                  )
+              )
+
+              print(
+                  "PE：",
+                  item.get(
+                      "pe"
+                  )
+              )
+
+              print(
+                  "殖利率：",
+                  item.get(
+                      "yield"
+                  )
+              )
+
+              print(
+                  "PBR：",
+                  item.get(
+                      "pbr"
+                  )
+              )
+
+              print(
+                  "MA5：",
+                  item.get(
+                      "ma5"
+                  )
+              )
+
+              print(
+                  "MA11：",
+                  item.get(
+                      "ma11"
+                  )
+              )
+
+              print(
+                  "MA31：",
+                  item.get(
+                      "ma31"
+                  )
+              )
+
+              print(
+                  "MA62：",
+                  item.get(
+                      "ma62"
+                  )
+              )
+
+              print(
+                  "MA122：",
+                  item.get(
+                      "ma122"
+                  )
+              )
+
+              print(
+                  "MA242：",
+                  item.get(
+                      "ma242"
+                  )
+              )
+
+              print(
+                  "外資5日：",
+                  item.get(
+                      "foreign5"
+                  )
+              )
+
+              print(
+                  "外資11日：",
+                  item.get(
+                      "foreign11"
+                  )
+              )
+
+              print(
+                  "外資31日：",
+                  item.get(
+                      "foreign31"
+                  )
+              )
+
+              print(
+                  "投信5日：",
+                  item.get(
+                      "trust5"
+                  )
+              )
+
+              print(
+                  "投信11日：",
+                  item.get(
+                      "trust11"
+                  )
+              )
+
+              print(
+                  "投信31日：",
+                  item.get(
+                      "trust31"
+                  )
+              )
+
+              print(
+                  "自營商5日：",
+                  item.get(
+                      "dealer5"
+                  )
+              )
+
+              print(
+                  "自營商11日：",
+                  item.get(
+                      "dealer11"
+                  )
+              )
+
+              print(
+                  "自營商31日：",
+                  item.get(
+                      "dealer31"
+                  )
+              )
+
+          print("")
           print(
               "OK：latest.json 格式正常"
           )
