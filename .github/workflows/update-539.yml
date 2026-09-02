@@ -1,0 +1,85 @@
+name: Update 539 Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download 539 data
+        shell: bash
+        run: |
+          set -e
+
+          API="https://lottery.timetable.tw/api/draws"
+          rm -f 539-data.json
+
+          echo "[]" > all-records.json
+
+          for offset in $(seq 0 500 9500); do
+            echo "Downloading offset $offset"
+
+            curl -fsSL --retry 3 \
+              -A "Mozilla/5.0" \
+              "$API?gameTypeId=5&limit=500&offset=$offset&sortOrder=DESC" \
+              -o page.json
+
+            jq -e '.records | type == "array"' page.json >/dev/null
+
+            jq -s '
+              .[0] + (.[1].records // [])
+            ' all-records.json page.json > tmp.json
+
+            mv tmp.json all-records.json
+          done
+
+          echo "Downloaded records: $(jq 'length' all-records.json)"
+
+          jq '
+            map(
+              select(type == "object")
+              | select(.period != null)
+            )
+            | unique_by(.period | tostring)
+            | sort_by(.period | tostring)
+            | reverse
+            | .[0:10000]
+          ' all-records.json > records.json
+
+          jq '
+            {
+              gameType: "今彩539",
+              gameTypeId: 5,
+              updatedAt: (now | todate),
+              count: length,
+              records: .
+            }
+          ' records.json > 539-data.json
+
+          echo "Final records: $(jq '.count' 539-data.json)"
+
+          rm -f page.json all-records.json records.json tmp.json
+
+      - name: Commit 539 data
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add 539-data.json
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Update 539 data"
+            git push
+          fi
