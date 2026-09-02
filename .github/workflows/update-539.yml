@@ -13,73 +13,227 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Download 539 data
+      - name: Download official Taiwan Lottery 539 data
         shell: bash
         run: |
-          set -e
+          set -euo pipefail
 
-          API="https://lottery.timetable.tw/api/draws"
+          API="https://api.taiwanlottery.com/TLCAPIWeB/Lottery/Daily539Result"
+
           rm -f 539-data.json
+          rm -f all-records.json
+          rm -f month.json
+          rm -f records.json
+          rm -f tmp.json
 
           echo "[]" > all-records.json
 
-          for offset in $(seq 0 500 9500); do
-            echo "Downloading offset $offset"
+          echo "======================================"
+          echo "今彩539 官方資料更新開始"
+          echo "======================================"
 
-            curl -fsSL --retry 3 \
+          # 從本月往前抓 60 個月
+          for i in $(seq 0 59); do
+
+            MONTH=$(date -u -d "$(date -u +%Y-%m-01) -${i} month" +%Y-%m)
+
+            echo ""
+            echo "抓取月份：$MONTH"
+
+            curl -fsSL \
+              --retry 5 \
+              --retry-delay 2 \
+              --connect-timeout 15 \
+              --max-time 60 \
               -A "Mozilla/5.0" \
-              "$API?gameTypeId=5&limit=500&offset=$offset&sortOrder=DESC" \
-              -o page.json
+              "${API}?month=${MONTH}&pageSize=500" \
+              -o month.json
 
-            jq -e '.records | type == "array"' page.json >/dev/null
+            # 確認 API 回傳格式
+            jq -e '
+              .content
+              and (.content.daily539Res | type == "array")
+            ' month.json >/dev/null
+
+            COUNT=$(jq '.content.daily539Res | length' month.json)
+
+            echo "本月資料：${COUNT} 筆"
 
             jq -s '
-              .[0] + (.[1].records // [])
-            ' all-records.json page.json > tmp.json
+              .[0] + (.[1].content.daily539Res // [])
+            ' all-records.json month.json > tmp.json
 
             mv tmp.json all-records.json
+
           done
 
-          echo "Downloaded records: $(jq 'length' all-records.json)"
+          echo ""
+          echo "======================================"
+          echo "開始整理 539 資料"
+          echo "======================================"
+
+          echo "原始資料筆數：$(jq 'length' all-records.json)"
 
           jq '
             map(
               select(type == "object")
               | select(.period != null)
+              | select(.drawNumberAppear != null)
+              | select(.lotteryDate != null)
+
+              # 今彩539期號格式：
+              # 115000xxx
+              | select(
+                  (.period | tostring)
+                  | test("^[0-9]{9}$")
+                )
+
+              # 必須剛好 5 個號碼
+              | select(
+                  (.drawNumberAppear | type == "array")
+                  and (.drawNumberAppear | length == 5)
+                )
+
+              # 只能是 01～39
+              | select(
+                  all(
+                    .drawNumberAppear[];
+                    ((tonumber >= 1) and (tonumber <= 39))
+                  )
+                )
+
+              # 五個號碼不能重複
+              | select(
+                  (
+                    .drawNumberAppear
+                    | map(tonumber)
+                    | unique
+                    | length
+                  ) == 5
+                )
+
+              # 整理成 App 使用的格式
+              | {
+                  period: (.period | tostring),
+                  draw_date: (
+                    .lotteryDate
+                    | tostring
+                    | .[0:10]
+                  ),
+                  numbers: (
+                    .drawNumberAppear
+                    | map(tonumber)
+                    | sort
+                  )
+                }
             )
-            | unique_by(.period | tostring)
-            | sort_by(.period | tostring)
+
+            # 同一期只保留一筆
+            | unique_by(.period)
+
+            # 新期在前
+            | sort_by(.period)
             | reverse
+
+            # 最多保留 10000 期
             | .[0:10000]
           ' all-records.json > records.json
 
-          jq '
-            {
+          VALID_COUNT=$(jq 'length' records.json)
+
+          echo ""
+          echo "======================================"
+          echo "有效今彩539資料：${VALID_COUNT} 期"
+          echo "======================================"
+
+          # 防止 API 異常時把正確資料洗掉
+          if [ "$VALID_COUNT" -lt 100 ]; then
+            echo "錯誤：有效539資料少於100期"
+            echo "為避免覆蓋正確資料，本次更新停止。"
+            exit 1
+          fi
+
+          # 再做一次嚴格驗證
+          jq -e '
+            all(
+              .[];
+              (.numbers | length == 5)
+              and
+              all(.numbers[]; . >= 1 and . <= 39)
+              and
+              ((.numbers | unique | length) == 5)
+            )
+          ' records.json >/dev/null
+
+          LATEST_PERIOD=$(jq -r '.[0].period' records.json)
+          LATEST_DATE=$(jq -r '.[0].draw_date' records.json)
+
+          echo ""
+          echo "最新期號：$LATEST_PERIOD"
+          echo "最新日期：$LATEST_DATE"
+
+          # 最終輸出
+          jq -n \
+            --arg updatedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+            --arg latestPeriod "$LATEST_PERIOD" \
+            --arg latestDate "$LATEST_DATE" \
+            --slurpfile records records.json \
+            '{
               gameType: "今彩539",
-              gameTypeId: 5,
-              updatedAt: (now | todate),
-              count: length,
-              records: .
-            }
-          ' records.json > 539-data.json
+              gameTypeId: 539,
+              updatedAt: $updatedAt,
+              latestPeriod: $latestPeriod,
+              latestDate: $latestDate,
+              count: ($records[0] | length),
+              records: $records[0]
+            }' > 539-data.json
 
-          echo "Final records: $(jq '.count' 539-data.json)"
+          echo ""
+          echo "======================================"
+          echo "最終檢查"
+          echo "======================================"
 
-          rm -f page.json all-records.json records.json tmp.json
+          jq -e '
+            .gameType == "今彩539"
+            and
+            (.records | type == "array")
+            and
+            (.count == (.records | length))
+            and
+            (.count >= 100)
+          ' 539-data.json >/dev/null
+
+          echo "539-data.json 建立成功"
+
+          echo ""
+          echo "最新5期："
+
+          jq -r '
+            .records[0:5][]
+            | "\(.period) | \(.draw_date) | \(.numbers | map(if . < 10 then "0\(. )" else tostring end) | join(" "))"
+          ' 539-data.json
+
+          rm -f all-records.json
+          rm -f month.json
+          rm -f records.json
+          rm -f tmp.json
 
       - name: Commit 539 data
         shell: bash
         run: |
+          set -e
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add 539-data.json
 
           if git diff --cached --quiet; then
-            echo "No changes"
+            echo "沒有新的539資料需要更新"
           else
-            git commit -m "Update 539 data"
+            git commit -m "Update official Taiwan Lottery 539 data"
             git push
           fi
