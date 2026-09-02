@@ -3,678 +3,388 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#10131a">
-<title>賓果賓果 Bingo Bingo｜每日開獎・熱門冷門・號碼分析</title>
+<meta name="theme-color" content="#111827">
+<title>🎱 賓果賓果｜歷史・冷熱門・1～8星推薦</title>
 
 <style>
-:root{
-  --bg:#0d1016;
-  --card:#171b23;
-  --card2:#202631;
-  --card3:#11151c;
-  --text:#f7f8fb;
-  --muted:#9fa8b7;
-  --line:#303744;
-  --yellow:#ffd43b;
-  --orange:#ff963d;
-  --green:#43d483;
-  --blue:#59a8ff;
-  --red:#ff6472;
-  --purple:#a783ff;
-  --shadow:0 12px 35px rgba(0,0,0,.28);
-}
-
 *{
   box-sizing:border-box;
   -webkit-tap-highlight-color:transparent;
 }
 
-html{
-  scroll-behavior:smooth;
+html,body{
+  margin:0;
+  padding:0;
+  background:#0b1020;
+  color:#f8fafc;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",Arial,sans-serif;
 }
 
 body{
-  margin:0;
-  background:
-    radial-gradient(circle at 50% -10%,#293142 0,#12161e 35%,#0b0e13 80%);
-  color:var(--text);
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Noto Sans TC",
-    "PingFang TC",
-    "Microsoft JhengHei",
-    sans-serif;
+  min-height:100vh;
 }
 
-button,
-input,
-select{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
-.app{
-  width:min(1150px,100%);
+.container{
+  width:min(1100px,100%);
   margin:auto;
-  padding:12px;
+  padding:16px;
 }
 
 .header{
-  text-align:center;
-  padding:18px 5px 12px;
+  background:linear-gradient(135deg,#1e293b,#111827);
+  border:1px solid #334155;
+  border-radius:22px;
+  padding:20px;
+  margin-bottom:14px;
+  box-shadow:0 12px 35px rgba(0,0,0,.28);
 }
 
 .header h1{
-  margin:0;
-  font-size:clamp(28px,7vw,50px);
-  font-weight:950;
-  letter-spacing:1px;
+  margin:0 0 8px;
+  font-size:28px;
 }
 
 .header p{
-  margin:8px 0 0;
-  color:var(--muted);
-}
-
-.notice{
-  border:1px solid #5b4c1e;
-  background:#292416;
-  color:#ffe58a;
-  border-radius:15px;
-  padding:11px 14px;
-  margin-bottom:13px;
-  text-align:center;
-  font-size:13px;
-  line-height:1.6;
-}
-
-.card{
-  background:
-    linear-gradient(180deg,var(--card),#141820);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:15px;
-  margin-bottom:14px;
-  box-shadow:var(--shadow);
-}
-
-.card-title{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:13px;
-  font-size:18px;
-  font-weight:900;
+  margin:5px 0;
+  color:#cbd5e1;
+  font-size:14px;
 }
 
 .badge{
   display:inline-flex;
   align-items:center;
-  justify-content:center;
-  padding:5px 9px;
+  gap:6px;
+  background:#064e3b;
+  color:#a7f3d0;
+  border:1px solid #059669;
+  padding:6px 10px;
   border-radius:999px;
-  background:#252c37;
-  border:1px solid #3b4350;
-  color:#dbe1e9;
   font-size:12px;
+  margin-top:8px;
 }
 
-.btn{
-  border:1px solid var(--line);
-  background:var(--card2);
-  color:var(--text);
-  border-radius:12px;
-  min-height:45px;
-  padding:9px 13px;
-  font-weight:850;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
 }
 
-.btn:active{
-  transform:scale(.97);
+.card{
+  background:#111827;
+  border:1px solid #263244;
+  border-radius:20px;
+  padding:16px;
+  box-shadow:0 8px 28px rgba(0,0,0,.22);
+  margin-bottom:14px;
 }
 
-.btn.primary{
-  border:0;
-  color:#191408;
-  background:linear-gradient(135deg,#ffe26a,#ff9d2e);
+.card h2{
+  font-size:18px;
+  margin:0 0 13px;
 }
 
-.btn.green{
-  color:#7df2ad;
-  background:#173a29;
-  border-color:#2d704c;
-}
-
-.btn.blue{
-  color:#85c3ff;
-  background:#172e48;
-  border-color:#2d5b85;
-}
-
-.btn.red{
-  color:#ff919c;
-  background:#401d24;
-  border-color:#71343d;
-}
-
-.btn.purple{
-  color:#c5a9ff;
-  background:#2a2143;
-  border-color:#51407c;
-}
-
-.btn.small{
-  min-height:38px;
-  padding:7px 10px;
-  font-size:13px;
-}
-
-.current{
-  text-align:center;
-}
-
-.current-label{
-  color:var(--muted);
-  font-size:13px;
-}
-
-.current-number{
-  width:145px;
-  height:145px;
-  margin:12px auto;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:68px;
-  font-weight:950;
-  color:#17120a;
-  background:
-    radial-gradient(circle at 33% 22%,#fff4ae,#ffd43b 38%,#db9300);
-  border:7px solid #fff0a0;
-  box-shadow:
-    0 0 0 5px #55491b,
-    0 18px 38px rgba(255,212,59,.2);
-}
-
-.current-number.pop{
-  animation:pop .25s ease;
-}
-
-@keyframes pop{
-  0%{transform:scale(.7)}
-  70%{transform:scale(1.08)}
-  100%{transform:scale(1)}
+.card h3{
+  font-size:15px;
+  margin:14px 0 8px;
 }
 
 .controls{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:9px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
 }
 
-.settings-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
+button{
+  border:0;
+  cursor:pointer;
+  color:white;
+  background:#334155;
+  border-radius:12px;
+  padding:11px 14px;
+  font-size:14px;
+  font-weight:700;
 }
 
-.field label{
-  display:block;
-  color:var(--muted);
-  font-size:12px;
+button:active{
+  transform:scale(.97);
+}
+
+button.primary{
+  background:#2563eb;
+}
+
+button.green{
+  background:#059669;
+}
+
+button.orange{
+  background:#d97706;
+}
+
+button.red{
+  background:#dc2626;
+}
+
+button.purple{
+  background:#7c3aed;
+}
+
+button.active{
+  outline:3px solid rgba(96,165,250,.35);
+  background:#2563eb;
+}
+
+select,input{
+  width:100%;
+  background:#0f172a;
+  color:white;
+  border:1px solid #334155;
+  border-radius:11px;
+  padding:11px;
+  font-size:15px;
+}
+
+.label{
+  font-size:13px;
+  color:#94a3b8;
   margin-bottom:6px;
 }
 
-.field input,
-.field select{
-  width:100%;
-  height:43px;
-  border:1px solid var(--line);
-  border-radius:11px;
-  background:#0e1218;
-  color:var(--text);
-  padding:0 10px;
-  outline:none;
-}
-
-.field input:focus,
-.field select:focus{
-  border-color:var(--yellow);
-}
-
-.api-status{
+.status{
+  padding:10px 12px;
+  background:#0f172a;
+  border-radius:12px;
+  color:#cbd5e1;
+  font-size:13px;
   margin-top:10px;
-  border-radius:11px;
-  padding:9px 11px;
-  background:#11161d;
-  border:1px solid var(--line);
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.5;
-}
-
-.api-status.ok{
-  color:#7df2ad;
-  border-color:#2b6948;
-}
-
-.api-status.error{
-  color:#ff919c;
-  border-color:#71343d;
+  border:1px solid #263244;
 }
 
 .number-grid{
   display:grid;
   grid-template-columns:repeat(10,1fr);
-  gap:6px;
+  gap:7px;
 }
 
 .ball{
   aspect-ratio:1;
-  border-radius:50%;
-  border:1px solid #3a424e;
-  background:#202631;
-  color:#e8edf4;
-  font-weight:850;
   display:flex;
-  align-items:center;
   justify-content:center;
-  padding:0;
+  align-items:center;
+  border-radius:50%;
+  background:#1e293b;
+  border:1px solid #475569;
+  font-weight:800;
+  font-size:14px;
+  user-select:none;
 }
 
 .ball.selected{
-  background:#284b76;
-  border-color:#6bb2ff;
-  color:#c9e5ff;
-  box-shadow:0 0 0 2px rgba(89,168,255,.13);
+  background:#2563eb;
+  border-color:#60a5fa;
+  box-shadow:0 0 0 3px rgba(37,99,235,.2);
+  transform:scale(1.06);
 }
 
-.ball.drawn{
-  background:linear-gradient(135deg,#ffd43b,#ff963d);
-  color:#191308;
-  border-color:#ffe99a;
+.ball.recommend{
+  background:#f59e0b;
+  color:#111827;
+  border-color:#fbbf24;
+  box-shadow:0 0 0 4px rgba(245,158,11,.18);
+  transform:scale(1.08);
 }
 
-.ball.selected.drawn{
-  background:linear-gradient(135deg,#50e79b,#1ea967);
-  color:#07160e;
-  border-color:#8cf7be;
+.ball.hot{
+  background:#991b1b;
+  border-color:#ef4444;
 }
 
-.selected-summary{
-  margin-top:12px;
-  background:#11161d;
-  border:1px solid var(--line);
-  border-radius:12px;
-  padding:10px 12px;
-  line-height:1.7;
+.ball.cold{
+  background:#1e3a8a;
+  border-color:#60a5fa;
 }
 
-.blue-text{
-  color:var(--blue);
+.recommend-box{
+  background:linear-gradient(135deg,#422006,#1f2937);
+  border:1px solid #92400e;
+  border-radius:18px;
+  padding:16px;
+  margin-top:10px;
+}
+
+.recommend-title{
+  color:#fde68a;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.recommend-numbers{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  min-height:48px;
+}
+
+.recommend-ball{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f59e0b;
+  color:#111827;
+  font-size:17px;
   font-weight:900;
+  box-shadow:0 5px 15px rgba(0,0,0,.3);
 }
 
-.green-text{
-  color:var(--green);
-  font-weight:900;
+.star-buttons{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:7px;
 }
 
-.drawn-list{
+.star-buttons button{
+  padding:12px 4px;
+  background:#1e293b;
+}
+
+.star-buttons button.active{
+  background:#7c3aed;
+}
+
+.stat-row{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+
+.stat{
+  background:#0f172a;
+  border:1px solid #263244;
+  border-radius:13px;
+  padding:12px;
+  text-align:center;
+}
+
+.stat b{
+  display:block;
+  font-size:21px;
+  margin-top:4px;
+}
+
+.small{
+  font-size:12px;
+  color:#94a3b8;
+}
+
+.tag-list{
   display:flex;
   flex-wrap:wrap;
   gap:7px;
 }
 
-.mini-ball{
-  width:39px;
-  height:39px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#252c36;
-  border:1px solid #424a57;
-  font-size:13px;
-  font-weight:850;
-}
-
-.mini-ball.hit{
-  background:var(--green);
-  color:#07170e;
-  border-color:#92f5bf;
-}
-
-.empty{
-  color:var(--muted);
-  padding:9px 0;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:8px;
-}
-
-.stat{
-  background:#12171e;
-  border:1px solid var(--line);
-  border-radius:13px;
-  padding:10px 5px;
-  text-align:center;
-}
-
-.stat .name{
-  color:var(--muted);
-  font-size:11px;
-}
-
-.stat .value{
-  margin-top:4px;
-  font-size:20px;
-  font-weight:950;
-}
-
-.analysis-grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-}
-
-.analysis-box{
-  background:#12171e;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:13px;
-}
-
-.analysis-box h3{
-  margin:0 0 9px;
-  font-size:14px;
-}
-
-.analysis-box p{
-  margin:6px 0;
-  color:#dbe0e8;
-  line-height:1.6;
-}
-
 .tag{
-  display:inline-flex;
-  padding:4px 8px;
-  margin:3px 3px 3px 0;
-  border-radius:999px;
-  background:#252c36;
-  border:1px solid #3b4350;
-  font-size:12px;
+  padding:8px 10px;
+  border-radius:10px;
+  background:#1e293b;
+  border:1px solid #334155;
+  font-weight:700;
 }
 
-.hot-tag{
-  background:#49351b;
-  border-color:#73541e;
-  color:#ffd86a;
+.tag.hot{
+  background:#451a1a;
+  border-color:#991b1b;
 }
 
-.cold-tag{
-  background:#182e45;
-  border-color:#2d567c;
-  color:#8ec6ff;
+.tag.cold{
+  background:#172554;
+  border-color:#1d4ed8;
 }
 
-.miss-tag{
-  background:#3b2028;
-  border-color:#6c333f;
-  color:#ff9aa4;
-}
-
-.easy-card{
-  border-color:#635321;
-  background:
-    linear-gradient(180deg,#211d12,#151820);
-}
-
-.easy-title{
-  color:#ffe171;
-}
-
-.score-row{
-  display:grid;
-  grid-template-columns:48px 1fr 72px;
-  align-items:center;
-  gap:8px;
-  margin:7px 0;
-}
-
-.score-number{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  background:#292f39;
-  border:1px solid #444d5a;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-}
-
-.score-bar{
-  height:10px;
-  border-radius:999px;
-  background:#282e37;
-  overflow:hidden;
-}
-
-.score-fill{
-  height:100%;
-  border-radius:999px;
-  background:linear-gradient(90deg,#ffd43b,#ff913d);
-}
-
-.score-value{
-  text-align:right;
-  color:#ffd969;
-  font-weight:900;
-  font-size:12px;
-}
-
-.daily-toolbar{
-  display:grid;
-  grid-template-columns:1.2fr 1fr 1fr 1fr;
-  gap:9px;
-}
-
-.daily-list{
-  margin-top:13px;
-}
-
-.daily-day{
-  margin-bottom:14px;
-  border:1px solid var(--line);
+.draw{
+  background:#0f172a;
+  border:1px solid #263244;
   border-radius:15px;
-  overflow:hidden;
-  background:#11161d;
-}
-
-.daily-head{
-  padding:11px 13px;
-  background:#1b2029;
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  font-weight:900;
-}
-
-.daily-period{
-  padding:11px 13px;
-  border-top:1px solid #272e39;
-}
-
-.period-head{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  color:#dce2ea;
-  margin-bottom:7px;
-}
-
-.period-numbers{
-  display:flex;
-  flex-wrap:wrap;
-  gap:5px;
-}
-
-.period-number{
-  width:29px;
-  height:29px;
-  border-radius:50%;
-  background:#252c36;
-  border:1px solid #3e4652;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:11px;
-  font-weight:800;
-}
-
-.period-number.selected{
-  background:#3ca76f;
-  color:white;
-}
-
-.history-item{
-  border:1px solid var(--line);
-  background:#12171e;
-  border-radius:14px;
   padding:12px;
   margin-bottom:9px;
 }
 
-.history-head{
+.draw-head{
   display:flex;
   justify-content:space-between;
   gap:10px;
   margin-bottom:8px;
-  font-weight:850;
+  font-size:13px;
 }
 
-.history-numbers{
+.draw-balls{
   display:flex;
   flex-wrap:wrap;
   gap:5px;
 }
 
-.history-number{
+.mini-ball{
   width:31px;
   height:31px;
   border-radius:50%;
-  background:#252c36;
+  background:#1e293b;
+  border:1px solid #475569;
   display:flex;
-  align-items:center;
   justify-content:center;
-  font-size:12px;
+  align-items:center;
+  font-size:11px;
+  font-weight:800;
 }
 
-.history-number.hit{
-  background:#2e9d67;
-  color:white;
-}
-
-.data-source{
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.6;
+.date-row{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
 }
 
 .footer{
+  color:#64748b;
   text-align:center;
-  color:#6f7887;
   font-size:12px;
-  padding:7px 0 25px;
-  line-height:1.7;
+  padding:20px 8px 35px;
 }
 
 .loading{
-  opacity:.65;
-  pointer-events:none;
+  opacity:.7;
+  animation:pulse 1.3s infinite;
 }
 
-@media(max-width:850px){
-  .settings-grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .daily-toolbar{
-    grid-template-columns:repeat(2,1fr);
-  }
+@keyframes pulse{
+  0%,100%{opacity:.55}
+  50%{opacity:1}
 }
 
 @media(max-width:700px){
-  .controls{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .stats{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-  .analysis-grid{
+  .grid{
     grid-template-columns:1fr;
   }
 
   .number-grid{
-    gap:4px;
+    grid-template-columns:repeat(10,1fr);
+    gap:5px;
   }
 
   .ball{
     font-size:12px;
   }
 
-  .current-number{
-    width:130px;
-    height:130px;
-    font-size:60px;
-  }
-}
-
-@media(max-width:480px){
-  .app{
-    padding:8px;
+  .star-buttons{
+    grid-template-columns:repeat(4,1fr);
   }
 
-  .settings-grid,
-  .daily-toolbar{
-    grid-template-columns:1fr;
+  .stat-row{
+    grid-template-columns:repeat(2,1fr);
   }
 
-  .number-grid{
-    gap:3px;
-  }
-
-  .ball{
-    font-size:11px;
-  }
-
-  .stats{
-    gap:5px;
-  }
-
-  .stat{
-    padding:8px 2px;
-  }
-
-  .stat .value{
-    font-size:17px;
-  }
-
-  .score-row{
-    grid-template-columns:43px 1fr 60px;
+  .header h1{
+    font-size:24px;
   }
 }
 </style>
@@ -682,2404 +392,1250 @@ button{
 
 <body>
 
-<div class="app">
+<div class="container">
 
-  <div class="header">
+  <section class="header">
     <h1>🎱 賓果賓果</h1>
-    <p>每日開獎歷史｜熱門・冷門・遺漏・號碼熱度分析</p>
-  </div>
+    <p>歷史開獎・冷熱門・遺漏・1～8星統計推薦</p>
+    <div class="badge" id="dataBadge">🟡 正在讀取資料</div>
+    <div class="status" id="status">
+      正在載入歷史資料……
+    </div>
+  </section>
 
-  <div class="notice">
-    ⚠️ 本 App 為娛樂與歷史統計工具。<br>
-    「熱門／冷門／熱度較高」只代表過去資料的統計結果，
-    不代表下一期一定比較容易出現，也不保證中獎。
-  </div>
+  <!-- 推薦 -->
+  <section class="card">
 
-  <!-- 最新資料 -->
-  <div class="card">
+    <h2>🎯 1～8星推薦</h2>
 
-    <div class="card-title">
-      <span>🌐 真實開獎資料</span>
-      <span id="apiBadge" class="badge">尚未更新</span>
+    <div class="label">選擇你要玩的星數</div>
+
+    <div class="star-buttons" id="starButtons">
+      <button data-star="1">1星</button>
+      <button data-star="2">2星</button>
+      <button data-star="3">3星</button>
+      <button data-star="4">4星</button>
+      <button data-star="5">5星</button>
+      <button data-star="6">6星</button>
+      <button data-star="7">7星</button>
+      <button data-star="8">8星</button>
     </div>
 
-    <div class="settings-grid">
+    <br>
 
-      <div class="field">
-        <label>歷史統計期數</label>
-        <select id="analysisPeriod">
-          <option value="20">最近 20 期</option>
-          <option value="50">最近 50 期</option>
-          <option value="100" selected>最近 100 期</option>
-          <option value="300">最近 300 期</option>
-          <option value="500">最近 500 期</option>
-        </select>
+    <div class="label">推薦模式</div>
+
+    <div class="controls">
+      <button class="active" id="modeHot">🔥 熱門</button>
+      <button id="modeBalance">⚖️ 均衡</button>
+      <button id="modeCold">❄️ 冷門</button>
+    </div>
+
+    <div class="recommend-box">
+      <div class="recommend-title">
+        ⭐ 本次推薦
       </div>
 
-      <div class="field">
-        <label>查詢日期</label>
-        <input type="date" id="queryDate">
+      <div class="recommend-numbers" id="recommendNumbers">
+        <span class="small">請先選擇 1～8 星</span>
       </div>
-
-      <div class="field">
-        <label>日期顯示期數</label>
-        <select id="dailyLimit">
-          <option value="20">20 期</option>
-          <option value="50" selected>50 期</option>
-          <option value="100">100 期</option>
-          <option value="200">200 期</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>操作</label>
-        <button class="btn primary" id="refreshBtn" style="width:100%;">
-          🔄 更新資料
-        </button>
-      </div>
-
-    </div>
-
-    <div id="apiStatus" class="api-status">
-      尚未載入資料。
-    </div>
-
-  </div>
-
-  <!-- 今日／每日歷史 -->
-  <div class="card">
-
-    <div class="card-title">
-      <span>📅 每日開獎歷史</span>
-      <span id="dailyCountBadge" class="badge">0 期</span>
-    </div>
-
-    <div class="daily-toolbar">
-
-      <button class="btn blue" id="todayBtn">
-        📅 今天
-      </button>
-
-      <button class="btn" id="yesterdayBtn">
-        昨天
-      </button>
-
-      <button class="btn" id="latestBtn">
-        🆕 最新資料
-      </button>
-
-      <button class="btn purple" id="loadDailyBtn">
-        🔎 查詢日期
-      </button>
-
-    </div>
-
-    <div id="dailyList" class="daily-list">
-      <div class="empty">請先更新資料。</div>
-    </div>
-
-  </div>
-
-  <!-- 容易開／歷史熱度 -->
-  <div class="card easy-card">
-
-    <div class="card-title">
-      <span class="easy-title">
-        ⭐ 歷史熱度較高號碼
-      </span>
-
-      <span class="badge">
-        非預測
-      </span>
-    </div>
-
-    <div class="analysis-box" style="background:#17150f;">
-
-      <h3>
-        🔥 「比較容易開」分析
-      </h3>
-
-      <p style="font-size:13px;color:#b9b09a;">
-        以下按照最近指定期數的歷史資料，
-        綜合「出現頻率、近期頻率、遺漏狀態」排序。
-        分數越高代表歷史熱度越高，不代表下一期機率真的提高。
-      </p>
-
-      <div id="easyNumbers">
-        <div class="empty">尚無資料</div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- 熱門冷門 -->
-  <div class="analysis-grid">
-
-    <div class="card">
-
-      <div class="card-title">
-        <span>🔥 熱門號碼</span>
-        <span class="badge">TOP 10</span>
-      </div>
-
-      <div id="hotNumbers">
-        <div class="empty">尚無資料</div>
-      </div>
-
-    </div>
-
-    <div class="card">
-
-      <div class="card-title">
-        <span>❄️ 冷門號碼</span>
-        <span class="badge">TOP 10</span>
-      </div>
-
-      <div id="coldNumbers">
-        <div class="empty">尚無資料</div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- 遺漏 -->
-  <div class="card">
-
-    <div class="card-title">
-      <span>⏳ 遺漏分析</span>
-      <span class="badge">最近未出現</span>
-    </div>
-
-    <div id="missingNumbers">
-      <div class="empty">尚無資料</div>
-    </div>
-
-  </div>
-
-  <!-- 頻率完整表 -->
-  <div class="card">
-
-    <div class="card-title">
-      <span>📊 01～80 完整統計</span>
-      <span id="frequencyPeriodBadge" class="badge">
-        最近 100 期
-      </span>
-    </div>
-
-    <div id="frequencyGrid" class="number-grid"></div>
-
-  </div>
-
-  <!-- 統計 -->
-  <div class="card">
-
-    <div class="card-title">
-      <span>⚖️ 統計分析</span>
-    </div>
-
-    <div class="stats">
-
-      <div class="stat">
-        <div class="name">總期數</div>
-        <div class="value" id="statPeriods">0</div>
-      </div>
-
-      <div class="stat">
-        <div class="name">奇數</div>
-        <div class="value" id="statOdd">0</div>
-      </div>
-
-      <div class="stat">
-        <div class="name">偶數</div>
-        <div class="value" id="statEven">0</div>
-      </div>
-
-      <div class="stat">
-        <div class="name">小號 01-40</div>
-        <div class="value" id="statSmall">0</div>
-      </div>
-
-      <div class="stat">
-        <div class="name">大號 41-80</div>
-        <div class="value" id="statBig">0</div>
-      </div>
-
-      <div class="stat">
-        <div class="name">平均和值</div>
-        <div class="value" id="statAvgSum">0</div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- 自選號碼 -->
-  <div class="card">
-
-    <div class="card-title">
-      <span>⭐ 我的自選號碼</span>
-
-      <button class="btn small" id="clearSelectedBtn">
-        清除選號
-      </button>
-    </div>
-
-    <div id="numberGrid" class="number-grid"></div>
-
-    <div class="selected-summary">
-
-      已選：
-      <span id="selectedCount" class="blue-text">0</span>
-      / 10 個
 
       <br>
 
-      最近資料命中：
-      <span id="hitCount" class="green-text">0</span>
-
-    </div>
-
-  </div>
-
-  <!-- 模擬開獎 -->
-  <div class="card current">
-
-    <div class="card-title">
-      <span>🎰 娛樂模擬開獎</span>
-      <span class="badge">01～80</span>
-    </div>
-
-    <div class="current-label">
-      模擬第 <span id="roundNo">1</span> 局　
-      已開 <span id="drawCount">0</span> / 20
-    </div>
-
-    <div id="currentNumber" class="current-number">
-      —
-    </div>
-
-    <div id="statusText" class="current-label">
-      準備開始
-    </div>
-
-    <div class="controls" style="margin-top:13px;">
-
-      <button class="btn primary" id="startBtn">
-        ▶ 開始
+      <button class="primary" id="recommendBtn">
+        🎯 再推薦一次
       </button>
-
-      <button class="btn green" id="drawBtn">
-        🎱 開一球
-      </button>
-
-      <button class="btn blue" id="newRoundBtn">
-        🔄 新一局
-      </button>
-
-      <button class="btn red" id="stopBtn">
-        ⏹ 停止
-      </button>
-
     </div>
 
-  </div>
+    <p class="small">
+      ※ 推薦依歷史出現頻率、近期頻率及號碼分布計算，
+      「熱門」不代表下一期一定會開。
+    </p>
 
-  <!-- 模擬結果 -->
-  <div class="card">
+  </section>
 
-    <div class="card-title">
-      <span>🎯 模擬已開號碼</span>
-      <span id="drawStatus" class="badge">尚未開始</span>
-    </div>
+  <!-- 號碼盤 -->
+  <section class="card">
+    <h2>🔢 1～80 號碼盤</h2>
+    <div class="number-grid" id="numberGrid"></div>
+  </section>
 
-    <div id="drawnList" class="drawn-list">
-      <div class="empty">還沒有開出的號碼</div>
-    </div>
+  <!-- 統計 -->
+  <section class="grid">
 
-  </div>
+    <section class="card">
+      <h2>🔥 熱門號碼</h2>
+      <div class="tag-list" id="hotNumbers">
+        <span class="small">尚無資料</span>
+      </div>
+    </section>
 
-  <!-- 模擬分析 -->
-  <div class="card">
+    <section class="card">
+      <h2>❄️ 冷門號碼</h2>
+      <div class="tag-list" id="coldNumbers">
+        <span class="small">尚無資料</span>
+      </div>
+    </section>
 
-    <div class="card-title">
-      <span>🔎 模擬分析</span>
-    </div>
+  </section>
 
-    <div class="analysis-grid">
+  <section class="card">
+    <h2>📊 統計概況</h2>
 
-      <div class="analysis-box">
-        <h3>🔥 本局開出</h3>
-        <div id="analysisDrawn">—</div>
+    <div class="stat-row">
+
+      <div class="stat">
+        資料期數
+        <b id="totalDraws">0</b>
       </div>
 
-      <div class="analysis-box">
-        <h3>⭐ 我的命中</h3>
-        <div id="analysisHit">—</div>
+      <div class="stat">
+        最近30期
+        <b id="recent30">0</b>
       </div>
 
-      <div class="analysis-box">
-        <h3>🔗 連號</h3>
-        <div id="analysisConsecutive">目前沒有</div>
+      <div class="stat">
+        最近100期
+        <b id="recent100">0</b>
       </div>
 
-      <div class="analysis-box">
-        <h3>⚖️ 奇偶／大小</h3>
-        <p id="analysisOddEven">—</p>
-        <p id="analysisSmallBig">—</p>
+      <div class="stat">
+        最近300期
+        <b id="recent300">0</b>
       </div>
 
     </div>
 
-  </div>
+  </section>
 
-  <!-- 本機歷史 -->
-  <div class="card">
+  <!-- 遺漏 -->
+  <section class="card">
+    <h2>⏳ 遺漏較久號碼</h2>
+    <div class="tag-list" id="missingNumbers">
+      <span class="small">尚無資料</span>
+    </div>
+  </section>
 
-    <div class="card-title">
-      <span>📋 模擬歷史紀錄</span>
+  <!-- 每日歷史 -->
+  <section class="card">
 
-      <button class="btn red small" id="clearHistoryBtn">
-        清除全部
+    <h2>📅 每日開獎歷史</h2>
+
+    <div class="date-row">
+      <input type="date" id="datePicker">
+      <button class="primary" id="todayBtn">今天</button>
+    </div>
+
+    <br>
+
+    <div id="dailyHistory">
+      <div class="small">尚無資料</div>
+    </div>
+
+  </section>
+
+  <!-- 最新 -->
+  <section class="card">
+
+    <h2>🕐 最新開獎</h2>
+
+    <div id="latestHistory">
+      <div class="small">尚無資料</div>
+    </div>
+
+  </section>
+
+  <section class="card">
+
+    <h2>🔄 資料</h2>
+
+    <div class="controls">
+      <button class="green" id="reloadBtn">
+        🔄 讀取最新資料
+      </button>
+
+      <button class="orange" id="clearBtn">
+        🗑️ 清除推薦
       </button>
     </div>
 
-    <div id="historyList">
-      <div class="empty">尚無歷史紀錄</div>
+    <div class="status">
+      本頁使用 GitHub Pages 同源的 bingo-data.json。
+      GitHub Actions 會定期更新歷史資料，因此不再讓手機瀏覽器直接跨網域抓 API。
     </div>
 
-  </div>
-
-  <!-- 資料來源 -->
-  <div class="card">
-
-    <div class="card-title">
-      <span>ℹ️ 資料來源</span>
-    </div>
-
-    <div class="data-source">
-      本 App 的每日歷史資料使用公開唯讀資料來源進行查詢與統計。
-      實際開獎結果請以台灣彩券官方公告為準。
-      <br><br>
-      台灣彩券 Bingo Bingo 為 01～80 選號，每期開出20個號碼。
-    </div>
-
-  </div>
+  </section>
 
   <div class="footer">
-    Bingo Bingo Entertainment & Statistics<br>
-    歷史熱度 ≠ 未來保證｜請理性使用統計資料
+    🎱 賓果賓果統計工具<br>
+    僅供歷史資料與統計研究參考，不代表未來開獎結果。
   </div>
 
 </div>
 
 <script>
-(() => {
-
-"use strict";
 
 /* =========================================================
-   基本設定
+   賓果賓果 V3
+   GitHub Pages 同源資料版本
 ========================================================= */
 
-const API_BASE =
-  "https://lottery.timetable.tw";
+const DATA_URL = "./bingo-data.json";
 
-const GAME_TYPE_ID = 10;
+let draws = [];
+let selectedStar = 1;
+let selectedMode = "hot";
+let recommendation = [];
 
-const TOTAL_NUMBERS = 80;
+/* ---------------------------------------------------------
+   備援資料
+   即使 bingo-data.json 尚未產生，頁面也可以顯示
+--------------------------------------------------------- */
 
-const STORAGE_SELECTED =
-  "bingo_v2_selected";
+const FALLBACK_DRAWS = [
+  {
+    period:"115049699",
+    draw_date:"2026-09-02",
+    numbers:[4,6,11,12,13,14,17,19,26,28,30,37,41,51,54,62,66,70,73,75]
+  },
+  {
+    period:"115049687",
+    draw_date:"2026-09-02",
+    numbers:[1,2,5,6,7,14,18,20,31,39,40,41,53,60,69,72,75,76,79,80]
+  },
+  {
+    period:"115049675",
+    draw_date:"2026-09-02",
+    numbers:[2,3,5,12,18,23,24,27,29,41,45,47,48,52,57,58,59,69,74,75]
+  },
+  {
+    period:"115049663",
+    draw_date:"2026-09-02",
+    numbers:[3,13,15,18,21,23,27,30,31,32,38,42,47,55,64,66,67,69,70,76]
+  },
+  {
+    period:"115049651",
+    draw_date:"2026-09-02",
+    numbers:[1,4,6,9,11,15,17,23,26,32,34,37,48,49,51,53,54,56,64,69]
+  },
+  {
+    period:"115049639",
+    draw_date:"2026-09-02",
+    numbers:[1,10,20,22,24,25,29,33,37,43,51,53,54,60,65,66,70,71,78,79]
+  },
+  {
+    period:"115049615",
+    draw_date:"2026-09-02",
+    numbers:[3,11,16,17,33,43,49,50,51,53,54,55,61,62,63,65,67,71,73,79]
+  },
+  {
+    period:"115049603",
+    draw_date:"2026-09-02",
+    numbers:[7,8,13,16,17,22,25,29,30,31,45,48,50,62,68,70,74,78,79,80]
+  },
+  {
+    period:"115049591",
+    draw_date:"2026-09-02",
+    numbers:[1,6,14,16,17,28,30,31,46,48,51,54,56,60,66,67,73,75,78,79]
+  },
+  {
+    period:"115049579",
+    draw_date:"2026-09-02",
+    numbers:[8,15,20,24,27,38,41,43,46,51,54,55,57,59,65,66,68,72,76,80]
+  }
+];
 
-const STORAGE_HISTORY =
-  "bingo_v2_history";
+/* ---------------------------------------------------------
+   工具
+--------------------------------------------------------- */
 
-const STORAGE_SETTINGS =
-  "bingo_v2_settings";
-
-/* =========================================================
-   狀態
-========================================================= */
-
-let remoteDraws = [];
-
-let selectedNumbers = [];
-
-let simulatedDrawn = [];
-
-let localHistory = [];
-
-let autoTimer = null;
-
-let isRunning = false;
-
-let roundNo = 1;
-
-/* =========================================================
-   DOM
-========================================================= */
-
-const $ = id =>
-  document.getElementById(id);
-
-const apiStatus =
-  $("apiStatus");
-
-const apiBadge =
-  $("apiBadge");
-
-const refreshBtn =
-  $("refreshBtn");
-
-const analysisPeriod =
-  $("analysisPeriod");
-
-const queryDate =
-  $("queryDate");
-
-const dailyLimit =
-  $("dailyLimit");
-
-const dailyList =
-  $("dailyList");
-
-const dailyCountBadge =
-  $("dailyCountBadge");
-
-const easyNumbers =
-  $("easyNumbers");
-
-const hotNumbers =
-  $("hotNumbers");
-
-const coldNumbers =
-  $("coldNumbers");
-
-const missingNumbers =
-  $("missingNumbers");
-
-const frequencyGrid =
-  $("frequencyGrid");
-
-const numberGrid =
-  $("numberGrid");
-
-const selectedCount =
-  $("selectedCount");
-
-const hitCount =
-  $("hitCount");
-
-const currentNumber =
-  $("currentNumber");
-
-const statusText =
-  $("statusText");
-
-const drawCount =
-  $("drawCount");
-
-const roundNoEl =
-  $("roundNo");
-
-const drawnList =
-  $("drawnList");
-
-const drawStatus =
-  $("drawStatus");
-
-const historyList =
-  $("historyList");
-
-/* =========================================================
-   日期
-========================================================= */
-
-function pad(n){
+function pad2(n){
   return String(n).padStart(2,"0");
 }
 
-function localDateString(date = new Date()){
+function normalizeDraws(raw){
 
-  return (
-    date.getFullYear() +
-    "-" +
-    pad(date.getMonth()+1) +
-    "-" +
-    pad(date.getDate())
-  );
+  let records = [];
 
-}
-
-queryDate.value =
-  localDateString();
-
-/* =========================================================
-   LocalStorage
-========================================================= */
-
-function loadStorage(){
-
-  try{
-
-    selectedNumbers =
-      JSON.parse(
-        localStorage.getItem(
-          STORAGE_SELECTED
-        ) || "[]"
-      );
-
-  }catch(e){
-
-    selectedNumbers = [];
-
+  if(Array.isArray(raw)){
+    records = raw;
   }
-
-  try{
-
-    localHistory =
-      JSON.parse(
-        localStorage.getItem(
-          STORAGE_HISTORY
-        ) || "[]"
-      );
-
-  }catch(e){
-
-    localHistory = [];
-
+  else if(raw && Array.isArray(raw.records)){
+    records = raw.records;
   }
-
-  try{
-
-    const settings =
-      JSON.parse(
-        localStorage.getItem(
-          STORAGE_SETTINGS
-        ) || "{}"
-      );
-
-    if(settings.analysisPeriod){
-      analysisPeriod.value =
-        settings.analysisPeriod;
-    }
-
-    if(settings.dailyLimit){
-      dailyLimit.value =
-        settings.dailyLimit;
-    }
-
-  }catch(e){}
-
-}
-
-function saveSelected(){
-
-  localStorage.setItem(
-    STORAGE_SELECTED,
-    JSON.stringify(
-      selectedNumbers
-    )
-  );
-
-}
-
-function saveHistory(){
-
-  localStorage.setItem(
-    STORAGE_HISTORY,
-    JSON.stringify(
-      localHistory
-    )
-  );
-
-}
-
-function saveSettings(){
-
-  localStorage.setItem(
-    STORAGE_SETTINGS,
-    JSON.stringify({
-
-      analysisPeriod:
-        analysisPeriod.value,
-
-      dailyLimit:
-        dailyLimit.value
-
-    })
-  );
-
-}
-
-/* =========================================================
-   API
-========================================================= */
-
-async function apiGet(url){
-
-  const response =
-    await fetch(url,{
-      method:"GET",
-      headers:{
-        "Accept":
-          "application/json"
-      }
-    });
-
-  if(!response.ok){
-
-    throw new Error(
-      "HTTP " + response.status
-    );
-
+  else if(raw && Array.isArray(raw.data)){
+    records = raw.data;
   }
-
-  return await response.json();
-
-}
-
-/* =========================================================
-   取得最近開獎
-========================================================= */
-
-async function loadLatestDraws(){
-
-  setApiStatus(
-    "正在取得最新 Bingo Bingo 歷史資料…",
-    "loading"
-  );
-
-  try{
-
-    const limit = 500;
-
-    const url =
-      API_BASE +
-      "/api/draws?" +
-      "gameTypeId=" +
-      GAME_TYPE_ID +
-      "&limit=" +
-      limit +
-      "&sortOrder=DESC";
-
-    const data =
-      await apiGet(url);
-
-    const records =
-      Array.isArray(data)
-      ? data
-      : (
-        data.records ||
-        data.data ||
-        []
-      );
-
-    remoteDraws =
-      normalizeDraws(records);
-
-    remoteDraws =
-      remoteDraws
-      .filter(d =>
-        Array.isArray(d.numbers) &&
-        d.numbers.length > 0
-      );
-
-    if(remoteDraws.length === 0){
-
-      throw new Error(
-        "沒有取得有效開獎資料"
-      );
-
-    }
-
-    apiBadge.textContent =
-      "已更新 " +
-      remoteDraws.length +
-      " 期";
-
-    setApiStatus(
-      "資料更新成功：已取得 " +
-      remoteDraws.length +
-      " 期 Bingo Bingo 歷史資料。",
-      "ok"
-    );
-
-    renderDailyHistory(
-      queryDate.value
-    );
-
-    renderRemoteAnalysis();
-
-  }catch(error){
-
-    console.error(error);
-
-    setApiStatus(
-      "資料取得失敗：" +
-      error.message +
-      "。請確認網路連線後再按「更新資料」。",
-      "error"
-    );
-
-    apiBadge.textContent =
-      "更新失敗";
-
-  }
-
-}
-
-function normalizeDraws(records){
 
   return records
-    .map(item => {
+    .map(x=>{
 
-      const numbers =
-        Array.isArray(item.numbers)
-        ? item.numbers
-            .map(Number)
-            .filter(n =>
-              n >= 1 &&
-              n <= 80
-            )
-        : [];
+      let nums =
+        x.numbers ||
+        x.number ||
+        x.draw_numbers ||
+        x.drawNumber ||
+        [];
+
+      if(typeof nums === "string"){
+        nums = nums
+          .split(/[,\s]+/)
+          .map(Number)
+          .filter(n=>n>=1 && n<=80);
+      }
+
+      nums = Array.from(new Set(nums.map(Number)))
+        .filter(n=>n>=1 && n<=80)
+        .sort((a,b)=>a-b);
 
       return {
+        period:String(
+          x.period ||
+          x.issue ||
+          x.draw_period ||
+          ""
+        ),
 
-        id:
-          item.id ?? "",
+        draw_date:String(
+          x.draw_date ||
+          x.date ||
+          x.drawDate ||
+          ""
+        ).slice(0,10),
 
-        period:
-          item.period ??
-          item.issue ??
-          item.drawPeriod ??
-          "—",
-
-        draw_date:
-          item.draw_date ??
-          item.drawDate ??
-          item.date ??
-          "",
-
-        numbers:
-          [...new Set(numbers)]
-            .sort((a,b)=>a-b)
-
+        numbers:nums
       };
 
     })
-    .filter(item =>
-      item.numbers.length > 0
-    );
+    .filter(x=>x.numbers.length>=15);
 
 }
 
-/* =========================================================
-   API 狀態
-========================================================= */
+/* ---------------------------------------------------------
+   載入資料
+--------------------------------------------------------- */
 
-function setApiStatus(text,type=""){
+async function loadData(){
 
-  apiStatus.textContent =
-    text;
+  setStatus("正在讀取最新歷史資料……");
+  setBadge("🟡 讀取中");
 
-  apiStatus.className =
-    "api-status " +
-    (type === "ok"
-      ? "ok"
-      : type === "error"
-      ? "error"
-      : "");
+  try{
 
-}
+    const url =
+      DATA_URL +
+      "?t=" +
+      Date.now();
 
-/* =========================================================
-   日期歷史
-========================================================= */
+    const response = await fetch(url,{
+      cache:"no-store"
+    });
 
-function renderDailyHistory(date){
+    if(!response.ok){
+      throw new Error(
+        "HTTP " + response.status
+      );
+    }
 
-  if(!remoteDraws.length){
+    const json = await response.json();
 
-    dailyList.innerHTML =
-      '<div class="empty">尚無資料。</div>';
+    const normalized = normalizeDraws(json);
 
-    dailyCountBadge.textContent =
-      "0 期";
+    if(!normalized.length){
+      throw new Error("資料格式沒有開獎記錄");
+    }
 
-    return;
-  }
+    draws = normalized;
 
-  let records =
-    remoteDraws.filter(
-      d => d.draw_date === date
+    setBadge("🟢 資料正常");
+
+    setStatus(
+      "資料更新成功，共 " +
+      draws.length +
+      " 期"
     );
 
-  if(records.length === 0){
+  }catch(error){
 
-    dailyList.innerHTML =
-      '<div class="empty">' +
-      "找不到 " +
-      date +
-      " 的資料。" +
-      "</div>";
+    console.warn(error);
 
-    dailyCountBadge.textContent =
-      "0 期";
+    draws = FALLBACK_DRAWS.slice();
 
-    return;
+    setBadge("🟠 使用備援資料");
+
+    setStatus(
+      "目前 bingo-data.json 尚未更新，先使用備援資料。"
+    );
   }
 
-  const limit =
-    Number(
-      dailyLimit.value
-    ) || 50;
+  renderAll();
+}
 
-  records =
-    records.slice(0,limit);
+/* ---------------------------------------------------------
+   Badge
+--------------------------------------------------------- */
 
-  dailyCountBadge.textContent =
-    records.length +
-    " 期";
+function setBadge(text){
+  document.getElementById("dataBadge").textContent=text;
+}
+
+function setStatus(text){
+  document.getElementById("status").textContent=text;
+}
+
+/* ---------------------------------------------------------
+   號碼盤
+--------------------------------------------------------- */
+
+function renderNumberGrid(){
 
   const box =
-    document.createElement("div");
+    document.getElementById("numberGrid");
 
-  box.className =
-    "daily-day";
+  box.innerHTML="";
 
-  const head =
-    document.createElement("div");
+  for(let n=1;n<=80;n++){
 
-  head.className =
-    "daily-head";
-
-  head.innerHTML =
-    "<span>📅 " +
-    date +
-    "</span>" +
-    "<span>" +
-    records.length +
-    " 期</span>";
-
-  box.appendChild(head);
-
-  records.forEach(record => {
-
-    const period =
+    const el =
       document.createElement("div");
 
-    period.className =
-      "daily-period";
+    el.className="ball";
+    el.id="ball-"+n;
+    el.textContent=pad2(n);
 
-    const selected =
-      selectedNumbers;
+    box.appendChild(el);
+  }
 
-    period.innerHTML = `
+}
 
-      <div class="period-head">
+/* ---------------------------------------------------------
+   統計
+--------------------------------------------------------- */
 
-        <span>
-          🎯 第 ${escapeHtml(record.period)} 期
-        </span>
+function getFrequency(list){
 
-        <span class="badge">
-          ${record.numbers.length} 號
-        </span>
+  const freq =
+    Array.from(
+      {length:81},
+      ()=>0
+    );
 
-      </div>
+  list.forEach(draw=>{
 
-      <div class="period-numbers">
+    draw.numbers.forEach(n=>{
 
-        ${record.numbers
-          .map(n => `
+      if(n>=1 && n<=80){
+        freq[n]++;
+      }
 
-            <div
-              class="period-number ${
-                selected.includes(n)
-                  ? "selected"
-                  : ""
-              }"
-            >
-              ${pad(n)}
-            </div>
-
-          `)
-          .join("")}
-
-      </div>
-    `;
-
-    box.appendChild(period);
+    });
 
   });
 
-  dailyList.innerHTML = "";
-
-  dailyList.appendChild(box);
-
+  return freq;
 }
 
-/* =========================================================
-   統計資料
-========================================================= */
+function getMissing(){
 
-function getAnalysisDraws(){
-
-  const count =
-    Number(
-      analysisPeriod.value
-    ) || 100;
-
-  return remoteDraws.slice(
-    0,
-    count
-  );
-
-}
-
-function calculateStats(draws){
-
-  const frequency =
-    Array(TOTAL_NUMBERS+1)
-      .fill(0);
+  const missing =
+    Array.from(
+      {length:81},
+      ()=>0
+    );
 
   const lastSeen =
-    Array(TOTAL_NUMBERS+1)
-      .fill(-1);
-
-  let odd = 0;
-
-  let even = 0;
-
-  let small = 0;
-
-  let big = 0;
-
-  let sumTotal = 0;
-
-  draws.forEach(
-    (draw,index) => {
-
-      let sum = 0;
-
-      draw.numbers.forEach(n => {
-
-        frequency[n]++;
-
-        if(
-          lastSeen[n] === -1
-        ){
-          lastSeen[n] =
-            index;
-        }
-
-        sum += n;
-
-        if(n % 2 === 0){
-          even++;
-        }else{
-          odd++;
-        }
-
-        if(n <= 40){
-          small++;
-        }else{
-          big++;
-        }
-
-      });
-
-      sumTotal += sum;
-
-    }
-  );
-
-  const missing =
-    lastSeen.map(
-      (index,n) => {
-
-        if(n === 0){
-          return 0;
-        }
-
-        if(index === -1){
-          return draws.length;
-        }
-
-        return index;
-
-      }
+    Array.from(
+      {length:81},
+      ()=>Infinity
     );
 
-  return {
+  for(let i=0;i<draws.length;i++){
 
-    frequency,
-    lastSeen,
-    missing,
+    draws[i].numbers.forEach(n=>{
 
-    odd,
-    even,
-
-    small,
-    big,
-
-    averageSum:
-      draws.length
-      ? sumTotal / draws.length
-      : 0
-
-  };
-
-}
-
-/* =========================================================
-   熱門／冷門／遺漏
-========================================================= */
-
-function renderRemoteAnalysis(){
-
-  const draws =
-    getAnalysisDraws();
-
-  if(!draws.length){
-
-    easyNumbers.innerHTML =
-      '<div class="empty">尚無資料</div>';
-
-    hotNumbers.innerHTML =
-      '<div class="empty">尚無資料</div>';
-
-    coldNumbers.innerHTML =
-      '<div class="empty">尚無資料</div>';
-
-    missingNumbers.innerHTML =
-      '<div class="empty">尚無資料</div>';
-
-    return;
-
-  }
-
-  const stats =
-    calculateStats(draws);
-
-  const numbers =
-    [];
-
-  for(let n=1;n<=80;n++){
-
-    numbers.push({
-
-      n,
-
-      freq:
-        stats.frequency[n],
-
-      missing:
-        stats.missing[n]
+      if(lastSeen[n]===Infinity){
+        lastSeen[n]=i;
+      }
 
     });
 
   }
 
-  /* 熱門 */
+  for(let n=1;n<=80;n++){
 
-  const hot =
-    [...numbers]
-      .sort(
-        (a,b) =>
-          b.freq-a.freq ||
-          a.n-b.n
-      )
-      .slice(0,10);
+    missing[n] =
+      lastSeen[n]===Infinity
+      ? draws.length
+      : lastSeen[n];
 
-  hotNumbers.innerHTML =
-    hot.map(x => `
+  }
 
-      <span class="tag hot-tag">
-        🔥 ${pad(x.n)}
-        × ${x.freq}
-      </span>
+  return missing;
+}
 
-    `).join("");
+function topNumbers(freq,count,descending=true){
 
-  /* 冷門 */
+  const arr=[];
 
-  const cold =
-    [...numbers]
-      .sort(
-        (a,b) =>
-          a.freq-b.freq ||
-          a.n-b.n
-      )
-      .slice(0,10);
+  for(let n=1;n<=80;n++){
 
-  coldNumbers.innerHTML =
-    cold.map(x => `
+    arr.push({
+      n,
+      value:freq[n]
+    });
 
-      <span class="tag cold-tag">
-        ❄️ ${pad(x.n)}
-        × ${x.freq}
-      </span>
+  }
 
-    `).join("");
+  arr.sort((a,b)=>{
 
-  /* 遺漏 */
+    if(descending){
+      return b.value-a.value || a.n-b.n;
+    }
 
-  const missing =
-    [...numbers]
-      .sort(
-        (a,b) =>
-          b.missing-a.missing ||
-          a.n-b.n
-      )
-      .slice(0,15);
+    return a.value-b.value || a.n-b.n;
 
-  missingNumbers.innerHTML =
-    missing.map(x => `
+  });
 
-      <span class="tag miss-tag">
-        ⏳ ${pad(x.n)}
-        遺漏 ${x.missing} 期
-      </span>
+  return arr.slice(0,count);
+}
 
-    `).join("");
+function renderStats(){
 
-  /* 統計 */
-
-  $("statPeriods").textContent =
+  const total =
     draws.length;
 
-  $("statOdd").textContent =
-    stats.odd;
+  const f30 =
+    getFrequency(draws.slice(0,30));
 
-  $("statEven").textContent =
-    stats.even;
+  const f100 =
+    getFrequency(draws.slice(0,100));
 
-  $("statSmall").textContent =
-    stats.small;
+  const f300 =
+    getFrequency(draws.slice(0,300));
 
-  $("statBig").textContent =
-    stats.big;
+  document.getElementById("totalDraws").textContent =
+    total;
 
-  $("statAvgSum").textContent =
-    stats.averageSum.toFixed(1);
+  document.getElementById("recent30").textContent =
+    Math.min(30,total);
 
-  $("frequencyPeriodBadge").textContent =
-    "最近 " +
-    draws.length +
-    " 期";
+  document.getElementById("recent100").textContent =
+    Math.min(100,total);
 
-  renderFrequencyGrid(
-    stats
-  );
+  document.getElementById("recent300").textContent =
+    Math.min(300,total);
 
-  renderEasyScore(
-    stats,
-    draws.length
-  );
+  const allFreq =
+    getFrequency(draws);
+
+  const hot =
+    topNumbers(allFreq,10,true);
+
+  const cold =
+    topNumbers(allFreq,10,false);
+
+  const missing =
+    getMissing();
+
+  const missingTop =
+    Array.from({length:80},(_,i)=>({
+      n:i+1,
+      value:missing[i+1]
+    }))
+    .sort((a,b)=>
+      b.value-a.value ||
+      a.n-b.n
+    )
+    .slice(0,10);
+
+  document.getElementById("hotNumbers").innerHTML =
+    hot.map(x=>
+      `<span class="tag hot">
+        ${pad2(x.n)} × ${x.value}
+      </span>`
+    ).join("");
+
+  document.getElementById("coldNumbers").innerHTML =
+    cold.map(x=>
+      `<span class="tag cold">
+        ${pad2(x.n)} × ${x.value}
+      </span>`
+    ).join("");
+
+  document.getElementById("missingNumbers").innerHTML =
+    missingTop.map(x=>
+      `<span class="tag">
+        ${pad2(x.n)} ・${x.value}期
+      </span>`
+    ).join("");
 
 }
 
-/* =========================================================
-   「比較容易開」歷史熱度模型
-========================================================= */
+/* ---------------------------------------------------------
+   推薦計算
+--------------------------------------------------------- */
 
-function renderEasyScore(
-  stats,
-  drawCount
-){
+function calculateScores(){
 
-  const items = [];
+  const recent30 =
+    getFrequency(draws.slice(0,30));
 
-  const maxFreq =
-    Math.max(
-      ...stats.frequency.slice(1)
-    );
+  const recent100 =
+    getFrequency(draws.slice(0,100));
 
-  const maxMissing =
-    Math.max(
-      1,
-      ...stats.missing.slice(1)
-    );
+  const recent300 =
+    getFrequency(draws.slice(0,300));
 
-  /*
-    歷史熱度：
+  const all =
+    getFrequency(draws);
 
-    55%：指定期間出現頻率
-    30%：近期性
-    15%：遺漏狀態
+  const missing =
+    getMissing();
 
-    注意：
-    這是「歷史統計分數」
-    不是下一期的實際機率。
-  */
+  const scores=[];
 
   for(let n=1;n<=80;n++){
-
-    const freq =
-      stats.frequency[n];
-
-    const freqScore =
-      maxFreq > 0
-      ? freq / maxFreq
-      : 0;
 
     /*
-      遺漏不是越久越好。
-      為避免把「很久沒出」直接當成容易開，
-      這裡只把「近期仍有出現」
-      當成熱度的一部分。
+      歷史綜合分數：
+
+      最近30期：35%
+      最近100期：30%
+      最近300期：20%
+      全部歷史：15%
+
+      這只是統計排序，不是預測機率。
     */
 
-    const recentScore =
-      stats.missing[n] === drawCount
-      ? 0
-      : 1 -
-        (
-          stats.missing[n] /
-          Math.max(1,drawCount)
-        );
+    let score =
+      recent30[n] * 0.35 +
+      recent100[n] * 0.30 +
+      recent300[n] * 0.20 +
+      all[n] * 0.15;
 
-    const balancedMissing =
-      Math.min(
-        1,
-        stats.missing[n] /
-        Math.max(1,drawCount*0.15)
-      );
-
-    const score =
-      (
-        freqScore * 0.55 +
-        recentScore * 0.30 +
-        balancedMissing * 0.15
-      ) * 100;
-
-    items.push({
-
+    scores.push({
       n,
-
-      freq,
-
-      missing:
-        stats.missing[n],
-
-      score
-
+      score,
+      recent30:recent30[n],
+      recent100:recent100[n],
+      recent300:recent300[n],
+      all:all[n],
+      missing:missing[n]
     });
 
   }
 
-  items.sort(
-    (a,b) =>
-      b.score-a.score ||
-      b.freq-a.freq ||
-      a.n-b.n
-  );
-
-  const top =
-    items.slice(0,10);
-
-  const maxScore =
-    Math.max(
-      ...top.map(x=>x.score)
-    );
-
-  easyNumbers.innerHTML =
-    top.map(x => {
-
-      const width =
-        maxScore > 0
-        ? (x.score/maxScore)*100
-        : 0;
-
-      return `
-
-        <div class="score-row">
-
-          <div class="score-number">
-            ${pad(x.n)}
-          </div>
-
-          <div>
-
-            <div class="score-bar">
-
-              <div
-                class="score-fill"
-                style="width:${width}%"
-              ></div>
-
-            </div>
-
-            <div
-              style="
-                margin-top:4px;
-                font-size:11px;
-                color:#9f987f;
-              "
-            >
-              歷史出現 ${x.freq} 次　
-              遺漏 ${x.missing} 期
-            </div>
-
-          </div>
-
-          <div class="score-value">
-            ${x.score.toFixed(1)}
-          </div>
-
-        </div>
-      `;
-
-    }).join("");
-
+  return scores;
 }
 
-/* =========================================================
-   01～80 頻率
-========================================================= */
+/* ---------------------------------------------------------
+   亂數
+--------------------------------------------------------- */
 
-function renderFrequencyGrid(
-  stats
-){
+function shuffle(array){
 
-  frequencyGrid.innerHTML = "";
+  const a =
+    array.slice();
 
-  for(let n=1;n<=80;n++){
+  for(let i=a.length-1;i>0;i--){
 
-    const btn =
-      document.createElement(
-        "div"
+    const j =
+      Math.floor(
+        Math.random()*(i+1)
       );
 
-    btn.className =
-      "ball";
-
-    const freq =
-      stats.frequency[n];
-
-    if(freq === 0){
-
-      btn.style.opacity =
-        ".45";
-
-    }
-
-    btn.innerHTML =
-      `
-      <span style="
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        line-height:1.05;
-      ">
-        <strong>${pad(n)}</strong>
-        <small style="
-          font-size:8px;
-          color:#aab2bf;
-          margin-top:2px;
-        ">
-          ${freq}
-        </small>
-      </span>
-      `;
-
-    frequencyGrid.appendChild(btn);
+    [a[i],a[j]] =
+      [a[j],a[i];
 
   }
 
+  return a;
 }
 
-/* =========================================================
-   自選號碼
-========================================================= */
+/* ---------------------------------------------------------
+   依區間平均分布
+--------------------------------------------------------- */
 
-function buildNumberGrid(){
+function spreadSelection(candidates,count){
 
-  numberGrid.innerHTML = "";
+  let result=[];
 
-  for(let n=1;n<=80;n++){
-
-    const btn =
-      document.createElement(
-        "button"
-      );
-
-    btn.className =
-      "ball";
-
-    if(
-      selectedNumbers.includes(n)
-    ){
-      btn.classList.add(
-        "selected"
-      );
-    }
-
-    if(
-      simulatedDrawn.includes(n)
-    ){
-      btn.classList.add(
-        "drawn"
-      );
-    }
-
-    btn.textContent =
-      pad(n);
-
-    btn.addEventListener(
-      "click",
-      () => {
-
-        toggleSelected(n);
-
-      }
-    );
-
-    numberGrid.appendChild(btn);
-
-  }
-
-}
-
-function toggleSelected(n){
-
-  if(
-    selectedNumbers.includes(n)
-  ){
-
-    selectedNumbers =
-      selectedNumbers.filter(
-        x => x !== n
-      );
-
-  }else{
-
-    if(
-      selectedNumbers.length >= 10
-    ){
-
-      alert(
-        "最多選擇 10 個號碼。"
-      );
-
-      return;
-
-    }
-
-    selectedNumbers.push(n);
-
-    selectedNumbers.sort(
-      (a,b)=>a-b
-    );
-
-  }
-
-  saveSelected();
-
-  updateSelectedUI();
-
-  renderDailyHistory(
-    queryDate.value
-  );
-
-}
-
-function updateSelectedUI(){
-
-  selectedCount.textContent =
-    selectedNumbers.length;
-
-  const hits =
-    simulatedDrawn.filter(
-      n =>
-        selectedNumbers.includes(n)
-    );
-
-  hitCount.textContent =
-    hits.length;
-
-  buildNumberGrid();
-
-}
-
-function clearSelected(){
-
-  if(
-    selectedNumbers.length === 0
-  ){
-    return;
-  }
-
-  if(
-    !confirm(
-      "確定要清除全部自選號碼嗎？"
-    )
-  ){
-    return;
-  }
-
-  selectedNumbers = [];
-
-  saveSelected();
-
-  updateSelectedUI();
-
-  renderDailyHistory(
-    queryDate.value
-  );
-
-}
-
-/* =========================================================
-   模擬開獎
-========================================================= */
-
-function randomNumber(){
-
-  const available = [];
-
-  for(let n=1;n<=80;n++){
-
-    if(
-      !simulatedDrawn.includes(n)
-    ){
-      available.push(n);
-    }
-
-  }
-
-  if(!available.length){
-    return null;
-  }
-
-  return available[
-    Math.floor(
-      Math.random() *
-      available.length
-    )
+  const groups=[
+    [1,10],
+    [11,20],
+    [21,30],
+    [31,40],
+    [41,50],
+    [51,60],
+    [61,70],
+    [71,80]
   ];
 
-}
+  const shuffledGroups =
+    shuffle(groups);
 
-function drawOne(){
+  /*
+    先從不同區間拿號碼，
+    避免推薦全部集中在同一區。
+  */
 
-  if(
-    simulatedDrawn.length >= 20
-  ){
+  for(const group of shuffledGroups){
 
-    stopAuto();
+    if(result.length>=count) break;
 
-    finishRound();
+    const available =
+      candidates.filter(x=>
+        x.n>=group[0] &&
+        x.n<=group[1] &&
+        !result.includes(x.n)
+      );
 
-    return;
+    if(available.length){
 
-  }
+      /*
+        分數高的優先，但保留一點隨機性
+      */
 
-  const n =
-    randomNumber();
+      available.sort((a,b)=>
+        b.score-a.score
+      );
 
-  if(n === null){
-    stopAuto();
-    finishRound();
-    return;
-  }
-
-  simulatedDrawn.push(n);
-
-  currentNumber.textContent =
-    pad(n);
-
-  currentNumber.classList.remove(
-    "pop"
-  );
-
-  void currentNumber.offsetWidth;
-
-  currentNumber.classList.add(
-    "pop"
-  );
-
-  statusText.textContent =
-    "剛剛開出：" +
-    pad(n);
-
-  updateSimulationUI();
-
-  if(
-    simulatedDrawn.length >= 20
-  ){
-
-    stopAuto();
-
-    finishRound();
-
-  }
-
-}
-
-function startAuto(){
-
-  if(isRunning){
-    return;
-  }
-
-  if(
-    simulatedDrawn.length >= 20
-  ){
-
-    alert(
-      "本局已完成，請開始新一局。"
-    );
-
-    return;
-
-  }
-
-  isRunning = true;
-
-  $("startBtn").textContent =
-    "⏸ 暫停";
-
-  statusText.textContent =
-    "模擬開球中…";
-
-  autoTimer =
-    setInterval(
-      drawOne,
-      700
-    );
-
-}
-
-function stopAuto(){
-
-  isRunning = false;
-
-  if(autoTimer){
-
-    clearInterval(
-      autoTimer
-    );
-
-    autoTimer = null;
-
-  }
-
-  $("startBtn").textContent =
-    "▶ 開始";
-
-}
-
-function finishRound(){
-
-  stopAuto();
-
-  if(
-    simulatedDrawn.length === 0
-  ){
-    return;
-  }
-
-  const already =
-    localHistory.some(
-      h =>
-        h.round === roundNo
-    );
-
-  if(!already){
-
-    localHistory.unshift({
-
-      round:
-        roundNo,
-
-      time:
-        new Date()
-          .toLocaleString(
-            "zh-TW"
-          ),
-
-      numbers:
-        [...simulatedDrawn],
-
-      selected:
-        [...selectedNumbers]
-
-    });
-
-    if(
-      localHistory.length > 50
-    ){
-
-      localHistory =
-        localHistory.slice(
+      const top =
+        available.slice(
           0,
-          50
+          Math.min(5,available.length)
         );
+
+      const pick =
+        top[
+          Math.floor(
+            Math.random()*top.length
+          )
+        ];
+
+      result.push(pick.n);
 
     }
 
-    saveHistory();
-
   }
 
-  drawStatus.textContent =
-    simulatedDrawn.length >= 20
-    ? "本局完成"
-    : "已停止";
+  if(result.length<count){
 
-  statusText.textContent =
-    simulatedDrawn.length >= 20
-    ? "🎉 本局完成"
-    : "已停止";
-
-  renderLocalHistory();
-
-}
-
-/* =========================================================
-   模擬 UI
-========================================================= */
-
-function updateSimulationUI(){
-
-  drawCount.textContent =
-    simulatedDrawn.length;
-
-  roundNoEl.textContent =
-    roundNo;
-
-  const hits =
-    simulatedDrawn.filter(
-      n =>
-        selectedNumbers.includes(n)
-    );
-
-  hitCount.textContent =
-    hits.length;
-
-  drawnList.innerHTML = "";
-
-  if(
-    simulatedDrawn.length === 0
-  ){
-
-    drawnList.innerHTML =
-      '<div class="empty">' +
-      "還沒有開出的號碼" +
-      "</div>";
-
-  }else{
-
-    simulatedDrawn.forEach(n => {
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-      div.className =
-        "mini-ball";
-
-      if(
-        selectedNumbers.includes(n)
-      ){
-
-        div.classList.add(
-          "hit"
-        );
-
-      }
-
-      div.textContent =
-        pad(n);
-
-      drawnList.appendChild(
-        div
+    const remain =
+      candidates.filter(x=>
+        !result.includes(x.n)
       );
 
-    });
-
-  }
-
-  $("analysisDrawn").innerHTML =
-    tagNumbers(
-      simulatedDrawn
+    result.push(
+      ...shuffle(remain)
+        .slice(
+          0,
+          count-result.length
+        )
+        .map(x=>x.n)
     );
 
-  $("analysisHit").innerHTML =
-    hits.length
-    ? tagNumbers(hits)
-    : "目前尚未命中";
+  }
 
-  const odd =
-    simulatedDrawn.filter(
-      n=>n%2===1
-    ).length;
-
-  const even =
-    simulatedDrawn.filter(
-      n=>n%2===0
-    ).length;
-
-  const small =
-    simulatedDrawn.filter(
-      n=>n<=40
-    ).length;
-
-  const big =
-    simulatedDrawn.filter(
-      n=>n>=41
-    ).length;
-
-  $("analysisOddEven").textContent =
-    "奇數 " +
-    odd +
-    " ：偶數 " +
-    even;
-
-  $("analysisSmallBig").textContent =
-    "小號 " +
-    small +
-    " ：大號 " +
-    big;
-
-  updateConsecutive();
-
-  buildNumberGrid();
-
+  return result
+    .sort((a,b)=>a-b)
+    .slice(0,count);
 }
 
-function updateConsecutive(){
+/* ---------------------------------------------------------
+   產生推薦
+--------------------------------------------------------- */
 
-  const sorted =
-    [...simulatedDrawn]
-      .sort((a,b)=>a-b);
+function generateRecommendation(){
 
-  const result = [];
+  if(!draws.length){
+    return;
+  }
 
-  for(
-    let i=1;
-    i<sorted.length;
-    i++
-  ){
+  const count =
+    selectedStar;
 
-    if(
-      sorted[i] ===
-      sorted[i-1] + 1
-    ){
+  let scores =
+    calculateScores();
 
-      const pair =
-        sorted[i-1] +
-        "-" +
-        sorted[i];
+  let candidates;
 
-      if(
-        !result.includes(pair)
-      ){
+  if(selectedMode==="hot"){
 
-        result.push(pair);
+    /*
+      熱門：
+      取綜合分數最高的候選
+    */
 
-      }
+    candidates =
+      scores
+        .sort((a,b)=>
+          b.score-a.score
+        )
+        .slice(0,35);
 
-    }
+  }
+  else if(selectedMode==="cold"){
+
+    /*
+      冷門：
+      選擇歷史較少出現、
+      且遺漏期數較長的號碼
+    */
+
+    candidates =
+      scores
+        .sort((a,b)=>{
+
+          const sa =
+            a.missing*0.65 -
+            a.score*0.35;
+
+          const sb =
+            b.missing*0.65 -
+            b.score*0.35;
+
+          return sb-sa;
+
+        })
+        .slice(0,35);
+
+  }
+  else{
+
+    /*
+      均衡：
+      中間區間＋頻率
+    */
+
+    scores.sort((a,b)=>
+      b.score-a.score
+    );
+
+    const middle =
+      scores.slice(
+        15,
+        55
+      );
+
+    candidates =
+      middle.length
+      ? middle
+      : scores;
 
   }
 
-  $("analysisConsecutive")
-    .innerHTML =
-    result.length
-    ? result.map(
-        x =>
-          '<span class="tag">' +
-          "🔗 " +
-          x +
-          "</span>"
-      ).join("")
-    : "目前沒有";
+  recommendation =
+    spreadSelection(
+      candidates,
+      count
+    );
 
+  renderRecommendation();
 }
 
-function tagNumbers(numbers){
+/* ---------------------------------------------------------
+   顯示推薦
+--------------------------------------------------------- */
 
-  if(
-    !numbers.length
-  ){
-    return "—";
-  }
+function renderRecommendation(){
 
-  return numbers
-    .map(
-      n =>
-        '<span class="tag">' +
-        pad(n) +
-        "</span>"
-    )
-    .join("");
+  const box =
+    document.getElementById(
+      "recommendNumbers"
+    );
 
-}
+  if(!recommendation.length){
 
-/* =========================================================
-   本機歷史
-========================================================= */
-
-function renderLocalHistory(){
-
-  historyList.innerHTML = "";
-
-  if(
-    localHistory.length === 0
-  ){
-
-    historyList.innerHTML =
-      '<div class="empty">' +
-      "尚無歷史紀錄" +
-      "</div>";
+    box.innerHTML =
+      `<span class="small">
+        請先選擇星數
+      </span>`;
 
     return;
-
   }
 
-  localHistory.forEach(h => {
+  box.innerHTML =
+    recommendation.map(n=>
+      `<div class="recommend-ball">
+        ${pad2(n)}
+      </div>`
+    ).join("");
 
-    const box =
-      document.createElement(
-        "div"
+  /*
+    號碼盤標示推薦
+  */
+
+  document.querySelectorAll(".ball")
+    .forEach(el=>
+      el.classList.remove("recommend")
+    );
+
+  recommendation.forEach(n=>{
+
+    const el =
+      document.getElementById(
+        "ball-"+n
       );
 
-    box.className =
-      "history-item";
-
-    const hits =
-      (h.numbers || [])
-        .filter(
-          n =>
-            (h.selected || [])
-              .includes(n)
-        );
-
-    box.innerHTML = `
-
-      <div class="history-head">
-
-        <span>
-          第 ${h.round} 局
-        </span>
-
-        <span class="badge">
-          ${escapeHtml(h.time)}
-        </span>
-
-      </div>
-
-      <div
-        style="
-          font-size:12px;
-          color:#aeb6c4;
-          margin-bottom:8px;
-        "
-      >
-        開出 ${h.numbers.length} 球　
-        命中 ${hits.length} 球
-      </div>
-
-      <div class="history-numbers">
-
-        ${h.numbers
-          .map(n => `
-
-            <div
-              class="history-number ${
-                hits.includes(n)
-                ? "hit"
-                : ""
-              }"
-            >
-              ${pad(n)}
-            </div>
-
-          `)
-          .join("")}
-
-      </div>
-    `;
-
-    historyList.appendChild(
-      box
-    );
+    if(el){
+      el.classList.add("recommend");
+    }
 
   });
 
 }
 
-/* =========================================================
-   新局
-========================================================= */
+/* ---------------------------------------------------------
+   最新開獎
+--------------------------------------------------------- */
 
-function newRound(){
+function renderLatest(){
 
-  stopAuto();
-
-  if(
-    simulatedDrawn.length > 0
-  ){
-
-    const already =
-      localHistory.some(
-        h =>
-          h.round === roundNo
-      );
-
-    if(!already){
-
-      localHistory.unshift({
-
-        round:
-          roundNo,
-
-        time:
-          new Date()
-            .toLocaleString(
-              "zh-TW"
-            ),
-
-        numbers:
-          [...simulatedDrawn],
-
-        selected:
-          [...selectedNumbers]
-
-      });
-
-      if(
-        localHistory.length > 50
-      ){
-
-        localHistory =
-          localHistory.slice(
-            0,
-            50
-          );
-
-      }
-
-      saveHistory();
-
-    }
-
-  }
-
-  roundNo++;
-
-  simulatedDrawn = [];
-
-  currentNumber.textContent =
-    "—";
-
-  statusText.textContent =
-    "準備開始";
-
-  drawStatus.textContent =
-    "尚未開始";
-
-  updateSimulationUI();
-
-  renderLocalHistory();
-
-}
-
-/* =========================================================
-   清除本機歷史
-========================================================= */
-
-function clearLocalHistory(){
-
-  if(
-    localHistory.length === 0
-  ){
-    return;
-  }
-
-  const ok =
-    confirm(
-      "確定要清除全部模擬歷史紀錄嗎？\n\n此操作無法復原。"
+  const box =
+    document.getElementById(
+      "latestHistory"
     );
 
-  if(!ok){
+  const list =
+    draws.slice(0,10);
+
+  if(!list.length){
+
+    box.innerHTML =
+      `<div class="small">
+        尚無資料
+      </div>`;
+
     return;
   }
 
-  localHistory = [];
-
-  saveHistory();
-
-  renderLocalHistory();
-
-}
-
-/* =========================================================
-   日期按鈕
-========================================================= */
-
-function setQueryDate(date){
-
-  queryDate.value =
-    date;
-
-  renderDailyHistory(
-    date
-  );
+  box.innerHTML =
+    list.map(draw=>
+      drawHTML(draw)
+    ).join("");
 
 }
 
-function getYesterday(){
+function drawHTML(draw){
+
+  return `
+    <div class="draw">
+
+      <div class="draw-head">
+
+        <strong>
+          第 ${draw.period || "-"} 期
+        </strong>
+
+        <span>
+          ${draw.draw_date || ""}
+        </span>
+
+      </div>
+
+      <div class="draw-balls">
+
+        ${
+          draw.numbers.map(n=>
+            `<div class="mini-ball">
+              ${pad2(n)}
+            </div>`
+          ).join("")
+        }
+
+      </div>
+
+    </div>
+  `;
+
+}
+
+/* ---------------------------------------------------------
+   每日歷史
+--------------------------------------------------------- */
+
+function renderDaily(date){
+
+  const box =
+    document.getElementById(
+      "dailyHistory"
+    );
+
+  let list =
+    draws.filter(draw=>
+      draw.draw_date===date
+    );
+
+  if(!list.length){
+
+    box.innerHTML =
+      `
+      <div class="status">
+        📭 ${date}
+        沒有找到資料。<br>
+        如果今天資料尚未同步，稍後再按「讀取最新資料」即可。
+      </div>
+      `;
+
+    return;
+  }
+
+  box.innerHTML =
+    list.map(draw=>
+      drawHTML(draw)
+    ).join("");
+
+}
+
+/* ---------------------------------------------------------
+   今天日期
+--------------------------------------------------------- */
+
+function getLocalDate(){
 
   const d =
     new Date();
 
-  d.setDate(
-    d.getDate()-1
+  const y =
+    d.getFullYear();
+
+  const m =
+    pad2(d.getMonth()+1);
+
+  const day =
+    pad2(d.getDate());
+
+  return `${y}-${m}-${day}`;
+}
+
+/* ---------------------------------------------------------
+   全部渲染
+--------------------------------------------------------- */
+
+function renderAll(){
+
+  renderNumberGrid();
+
+  renderStats();
+
+  renderLatest();
+
+  const date =
+    document.getElementById(
+      "datePicker"
+    ).value;
+
+  renderDaily(
+    date || getLocalDate()
   );
 
-  return localDateString(d);
+  if(selectedStar){
+    generateRecommendation();
+  }
 
 }
 
-/* =========================================================
-   XSS 保護
-========================================================= */
-
-function escapeHtml(value){
-
-  return String(value)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-
-}
-
-/* =========================================================
+/* ---------------------------------------------------------
    事件
-========================================================= */
+--------------------------------------------------------- */
 
-refreshBtn.addEventListener(
-  "click",
-  async () => {
+document
+  .querySelectorAll(
+    "#starButtons button"
+  )
+  .forEach(btn=>{
 
-    refreshBtn.classList.add(
-      "loading"
+    btn.addEventListener(
+      "click",
+      ()=>{
+
+        document
+          .querySelectorAll(
+            "#starButtons button"
+          )
+          .forEach(x=>
+            x.classList.remove(
+              "active"
+            )
+          );
+
+        btn.classList.add("active");
+
+        selectedStar =
+          Number(
+            btn.dataset.star
+          );
+
+        generateRecommendation();
+
+      }
     );
 
-    try{
+  });
 
-      await loadLatestDraws();
+document
+  .getElementById("modeHot")
+  .addEventListener(
+    "click",
+    ()=>{
 
-    }finally{
+      selectedMode="hot";
 
-      refreshBtn.classList.remove(
-        "loading"
+      setModeButton(
+        "modeHot"
       );
 
+      generateRecommendation();
+
     }
+  );
 
-  }
-);
+document
+  .getElementById("modeBalance")
+  .addEventListener(
+    "click",
+    ()=>{
 
-analysisPeriod.addEventListener(
-  "change",
-  () => {
+      selectedMode="balance";
 
-    saveSettings();
-
-    renderRemoteAnalysis();
-
-  }
-);
-
-dailyLimit.addEventListener(
-  "change",
-  () => {
-
-    saveSettings();
-
-    renderDailyHistory(
-      queryDate.value
-    );
-
-  }
-);
-
-queryDate.addEventListener(
-  "change",
-  () => {
-
-    renderDailyHistory(
-      queryDate.value
-    );
-
-  }
-);
-
-$("todayBtn").addEventListener(
-  "click",
-  () => {
-
-    setQueryDate(
-      localDateString()
-    );
-
-  }
-);
-
-$("yesterdayBtn").addEventListener(
-  "click",
-  () => {
-
-    setQueryDate(
-      getYesterday()
-    );
-
-  }
-);
-
-$("latestBtn").addEventListener(
-  "click",
-  () => {
-
-    if(
-      remoteDraws.length
-    ){
-
-      renderDailyHistory(
-        remoteDraws[0].draw_date
+      setModeButton(
+        "modeBalance"
       );
 
-      queryDate.value =
-        remoteDraws[0].draw_date;
-
-    }else{
-
-      loadLatestDraws();
+      generateRecommendation();
 
     }
+  );
 
-  }
-);
+document
+  .getElementById("modeCold")
+  .addEventListener(
+    "click",
+    ()=>{
 
-$("loadDailyBtn").addEventListener(
-  "click",
-  () => {
+      selectedMode="cold";
 
-    renderDailyHistory(
-      queryDate.value
+      setModeButton(
+        "modeCold"
+      );
+
+      generateRecommendation();
+
+    }
+  );
+
+function setModeButton(id){
+
+  [
+    "modeHot",
+    "modeBalance",
+    "modeCold"
+  ].forEach(x=>
+    document
+      .getElementById(x)
+      .classList.remove(
+        "active"
+      )
+  );
+
+  document
+    .getElementById(id)
+    .classList.add(
+      "active"
     );
 
-  }
-);
+}
 
-$("clearSelectedBtn").addEventListener(
-  "click",
-  clearSelected
-);
+document
+  .getElementById("recommendBtn")
+  .addEventListener(
+    "click",
+    generateRecommendation
+  );
 
-$("startBtn").addEventListener(
-  "click",
-  () => {
+document
+  .getElementById("datePicker")
+  .addEventListener(
+    "change",
+    e=>
+      renderDaily(
+        e.target.value
+      )
+  );
 
-    if(isRunning){
+document
+  .getElementById("todayBtn")
+  .addEventListener(
+    "click",
+    ()=>{
 
-      stopAuto();
+      const today =
+        getLocalDate();
 
-      statusText.textContent =
-        "已暫停";
+      document
+        .getElementById(
+          "datePicker"
+        )
+        .value=today;
 
-    }else{
-
-      startAuto();
+      renderDaily(today);
 
     }
+  );
 
-  }
-);
+document
+  .getElementById("reloadBtn")
+  .addEventListener(
+    "click",
+    loadData
+  );
 
-$("drawBtn").addEventListener(
-  "click",
-  () => {
+document
+  .getElementById("clearBtn")
+  .addEventListener(
+    "click",
+    ()=>{
 
-    if(isRunning){
-      stopAuto();
+      recommendation=[];
+
+      document
+        .getElementById(
+          "recommendNumbers"
+        )
+        .innerHTML =
+        `<span class="small">
+          已清除推薦
+        </span>`;
+
+      document
+        .querySelectorAll(".ball")
+        .forEach(el=>
+          el.classList.remove(
+            "recommend"
+          )
+        );
+
     }
+  );
 
-    drawOne();
+/* ---------------------------------------------------------
+   啟動
+--------------------------------------------------------- */
 
-  }
-);
+document
+  .getElementById("datePicker")
+  .value =
+  getLocalDate();
 
-$("stopBtn").addEventListener(
-  "click",
-  () => {
+document
+  .querySelector(
+    '#starButtons button[data-star="1"]'
+  )
+  .classList.add("active");
 
-    stopAuto();
+loadData();
 
-    statusText.textContent =
-      "已停止";
-
-    drawStatus.textContent =
-      "已停止";
-
-  }
-);
-
-$("newRoundBtn").addEventListener(
-  "click",
-  newRound
-);
-
-$("clearHistoryBtn").addEventListener(
-  "click",
-  clearLocalHistory
-);
-
-/* =========================================================
-   初始化
-========================================================= */
-
-loadStorage();
-
-buildNumberGrid();
-
-updateSelectedUI();
-
-renderLocalHistory();
-
-setApiStatus(
-  "準備連線取得最新 Bingo Bingo 歷史資料…"
-);
-
-loadLatestDraws();
-
-})();
 </script>
 
 </body>
