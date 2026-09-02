@@ -1,10 +1,10 @@
 name: Update Bingo Bingo Data
 
-on: 
+on:
   workflow_dispatch:
   schedule:
     - cron: "*/15 * * * *"
- 
+
 permissions:
   contents: write
 
@@ -27,14 +27,25 @@ jobs:
             echo "Downloading offset $offset"
 
             curl -fsSL --retry 3 \
+              -A "Mozilla/5.0" \
               "$API?gameTypeId=10&limit=500&offset=$offset&sortOrder=DESC" \
-              | jq -c '.records // [] | .[]' >> pages.ndjson
+              | jq -c '
+                  .records
+                  | if type == "array" then .[] else empty end
+                  | select(type == "object")
+                  | select(.period != null)
+                ' >> pages.ndjson
           done
 
+          echo "Downloaded records: $(wc -l < pages.ndjson)"
+
           jq -s '
-            map(.[])
-            | unique_by(.period)
-            | sort_by(.period | tonumber)
+            map(
+              select(type == "object")
+              | select(.period != null)
+            )
+            | unique_by(.period | tostring)
+            | sort_by(.period | tostring)
             | reverse
             | .[0:10000]
           ' pages.ndjson > records.json
@@ -48,6 +59,8 @@ jobs:
               records: .
             }
           ' records.json > bingo-data.json
+
+          echo "Final records: $(jq '.count' bingo-data.json)"
 
           rm -f pages.ndjson records.json
 
