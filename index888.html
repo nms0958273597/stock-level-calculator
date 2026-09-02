@@ -1,0 +1,3086 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#10131a">
+<title>賓果賓果 Bingo Bingo｜每日開獎・熱門冷門・號碼分析</title>
+
+<style>
+:root{
+  --bg:#0d1016;
+  --card:#171b23;
+  --card2:#202631;
+  --card3:#11151c;
+  --text:#f7f8fb;
+  --muted:#9fa8b7;
+  --line:#303744;
+  --yellow:#ffd43b;
+  --orange:#ff963d;
+  --green:#43d483;
+  --blue:#59a8ff;
+  --red:#ff6472;
+  --purple:#a783ff;
+  --shadow:0 12px 35px rgba(0,0,0,.28);
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 50% -10%,#293142 0,#12161e 35%,#0b0e13 80%);
+  color:var(--text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Noto Sans TC",
+    "PingFang TC",
+    "Microsoft JhengHei",
+    sans-serif;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.app{
+  width:min(1150px,100%);
+  margin:auto;
+  padding:12px;
+}
+
+.header{
+  text-align:center;
+  padding:18px 5px 12px;
+}
+
+.header h1{
+  margin:0;
+  font-size:clamp(28px,7vw,50px);
+  font-weight:950;
+  letter-spacing:1px;
+}
+
+.header p{
+  margin:8px 0 0;
+  color:var(--muted);
+}
+
+.notice{
+  border:1px solid #5b4c1e;
+  background:#292416;
+  color:#ffe58a;
+  border-radius:15px;
+  padding:11px 14px;
+  margin-bottom:13px;
+  text-align:center;
+  font-size:13px;
+  line-height:1.6;
+}
+
+.card{
+  background:
+    linear-gradient(180deg,var(--card),#141820);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:15px;
+  margin-bottom:14px;
+  box-shadow:var(--shadow);
+}
+
+.card-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:13px;
+  font-size:18px;
+  font-weight:900;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#252c37;
+  border:1px solid #3b4350;
+  color:#dbe1e9;
+  font-size:12px;
+}
+
+.btn{
+  border:1px solid var(--line);
+  background:var(--card2);
+  color:var(--text);
+  border-radius:12px;
+  min-height:45px;
+  padding:9px 13px;
+  font-weight:850;
+}
+
+.btn:active{
+  transform:scale(.97);
+}
+
+.btn.primary{
+  border:0;
+  color:#191408;
+  background:linear-gradient(135deg,#ffe26a,#ff9d2e);
+}
+
+.btn.green{
+  color:#7df2ad;
+  background:#173a29;
+  border-color:#2d704c;
+}
+
+.btn.blue{
+  color:#85c3ff;
+  background:#172e48;
+  border-color:#2d5b85;
+}
+
+.btn.red{
+  color:#ff919c;
+  background:#401d24;
+  border-color:#71343d;
+}
+
+.btn.purple{
+  color:#c5a9ff;
+  background:#2a2143;
+  border-color:#51407c;
+}
+
+.btn.small{
+  min-height:38px;
+  padding:7px 10px;
+  font-size:13px;
+}
+
+.current{
+  text-align:center;
+}
+
+.current-label{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.current-number{
+  width:145px;
+  height:145px;
+  margin:12px auto;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:68px;
+  font-weight:950;
+  color:#17120a;
+  background:
+    radial-gradient(circle at 33% 22%,#fff4ae,#ffd43b 38%,#db9300);
+  border:7px solid #fff0a0;
+  box-shadow:
+    0 0 0 5px #55491b,
+    0 18px 38px rgba(255,212,59,.2);
+}
+
+.current-number.pop{
+  animation:pop .25s ease;
+}
+
+@keyframes pop{
+  0%{transform:scale(.7)}
+  70%{transform:scale(1.08)}
+  100%{transform:scale(1)}
+}
+
+.controls{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+}
+
+.settings-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+.field label{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:6px;
+}
+
+.field input,
+.field select{
+  width:100%;
+  height:43px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:#0e1218;
+  color:var(--text);
+  padding:0 10px;
+  outline:none;
+}
+
+.field input:focus,
+.field select:focus{
+  border-color:var(--yellow);
+}
+
+.api-status{
+  margin-top:10px;
+  border-radius:11px;
+  padding:9px 11px;
+  background:#11161d;
+  border:1px solid var(--line);
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+
+.api-status.ok{
+  color:#7df2ad;
+  border-color:#2b6948;
+}
+
+.api-status.error{
+  color:#ff919c;
+  border-color:#71343d;
+}
+
+.number-grid{
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:6px;
+}
+
+.ball{
+  aspect-ratio:1;
+  border-radius:50%;
+  border:1px solid #3a424e;
+  background:#202631;
+  color:#e8edf4;
+  font-weight:850;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+
+.ball.selected{
+  background:#284b76;
+  border-color:#6bb2ff;
+  color:#c9e5ff;
+  box-shadow:0 0 0 2px rgba(89,168,255,.13);
+}
+
+.ball.drawn{
+  background:linear-gradient(135deg,#ffd43b,#ff963d);
+  color:#191308;
+  border-color:#ffe99a;
+}
+
+.ball.selected.drawn{
+  background:linear-gradient(135deg,#50e79b,#1ea967);
+  color:#07160e;
+  border-color:#8cf7be;
+}
+
+.selected-summary{
+  margin-top:12px;
+  background:#11161d;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  line-height:1.7;
+}
+
+.blue-text{
+  color:var(--blue);
+  font-weight:900;
+}
+
+.green-text{
+  color:var(--green);
+  font-weight:900;
+}
+
+.drawn-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
+.mini-ball{
+  width:39px;
+  height:39px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#252c36;
+  border:1px solid #424a57;
+  font-size:13px;
+  font-weight:850;
+}
+
+.mini-ball.hit{
+  background:var(--green);
+  color:#07170e;
+  border-color:#92f5bf;
+}
+
+.empty{
+  color:var(--muted);
+  padding:9px 0;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:8px;
+}
+
+.stat{
+  background:#12171e;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:10px 5px;
+  text-align:center;
+}
+
+.stat .name{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.stat .value{
+  margin-top:4px;
+  font-size:20px;
+  font-weight:950;
+}
+
+.analysis-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+
+.analysis-box{
+  background:#12171e;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:13px;
+}
+
+.analysis-box h3{
+  margin:0 0 9px;
+  font-size:14px;
+}
+
+.analysis-box p{
+  margin:6px 0;
+  color:#dbe0e8;
+  line-height:1.6;
+}
+
+.tag{
+  display:inline-flex;
+  padding:4px 8px;
+  margin:3px 3px 3px 0;
+  border-radius:999px;
+  background:#252c36;
+  border:1px solid #3b4350;
+  font-size:12px;
+}
+
+.hot-tag{
+  background:#49351b;
+  border-color:#73541e;
+  color:#ffd86a;
+}
+
+.cold-tag{
+  background:#182e45;
+  border-color:#2d567c;
+  color:#8ec6ff;
+}
+
+.miss-tag{
+  background:#3b2028;
+  border-color:#6c333f;
+  color:#ff9aa4;
+}
+
+.easy-card{
+  border-color:#635321;
+  background:
+    linear-gradient(180deg,#211d12,#151820);
+}
+
+.easy-title{
+  color:#ffe171;
+}
+
+.score-row{
+  display:grid;
+  grid-template-columns:48px 1fr 72px;
+  align-items:center;
+  gap:8px;
+  margin:7px 0;
+}
+
+.score-number{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background:#292f39;
+  border:1px solid #444d5a;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+}
+
+.score-bar{
+  height:10px;
+  border-radius:999px;
+  background:#282e37;
+  overflow:hidden;
+}
+
+.score-fill{
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#ffd43b,#ff913d);
+}
+
+.score-value{
+  text-align:right;
+  color:#ffd969;
+  font-weight:900;
+  font-size:12px;
+}
+
+.daily-toolbar{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 1fr 1fr;
+  gap:9px;
+}
+
+.daily-list{
+  margin-top:13px;
+}
+
+.daily-day{
+  margin-bottom:14px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  overflow:hidden;
+  background:#11161d;
+}
+
+.daily-head{
+  padding:11px 13px;
+  background:#1b2029;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-weight:900;
+}
+
+.daily-period{
+  padding:11px 13px;
+  border-top:1px solid #272e39;
+}
+
+.period-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  color:#dce2ea;
+  margin-bottom:7px;
+}
+
+.period-numbers{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+
+.period-number{
+  width:29px;
+  height:29px;
+  border-radius:50%;
+  background:#252c36;
+  border:1px solid #3e4652;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  font-weight:800;
+}
+
+.period-number.selected{
+  background:#3ca76f;
+  color:white;
+}
+
+.history-item{
+  border:1px solid var(--line);
+  background:#12171e;
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:9px;
+}
+
+.history-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+  font-weight:850;
+}
+
+.history-numbers{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+
+.history-number{
+  width:31px;
+  height:31px;
+  border-radius:50%;
+  background:#252c36;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+}
+
+.history-number.hit{
+  background:#2e9d67;
+  color:white;
+}
+
+.data-source{
+  font-size:12px;
+  color:var(--muted);
+  line-height:1.6;
+}
+
+.footer{
+  text-align:center;
+  color:#6f7887;
+  font-size:12px;
+  padding:7px 0 25px;
+  line-height:1.7;
+}
+
+.loading{
+  opacity:.65;
+  pointer-events:none;
+}
+
+@media(max-width:850px){
+  .settings-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .daily-toolbar{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:700px){
+  .controls{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .stats{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .analysis-grid{
+    grid-template-columns:1fr;
+  }
+
+  .number-grid{
+    gap:4px;
+  }
+
+  .ball{
+    font-size:12px;
+  }
+
+  .current-number{
+    width:130px;
+    height:130px;
+    font-size:60px;
+  }
+}
+
+@media(max-width:480px){
+  .app{
+    padding:8px;
+  }
+
+  .settings-grid,
+  .daily-toolbar{
+    grid-template-columns:1fr;
+  }
+
+  .number-grid{
+    gap:3px;
+  }
+
+  .ball{
+    font-size:11px;
+  }
+
+  .stats{
+    gap:5px;
+  }
+
+  .stat{
+    padding:8px 2px;
+  }
+
+  .stat .value{
+    font-size:17px;
+  }
+
+  .score-row{
+    grid-template-columns:43px 1fr 60px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="header">
+    <h1>🎱 賓果賓果</h1>
+    <p>每日開獎歷史｜熱門・冷門・遺漏・號碼熱度分析</p>
+  </div>
+
+  <div class="notice">
+    ⚠️ 本 App 為娛樂與歷史統計工具。<br>
+    「熱門／冷門／熱度較高」只代表過去資料的統計結果，
+    不代表下一期一定比較容易出現，也不保證中獎。
+  </div>
+
+  <!-- 最新資料 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>🌐 真實開獎資料</span>
+      <span id="apiBadge" class="badge">尚未更新</span>
+    </div>
+
+    <div class="settings-grid">
+
+      <div class="field">
+        <label>歷史統計期數</label>
+        <select id="analysisPeriod">
+          <option value="20">最近 20 期</option>
+          <option value="50">最近 50 期</option>
+          <option value="100" selected>最近 100 期</option>
+          <option value="300">最近 300 期</option>
+          <option value="500">最近 500 期</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>查詢日期</label>
+        <input type="date" id="queryDate">
+      </div>
+
+      <div class="field">
+        <label>日期顯示期數</label>
+        <select id="dailyLimit">
+          <option value="20">20 期</option>
+          <option value="50" selected>50 期</option>
+          <option value="100">100 期</option>
+          <option value="200">200 期</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>操作</label>
+        <button class="btn primary" id="refreshBtn" style="width:100%;">
+          🔄 更新資料
+        </button>
+      </div>
+
+    </div>
+
+    <div id="apiStatus" class="api-status">
+      尚未載入資料。
+    </div>
+
+  </div>
+
+  <!-- 今日／每日歷史 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>📅 每日開獎歷史</span>
+      <span id="dailyCountBadge" class="badge">0 期</span>
+    </div>
+
+    <div class="daily-toolbar">
+
+      <button class="btn blue" id="todayBtn">
+        📅 今天
+      </button>
+
+      <button class="btn" id="yesterdayBtn">
+        昨天
+      </button>
+
+      <button class="btn" id="latestBtn">
+        🆕 最新資料
+      </button>
+
+      <button class="btn purple" id="loadDailyBtn">
+        🔎 查詢日期
+      </button>
+
+    </div>
+
+    <div id="dailyList" class="daily-list">
+      <div class="empty">請先更新資料。</div>
+    </div>
+
+  </div>
+
+  <!-- 容易開／歷史熱度 -->
+  <div class="card easy-card">
+
+    <div class="card-title">
+      <span class="easy-title">
+        ⭐ 歷史熱度較高號碼
+      </span>
+
+      <span class="badge">
+        非預測
+      </span>
+    </div>
+
+    <div class="analysis-box" style="background:#17150f;">
+
+      <h3>
+        🔥 「比較容易開」分析
+      </h3>
+
+      <p style="font-size:13px;color:#b9b09a;">
+        以下按照最近指定期數的歷史資料，
+        綜合「出現頻率、近期頻率、遺漏狀態」排序。
+        分數越高代表歷史熱度越高，不代表下一期機率真的提高。
+      </p>
+
+      <div id="easyNumbers">
+        <div class="empty">尚無資料</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 熱門冷門 -->
+  <div class="analysis-grid">
+
+    <div class="card">
+
+      <div class="card-title">
+        <span>🔥 熱門號碼</span>
+        <span class="badge">TOP 10</span>
+      </div>
+
+      <div id="hotNumbers">
+        <div class="empty">尚無資料</div>
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <div class="card-title">
+        <span>❄️ 冷門號碼</span>
+        <span class="badge">TOP 10</span>
+      </div>
+
+      <div id="coldNumbers">
+        <div class="empty">尚無資料</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 遺漏 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>⏳ 遺漏分析</span>
+      <span class="badge">最近未出現</span>
+    </div>
+
+    <div id="missingNumbers">
+      <div class="empty">尚無資料</div>
+    </div>
+
+  </div>
+
+  <!-- 頻率完整表 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>📊 01～80 完整統計</span>
+      <span id="frequencyPeriodBadge" class="badge">
+        最近 100 期
+      </span>
+    </div>
+
+    <div id="frequencyGrid" class="number-grid"></div>
+
+  </div>
+
+  <!-- 統計 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>⚖️ 統計分析</span>
+    </div>
+
+    <div class="stats">
+
+      <div class="stat">
+        <div class="name">總期數</div>
+        <div class="value" id="statPeriods">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="name">奇數</div>
+        <div class="value" id="statOdd">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="name">偶數</div>
+        <div class="value" id="statEven">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="name">小號 01-40</div>
+        <div class="value" id="statSmall">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="name">大號 41-80</div>
+        <div class="value" id="statBig">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="name">平均和值</div>
+        <div class="value" id="statAvgSum">0</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 自選號碼 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>⭐ 我的自選號碼</span>
+
+      <button class="btn small" id="clearSelectedBtn">
+        清除選號
+      </button>
+    </div>
+
+    <div id="numberGrid" class="number-grid"></div>
+
+    <div class="selected-summary">
+
+      已選：
+      <span id="selectedCount" class="blue-text">0</span>
+      / 10 個
+
+      <br>
+
+      最近資料命中：
+      <span id="hitCount" class="green-text">0</span>
+
+    </div>
+
+  </div>
+
+  <!-- 模擬開獎 -->
+  <div class="card current">
+
+    <div class="card-title">
+      <span>🎰 娛樂模擬開獎</span>
+      <span class="badge">01～80</span>
+    </div>
+
+    <div class="current-label">
+      模擬第 <span id="roundNo">1</span> 局　
+      已開 <span id="drawCount">0</span> / 20
+    </div>
+
+    <div id="currentNumber" class="current-number">
+      —
+    </div>
+
+    <div id="statusText" class="current-label">
+      準備開始
+    </div>
+
+    <div class="controls" style="margin-top:13px;">
+
+      <button class="btn primary" id="startBtn">
+        ▶ 開始
+      </button>
+
+      <button class="btn green" id="drawBtn">
+        🎱 開一球
+      </button>
+
+      <button class="btn blue" id="newRoundBtn">
+        🔄 新一局
+      </button>
+
+      <button class="btn red" id="stopBtn">
+        ⏹ 停止
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- 模擬結果 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>🎯 模擬已開號碼</span>
+      <span id="drawStatus" class="badge">尚未開始</span>
+    </div>
+
+    <div id="drawnList" class="drawn-list">
+      <div class="empty">還沒有開出的號碼</div>
+    </div>
+
+  </div>
+
+  <!-- 模擬分析 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>🔎 模擬分析</span>
+    </div>
+
+    <div class="analysis-grid">
+
+      <div class="analysis-box">
+        <h3>🔥 本局開出</h3>
+        <div id="analysisDrawn">—</div>
+      </div>
+
+      <div class="analysis-box">
+        <h3>⭐ 我的命中</h3>
+        <div id="analysisHit">—</div>
+      </div>
+
+      <div class="analysis-box">
+        <h3>🔗 連號</h3>
+        <div id="analysisConsecutive">目前沒有</div>
+      </div>
+
+      <div class="analysis-box">
+        <h3>⚖️ 奇偶／大小</h3>
+        <p id="analysisOddEven">—</p>
+        <p id="analysisSmallBig">—</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 本機歷史 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>📋 模擬歷史紀錄</span>
+
+      <button class="btn red small" id="clearHistoryBtn">
+        清除全部
+      </button>
+    </div>
+
+    <div id="historyList">
+      <div class="empty">尚無歷史紀錄</div>
+    </div>
+
+  </div>
+
+  <!-- 資料來源 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>ℹ️ 資料來源</span>
+    </div>
+
+    <div class="data-source">
+      本 App 的每日歷史資料使用公開唯讀資料來源進行查詢與統計。
+      實際開獎結果請以台灣彩券官方公告為準。
+      <br><br>
+      台灣彩券 Bingo Bingo 為 01～80 選號，每期開出20個號碼。
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Bingo Bingo Entertainment & Statistics<br>
+    歷史熱度 ≠ 未來保證｜請理性使用統計資料
+  </div>
+
+</div>
+
+<script>
+(() => {
+
+"use strict";
+
+/* =========================================================
+   基本設定
+========================================================= */
+
+const API_BASE =
+  "https://lottery.timetable.tw";
+
+const GAME_TYPE_ID = 10;
+
+const TOTAL_NUMBERS = 80;
+
+const STORAGE_SELECTED =
+  "bingo_v2_selected";
+
+const STORAGE_HISTORY =
+  "bingo_v2_history";
+
+const STORAGE_SETTINGS =
+  "bingo_v2_settings";
+
+/* =========================================================
+   狀態
+========================================================= */
+
+let remoteDraws = [];
+
+let selectedNumbers = [];
+
+let simulatedDrawn = [];
+
+let localHistory = [];
+
+let autoTimer = null;
+
+let isRunning = false;
+
+let roundNo = 1;
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const $ = id =>
+  document.getElementById(id);
+
+const apiStatus =
+  $("apiStatus");
+
+const apiBadge =
+  $("apiBadge");
+
+const refreshBtn =
+  $("refreshBtn");
+
+const analysisPeriod =
+  $("analysisPeriod");
+
+const queryDate =
+  $("queryDate");
+
+const dailyLimit =
+  $("dailyLimit");
+
+const dailyList =
+  $("dailyList");
+
+const dailyCountBadge =
+  $("dailyCountBadge");
+
+const easyNumbers =
+  $("easyNumbers");
+
+const hotNumbers =
+  $("hotNumbers");
+
+const coldNumbers =
+  $("coldNumbers");
+
+const missingNumbers =
+  $("missingNumbers");
+
+const frequencyGrid =
+  $("frequencyGrid");
+
+const numberGrid =
+  $("numberGrid");
+
+const selectedCount =
+  $("selectedCount");
+
+const hitCount =
+  $("hitCount");
+
+const currentNumber =
+  $("currentNumber");
+
+const statusText =
+  $("statusText");
+
+const drawCount =
+  $("drawCount");
+
+const roundNoEl =
+  $("roundNo");
+
+const drawnList =
+  $("drawnList");
+
+const drawStatus =
+  $("drawStatus");
+
+const historyList =
+  $("historyList");
+
+/* =========================================================
+   日期
+========================================================= */
+
+function pad(n){
+  return String(n).padStart(2,"0");
+}
+
+function localDateString(date = new Date()){
+
+  return (
+    date.getFullYear() +
+    "-" +
+    pad(date.getMonth()+1) +
+    "-" +
+    pad(date.getDate())
+  );
+
+}
+
+queryDate.value =
+  localDateString();
+
+/* =========================================================
+   LocalStorage
+========================================================= */
+
+function loadStorage(){
+
+  try{
+
+    selectedNumbers =
+      JSON.parse(
+        localStorage.getItem(
+          STORAGE_SELECTED
+        ) || "[]"
+      );
+
+  }catch(e){
+
+    selectedNumbers = [];
+
+  }
+
+  try{
+
+    localHistory =
+      JSON.parse(
+        localStorage.getItem(
+          STORAGE_HISTORY
+        ) || "[]"
+      );
+
+  }catch(e){
+
+    localHistory = [];
+
+  }
+
+  try{
+
+    const settings =
+      JSON.parse(
+        localStorage.getItem(
+          STORAGE_SETTINGS
+        ) || "{}"
+      );
+
+    if(settings.analysisPeriod){
+      analysisPeriod.value =
+        settings.analysisPeriod;
+    }
+
+    if(settings.dailyLimit){
+      dailyLimit.value =
+        settings.dailyLimit;
+    }
+
+  }catch(e){}
+
+}
+
+function saveSelected(){
+
+  localStorage.setItem(
+    STORAGE_SELECTED,
+    JSON.stringify(
+      selectedNumbers
+    )
+  );
+
+}
+
+function saveHistory(){
+
+  localStorage.setItem(
+    STORAGE_HISTORY,
+    JSON.stringify(
+      localHistory
+    )
+  );
+
+}
+
+function saveSettings(){
+
+  localStorage.setItem(
+    STORAGE_SETTINGS,
+    JSON.stringify({
+
+      analysisPeriod:
+        analysisPeriod.value,
+
+      dailyLimit:
+        dailyLimit.value
+
+    })
+  );
+
+}
+
+/* =========================================================
+   API
+========================================================= */
+
+async function apiGet(url){
+
+  const response =
+    await fetch(url,{
+      method:"GET",
+      headers:{
+        "Accept":
+          "application/json"
+      }
+    });
+
+  if(!response.ok){
+
+    throw new Error(
+      "HTTP " + response.status
+    );
+
+  }
+
+  return await response.json();
+
+}
+
+/* =========================================================
+   取得最近開獎
+========================================================= */
+
+async function loadLatestDraws(){
+
+  setApiStatus(
+    "正在取得最新 Bingo Bingo 歷史資料…",
+    "loading"
+  );
+
+  try{
+
+    const limit = 500;
+
+    const url =
+      API_BASE +
+      "/api/draws?" +
+      "gameTypeId=" +
+      GAME_TYPE_ID +
+      "&limit=" +
+      limit +
+      "&sortOrder=DESC";
+
+    const data =
+      await apiGet(url);
+
+    const records =
+      Array.isArray(data)
+      ? data
+      : (
+        data.records ||
+        data.data ||
+        []
+      );
+
+    remoteDraws =
+      normalizeDraws(records);
+
+    remoteDraws =
+      remoteDraws
+      .filter(d =>
+        Array.isArray(d.numbers) &&
+        d.numbers.length > 0
+      );
+
+    if(remoteDraws.length === 0){
+
+      throw new Error(
+        "沒有取得有效開獎資料"
+      );
+
+    }
+
+    apiBadge.textContent =
+      "已更新 " +
+      remoteDraws.length +
+      " 期";
+
+    setApiStatus(
+      "資料更新成功：已取得 " +
+      remoteDraws.length +
+      " 期 Bingo Bingo 歷史資料。",
+      "ok"
+    );
+
+    renderDailyHistory(
+      queryDate.value
+    );
+
+    renderRemoteAnalysis();
+
+  }catch(error){
+
+    console.error(error);
+
+    setApiStatus(
+      "資料取得失敗：" +
+      error.message +
+      "。請確認網路連線後再按「更新資料」。",
+      "error"
+    );
+
+    apiBadge.textContent =
+      "更新失敗";
+
+  }
+
+}
+
+function normalizeDraws(records){
+
+  return records
+    .map(item => {
+
+      const numbers =
+        Array.isArray(item.numbers)
+        ? item.numbers
+            .map(Number)
+            .filter(n =>
+              n >= 1 &&
+              n <= 80
+            )
+        : [];
+
+      return {
+
+        id:
+          item.id ?? "",
+
+        period:
+          item.period ??
+          item.issue ??
+          item.drawPeriod ??
+          "—",
+
+        draw_date:
+          item.draw_date ??
+          item.drawDate ??
+          item.date ??
+          "",
+
+        numbers:
+          [...new Set(numbers)]
+            .sort((a,b)=>a-b)
+
+      };
+
+    })
+    .filter(item =>
+      item.numbers.length > 0
+    );
+
+}
+
+/* =========================================================
+   API 狀態
+========================================================= */
+
+function setApiStatus(text,type=""){
+
+  apiStatus.textContent =
+    text;
+
+  apiStatus.className =
+    "api-status " +
+    (type === "ok"
+      ? "ok"
+      : type === "error"
+      ? "error"
+      : "");
+
+}
+
+/* =========================================================
+   日期歷史
+========================================================= */
+
+function renderDailyHistory(date){
+
+  if(!remoteDraws.length){
+
+    dailyList.innerHTML =
+      '<div class="empty">尚無資料。</div>';
+
+    dailyCountBadge.textContent =
+      "0 期";
+
+    return;
+  }
+
+  let records =
+    remoteDraws.filter(
+      d => d.draw_date === date
+    );
+
+  if(records.length === 0){
+
+    dailyList.innerHTML =
+      '<div class="empty">' +
+      "找不到 " +
+      date +
+      " 的資料。" +
+      "</div>";
+
+    dailyCountBadge.textContent =
+      "0 期";
+
+    return;
+  }
+
+  const limit =
+    Number(
+      dailyLimit.value
+    ) || 50;
+
+  records =
+    records.slice(0,limit);
+
+  dailyCountBadge.textContent =
+    records.length +
+    " 期";
+
+  const box =
+    document.createElement("div");
+
+  box.className =
+    "daily-day";
+
+  const head =
+    document.createElement("div");
+
+  head.className =
+    "daily-head";
+
+  head.innerHTML =
+    "<span>📅 " +
+    date +
+    "</span>" +
+    "<span>" +
+    records.length +
+    " 期</span>";
+
+  box.appendChild(head);
+
+  records.forEach(record => {
+
+    const period =
+      document.createElement("div");
+
+    period.className =
+      "daily-period";
+
+    const selected =
+      selectedNumbers;
+
+    period.innerHTML = `
+
+      <div class="period-head">
+
+        <span>
+          🎯 第 ${escapeHtml(record.period)} 期
+        </span>
+
+        <span class="badge">
+          ${record.numbers.length} 號
+        </span>
+
+      </div>
+
+      <div class="period-numbers">
+
+        ${record.numbers
+          .map(n => `
+
+            <div
+              class="period-number ${
+                selected.includes(n)
+                  ? "selected"
+                  : ""
+              }"
+            >
+              ${pad(n)}
+            </div>
+
+          `)
+          .join("")}
+
+      </div>
+    `;
+
+    box.appendChild(period);
+
+  });
+
+  dailyList.innerHTML = "";
+
+  dailyList.appendChild(box);
+
+}
+
+/* =========================================================
+   統計資料
+========================================================= */
+
+function getAnalysisDraws(){
+
+  const count =
+    Number(
+      analysisPeriod.value
+    ) || 100;
+
+  return remoteDraws.slice(
+    0,
+    count
+  );
+
+}
+
+function calculateStats(draws){
+
+  const frequency =
+    Array(TOTAL_NUMBERS+1)
+      .fill(0);
+
+  const lastSeen =
+    Array(TOTAL_NUMBERS+1)
+      .fill(-1);
+
+  let odd = 0;
+
+  let even = 0;
+
+  let small = 0;
+
+  let big = 0;
+
+  let sumTotal = 0;
+
+  draws.forEach(
+    (draw,index) => {
+
+      let sum = 0;
+
+      draw.numbers.forEach(n => {
+
+        frequency[n]++;
+
+        if(
+          lastSeen[n] === -1
+        ){
+          lastSeen[n] =
+            index;
+        }
+
+        sum += n;
+
+        if(n % 2 === 0){
+          even++;
+        }else{
+          odd++;
+        }
+
+        if(n <= 40){
+          small++;
+        }else{
+          big++;
+        }
+
+      });
+
+      sumTotal += sum;
+
+    }
+  );
+
+  const missing =
+    lastSeen.map(
+      (index,n) => {
+
+        if(n === 0){
+          return 0;
+        }
+
+        if(index === -1){
+          return draws.length;
+        }
+
+        return index;
+
+      }
+    );
+
+  return {
+
+    frequency,
+    lastSeen,
+    missing,
+
+    odd,
+    even,
+
+    small,
+    big,
+
+    averageSum:
+      draws.length
+      ? sumTotal / draws.length
+      : 0
+
+  };
+
+}
+
+/* =========================================================
+   熱門／冷門／遺漏
+========================================================= */
+
+function renderRemoteAnalysis(){
+
+  const draws =
+    getAnalysisDraws();
+
+  if(!draws.length){
+
+    easyNumbers.innerHTML =
+      '<div class="empty">尚無資料</div>';
+
+    hotNumbers.innerHTML =
+      '<div class="empty">尚無資料</div>';
+
+    coldNumbers.innerHTML =
+      '<div class="empty">尚無資料</div>';
+
+    missingNumbers.innerHTML =
+      '<div class="empty">尚無資料</div>';
+
+    return;
+
+  }
+
+  const stats =
+    calculateStats(draws);
+
+  const numbers =
+    [];
+
+  for(let n=1;n<=80;n++){
+
+    numbers.push({
+
+      n,
+
+      freq:
+        stats.frequency[n],
+
+      missing:
+        stats.missing[n]
+
+    });
+
+  }
+
+  /* 熱門 */
+
+  const hot =
+    [...numbers]
+      .sort(
+        (a,b) =>
+          b.freq-a.freq ||
+          a.n-b.n
+      )
+      .slice(0,10);
+
+  hotNumbers.innerHTML =
+    hot.map(x => `
+
+      <span class="tag hot-tag">
+        🔥 ${pad(x.n)}
+        × ${x.freq}
+      </span>
+
+    `).join("");
+
+  /* 冷門 */
+
+  const cold =
+    [...numbers]
+      .sort(
+        (a,b) =>
+          a.freq-b.freq ||
+          a.n-b.n
+      )
+      .slice(0,10);
+
+  coldNumbers.innerHTML =
+    cold.map(x => `
+
+      <span class="tag cold-tag">
+        ❄️ ${pad(x.n)}
+        × ${x.freq}
+      </span>
+
+    `).join("");
+
+  /* 遺漏 */
+
+  const missing =
+    [...numbers]
+      .sort(
+        (a,b) =>
+          b.missing-a.missing ||
+          a.n-b.n
+      )
+      .slice(0,15);
+
+  missingNumbers.innerHTML =
+    missing.map(x => `
+
+      <span class="tag miss-tag">
+        ⏳ ${pad(x.n)}
+        遺漏 ${x.missing} 期
+      </span>
+
+    `).join("");
+
+  /* 統計 */
+
+  $("statPeriods").textContent =
+    draws.length;
+
+  $("statOdd").textContent =
+    stats.odd;
+
+  $("statEven").textContent =
+    stats.even;
+
+  $("statSmall").textContent =
+    stats.small;
+
+  $("statBig").textContent =
+    stats.big;
+
+  $("statAvgSum").textContent =
+    stats.averageSum.toFixed(1);
+
+  $("frequencyPeriodBadge").textContent =
+    "最近 " +
+    draws.length +
+    " 期";
+
+  renderFrequencyGrid(
+    stats
+  );
+
+  renderEasyScore(
+    stats,
+    draws.length
+  );
+
+}
+
+/* =========================================================
+   「比較容易開」歷史熱度模型
+========================================================= */
+
+function renderEasyScore(
+  stats,
+  drawCount
+){
+
+  const items = [];
+
+  const maxFreq =
+    Math.max(
+      ...stats.frequency.slice(1)
+    );
+
+  const maxMissing =
+    Math.max(
+      1,
+      ...stats.missing.slice(1)
+    );
+
+  /*
+    歷史熱度：
+
+    55%：指定期間出現頻率
+    30%：近期性
+    15%：遺漏狀態
+
+    注意：
+    這是「歷史統計分數」
+    不是下一期的實際機率。
+  */
+
+  for(let n=1;n<=80;n++){
+
+    const freq =
+      stats.frequency[n];
+
+    const freqScore =
+      maxFreq > 0
+      ? freq / maxFreq
+      : 0;
+
+    /*
+      遺漏不是越久越好。
+      為避免把「很久沒出」直接當成容易開，
+      這裡只把「近期仍有出現」
+      當成熱度的一部分。
+    */
+
+    const recentScore =
+      stats.missing[n] === drawCount
+      ? 0
+      : 1 -
+        (
+          stats.missing[n] /
+          Math.max(1,drawCount)
+        );
+
+    const balancedMissing =
+      Math.min(
+        1,
+        stats.missing[n] /
+        Math.max(1,drawCount*0.15)
+      );
+
+    const score =
+      (
+        freqScore * 0.55 +
+        recentScore * 0.30 +
+        balancedMissing * 0.15
+      ) * 100;
+
+    items.push({
+
+      n,
+
+      freq,
+
+      missing:
+        stats.missing[n],
+
+      score
+
+    });
+
+  }
+
+  items.sort(
+    (a,b) =>
+      b.score-a.score ||
+      b.freq-a.freq ||
+      a.n-b.n
+  );
+
+  const top =
+    items.slice(0,10);
+
+  const maxScore =
+    Math.max(
+      ...top.map(x=>x.score)
+    );
+
+  easyNumbers.innerHTML =
+    top.map(x => {
+
+      const width =
+        maxScore > 0
+        ? (x.score/maxScore)*100
+        : 0;
+
+      return `
+
+        <div class="score-row">
+
+          <div class="score-number">
+            ${pad(x.n)}
+          </div>
+
+          <div>
+
+            <div class="score-bar">
+
+              <div
+                class="score-fill"
+                style="width:${width}%"
+              ></div>
+
+            </div>
+
+            <div
+              style="
+                margin-top:4px;
+                font-size:11px;
+                color:#9f987f;
+              "
+            >
+              歷史出現 ${x.freq} 次　
+              遺漏 ${x.missing} 期
+            </div>
+
+          </div>
+
+          <div class="score-value">
+            ${x.score.toFixed(1)}
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+/* =========================================================
+   01～80 頻率
+========================================================= */
+
+function renderFrequencyGrid(
+  stats
+){
+
+  frequencyGrid.innerHTML = "";
+
+  for(let n=1;n<=80;n++){
+
+    const btn =
+      document.createElement(
+        "div"
+      );
+
+    btn.className =
+      "ball";
+
+    const freq =
+      stats.frequency[n];
+
+    if(freq === 0){
+
+      btn.style.opacity =
+        ".45";
+
+    }
+
+    btn.innerHTML =
+      `
+      <span style="
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        line-height:1.05;
+      ">
+        <strong>${pad(n)}</strong>
+        <small style="
+          font-size:8px;
+          color:#aab2bf;
+          margin-top:2px;
+        ">
+          ${freq}
+        </small>
+      </span>
+      `;
+
+    frequencyGrid.appendChild(btn);
+
+  }
+
+}
+
+/* =========================================================
+   自選號碼
+========================================================= */
+
+function buildNumberGrid(){
+
+  numberGrid.innerHTML = "";
+
+  for(let n=1;n<=80;n++){
+
+    const btn =
+      document.createElement(
+        "button"
+      );
+
+    btn.className =
+      "ball";
+
+    if(
+      selectedNumbers.includes(n)
+    ){
+      btn.classList.add(
+        "selected"
+      );
+    }
+
+    if(
+      simulatedDrawn.includes(n)
+    ){
+      btn.classList.add(
+        "drawn"
+      );
+    }
+
+    btn.textContent =
+      pad(n);
+
+    btn.addEventListener(
+      "click",
+      () => {
+
+        toggleSelected(n);
+
+      }
+    );
+
+    numberGrid.appendChild(btn);
+
+  }
+
+}
+
+function toggleSelected(n){
+
+  if(
+    selectedNumbers.includes(n)
+  ){
+
+    selectedNumbers =
+      selectedNumbers.filter(
+        x => x !== n
+      );
+
+  }else{
+
+    if(
+      selectedNumbers.length >= 10
+    ){
+
+      alert(
+        "最多選擇 10 個號碼。"
+      );
+
+      return;
+
+    }
+
+    selectedNumbers.push(n);
+
+    selectedNumbers.sort(
+      (a,b)=>a-b
+    );
+
+  }
+
+  saveSelected();
+
+  updateSelectedUI();
+
+  renderDailyHistory(
+    queryDate.value
+  );
+
+}
+
+function updateSelectedUI(){
+
+  selectedCount.textContent =
+    selectedNumbers.length;
+
+  const hits =
+    simulatedDrawn.filter(
+      n =>
+        selectedNumbers.includes(n)
+    );
+
+  hitCount.textContent =
+    hits.length;
+
+  buildNumberGrid();
+
+}
+
+function clearSelected(){
+
+  if(
+    selectedNumbers.length === 0
+  ){
+    return;
+  }
+
+  if(
+    !confirm(
+      "確定要清除全部自選號碼嗎？"
+    )
+  ){
+    return;
+  }
+
+  selectedNumbers = [];
+
+  saveSelected();
+
+  updateSelectedUI();
+
+  renderDailyHistory(
+    queryDate.value
+  );
+
+}
+
+/* =========================================================
+   模擬開獎
+========================================================= */
+
+function randomNumber(){
+
+  const available = [];
+
+  for(let n=1;n<=80;n++){
+
+    if(
+      !simulatedDrawn.includes(n)
+    ){
+      available.push(n);
+    }
+
+  }
+
+  if(!available.length){
+    return null;
+  }
+
+  return available[
+    Math.floor(
+      Math.random() *
+      available.length
+    )
+  ];
+
+}
+
+function drawOne(){
+
+  if(
+    simulatedDrawn.length >= 20
+  ){
+
+    stopAuto();
+
+    finishRound();
+
+    return;
+
+  }
+
+  const n =
+    randomNumber();
+
+  if(n === null){
+    stopAuto();
+    finishRound();
+    return;
+  }
+
+  simulatedDrawn.push(n);
+
+  currentNumber.textContent =
+    pad(n);
+
+  currentNumber.classList.remove(
+    "pop"
+  );
+
+  void currentNumber.offsetWidth;
+
+  currentNumber.classList.add(
+    "pop"
+  );
+
+  statusText.textContent =
+    "剛剛開出：" +
+    pad(n);
+
+  updateSimulationUI();
+
+  if(
+    simulatedDrawn.length >= 20
+  ){
+
+    stopAuto();
+
+    finishRound();
+
+  }
+
+}
+
+function startAuto(){
+
+  if(isRunning){
+    return;
+  }
+
+  if(
+    simulatedDrawn.length >= 20
+  ){
+
+    alert(
+      "本局已完成，請開始新一局。"
+    );
+
+    return;
+
+  }
+
+  isRunning = true;
+
+  $("startBtn").textContent =
+    "⏸ 暫停";
+
+  statusText.textContent =
+    "模擬開球中…";
+
+  autoTimer =
+    setInterval(
+      drawOne,
+      700
+    );
+
+}
+
+function stopAuto(){
+
+  isRunning = false;
+
+  if(autoTimer){
+
+    clearInterval(
+      autoTimer
+    );
+
+    autoTimer = null;
+
+  }
+
+  $("startBtn").textContent =
+    "▶ 開始";
+
+}
+
+function finishRound(){
+
+  stopAuto();
+
+  if(
+    simulatedDrawn.length === 0
+  ){
+    return;
+  }
+
+  const already =
+    localHistory.some(
+      h =>
+        h.round === roundNo
+    );
+
+  if(!already){
+
+    localHistory.unshift({
+
+      round:
+        roundNo,
+
+      time:
+        new Date()
+          .toLocaleString(
+            "zh-TW"
+          ),
+
+      numbers:
+        [...simulatedDrawn],
+
+      selected:
+        [...selectedNumbers]
+
+    });
+
+    if(
+      localHistory.length > 50
+    ){
+
+      localHistory =
+        localHistory.slice(
+          0,
+          50
+        );
+
+    }
+
+    saveHistory();
+
+  }
+
+  drawStatus.textContent =
+    simulatedDrawn.length >= 20
+    ? "本局完成"
+    : "已停止";
+
+  statusText.textContent =
+    simulatedDrawn.length >= 20
+    ? "🎉 本局完成"
+    : "已停止";
+
+  renderLocalHistory();
+
+}
+
+/* =========================================================
+   模擬 UI
+========================================================= */
+
+function updateSimulationUI(){
+
+  drawCount.textContent =
+    simulatedDrawn.length;
+
+  roundNoEl.textContent =
+    roundNo;
+
+  const hits =
+    simulatedDrawn.filter(
+      n =>
+        selectedNumbers.includes(n)
+    );
+
+  hitCount.textContent =
+    hits.length;
+
+  drawnList.innerHTML = "";
+
+  if(
+    simulatedDrawn.length === 0
+  ){
+
+    drawnList.innerHTML =
+      '<div class="empty">' +
+      "還沒有開出的號碼" +
+      "</div>";
+
+  }else{
+
+    simulatedDrawn.forEach(n => {
+
+      const div =
+        document.createElement(
+          "div"
+        );
+
+      div.className =
+        "mini-ball";
+
+      if(
+        selectedNumbers.includes(n)
+      ){
+
+        div.classList.add(
+          "hit"
+        );
+
+      }
+
+      div.textContent =
+        pad(n);
+
+      drawnList.appendChild(
+        div
+      );
+
+    });
+
+  }
+
+  $("analysisDrawn").innerHTML =
+    tagNumbers(
+      simulatedDrawn
+    );
+
+  $("analysisHit").innerHTML =
+    hits.length
+    ? tagNumbers(hits)
+    : "目前尚未命中";
+
+  const odd =
+    simulatedDrawn.filter(
+      n=>n%2===1
+    ).length;
+
+  const even =
+    simulatedDrawn.filter(
+      n=>n%2===0
+    ).length;
+
+  const small =
+    simulatedDrawn.filter(
+      n=>n<=40
+    ).length;
+
+  const big =
+    simulatedDrawn.filter(
+      n=>n>=41
+    ).length;
+
+  $("analysisOddEven").textContent =
+    "奇數 " +
+    odd +
+    " ：偶數 " +
+    even;
+
+  $("analysisSmallBig").textContent =
+    "小號 " +
+    small +
+    " ：大號 " +
+    big;
+
+  updateConsecutive();
+
+  buildNumberGrid();
+
+}
+
+function updateConsecutive(){
+
+  const sorted =
+    [...simulatedDrawn]
+      .sort((a,b)=>a-b);
+
+  const result = [];
+
+  for(
+    let i=1;
+    i<sorted.length;
+    i++
+  ){
+
+    if(
+      sorted[i] ===
+      sorted[i-1] + 1
+    ){
+
+      const pair =
+        sorted[i-1] +
+        "-" +
+        sorted[i];
+
+      if(
+        !result.includes(pair)
+      ){
+
+        result.push(pair);
+
+      }
+
+    }
+
+  }
+
+  $("analysisConsecutive")
+    .innerHTML =
+    result.length
+    ? result.map(
+        x =>
+          '<span class="tag">' +
+          "🔗 " +
+          x +
+          "</span>"
+      ).join("")
+    : "目前沒有";
+
+}
+
+function tagNumbers(numbers){
+
+  if(
+    !numbers.length
+  ){
+    return "—";
+  }
+
+  return numbers
+    .map(
+      n =>
+        '<span class="tag">' +
+        pad(n) +
+        "</span>"
+    )
+    .join("");
+
+}
+
+/* =========================================================
+   本機歷史
+========================================================= */
+
+function renderLocalHistory(){
+
+  historyList.innerHTML = "";
+
+  if(
+    localHistory.length === 0
+  ){
+
+    historyList.innerHTML =
+      '<div class="empty">' +
+      "尚無歷史紀錄" +
+      "</div>";
+
+    return;
+
+  }
+
+  localHistory.forEach(h => {
+
+    const box =
+      document.createElement(
+        "div"
+      );
+
+    box.className =
+      "history-item";
+
+    const hits =
+      (h.numbers || [])
+        .filter(
+          n =>
+            (h.selected || [])
+              .includes(n)
+        );
+
+    box.innerHTML = `
+
+      <div class="history-head">
+
+        <span>
+          第 ${h.round} 局
+        </span>
+
+        <span class="badge">
+          ${escapeHtml(h.time)}
+        </span>
+
+      </div>
+
+      <div
+        style="
+          font-size:12px;
+          color:#aeb6c4;
+          margin-bottom:8px;
+        "
+      >
+        開出 ${h.numbers.length} 球　
+        命中 ${hits.length} 球
+      </div>
+
+      <div class="history-numbers">
+
+        ${h.numbers
+          .map(n => `
+
+            <div
+              class="history-number ${
+                hits.includes(n)
+                ? "hit"
+                : ""
+              }"
+            >
+              ${pad(n)}
+            </div>
+
+          `)
+          .join("")}
+
+      </div>
+    `;
+
+    historyList.appendChild(
+      box
+    );
+
+  });
+
+}
+
+/* =========================================================
+   新局
+========================================================= */
+
+function newRound(){
+
+  stopAuto();
+
+  if(
+    simulatedDrawn.length > 0
+  ){
+
+    const already =
+      localHistory.some(
+        h =>
+          h.round === roundNo
+      );
+
+    if(!already){
+
+      localHistory.unshift({
+
+        round:
+          roundNo,
+
+        time:
+          new Date()
+            .toLocaleString(
+              "zh-TW"
+            ),
+
+        numbers:
+          [...simulatedDrawn],
+
+        selected:
+          [...selectedNumbers]
+
+      });
+
+      if(
+        localHistory.length > 50
+      ){
+
+        localHistory =
+          localHistory.slice(
+            0,
+            50
+          );
+
+      }
+
+      saveHistory();
+
+    }
+
+  }
+
+  roundNo++;
+
+  simulatedDrawn = [];
+
+  currentNumber.textContent =
+    "—";
+
+  statusText.textContent =
+    "準備開始";
+
+  drawStatus.textContent =
+    "尚未開始";
+
+  updateSimulationUI();
+
+  renderLocalHistory();
+
+}
+
+/* =========================================================
+   清除本機歷史
+========================================================= */
+
+function clearLocalHistory(){
+
+  if(
+    localHistory.length === 0
+  ){
+    return;
+  }
+
+  const ok =
+    confirm(
+      "確定要清除全部模擬歷史紀錄嗎？\n\n此操作無法復原。"
+    );
+
+  if(!ok){
+    return;
+  }
+
+  localHistory = [];
+
+  saveHistory();
+
+  renderLocalHistory();
+
+}
+
+/* =========================================================
+   日期按鈕
+========================================================= */
+
+function setQueryDate(date){
+
+  queryDate.value =
+    date;
+
+  renderDailyHistory(
+    date
+  );
+
+}
+
+function getYesterday(){
+
+  const d =
+    new Date();
+
+  d.setDate(
+    d.getDate()-1
+  );
+
+  return localDateString(d);
+
+}
+
+/* =========================================================
+   XSS 保護
+========================================================= */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+/* =========================================================
+   事件
+========================================================= */
+
+refreshBtn.addEventListener(
+  "click",
+  async () => {
+
+    refreshBtn.classList.add(
+      "loading"
+    );
+
+    try{
+
+      await loadLatestDraws();
+
+    }finally{
+
+      refreshBtn.classList.remove(
+        "loading"
+      );
+
+    }
+
+  }
+);
+
+analysisPeriod.addEventListener(
+  "change",
+  () => {
+
+    saveSettings();
+
+    renderRemoteAnalysis();
+
+  }
+);
+
+dailyLimit.addEventListener(
+  "change",
+  () => {
+
+    saveSettings();
+
+    renderDailyHistory(
+      queryDate.value
+    );
+
+  }
+);
+
+queryDate.addEventListener(
+  "change",
+  () => {
+
+    renderDailyHistory(
+      queryDate.value
+    );
+
+  }
+);
+
+$("todayBtn").addEventListener(
+  "click",
+  () => {
+
+    setQueryDate(
+      localDateString()
+    );
+
+  }
+);
+
+$("yesterdayBtn").addEventListener(
+  "click",
+  () => {
+
+    setQueryDate(
+      getYesterday()
+    );
+
+  }
+);
+
+$("latestBtn").addEventListener(
+  "click",
+  () => {
+
+    if(
+      remoteDraws.length
+    ){
+
+      renderDailyHistory(
+        remoteDraws[0].draw_date
+      );
+
+      queryDate.value =
+        remoteDraws[0].draw_date;
+
+    }else{
+
+      loadLatestDraws();
+
+    }
+
+  }
+);
+
+$("loadDailyBtn").addEventListener(
+  "click",
+  () => {
+
+    renderDailyHistory(
+      queryDate.value
+    );
+
+  }
+);
+
+$("clearSelectedBtn").addEventListener(
+  "click",
+  clearSelected
+);
+
+$("startBtn").addEventListener(
+  "click",
+  () => {
+
+    if(isRunning){
+
+      stopAuto();
+
+      statusText.textContent =
+        "已暫停";
+
+    }else{
+
+      startAuto();
+
+    }
+
+  }
+);
+
+$("drawBtn").addEventListener(
+  "click",
+  () => {
+
+    if(isRunning){
+      stopAuto();
+    }
+
+    drawOne();
+
+  }
+);
+
+$("stopBtn").addEventListener(
+  "click",
+  () => {
+
+    stopAuto();
+
+    statusText.textContent =
+      "已停止";
+
+    drawStatus.textContent =
+      "已停止";
+
+  }
+);
+
+$("newRoundBtn").addEventListener(
+  "click",
+  newRound
+);
+
+$("clearHistoryBtn").addEventListener(
+  "click",
+  clearLocalHistory
+);
+
+/* =========================================================
+   初始化
+========================================================= */
+
+loadStorage();
+
+buildNumberGrid();
+
+updateSelectedUI();
+
+renderLocalHistory();
+
+setApiStatus(
+  "準備連線取得最新 Bingo Bingo 歷史資料…"
+);
+
+loadLatestDraws();
+
+})();
+</script>
+
+</body>
+</html>
