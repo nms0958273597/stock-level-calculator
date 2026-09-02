@@ -2,11 +2,10 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#07111f">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08111f">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>🎱 賓果賓果｜歷史比對推薦 V7</title>
+<title>🎱 賓果賓果｜完整歷史分析 V9</title>
 
 <style>
 *{
@@ -17,1305 +16,972 @@
 html,body{
   margin:0;
   padding:0;
-  width:100%;
-  min-height:100%;
   background:#07111f;
-  color:#f8fafc;
+  color:#eef4ff;
   font-family:-apple-system,BlinkMacSystemFont,
-  "Segoe UI","Noto Sans TC","PingFang TC",
-  Arial,sans-serif;
+  "Segoe UI","PingFang TC",
+  "Microsoft JhengHei",sans-serif;
 }
 
 body{
-  padding-bottom:40px;
+  padding-bottom:50px;
 }
 
 button,
 input,
 select{
-  font:inherit;
+  font-family:inherit;
+}
+
+header{
+  padding:26px 18px 18px;
+  text-align:center;
+}
+
+h1{
+  margin:0;
+  font-size:28px;
+  font-weight:900;
+}
+
+.subtitle{
+  margin-top:8px;
+  color:#91a4bd;
+  font-size:13px;
+}
+
+.container{
+  width:min(980px,94%);
+  margin:auto;
+}
+
+.card{
+  background:#0d192a;
+  border:1px solid #273b55;
+  border-radius:24px;
+  padding:18px;
+  margin:14px 0;
+  box-shadow:0 10px 35px rgba(0,0,0,.18);
+}
+
+.card h2{
+  margin:0 0 15px;
+  font-size:20px;
+}
+
+.status{
+  border-radius:15px;
+  padding:13px 15px;
+  background:#111f32;
+  color:#b9c8db;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.status.ok{
+  color:#a8ffd1;
+}
+
+.status.warn{
+  color:#ffd987;
+}
+
+.status.error{
+  color:#ff9d9d;
+}
+
+.controls{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
 }
 
 button{
+  border:0;
+  border-radius:14px;
+  padding:13px 10px;
+  background:#24364f;
+  color:#fff;
+  font-size:15px;
+  font-weight:900;
   cursor:pointer;
-  touch-action:manipulation;
-  user-select:none;
-  -webkit-user-select:none;
 }
 
 button:active{
   transform:scale(.97);
 }
 
-button:disabled{
-  opacity:.6;
-  cursor:not-allowed;
+button.active{
+  background:#58769e;
 }
 
-.container{
-  width:min(1120px,100%);
-  margin:auto;
-  padding:10px;
+button.primary{
+  background:#3f73b8;
 }
 
-.card{
-  background:#111b2b;
-  border:1px solid #2a3950;
-  border-radius:22px;
-  padding:17px;
-  margin-bottom:14px;
-  box-shadow:0 10px 28px rgba(0,0,0,.25);
+button.danger{
+  background:#6d3541;
 }
 
-.hero{
-  background:
-    radial-gradient(
-      circle at 90% 5%,
-      rgba(37,99,235,.28),
-      transparent 42%
-    ),
-    linear-gradient(
-      145deg,
-      #18273e,
-      #0d1728
-    );
+.date-row{
+  display:grid;
+  grid-template-columns:1fr 120px;
+  gap:10px;
 }
 
-h1{
-  margin:0;
-  font-size:30px;
-  line-height:1.25;
-}
-
-h2{
-  margin:0 0 12px;
-  font-size:20px;
-}
-
-.subtitle{
-  margin-top:8px;
-  color:#aebbd0;
-  font-size:14px;
-  line-height:1.7;
-}
-
-.badge{
-  display:inline-flex;
-  align-items:center;
-  margin-top:13px;
-  padding:8px 13px;
-  border-radius:999px;
-  background:#064e3b;
-  border:1px solid #10b981;
-  color:#a7f3d0;
-  font-size:13px;
-  font-weight:900;
-}
-
-.status{
-  margin-top:11px;
-  padding:12px 13px;
-  background:#0b1423;
-  border:1px solid #2a3950;
+input,
+select{
+  width:100%;
+  border:1px solid #30455f;
   border-radius:14px;
-  color:#cbd5e1;
-  font-size:13px;
-  line-height:1.75;
-}
-
-.note{
-  color:#94a3b8;
-  font-size:12px;
-  line-height:1.7;
-}
-
-/* ==========================
-   星數
-========================== */
-
-.star-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
-  margin-top:13px;
-}
-
-.star-btn{
-  min-height:58px;
-  border:0;
-  border-radius:15px;
-  background:#202d42;
+  background:#081322;
   color:#fff;
-  font-size:16px;
-  font-weight:900;
+  padding:13px;
+  font-size:15px;
+  font-weight:800;
 }
 
-.star-btn.active{
-  background:#7c3aed;
-  box-shadow:
-    0 0 0 4px rgba(124,58,237,.20);
-}
-
-/* ==========================
-   模式
-========================== */
-
-.mode-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
-  margin-top:12px;
-}
-
-.mode-btn{
-  min-height:48px;
-  border:0;
-  border-radius:15px;
-  background:#334155;
-  color:#fff;
-  font-weight:900;
-}
-
-.mode-btn.active{
-  background:#2563eb;
-  box-shadow:
-    0 0 0 4px rgba(37,99,235,.18);
-}
-
-/* ==========================
-   推薦
-========================== */
-
-.recommend-box{
-  margin-top:16px;
-  padding:17px;
+.recommend{
+  margin-top:15px;
+  background:#091423;
+  border:1px solid #30445f;
   border-radius:20px;
-  border:1px solid #a65308;
-  background:
-    linear-gradient(
-      145deg,
-      #42240d,
-      #172133
-    );
+  padding:18px;
 }
 
 .recommend-title{
-  margin-bottom:13px;
-  color:#fde68a;
-  font-size:21px;
-  font-weight:900;
+  color:#9eb0c7;
+  font-size:14px;
 }
 
-.recommend-list{
+.recommend-numbers{
   display:flex;
   flex-wrap:wrap;
-  align-items:center;
-  gap:10px;
-  min-height:55px;
-}
-
-.rec-ball{
-  width:54px;
-  height:54px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#f59e0b;
-  color:#111827;
-  font-size:18px;
-  font-weight:900;
-  box-shadow:0 6px 18px rgba(0,0,0,.35);
-}
-
-.rec-detail{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
   gap:8px;
-  margin-top:14px;
-}
-
-.detail{
-  padding:10px;
-  border-radius:13px;
-  background:#0b1423;
-  border:1px solid #29384f;
-  color:#94a3b8;
-  font-size:12px;
-}
-
-.detail b{
-  display:block;
-  margin-top:3px;
-  color:#fff;
-  font-size:16px;
-}
-
-.big-button{
-  width:100%;
-  margin-top:15px;
-  padding:16px;
-  border:0;
-  border-radius:15px;
-  background:#2563eb;
-  color:#fff;
-  font-size:18px;
-  font-weight:900;
-}
-
-/* ==========================
-   號碼盤
-========================== */
-
-.number-grid{
-  display:grid;
-  grid-template-columns:repeat(10,1fr);
-  gap:6px;
   margin-top:14px;
 }
 
 .ball{
-  aspect-ratio:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  width:43px;
+  height:43px;
   border-radius:50%;
-  background:#1e293b;
-  border:1px solid #475569;
-  color:#e2e8f0;
-  font-size:12px;
-  font-weight:900;
-  transition:.15s;
-}
-
-.ball.recommend{
-  background:#f59e0b;
-  border-color:#fbbf24;
-  color:#111827;
-  transform:scale(1.08);
-  box-shadow:
-    0 0 0 4px rgba(245,158,11,.18);
-}
-
-/* ==========================
-   統計
-========================== */
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-  gap:8px;
-}
-
-.stat{
-  padding:13px 5px;
-  text-align:center;
-  border:1px solid #29384f;
-  border-radius:14px;
-  background:#0b1423;
-  color:#94a3b8;
-  font-size:12px;
-}
-
-.stat b{
-  display:block;
-  margin-top:4px;
-  color:#fff;
-  font-size:21px;
-}
-
-/* ==========================
-   熱門冷門遺漏
-========================== */
-
-.tag-list{
   display:flex;
-  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  background:#1a2a3f;
+  border:2px solid #42566f;
+  font-weight:900;
+}
+
+.ball.hot{
+  background:#4a2e2e;
+  border-color:#b95c5c;
+}
+
+.ball.cold{
+  background:#193244;
+  border-color:#5085a8;
+}
+
+.ball.star{
+  background:#3f351e;
+  border-color:#c4a14d;
+}
+
+.number-grid{
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
   gap:7px;
 }
 
-.tag{
-  padding:8px 10px;
-  border-radius:10px;
-  background:#1e293b;
-  border:1px solid #334155;
-  color:#e2e8f0;
-  font-size:12px;
+.grid-ball{
+  aspect-ratio:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:12px;
+  background:#17263a;
+  border:1px solid #30445e;
+  font-size:13px;
   font-weight:900;
 }
 
-.tag.hot{
-  background:#451a1a;
-  border-color:#991b1b;
+.grid-ball.hot{
+  background:#472d2d;
+  border-color:#aa5b5b;
 }
 
-.tag.cold{
-  background:#172554;
-  border-color:#1d4ed8;
+.grid-ball.cold{
+  background:#183245;
+  border-color:#4e85a9;
 }
 
-.tag.miss{
-  background:#422006;
-  border-color:#d97706;
-  color:#fde68a;
+.grid-ball.missing{
+  box-shadow:inset 0 0 0 2px #caa34f;
 }
-
-/* ==========================
-   表格
-========================== */
-
-.table-wrap{
-  width:100%;
-  overflow-x:auto;
-}
-
-table{
-  width:100%;
-  min-width:780px;
-  border-collapse:collapse;
-}
-
-th,
-td{
-  padding:9px 6px;
-  border-bottom:1px solid #29384f;
-  text-align:center;
-  font-size:12px;
-}
-
-th{
-  color:#94a3b8;
-}
-
-td{
-  color:#e2e8f0;
-}
-
-.gold{
-  color:#fbbf24;
-  font-weight:900;
-}
-
-.bar{
-  width:100%;
-  height:7px;
-  margin-top:5px;
-  border-radius:20px;
-  background:#1e293b;
-  overflow:hidden;
-}
-
-.fill{
-  height:100%;
-  border-radius:20px;
-  background:#f59e0b;
-}
-
-/* ==========================
-   開獎
-========================== */
 
 .draw{
-  padding:13px;
-  margin-bottom:9px;
-  border-radius:15px;
-  background:#0b1423;
-  border:1px solid #29384f;
+  background:#091423;
+  border:1px solid #2c405b;
+  border-radius:20px;
+  padding:16px;
+  margin:12px 0;
 }
 
-.draw-top{
+.draw-head{
   display:flex;
   justify-content:space-between;
-  gap:10px;
-  margin-bottom:9px;
-  color:#cbd5e1;
-  font-size:13px;
+  align-items:flex-start;
+  gap:15px;
+  margin-bottom:14px;
+}
+
+.period{
+  font-size:17px;
+  font-weight:900;
+}
+
+.datetime{
+  color:#b8c5d7;
+  text-align:right;
+  font-size:14px;
+  line-height:1.6;
+  white-space:nowrap;
 }
 
 .draw-balls{
   display:flex;
   flex-wrap:wrap;
-  gap:5px;
+  gap:7px;
 }
 
-.mini{
-  width:31px;
-  height:31px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+.draw-ball{
+  width:40px;
+  height:40px;
   border-radius:50%;
-  background:#1e293b;
-  border:1px solid #475569;
-  font-size:11px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#1b2b40;
+  border:2px solid #40546d;
   font-weight:900;
 }
 
-/* ==========================
-   日期
-========================== */
-
-.date-row{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:8px;
+.time-badge{
+  display:inline-block;
+  margin-top:4px;
+  padding:4px 8px;
+  border-radius:8px;
+  background:#1e334c;
+  color:#d4e0ee;
+  font-size:13px;
+  font-weight:900;
 }
 
-input{
+.empty{
+  padding:25px 10px;
+  text-align:center;
+  color:#8093aa;
+}
+
+.table-wrap{
+  overflow:auto;
+}
+
+table{
   width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #334155;
-  background:#0b1423;
-  color:#fff;
-  outline:none;
+  min-width:520px;
+  border-collapse:collapse;
 }
 
-.action-grid{
+th,
+td{
+  padding:10px 8px;
+  border-bottom:1px solid #263952;
+  text-align:center;
+}
+
+th{
+  color:#aebdd0;
+  font-size:13px;
+}
+
+td{
+  font-size:14px;
+}
+
+.info-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:8px;
+  gap:10px;
 }
 
-.action-btn{
-  min-height:48px;
-  padding:12px;
-  border:0;
-  border-radius:14px;
-  background:#334155;
-  color:#fff;
-  font-weight:900;
+.info-box{
+  background:#091423;
+  border:1px solid #2c405b;
+  border-radius:15px;
+  padding:14px;
+  text-align:center;
 }
 
-.green{
-  background:#059669;
-}
-
-.orange{
-  background:#d97706;
-}
-
-.red{
-  background:#dc2626;
-}
-
-.warning{
-  margin-top:12px;
-  padding:11px;
-  border-radius:12px;
-  background:#3f1d0b;
-  border:1px solid #92400e;
-  color:#fed7aa;
+.info-label{
+  color:#8ea2bb;
   font-size:12px;
-  line-height:1.7;
 }
 
-.success{
-  color:#86efac;
+.info-value{
+  margin-top:5px;
+  font-size:18px;
+  font-weight:900;
 }
 
 .footer{
-  padding:20px;
   text-align:center;
-  color:#64748b;
+  color:#6f829a;
   font-size:12px;
   line-height:1.7;
+  padding:20px;
 }
 
-/* ==========================
-   手機
-========================== */
+@media(max-width:650px){
 
-@media(max-width:700px){
-
-  .container{
-    padding:9px;
-  }
-
-  .card{
-    padding:14px;
-    border-radius:19px;
-  }
-
-  h1{
-    font-size:27px;
-  }
-
-  .mode-grid{
+  .controls{
     grid-template-columns:repeat(2,1fr);
   }
 
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .rec-detail{
-    grid-template-columns:repeat(2,1fr);
-  }
-
-  .action-grid{
+  .date-row{
     grid-template-columns:1fr;
+  }
+
+  .draw-head{
+    flex-direction:column;
+  }
+
+  .datetime{
+    text-align:left;
   }
 
   .number-grid{
     gap:5px;
   }
 
-  .ball{
-    font-size:10px;
+  .grid-ball{
+    border-radius:9px;
+    font-size:12px;
   }
 
+  .info-grid{
+    grid-template-columns:1fr 1fr;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
-<!-- ==================================================
-     頂部
-================================================== -->
-
-<section class="card hero">
+<header>
 
   <h1>🎱 賓果賓果</h1>
 
   <div class="subtitle">
-    V7｜歷史開獎比對・熱門・冷門・遺漏・綜合推薦
+    完整歷史・連續期數・開獎時間・熱門冷門分析 V9
   </div>
 
-  <div class="badge" id="badge">
-    🟢 App 已啟動
-  </div>
-
-  <div class="status" id="status">
-    🎯 正在準備歷史資料……
-  </div>
-
-</section>
+</header>
 
 
-<!-- ==================================================
-     推薦
-================================================== -->
+<div class="container">
 
-<section class="card">
-
-  <h2>🎯 歷史比對推薦</h2>
-
-  <div class="note">
-    選擇星數後，系統會依照已保存的歷史開獎資料進行比對。
-    不使用沒有資料時的亂數推薦。
+  <div id="status" class="status">
+    🟡 App 正在啟動……
   </div>
 
 
-  <div class="star-grid">
+  <!-- ================================
+       資料摘要
+  ================================= -->
 
-    <button class="star-btn active" data-star="1">
-      1星
-    </button>
+  <section class="card">
 
-    <button class="star-btn" data-star="2">
-      2星
-    </button>
+    <h2>📊 歷史資料庫</h2>
 
-    <button class="star-btn" data-star="3">
-      3星
-    </button>
+    <div class="info-grid">
 
-    <button class="star-btn" data-star="4">
-      4星
-    </button>
+      <div class="info-box">
+        <div class="info-label">資料總期數</div>
+        <div id="totalCount" class="info-value">0</div>
+      </div>
 
-    <button class="star-btn" data-star="5">
-      5星
-    </button>
+      <div class="info-box">
+        <div class="info-label">最新期數</div>
+        <div id="latestPeriod" class="info-value">--</div>
+      </div>
 
-    <button class="star-btn" data-star="6">
-      6星
-    </button>
+      <div class="info-box">
+        <div class="info-label">最新時間</div>
+        <div id="latestTime" class="info-value">--</div>
+      </div>
 
-    <button class="star-btn" data-star="7">
-      7星
-    </button>
-
-    <button class="star-btn" data-star="8">
-      8星
-    </button>
-
-  </div>
-
-
-  <div class="mode-grid">
-
-    <button
-      class="mode-btn active"
-      data-mode="hot">
-
-      🔥 熱門
-
-    </button>
-
-    <button
-      class="mode-btn"
-      data-mode="balance">
-
-      ⚖️ 均衡
-
-    </button>
-
-    <button
-      class="mode-btn"
-      data-mode="cold">
-
-      ❄️ 冷門
-
-    </button>
-
-    <button
-      class="mode-btn"
-      data-mode="smart">
-
-      🧠 綜合
-
-    </button>
-
-  </div>
-
-
-  <div class="recommend-box">
-
-    <div class="recommend-title">
-      ⭐ 歷史比對推薦
     </div>
 
+  </section>
+
+
+  <!-- ================================
+       推薦
+  ================================= -->
+
+  <section class="card">
+
+    <h2>🎯 歷史分析推薦</h2>
+
+    <div class="controls" id="starButtons">
+
+      <button data-star="1">1星</button>
+      <button data-star="2">2星</button>
+      <button data-star="3">3星</button>
+      <button data-star="4">4星</button>
+      <button data-star="5">5星</button>
+      <button data-star="6">6星</button>
+      <button data-star="7">7星</button>
+      <button data-star="8">8星</button>
+
+    </div>
+
+    <br>
+
+    <div class="controls" id="modeButtons">
+
+      <button data-mode="hot">
+        🔥熱門
+      </button>
+
+      <button data-mode="balance">
+        ⚖️均衡
+      </button>
+
+      <button data-mode="cold">
+        ❄️冷門
+      </button>
+
+      <button data-mode="smart" class="active">
+        🧠綜合
+      </button>
+
+    </div>
+
+    <br>
+
+    <button
+      id="recommendBtn"
+      class="primary"
+      style="width:100%;"
+    >
+      🎯 產生歷史分析推薦
+    </button>
+
+    <div class="recommend">
+
+      <div
+        id="recommendInfo"
+        class="recommend-title"
+      >
+        尚未產生推薦
+      </div>
+
+      <div
+        id="recommendNumbers"
+        class="recommend-numbers"
+      >
+
+        <div class="empty">
+          請按上方按鈕
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ================================
+       統計區間
+  ================================= -->
+
+  <section class="card">
+
+    <h2>📈 分析區間</h2>
+
+    <div class="controls">
+
+      <button data-range="30">
+        近30期
+      </button>
+
+      <button data-range="100">
+        近100期
+      </button>
+
+      <button data-range="300">
+        近300期
+      </button>
+
+      <button data-range="1000">
+        近1000期
+      </button>
+
+    </div>
+
+    <br>
+
+    <button
+      id="allRangeBtn"
+      style="width:100%;"
+    >
+      📚 全部歷史資料
+    </button>
+
+    <br><br>
 
     <div
-      id="recommendList"
-      class="recommend-list">
-
-      <span class="note">
-        正在準備資料……
-      </span>
-
+      id="statsInfo"
+      class="status"
+    >
+      尚未分析
     </div>
 
+  </section>
+
+
+  <!-- ================================
+       01～80
+  ================================= -->
+
+  <section class="card">
+
+    <h2>🔢 01～80 號碼熱冷</h2>
 
     <div
-      id="recommendDetail"
-      class="rec-detail">
+      id="numberGrid"
+      class="number-grid"
+    ></div>
+
+  </section>
+
+
+  <!-- ================================
+       熱門
+  ================================= -->
+
+  <section class="card">
+
+    <h2>🔥 熱門號碼</h2>
+
+    <div
+      id="hotNumbers"
+      class="recommend-numbers"
+    ></div>
+
+  </section>
+
+
+  <!-- ================================
+       冷門
+  ================================= -->
+
+  <section class="card">
+
+    <h2>❄️ 冷門號碼</h2>
+
+    <div
+      id="coldNumbers"
+      class="recommend-numbers"
+    ></div>
+
+  </section>
+
+
+  <!-- ================================
+       遺漏
+  ================================= -->
+
+  <section class="card">
+
+    <h2>⏳ 遺漏較久號碼</h2>
+
+    <div
+      id="missingNumbers"
+      class="recommend-numbers"
+    ></div>
+
+  </section>
+
+
+  <!-- ================================
+       分數表
+  ================================= -->
+
+  <section class="card">
+
+    <h2>🏆 號碼綜合分析</h2>
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>號碼</th>
+            <th>出現</th>
+            <th>比例</th>
+            <th>遺漏</th>
+            <th>分數</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="scoreTable"></tbody>
+
+      </table>
+
     </div>
 
-
-    <button
-      id="againButton"
-      class="big-button">
-
-      🔄 重新分析
-
-    </button>
-
-  </div>
+  </section>
 
 
-  <div class="warning">
+  <!-- ================================
+       每日歷史
+  ================================= -->
 
-    ⚠️ 重要：推薦是歷史統計模型，不代表下一期一定開出。
-    彩票開獎具有隨機性，請勿將統計結果視為保證。
+  <section class="card">
 
-  </div>
+    <h2>📅 每日開獎歷史</h2>
 
-</section>
+    <div class="date-row">
 
+      <input
+        id="datePicker"
+        type="date"
+      >
 
-<!-- ==================================================
-     1～80
-================================================== -->
+      <button id="todayBtn">
+        今天
+      </button>
 
-<section class="card">
-
-  <h2>🔢 1～80 號碼盤</h2>
-
-  <div class="note">
-    🟡 黃色＝目前歷史比對推薦
-  </div>
-
-  <div
-    id="numberGrid"
-    class="number-grid">
-  </div>
-
-</section>
-
-
-<!-- ==================================================
-     統計
-================================================== -->
-
-<section class="card">
-
-  <h2>📊 歷史資料統計</h2>
-
-  <div class="stats">
-
-    <div class="stat">
-      資料期數
-      <b id="totalCount">0</b>
     </div>
 
-    <div class="stat">
-      30期
-      <b id="count30">0</b>
+    <br>
+
+    <div
+      id="dailyInfo"
+      class="status"
+    >
+      請選擇日期
     </div>
 
-    <div class="stat">
-      100期
-      <b id="count100">0</b>
+    <div id="dailyHistory"></div>
+
+  </section>
+
+
+  <!-- ================================
+       最新20期
+  ================================= -->
+
+  <section class="card">
+
+    <h2>🕐 最新20期</h2>
+
+    <div id="latestHistory"></div>
+
+  </section>
+
+
+  <!-- ================================
+       資料管理
+  ================================= -->
+
+  <section class="card">
+
+    <h2>⚙️ 資料管理</h2>
+
+    <div class="controls">
+
+      <button
+        id="reloadBtn"
+        class="primary"
+      >
+        🌐 更新資料
+      </button>
+
+      <button id="reanalyzeBtn">
+        🔄 重新分析
+      </button>
+
+      <button id="clearRecommendBtn">
+        🧹 清除推薦
+      </button>
+
+      <button
+        id="clearCacheBtn"
+        class="danger"
+      >
+        🗑️ 清除快取
+      </button>
+
     </div>
 
-    <div class="stat">
-      300期
-      <b id="count300">0</b>
+    <br>
+
+    <div
+      id="dataInfo"
+      class="status"
+    >
+      尚未讀取資料
     </div>
 
-    <div class="stat">
-      1000期
-      <b id="count1000">0</b>
-    </div>
+  </section>
 
-  </div>
-
-</section>
-
-
-<!-- ==================================================
-     熱門
-================================================== -->
-
-<section class="card">
-
-  <h2>🔥 熱門號碼 TOP 15</h2>
-
-  <div
-    id="hotList"
-    class="tag-list">
-
-    <span class="note">
-      尚無資料
-    </span>
-
-  </div>
-
-</section>
-
-
-<!-- ==================================================
-     冷門
-================================================== -->
-
-<section class="card">
-
-  <h2>❄️ 冷門號碼 TOP 15</h2>
-
-  <div
-    id="coldList"
-    class="tag-list">
-
-    <span class="note">
-      尚無資料
-    </span>
-
-  </div>
-
-</section>
-
-
-<!-- ==================================================
-     遺漏
-================================================== -->
-
-<section class="card">
-
-  <h2>⏳ 遺漏較久 TOP 15</h2>
-
-  <div
-    id="missingList"
-    class="tag-list">
-
-    <span class="note">
-      尚無資料
-    </span>
-
-  </div>
-
-</section>
-
-
-<!-- ==================================================
-     綜合分數
-================================================== -->
-
-<section class="card">
-
-  <h2>🧠 歷史綜合分數 TOP 20</h2>
-
-  <div class="table-wrap">
-
-    <table>
-
-      <thead>
-
-        <tr>
-
-          <th>排名</th>
-          <th>號碼</th>
-          <th>綜合分</th>
-          <th>30期</th>
-          <th>100期</th>
-          <th>300期</th>
-          <th>1000期</th>
-          <th>全部</th>
-          <th>遺漏</th>
-
-        </tr>
-
-      </thead>
-
-      <tbody id="scoreTable">
-      </tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-<!-- ==================================================
-     每日
-================================================== -->
-
-<section class="card">
-
-  <h2>📅 每日開獎歷史</h2>
-
-  <div class="date-row">
-
-    <input
-      id="datePicker"
-      type="date">
-
-    <button
-      id="todayButton"
-      class="action-btn">
-
-      今天
-
-    </button>
-
-  </div>
-
-
-  <div
-    id="dailyHistory"
-    style="margin-top:14px;">
-
-    <span class="note">
-      尚無資料
-    </span>
-
-  </div>
-
-</section>
-
-
-<!-- ==================================================
-     最新
-================================================== -->
-
-<section class="card">
-
-  <h2>🕐 最新開獎</h2>
-
-  <div id="latestHistory">
-
-    <span class="note">
-      尚無資料
-    </span>
-
-  </div>
-
-</section>
-
-
-<!-- ==================================================
-     資料控制
-================================================== -->
-
-<section class="card">
-
-  <h2>🔄 資料控制</h2>
-
-  <div class="action-grid">
-
-    <button
-      id="reloadButton"
-      class="action-btn green">
-
-      🌐 更新歷史資料
-
-    </button>
-
-
-    <button
-      id="clearRecommendationButton"
-      class="action-btn orange">
-
-      🧹 清除推薦
-
-    </button>
-
-
-    <button
-      id="clearHistoryButton"
-      class="action-btn red">
-
-      🗑️ 清除手機歷史
-
-    </button>
-
-  </div>
-
-
-  <div class="status">
-
-    📱 沒網路：
-    使用手機已保存的歷史資料。<br>
-
-    🌐 有網路：
-    更新 GitHub 上的歷史資料。<br>
-
-    🎯 推薦：
-    只在有歷史資料時進行歷史比對。<br>
-
-    🚫 沒有歷史資料：
-    不會偷偷使用亂數推薦。
-
-  </div>
-
-</section>
+</div>
 
 
 <div class="footer">
 
-  🎱 賓果賓果 V7<br>
-  歷史統計與研究工具・僅供娛樂參考
+  🎱 本工具僅供歷史資料整理、統計與研究參考。<br>
 
-</div>
+  歷史開獎結果不代表未來結果。<br>
+
+  實際開獎結果請以台灣彩券官方公告為準。
 
 </div>
 
 
 <script>
 
-/* =========================================================
-   V7 核心設定
-========================================================= */
+const CACHE_KEY = "BINGO_V9_HISTORY";
 
-const CACHE_KEY =
-  "BINGO_V7_HISTORY";
+const DATA_URL = "./bingo-data.json";
 
-const DATA_URL =
-  "./bingo-data.json";
+let history = [];
 
+let currentRange = 100;
 
-let draws = [];
+let currentMode = "smart";
 
-let selectedStar = 1;
+let currentStar = 5;
 
-let selectedMode = "hot";
-
-let recommendation = [];
+let scoreData = [];
 
 
-/* =========================================================
-   內建資料
-   ★ 只是為了第一次沒有網路時 App 仍然可以啟動
-========================================================= */
+/* ==========================================
+   基本工具
+========================================== */
 
-const BUILTIN_DATA = [
+function pad(n){
 
-{
-  period:"115049615",
-  draw_date:"2026-09-02",
-  numbers:[
-    3,11,16,17,33,43,49,50,51,53,
-    54,55,61,62,63,65,67,71,73,79
-  ]
-},
+  return String(n).padStart(2,"0");
 
-{
-  period:"115049603",
-  draw_date:"2026-09-02",
-  numbers:[
-    7,8,13,16,17,22,25,29,30,31,
-    45,48,50,62,68,70,74,78,79,80
-  ]
-},
-
-{
-  period:"115049591",
-  draw_date:"2026-09-02",
-  numbers:[
-    1,6,14,16,17,28,30,31,46,48,
-    51,54,56,60,66,67,73,75,78,79
-  ]
-},
-
-{
-  period:"115049579",
-  draw_date:"2026-09-02",
-  numbers:[
-    8,15,20,24,27,38,41,43,46,51,
-    54,55,57,59,65,66,68,72,76,80
-  ]
-},
-
-{
-  period:"115049567",
-  draw_date:"2026-09-02",
-  numbers:[
-    2,5,12,18,21,23,27,34,36,40,
-    44,47,52,58,61,64,69,72,75,77
-  ]
-},
-
-{
-  period:"115049555",
-  draw_date:"2026-09-02",
-  numbers:[
-    4,9,10,15,19,24,26,32,35,39,
-    42,45,49,57,60,63,68,70,74,78
-  ]
-},
-
-{
-  period:"115049543",
-  draw_date:"2026-09-02",
-  numbers:[
-    6,7,11,14,22,25,28,33,37,41,
-    43,48,51,56,59,62,66,71,73,80
-  ]
-},
-
-{
-  period:"115049531",
-  draw_date:"2026-09-02",
-  numbers:[
-    1,8,13,17,20,29,31,34,38,46,
-    50,53,55,61,64,67,69,72,76,79
-  ]
 }
 
-];
 
+function escapeHtml(str){
 
-/* =========================================================
-   工具
-========================================================= */
-
-function pad2(number){
-
-  return String(number).padStart(2,"0");
+  return String(str ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 
 }
 
 
 function todayString(){
 
-  const date =
-    new Date();
+  const d = new Date();
 
-  return (
-    date.getFullYear()+
-    "-"+
-    pad2(
-      date.getMonth()+1
-    )+
-    "-"+
-    pad2(
-      date.getDate()
-    )
-  );
+  return [
+    d.getFullYear(),
+    pad(d.getMonth()+1),
+    pad(d.getDate())
+  ].join("-");
 
 }
 
 
-/* =========================================================
-   正規化資料
-========================================================= */
+/* ==========================================
+   狀態
+========================================== */
 
-function normalize(raw){
+function setStatus(text,type=""){
 
-  let records = [];
+  const el =
+    document.getElementById("status");
 
+  el.textContent = text;
 
-  if(
-    Array.isArray(raw)
-  ){
+  el.className =
+    "status " + type;
 
-    records = raw;
-
-  }
-  else if(
-    raw &&
-    Array.isArray(raw.records)
-  ){
-
-    records = raw.records;
-
-  }
-  else if(
-    raw &&
-    Array.isArray(raw.data)
-  ){
-
-    records = raw.data;
-
-  }
+}
 
 
-  return records
-  .map(item=>{
+/* ==========================================
+   資料清理
+========================================== */
 
-    let numbers =
-      item.numbers ||
-      item.number ||
-      item.draw_numbers ||
-      item.drawNumber ||
-      [];
+function normalizeRecord(r){
 
+  if(!r) return null;
 
-    if(
-      typeof numbers === "string"
-    ){
+  const period =
+    String(
+      r.period ??
+      r.issue ??
+      ""
+    ).trim();
 
-      numbers =
-        numbers
-        .split(/[,\s]+/)
-        .map(Number);
+  let date =
+    String(
+      r.draw_date ??
+      r.date ??
+      ""
+    ).trim();
 
-    }
+  let time =
+    String(
+      r.draw_time ??
+      r.time ??
+      ""
+    ).trim();
 
+  let numbers =
+    r.numbers ??
+    r.number ??
+    r.result ??
+    [];
+
+  if(typeof numbers === "string"){
 
     numbers =
-      Array.from(
-        new Set(
-          numbers
+      numbers.match(/\d{1,2}/g) || [];
+
+  }
+
+  numbers =
+    Array.from(
+      new Set(
+        numbers
           .map(Number)
           .filter(
-            number =>
-              number >= 1 &&
-              number <= 80
+            n => n >= 1 && n <= 80
           )
-        )
       )
-      .sort(
-        (a,b)=>a-b
-      );
+    ).sort(
+      (a,b)=>a-b
+    );
 
+  if(!period || numbers.length !== 20){
 
-    return {
+    return null;
 
-      period:String(
-        item.period ||
-        item.issue ||
-        item.draw_period ||
-        ""
-      ),
+  }
 
-      draw_date:String(
-        item.draw_date ||
-        item.date ||
-        item.drawDate ||
-        ""
-      ).slice(0,10),
+  if(date.includes("/")){
 
-      numbers:numbers
+    date =
+      date.replaceAll("/","-");
 
-    };
+  }
 
-  })
-  .filter(
-    item =>
-      item.period &&
-      item.numbers.length >= 15
-  );
+  if(date.includes("T")){
+
+    date =
+      date.slice(0,10);
+
+  }
+
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){
+
+    date = "";
+
+  }
+
+  if(!/^\d{2}:\d{2}$/.test(time)){
+
+    time = "";
+
+  }
+
+  return {
+
+    period,
+
+    draw_date:date,
+
+    draw_time:time,
+
+    numbers
+
+  };
 
 }
 
 
-/* =========================================================
-   清理歷史
-========================================================= */
+/* ==========================================
+   排序
+========================================== */
 
-function cleanDraws(data){
+function sortHistory(){
 
-  const map =
-    new Map();
+  history.sort((a,b)=>{
 
+    const pa = BigInt(a.period);
 
-  data.forEach(item=>{
+    const pb = BigInt(b.period);
 
-    if(
-      item.period
-    ){
+    if(pa > pb) return -1;
 
-      map.set(
-        item.period,
-        item
-      );
+    if(pa < pb) return 1;
 
-    }
+    return 0;
 
   });
 
-
-  return Array
-    .from(
-      map.values()
-    )
-    .sort(
-      (a,b)=>
-        String(b.period)
-        .localeCompare(
-          String(a.period)
-        )
-    );
-
 }
 
 
-/* =========================================================
-   儲存手機
-========================================================= */
+/* ==========================================
+   儲存
+========================================== */
 
 function saveCache(){
 
   try{
 
     localStorage.setItem(
+
       CACHE_KEY,
-      JSON.stringify(draws)
+
+      JSON.stringify({
+
+        updatedAt:
+          new Date().toISOString(),
+
+        records:
+          history
+
+      })
+
     );
 
-  }
-  catch(error){
+  }catch(e){
 
-    console.log(
-      "儲存歷史失敗",
-      error
+    console.warn(
+      "無法儲存快取",
+      e
     );
 
   }
@@ -1323,9 +989,9 @@ function saveCache(){
 }
 
 
-/* =========================================================
-   讀取手機
-========================================================= */
+/* ==========================================
+   讀取快取
+========================================== */
 
 function loadCache(){
 
@@ -1336,43 +1002,58 @@ function loadCache(){
         CACHE_KEY
       );
 
-
-    if(
-      !raw
-    ){
+    if(!raw){
 
       return false;
 
     }
 
+    const obj =
+      JSON.parse(raw);
 
-    const data =
-      cleanDraws(
-        normalize(
-          JSON.parse(raw)
-        )
+    const arr =
+      Array.isArray(obj)
+        ? obj
+        : obj.records;
+
+    if(!Array.isArray(arr)){
+
+      return false;
+
+    }
+
+    const map = new Map();
+
+    arr.forEach(item=>{
+
+      const r =
+        normalizeRecord(item);
+
+      if(r){
+
+        map.set(
+          r.period,
+          r
+        );
+
+      }
+
+    });
+
+    history =
+      Array.from(
+        map.values()
       );
 
+    sortHistory();
 
-    if(
-      !data.length
-    ){
+    return history.length > 0;
 
-      return false;
+  }catch(e){
 
-    }
-
-
-    draws = data;
-
-    return true;
-
-  }
-  catch(error){
-
-    console.log(
-      "讀取歷史失敗",
-      error
+    console.warn(
+      "讀取快取失敗",
+      e
     );
 
     return false;
@@ -1382,647 +1063,652 @@ function loadCache(){
 }
 
 
-/* =========================================================
-   1～80 號碼盤
-========================================================= */
+/* ==========================================
+   下載資料
+========================================== */
 
-function buildNumberGrid(){
+async function fetchData(){
+
+  setStatus(
+    "🟡 正在更新完整歷史資料……",
+    "warn"
+  );
+
+  const response =
+    await fetch(
+      DATA_URL +
+      "?t=" +
+      Date.now(),
+      {
+        cache:"no-store"
+      }
+    );
+
+  if(!response.ok){
+
+    throw new Error(
+      "HTTP " +
+      response.status
+    );
+
+  }
+
+  const data =
+    await response.json();
+
+  const records =
+    Array.isArray(data)
+      ? data
+      : data.records;
+
+  if(!Array.isArray(records)){
+
+    throw new Error(
+      "bingo-data.json 格式錯誤"
+    );
+
+  }
+
+  const map = new Map();
+
+  records.forEach(item=>{
+
+    const r =
+      normalizeRecord(item);
+
+    if(r){
+
+      map.set(
+        r.period,
+        r
+      );
+
+    }
+
+  });
+
+  const result =
+    Array.from(
+      map.values()
+    );
+
+  if(result.length === 0){
+
+    throw new Error(
+      "沒有有效歷史資料"
+    );
+
+  }
+
+  history = result;
+
+  sortHistory();
+
+  /*
+    保留最多10000期
+  */
+
+  history =
+    history.slice(0,10000);
+
+  saveCache();
+
+  renderAll();
+
+  setStatus(
+    "🟢 歷史資料更新完成，共 " +
+    history.length +
+    " 期",
+    "ok"
+  );
+
+}
+
+
+/* ==========================================
+   統計
+========================================== */
+
+function calcFrequency(
+  number,
+  count
+){
+
+  const records =
+    history.slice(
+      0,
+      Math.min(
+        count,
+        history.length
+      )
+    );
+
+  let hits = 0;
+
+  records.forEach(r=>{
+
+    if(
+      r.numbers.includes(number)
+    ){
+
+      hits++;
+
+    }
+
+  });
+
+  return hits;
+
+}
+
+
+/* ==========================================
+   分析
+========================================== */
+
+function analyze(){
+
+  const records =
+    history.slice(
+      0,
+      Math.min(
+        currentRange,
+        history.length
+      )
+    );
+
+  const freq =
+    Array(81).fill(0);
+
+  const missing =
+    Array(81).fill(
+      records.length
+    );
+
+  records.forEach(
+    (r,index)=>{
+
+      r.numbers.forEach(n=>{
+
+        freq[n]++;
+
+        if(
+          missing[n] ===
+          records.length
+        ){
+
+          missing[n] = index;
+
+        }
+
+      });
+
+    }
+  );
+
+
+  scoreData = [];
+
+
+  for(
+    let n=1;
+    n<=80;
+    n++
+  ){
+
+    const f30 =
+      calcFrequency(n,30);
+
+    const f100 =
+      calcFrequency(n,100);
+
+    const f300 =
+      calcFrequency(n,300);
+
+    const f1000 =
+      calcFrequency(n,1000);
+
+    const fall =
+      calcFrequency(
+        n,
+        history.length
+      );
+
+
+    /*
+      綜合歷史分數
+
+      近期：
+      30期 35%
+      100期 30%
+      300期 20%
+      1000期 10%
+      全部 5%
+    */
+
+    const score =
+      f30 * 0.35 +
+      f100 * 0.30 +
+      f300 * 0.20 +
+      f1000 * 0.10 +
+      fall * 0.05;
+
+
+    scoreData.push({
+
+      number:n,
+
+      freq:freq[n],
+
+      missing:missing[n],
+
+      score:score
+
+    });
+
+  }
+
+
+  scoreData.sort(
+    (a,b)=>
+      b.score-a.score
+  );
+
+
+  renderStats(
+    records
+  );
+
+}
+
+
+/* ==========================================
+   統計表
+========================================== */
+
+function renderStats(records){
+
+  const tbody =
+    document.getElementById(
+      "scoreTable"
+    );
+
+  tbody.innerHTML =
+    scoreData
+      .slice()
+      .sort(
+        (a,b)=>
+          a.number-b.number
+      )
+      .map(x=>{
+
+        const pct =
+          records.length
+            ? (
+                x.freq /
+                records.length *
+                100
+              ).toFixed(1)
+            : "0.0";
+
+        return `
+
+          <tr>
+
+            <td>
+              <strong>
+                ${pad(x.number)}
+              </strong>
+            </td>
+
+            <td>
+              ${x.freq}
+            </td>
+
+            <td>
+              ${pct}%
+            </td>
+
+            <td>
+              ${x.missing}
+            </td>
+
+            <td>
+              ${x.score.toFixed(3)}
+            </td>
+
+          </tr>
+
+        `;
+
+      })
+      .join("");
+
+
+  document.getElementById(
+    "statsInfo"
+  ).textContent =
+    "分析 " +
+    records.length +
+    " 期｜資料庫共 " +
+    history.length +
+    " 期";
+
+}
+
+
+/* ==========================================
+   號碼網格
+========================================== */
+
+function renderNumberGrid(){
 
   const grid =
     document.getElementById(
       "numberGrid"
     );
 
-
-  grid.innerHTML = "";
-
-
-  for(
-    let number=1;
-    number<=80;
-    number++
-  ){
-
-    const div =
-      document.createElement(
-        "div"
-      );
-
-
-    div.className =
-      "ball";
-
-
-    div.id =
-      "ball-"+number;
-
-
-    div.textContent =
-      pad2(number);
-
-
-    grid.appendChild(
-      div
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   頻率
-========================================================= */
-
-function getFrequency(list){
-
-  const result =
-    Array(81).fill(0);
-
-
-  list.forEach(draw=>{
-
-    draw.numbers.forEach(number=>{
-
-      if(
-        number>=1 &&
-        number<=80
-      ){
-
-        result[number]++;
-
-      }
-
-    });
-
-  });
-
-
-  return result;
-
-}
-
-
-/* =========================================================
-   遺漏
-========================================================= */
-
-function getMissing(){
-
-  const result =
-    Array(81).fill(0);
-
-
-  for(
-    let number=1;
-    number<=80;
-    number++
-  ){
-
-    let foundIndex = -1;
-
-
-    for(
-      let index=0;
-      index<draws.length;
-      index++
-    ){
-
-      if(
-        draws[index]
-        .numbers
-        .includes(number)
-      ){
-
-        foundIndex =
-          index;
-
-        break;
-
-      }
-
-    }
-
-
-    result[number] =
-      foundIndex === -1
-        ? draws.length
-        : foundIndex;
-
-  }
-
-
-  return result;
-
-}
-
-
-/* =========================================================
-   歷史分數
-========================================================= */
-
-function calculateScores(){
-
-  const f30 =
-    getFrequency(
-      draws.slice(0,30)
-    );
-
-
-  const f100 =
-    getFrequency(
-      draws.slice(0,100)
-    );
-
-
-  const f300 =
-    getFrequency(
-      draws.slice(0,300)
-    );
-
-
-  const f1000 =
-    getFrequency(
-      draws.slice(0,1000)
-    );
-
-
-  const fall =
-    getFrequency(
-      draws
-    );
-
-
-  const missing =
-    getMissing();
-
-
-  const result=[];
-
-
-  for(
-    let number=1;
-    number<=80;
-    number++
-  ){
-
-    /*
-      歷史綜合分
-
-      30期    30%
-      100期   25%
-      300期   20%
-      1000期  15%
-      全部    10%
-    */
-
-    const score =
-      f30[number] * 0.30 +
-      f100[number] * 0.25 +
-      f300[number] * 0.20 +
-      f1000[number] * 0.15 +
-      fall[number] * 0.10;
-
-
-    result.push({
-
-      n:number,
-
-      score:score,
-
-      f30:f30[number],
-
-      f100:f100[number],
-
-      f300:f300[number],
-
-      f1000:f1000[number],
-
-      all:fall[number],
-
-      missing:missing[number]
-
-    });
-
-  }
-
-
-  return result;
-
-}
-
-
-/* =========================================================
-   統計畫面
-========================================================= */
-
-function renderStats(){
-
-  const frequency =
-    getFrequency(draws);
-
-
-  const missing =
-    getMissing();
-
-
-  const numbers =
-    Array.from(
-      {length:80},
-      (_,index)=>index+1
-    );
-
+  const sorted =
+    scoreData.slice();
 
   const hot =
-    numbers
-    .slice()
-    .sort(
-      (a,b)=>
-        frequency[b]-
-        frequency[a] ||
-        a-b
-    )
-    .slice(0,15);
-
+    new Set(
+      sorted
+        .sort(
+          (a,b)=>
+            b.score-a.score
+        )
+        .slice(0,10)
+        .map(x=>x.number)
+    );
 
   const cold =
-    numbers
-    .slice()
-    .sort(
-      (a,b)=>
-        frequency[a]-
-        frequency[b] ||
-        a-b
-    )
-    .slice(0,15);
+    new Set(
+      scoreData
+        .slice()
+        .sort(
+          (a,b)=>
+            a.score-b.score
+        )
+        .slice(0,10)
+        .map(x=>x.number)
+    );
 
-
-  const missingTop =
-    numbers
-    .slice()
-    .sort(
-      (a,b)=>
-        missing[b]-
-        missing[a] ||
-        a-b
-    )
-    .slice(0,15);
-
-
-  document.getElementById(
-    "totalCount"
-  ).textContent =
-    draws.length;
-
-
-  document.getElementById(
-    "count30"
-  ).textContent =
-    Math.min(
-      30,
-      draws.length
+  const missing =
+    new Set(
+      scoreData
+        .slice()
+        .sort(
+          (a,b)=>
+            b.missing-a.missing
+        )
+        .slice(0,10)
+        .map(x=>x.number)
     );
 
 
-  document.getElementById(
-    "count100"
-  ).textContent =
-    Math.min(
-      100,
-      draws.length
-    );
+  grid.innerHTML =
+    Array.from(
+      {length:80},
+      (_,i)=>{
 
+        const n=i+1;
 
-  document.getElementById(
-    "count300"
-  ).textContent =
-    Math.min(
-      300,
-      draws.length
-    );
+        let cls =
+          "grid-ball";
 
+        if(
+          hot.has(n)
+        ){
 
-  document.getElementById(
-    "count1000"
-  ).textContent =
-    Math.min(
-      1000,
-      draws.length
-    );
+          cls += " hot";
 
+        }
 
-  document.getElementById(
-    "hotList"
-  ).innerHTML =
+        if(
+          cold.has(n)
+        ){
 
-    hot.map(
-      number=>
-        `
-        <span class="tag hot">
-          ${pad2(number)}
-          ×
-          ${frequency[number]}
-        </span>
-        `
-    ).join("");
+          cls += " cold";
 
+        }
 
-  document.getElementById(
-    "coldList"
-  ).innerHTML =
+        if(
+          missing.has(n)
+        ){
 
-    cold.map(
-      number=>
-        `
-        <span class="tag cold">
-          ${pad2(number)}
-          ×
-          ${frequency[number]}
-        </span>
-        `
-    ).join("");
+          cls += " missing";
 
+        }
 
-  document.getElementById(
-    "missingList"
-  ).innerHTML =
+        return `
 
-    missingTop.map(
-      number=>
-        `
-        <span class="tag miss">
-          ${pad2(number)}
-          ·
-          ${missing[number]}期
-        </span>
-        `
+          <div class="${cls}">
+            ${pad(n)}
+          </div>
+
+        `;
+
+      }
     ).join("");
 
 }
 
 
-/* =========================================================
-   綜合表
-========================================================= */
+/* ==========================================
+   熱門冷門遺漏
+========================================== */
 
-function renderScoreTable(){
+function renderTopLists(){
 
-  const table =
-    document.getElementById(
-      "scoreTable"
-    );
+  const hot =
+    scoreData
+      .slice()
+      .sort(
+        (a,b)=>
+          b.score-a.score
+      )
+      .slice(0,12);
 
+  const cold =
+    scoreData
+      .slice()
+      .sort(
+        (a,b)=>
+          a.score-b.score
+      )
+      .slice(0,12);
+
+  const missing =
+    scoreData
+      .slice()
+      .sort(
+        (a,b)=>
+          b.missing-a.missing
+      )
+      .slice(0,12);
+
+
+  document.getElementById(
+    "hotNumbers"
+  ).innerHTML =
+
+    hot.map(x=>
+
+      `<div class="ball hot">
+        ${pad(x.number)}
+      </div>`
+
+    ).join("");
+
+
+  document.getElementById(
+    "coldNumbers"
+  ).innerHTML =
+
+    cold.map(x=>
+
+      `<div class="ball cold">
+        ${pad(x.number)}
+      </div>`
+
+    ).join("");
+
+
+  document.getElementById(
+    "missingNumbers"
+  ).innerHTML =
+
+    missing.map(x=>
+
+      `<div class="ball star">
+        ${pad(x.number)}
+      </div>`
+
+    ).join("");
+
+}
+
+
+/* ==========================================
+   推薦
+========================================== */
+
+function makeRecommendation(){
 
   if(
-    !draws.length
+    history.length === 0
   ){
 
-    table.innerHTML = "";
+    document.getElementById(
+      "recommendInfo"
+    ).textContent =
+      "沒有歷史資料，不使用亂數推薦。";
+
+    document.getElementById(
+      "recommendNumbers"
+    ).innerHTML =
+
+      `<div class="empty">
+        請先更新歷史資料
+      </div>`;
 
     return;
 
   }
 
 
-  const data =
-    calculateScores()
-    .sort(
+  let candidates =
+    scoreData.slice();
+
+
+  if(
+    currentMode === "hot"
+  ){
+
+    candidates.sort(
       (a,b)=>
-        b.score-a.score ||
-        a.n-b.n
-    )
-    .slice(0,20);
-
-
-  const max =
-    data[0]?.score || 1;
-
-
-  table.innerHTML =
-
-    data.map(
-      (item,index)=>{
-
-        const width =
-          Math.max(
-            4,
-            item.score/max*100
-          );
-
-
-        return `
-
-        <tr>
-
-          <td>
-            ${index+1}
-          </td>
-
-          <td class="gold">
-            ${pad2(item.n)}
-          </td>
-
-          <td>
-
-            ${item.score.toFixed(2)}
-
-            <div class="bar">
-
-              <div
-                class="fill"
-                style="width:${width}%">
-              </div>
-
-            </div>
-
-          </td>
-
-          <td>
-            ${item.f30}
-          </td>
-
-          <td>
-            ${item.f100}
-          </td>
-
-          <td>
-            ${item.f300}
-          </td>
-
-          <td>
-            ${item.f1000}
-          </td>
-
-          <td>
-            ${item.all}
-          </td>
-
-          <td>
-            ${item.missing}
-          </td>
-
-        </tr>
-
-        `;
-
-      }
-    )
-    .join("");
-
-}
-
-
-/* =========================================================
-   推薦池
-========================================================= */
-
-function getRecommendationPool(){
-
-  const data =
-    calculateScores();
-
-
-  /*
-    熱門
-  */
-
-  if(
-    selectedMode === "hot"
-  ){
-
-    return data
-      .sort(
-        (a,b)=>
-          b.score-a.score ||
-          a.n-b.n
-      )
-      .slice(0,35);
+        b.score-a.score
+    );
 
   }
 
 
-  /*
-    冷門
-  */
-
-  if(
-    selectedMode === "cold"
+  else if(
+    currentMode === "cold"
   ){
 
-    return data
-      .sort(
-        (a,b)=>{
-
-          const scoreA =
-            a.missing * 0.9 -
-            a.score * 0.25;
-
-          const scoreB =
-            b.missing * 0.9 -
-            b.score * 0.25;
-
-
-          return (
-            scoreB-scoreA ||
-            a.n-b.n
-          );
-
-        }
-      )
-      .slice(0,35);
+    candidates.sort(
+      (a,b)=>
+        b.missing-a.missing
+    );
 
   }
 
 
-  /*
-    均衡
-  */
-
-  if(
-    selectedMode === "balance"
+  else if(
+    currentMode === "balance"
   ){
 
-    return data
-      .sort(
-        (a,b)=>
-          b.score-a.score ||
-          a.n-b.n
-      )
-      .slice(0,60);
-
-  }
-
-
-  /*
-    綜合
-  */
-
-  return data
-    .sort(
+    candidates.sort(
       (a,b)=>{
 
-        const scoreA =
+        const sa =
           a.score +
           Math.min(
             a.missing,
-            30
-          ) * 0.15;
+            20
+          ) * 0.02;
 
-        const scoreB =
+        const sb =
           b.score +
           Math.min(
             b.missing,
-            30
-          ) * 0.15;
+            20
+          ) * 0.02;
 
-
-        return (
-          scoreB-scoreA ||
-          a.n-b.n
-        );
+        return sb-sa;
 
       }
-    )
-    .slice(0,45);
+    );
 
-}
+  }
 
 
-/* =========================================================
-   選號
-   ★ 不用亂數
-   ★ 依歷史分數排序
-========================================================= */
+  else{
 
-function selectNumbers(
-  pool,
-  count
-){
+    candidates.sort(
+      (a,b)=>
+        b.score-a.score
+    );
 
-  const selected=[];
-
-  const used =
-    new Set();
+  }
 
 
   /*
-    第一階段：
-    8個區間各取歷史排名前面的號碼。
+    不使用 Math.random()
 
-    1～10
+    分成8個區間：
+
+    01～10
     11～20
-    ...
+    21～30
+    31～40
+    41～50
+    51～60
+    61～70
     71～80
   */
 
+  const ranges = [
+
+    [1,10],
+    [11,20],
+    [21,30],
+    [31,40],
+    [41,50],
+    [51,60],
+    [61,70],
+    [71,80]
+
+  ];
+
+
+  const selected = [];
+
+
+  /*
+    第一輪
+    優先每區挑一個
+  */
+
   for(
-    let group=0;
-    group<8;
-    group++
+    const range of ranges
   ){
 
     if(
-      selected.length>=count
+      selected.length >=
+      currentStar
     ){
 
       break;
@@ -2030,436 +1716,186 @@ function selectNumbers(
     }
 
 
-    const min =
-      group*10+1;
+    const found =
+      candidates.find(
+        x=>
 
-    const max =
-      group*10+10;
+          x.number >=
+          range[0]
 
+          &&
 
-    const candidates =
-      pool
-      .filter(
-        item=>
-          item.n>=min &&
-          item.n<=max &&
-          !used.has(item.n)
-      )
-      .sort(
-        (a,b)=>
-          b.score-a.score ||
-          b.missing-a.missing ||
-          a.n-b.n
+          x.number <=
+          range[1]
+
+          &&
+
+          !selected.includes(
+            x.number
+          )
       );
+
+
+    if(found){
+
+      selected.push(
+        found.number
+      );
+
+    }
+
+  }
+
+
+  /*
+    第二輪
+    依歷史分數補足
+  */
+
+  for(
+    const item of candidates
+  ){
+
+    if(
+      selected.length >=
+      currentStar
+    ){
+
+      break;
+
+    }
 
 
     if(
-      candidates.length
+      !selected.includes(
+        item.number
+      )
     ){
 
-      const item =
-        candidates[0];
-
-
-      selected.push(item);
-
-      used.add(item.n);
-
-    }
-
-  }
-
-
-  /*
-    第二階段：
-    不足時直接按照歷史分數補足
-  */
-
-  if(
-    selected.length<count
-  ){
-
-    const candidates =
-      pool
-      .slice()
-      .sort(
-        (a,b)=>
-          b.score-a.score ||
-          b.missing-a.missing ||
-          a.n-b.n
+      selected.push(
+        item.number
       );
 
-
-    for(
-      const item of candidates
-    ){
-
-      if(
-        used.has(item.n)
-      ){
-
-        continue;
-
-      }
-
-
-      selected.push(item);
-
-      used.add(item.n);
-
-
-      if(
-        selected.length>=count
-      ){
-
-        break;
-
-      }
-
     }
 
   }
 
 
-  return selected
-    .slice(0,count)
-    .sort(
-      (a,b)=>
-        a.n-b.n
-    );
-
-}
-
-
-/* =========================================================
-   產生推薦
-========================================================= */
-
-function generateRecommendation(){
-
-  /*
-    ★ 完全沒有資料：
-       絕對不亂猜
-  */
-
-  if(
-    draws.length===0
-  ){
-
-    recommendation=[];
-
-    renderNoData();
-
-    return;
-
-  }
-
-
-  const pool =
-    getRecommendationPool();
-
-
-  const selected =
-    selectNumbers(
-      pool,
-      selectedStar
-    );
-
-
-  if(
-    selected.length<
-    selectedStar
-  ){
-
-    recommendation=[];
-
-    renderNoData();
-
-    return;
-
-  }
-
-
-  recommendation =
-    selected;
-
-
-  renderRecommendation();
-
-}
-
-
-/* =========================================================
-   沒有資料
-========================================================= */
-
-function renderNoData(){
-
-  document.getElementById(
-    "recommendList"
-  ).innerHTML =
-
-    `
-    <span class="note">
-      ❌ 沒有足夠歷史資料，暫不進行推薦。
-    </span>
-    `;
+  selected.sort(
+    (a,b)=>a-b
+  );
 
 
   document.getElementById(
-    "recommendDetail"
-  ).innerHTML = "";
-
-
-  document
-    .querySelectorAll(
-      ".ball"
-    )
-    .forEach(
-      ball=>
-        ball.classList.remove(
-          "recommend"
-        )
-    );
-
-
-  document.getElementById(
-    "status"
+    "recommendInfo"
   ).textContent =
-    "⚠️ 沒有歷史資料，因此不使用亂數推薦。";
+
+    "歷史分析｜" +
+    modeName(currentMode) +
+    "｜" +
+    currentStar +
+    "星｜近" +
+    currentRange +
+    "期";
+
+
+  document.getElementById(
+    "recommendNumbers"
+  ).innerHTML =
+
+    selected.map(n=>
+
+      `<div class="ball star">
+        ${pad(n)}
+      </div>`
+
+    ).join("");
 
 }
 
 
-/* =========================================================
-   顯示推薦
-========================================================= */
-
-function renderRecommendation(){
-
-  const list =
-    document.getElementById(
-      "recommendList"
-    );
-
-
-  list.innerHTML = "";
-
-
-  recommendation.forEach(
-    item=>{
-
-      const ball =
-        document.createElement(
-          "div"
-        );
-
-
-      ball.className =
-        "rec-ball";
-
-
-      ball.textContent =
-        pad2(item.n);
-
-
-      list.appendChild(
-        ball
-      );
-
-    }
-  );
-
-
-  /*
-    清除舊亮燈
-  */
-
-  document
-    .querySelectorAll(
-      ".ball"
-    )
-    .forEach(
-      ball=>
-        ball.classList.remove(
-          "recommend"
-        )
-    );
-
-
-  /*
-    亮新推薦
-  */
-
-  recommendation.forEach(
-    item=>{
-
-      const ball =
-        document.getElementById(
-          "ball-"+item.n
-        );
-
-
-      if(ball){
-
-        ball.classList.add(
-          "recommend"
-        );
-
-      }
-
-    }
-  );
-
-
-  /*
-    第一推薦號碼的詳細統計
-  */
-
-  const best =
-    recommendation[0];
-
-
-  if(!best){
-
-    return;
-
-  }
-
-
-  document.getElementById(
-    "recommendDetail"
-  ).innerHTML =
-
-    `
-
-    <div class="detail">
-      綜合分
-      <b>
-        ${best.score.toFixed(2)}
-      </b>
-    </div>
-
-    <div class="detail">
-      30期
-      <b>
-        ${best.f30} 次
-      </b>
-    </div>
-
-    <div class="detail">
-      100期
-      <b>
-        ${best.f100} 次
-      </b>
-    </div>
-
-    <div class="detail">
-      遺漏
-      <b>
-        ${best.missing} 期
-      </b>
-    </div>
-
-    `;
-
-
-  document.getElementById(
-    "status"
-  ).innerHTML =
-
-    `
-    🎯
-    ${selectedStar}星｜
-    ${getModeName()}｜
-    歷史比對完成｜
-    <span class="success">
-      ${recommendation
-        .map(
-          item=>pad2(item.n)
-        )
-        .join(" ・ ")
-      }
-    </span>
-    `;
-
-}
-
-
-/* =========================================================
+/* ==========================================
    模式名稱
-========================================================= */
+========================================== */
 
-function getModeName(){
+function modeName(mode){
 
-  if(
-    selectedMode==="hot"
-  ){
+  return {
 
-    return "🔥熱門";
+    hot:"熱門",
 
-  }
+    balance:"均衡",
 
+    cold:"冷門",
 
-  if(
-    selectedMode==="balance"
-  ){
+    smart:"綜合"
 
-    return "⚖️均衡";
-
-  }
-
-
-  if(
-    selectedMode==="cold"
-  ){
-
-    return "❄️冷門";
-
-  }
-
-
-  return "🧠綜合";
+  }[mode] || "綜合";
 
 }
 
 
-/* =========================================================
-   開獎畫面
-========================================================= */
+/* ==========================================
+   顯示單期
+========================================== */
 
-function drawHTML(draw){
+function renderDraw(r){
+
+  const time =
+    r.draw_time
+      ? r.draw_time
+      : "--:--";
+
 
   return `
 
     <div class="draw">
 
-      <div class="draw-top">
+      <div class="draw-head">
 
-        <strong>
-          第 ${draw.period} 期
-        </strong>
+        <div>
 
-        <span>
-          ${draw.draw_date || ""}
-        </span>
+          <div class="period">
+            第 ${escapeHtml(r.period)} 期
+          </div>
+
+          <div
+            style="
+              color:#8fa3bb;
+              font-size:13px;
+              margin-top:5px;
+            "
+          >
+            連續期數資料
+          </div>
+
+        </div>
+
+
+        <div class="datetime">
+
+          📅 ${escapeHtml(r.draw_date)}
+
+          <br>
+
+          <span class="time-badge">
+            🕐 ${escapeHtml(time)}
+          </span>
+
+        </div>
 
       </div>
 
+
       <div class="draw-balls">
 
-        ${
-          draw.numbers
-          .map(
-            number=>
-              `
-              <div class="mini">
-                ${pad2(number)}
-              </div>
-              `
-          )
-          .join("")
-        }
+        ${r.numbers.map(n=>
+
+          `<div class="draw-ball">
+            ${pad(n)}
+          </div>`
+
+        ).join("")}
 
       </div>
 
@@ -2470,48 +1906,173 @@ function drawHTML(draw){
 }
 
 
-/* =========================================================
-   最新開獎
-========================================================= */
+/* ==========================================
+   每日歷史
+========================================== */
 
-function renderLatest(){
+function renderDaily(date){
 
-  const box =
+  const list =
+    history
+      .filter(
+        r =>
+          r.draw_date === date
+      )
+      .sort(
+        (a,b)=>{
+
+          const pa =
+            BigInt(a.period);
+
+          const pb =
+            BigInt(b.period);
+
+          if(pa>pb) return -1;
+
+          if(pa<pb) return 1;
+
+          return 0;
+
+        }
+      );
+
+
+  const info =
     document.getElementById(
-      "latestHistory"
+      "dailyInfo"
     );
 
 
   if(
-    !draws.length
+    list.length === 0
   ){
 
-    box.innerHTML =
-      `
-      <span class="note">
-        尚無歷史資料
-      </span>
-      `;
+    info.textContent =
+      date +
+      "｜目前資料庫沒有這一天資料";
+
+    document.getElementById(
+      "dailyHistory"
+    ).innerHTML =
+
+      `<div class="empty">
+        找不到這一天的資料
+      </div>`;
 
     return;
 
   }
 
 
-  box.innerHTML =
-    draws
-    .slice(0,20)
-    .map(drawHTML)
-    .join("");
+  info.textContent =
+    date +
+    "｜共 " +
+    list.length +
+    " 期";
+
+
+  document.getElementById(
+    "dailyHistory"
+  ).innerHTML =
+
+    list
+      .map(renderDraw)
+      .join("");
 
 }
 
 
-/* =========================================================
-   每日
-========================================================= */
+/* ==========================================
+   最新20期
+========================================== */
 
-function renderDaily(){
+function renderLatest(){
+
+  document.getElementById(
+    "latestHistory"
+  ).innerHTML =
+
+    history
+      .slice(0,20)
+      .map(renderDraw)
+      .join("");
+
+}
+
+
+/* ==========================================
+   摘要
+========================================== */
+
+function renderSummary(){
+
+  document.getElementById(
+    "totalCount"
+  ).textContent =
+    history.length;
+
+
+  if(history.length){
+
+    const latest =
+      history[0];
+
+    document.getElementById(
+      "latestPeriod"
+    ).textContent =
+      latest.period;
+
+
+    document.getElementById(
+      "latestTime"
+    ).textContent =
+      latest.draw_time ||
+      "--:--";
+
+  }else{
+
+    document.getElementById(
+      "latestPeriod"
+    ).textContent =
+      "--";
+
+    document.getElementById(
+      "latestTime"
+    ).textContent =
+      "--";
+
+  }
+
+}
+
+
+/* ==========================================
+   全部畫面
+========================================== */
+
+function renderAll(){
+
+  if(
+    history.length === 0
+  ){
+
+    return;
+
+  }
+
+
+  sortHistory();
+
+  renderSummary();
+
+  analyze();
+
+  renderNumberGrid();
+
+  renderTopLists();
+
+  renderLatest();
+
 
   const date =
     document.getElementById(
@@ -2519,284 +2080,237 @@ function renderDaily(){
     ).value;
 
 
-  if(!date){
+  if(date){
 
-    return;
-
-  }
-
-
-  const list =
-    draws.filter(
-      draw=>
-        draw.draw_date===date
-    );
-
-
-  const box =
-    document.getElementById(
-      "dailyHistory"
-    );
-
-
-  if(
-    !list.length
-  ){
-
-    box.innerHTML =
-
-      `
-      <div class="status">
-        📭 ${date} 沒有已保存的開獎資料。
-      </div>
-      `;
-
-    return;
+    renderDaily(date);
 
   }
 
 
-  box.innerHTML =
-    list
-    .map(drawHTML)
-    .join("");
+  document.getElementById(
+    "dataInfo"
+  ).textContent =
+    "目前手機共有 " +
+    history.length +
+    " 期歷史資料";
 
 }
 
 
-/* =========================================================
-   全部重新整理
-========================================================= */
-
-function renderAll(){
-
-  renderStats();
-
-  renderScoreTable();
-
-  renderLatest();
-
-  renderDaily();
-
-  generateRecommendation();
-
-}
-
-
-/* =========================================================
-   背景更新
-   ★ 不阻塞任何按鈕
-========================================================= */
-
-async function fetchLatestData(){
-
-  try{
-
-    const response =
-      await fetch(
-        DATA_URL+
-        "?t="+
-        Date.now(),
-        {
-          cache:"no-store"
-        }
-      );
-
-
-    if(
-      !response.ok
-    ){
-
-      throw new Error(
-        "HTTP "+
-        response.status
-      );
-
-    }
-
-
-    const json =
-      await response.json();
-
-
-    const data =
-      cleanDraws(
-        normalize(json)
-      );
-
-
-    if(
-      !data.length
-    ){
-
-      throw new Error(
-        "沒有有效歷史資料"
-      );
-
-    }
-
-
-    draws=data;
-
-
-    saveCache();
-
-
-    renderAll();
-
-
-    document.getElementById(
-      "badge"
-    ).textContent =
-      "🟢 歷史資料已更新";
-
-
-    document.getElementById(
-      "status"
-    ).textContent =
-
-      "📊 已取得 "+
-      draws.length+
-      " 期歷史資料，推薦已重新比對。";
-
-
-    return true;
-
-  }
-  catch(error){
-
-    console.log(
-      "歷史資料更新失敗",
-      error
-    );
-
-
-    document.getElementById(
-      "badge"
-    ).textContent =
-      "🟡 使用已保存歷史資料";
-
-
-    return false;
-
-  }
-
-}
-
-
-/* =========================================================
+/* ==========================================
    星數按鈕
-========================================================= */
+========================================== */
 
 document
   .querySelectorAll(
-    ".star-btn"
+    "[data-star]"
   )
-  .forEach(
-    button=>{
+  .forEach(btn=>{
 
-      button.addEventListener(
-        "click",
-        function(){
+    btn.addEventListener(
+      "click",
+      ()=>{
 
-          selectedStar =
-            Number(
-              this.dataset.star
-            );
-
-
-          document
-            .querySelectorAll(
-              ".star-btn"
-            )
-            .forEach(
-              item=>
-                item.classList.remove(
-                  "active"
-                )
-            );
-
-
-          this.classList.add(
-            "active"
+        currentStar =
+          Number(
+            btn.dataset.star
           );
 
 
-          generateRecommendation();
+        document
+          .querySelectorAll(
+            "[data-star]"
+          )
+          .forEach(x=>
+            x.classList.remove(
+              "active"
+            )
+          );
 
-        }
-      );
 
-    }
-  );
+        btn.classList.add(
+          "active"
+        );
 
 
-/* =========================================================
+        makeRecommendation();
+
+      }
+    );
+
+  });
+
+
+/* ==========================================
    模式按鈕
-========================================================= */
+========================================== */
 
 document
   .querySelectorAll(
-    ".mode-btn"
+    "[data-mode]"
   )
-  .forEach(
-    button=>{
+  .forEach(btn=>{
 
-      button.addEventListener(
-        "click",
-        function(){
+    btn.addEventListener(
+      "click",
+      ()=>{
 
-          selectedMode =
-            this.dataset.mode;
+        currentMode =
+          btn.dataset.mode;
 
 
-          document
-            .querySelectorAll(
-              ".mode-btn"
+        document
+          .querySelectorAll(
+            "[data-mode]"
+          )
+          .forEach(x=>
+            x.classList.remove(
+              "active"
             )
-            .forEach(
-              item=>
-                item.classList.remove(
-                  "active"
-                )
-            );
-
-
-          this.classList.add(
-            "active"
           );
 
 
-          generateRecommendation();
-
-        }
-      );
-
-    }
-  );
+        btn.classList.add(
+          "active"
+        );
 
 
-/* =========================================================
-   重新分析
-========================================================= */
+        makeRecommendation();
+
+      }
+    );
+
+  });
+
+
+/* ==========================================
+   分析區間
+========================================== */
+
+document
+  .querySelectorAll(
+    "[data-range]"
+  )
+  .forEach(btn=>{
+
+    btn.addEventListener(
+      "click",
+      ()=>{
+
+        currentRange =
+          Number(
+            btn.dataset.range
+          );
+
+
+        analyze();
+
+        renderNumberGrid();
+
+        renderTopLists();
+
+        makeRecommendation();
+
+      }
+    );
+
+  });
+
 
 document
   .getElementById(
-    "againButton"
+    "allRangeBtn"
   )
   .addEventListener(
     "click",
-    function(){
+    ()=>{
 
-      generateRecommendation();
+      currentRange =
+        history.length;
+
+      analyze();
+
+      renderNumberGrid();
+
+      renderTopLists();
+
+      makeRecommendation();
 
     }
   );
 
 
-/* =========================================================
+/* ==========================================
+   推薦
+========================================== */
+
+document
+  .getElementById(
+    "recommendBtn"
+  )
+  .addEventListener(
+    "click",
+    makeRecommendation
+  );
+
+
+/* ==========================================
+   重新分析
+========================================== */
+
+document
+  .getElementById(
+    "reanalyzeBtn"
+  )
+  .addEventListener(
+    "click",
+    ()=>{
+
+      analyze();
+
+      renderNumberGrid();
+
+      renderTopLists();
+
+      makeRecommendation();
+
+    }
+  );
+
+
+/* ==========================================
+   清除推薦
+========================================== */
+
+document
+  .getElementById(
+    "clearRecommendBtn"
+  )
+  .addEventListener(
+    "click",
+    ()=>{
+
+      document.getElementById(
+        "recommendInfo"
+      ).textContent =
+        "尚未產生推薦";
+
+
+      document.getElementById(
+        "recommendNumbers"
+      ).innerHTML =
+
+        `<div class="empty">
+          已清除推薦
+        </div>`;
+
+    }
+  );
+
+
+/* ==========================================
    日期
-========================================================= */
+========================================== */
 
 document
   .getElementById(
@@ -2804,143 +2318,106 @@ document
   )
   .addEventListener(
     "change",
-    function(){
+    e=>{
 
-      renderDaily();
+      renderDaily(
+        e.target.value
+      );
 
     }
   );
 
 
-/* =========================================================
+/* ==========================================
    今天
-========================================================= */
+========================================== */
 
 document
   .getElementById(
-    "todayButton"
+    "todayBtn"
   )
   .addEventListener(
     "click",
-    function(){
+    ()=>{
+
+      const today =
+        todayString();
+
 
       document.getElementById(
         "datePicker"
       ).value =
-        todayString();
+        today;
 
 
-      renderDaily();
+      renderDaily(today);
 
     }
   );
 
 
-/* =========================================================
+/* ==========================================
    更新資料
-========================================================= */
+========================================== */
 
 document
   .getElementById(
-    "reloadButton"
+    "reloadBtn"
   )
   .addEventListener(
     "click",
-    async function(){
+    async ()=>{
 
-      const button =
-        this;
+      try{
 
+        await fetchData();
 
-      button.disabled =
-        true;
+        makeRecommendation();
 
+      }catch(error){
 
-      button.textContent =
-        "⏳ 更新中";
+        console.error(error);
 
+        if(history.length){
 
-      await fetchLatestData();
+          setStatus(
+            "🟡 網路更新失敗，但手機已有 " +
+            history.length +
+            " 期歷史資料，可以繼續使用。",
+            "warn"
+          );
 
+        }else{
 
-      button.disabled =
-        false;
+          setStatus(
+            "🔴 更新失敗：" +
+            error.message,
+            "error"
+          );
 
+        }
 
-      button.textContent =
-        "🌐 更新歷史資料";
+      }
 
     }
   );
 
 
-/* =========================================================
-   清除推薦
-========================================================= */
+/* ==========================================
+   清除快取
+========================================== */
 
 document
   .getElementById(
-    "clearRecommendationButton"
+    "clearCacheBtn"
   )
   .addEventListener(
     "click",
-    function(){
-
-      recommendation=[];
-
-
-      document.getElementById(
-        "recommendList"
-      ).innerHTML =
-
-        `
-        <span class="note">
-          🧹 推薦已清除。
-        </span>
-        `;
-
-
-      document.getElementById(
-        "recommendDetail"
-      ).innerHTML = "";
-
-
-      document
-        .querySelectorAll(
-          ".ball"
-        )
-        .forEach(
-          ball=>
-            ball.classList.remove(
-              "recommend"
-            )
-        );
-
-
-      document.getElementById(
-        "status"
-      ).textContent =
-        "🧹 推薦已清除，歷史資料仍然保留。";
-
-    }
-  );
-
-
-/* =========================================================
-   清除手機歷史
-========================================================= */
-
-document
-  .getElementById(
-    "clearHistoryButton"
-  )
-  .addEventListener(
-    "click",
-    function(){
+    ()=>{
 
       const ok =
-        window.confirm(
-          "確定要清除手機保存的歷史資料嗎？\n\n清除後，如果沒有網路，就無法使用這些歷史資料。"
+        confirm(
+          "確定要刪除手機保存的全部歷史資料嗎？"
         );
 
 
@@ -2951,64 +2428,78 @@ document
       }
 
 
-      try{
-
-        localStorage.removeItem(
-          CACHE_KEY
-        );
-
-      }
-      catch(error){
-
-        console.log(error);
-
-      }
+      localStorage.removeItem(
+        CACHE_KEY
+      );
 
 
-      /*
-        清除後回到內建資料
-      */
+      history = [];
 
-      draws =
-        cleanDraws(
-          BUILTIN_DATA
-        );
-
-
-      renderAll();
+      scoreData = [];
 
 
       document.getElementById(
-        "badge"
-      ).textContent =
-        "🟡 已清除手機資料";
+        "numberGrid"
+      ).innerHTML = "";
 
 
       document.getElementById(
-        "status"
+        "hotNumbers"
+      ).innerHTML = "";
+
+
+      document.getElementById(
+        "coldNumbers"
+      ).innerHTML = "";
+
+
+      document.getElementById(
+        "missingNumbers"
+      ).innerHTML = "";
+
+
+      document.getElementById(
+        "latestHistory"
+      ).innerHTML = "";
+
+
+      document.getElementById(
+        "dailyHistory"
+      ).innerHTML = "";
+
+
+      document.getElementById(
+        "recommendNumbers"
+      ).innerHTML =
+
+        `<div class="empty">
+          歷史資料已清除
+        </div>`;
+
+
+      renderSummary();
+
+
+      document.getElementById(
+        "dataInfo"
       ).textContent =
-        "🧹 手機歷史已清除，目前使用 App 內建資料。";
+        "手機歷史快取已清除";
+
+
+      setStatus(
+        "🟡 已清除手機歷史資料",
+        "warn"
+      );
 
     }
   );
 
 
-/* =========================================================
+/* ==========================================
    啟動
-========================================================= */
+========================================== */
 
-function startApp(){
-
-  /*
-    ① 最先建立80個號碼
-  */
-
-  buildNumberGrid();
-
-
-  /*
-    ② 日期
-  */
+async function startApp(){
 
   document.getElementById(
     "datePicker"
@@ -3016,83 +2507,75 @@ function startApp(){
     todayString();
 
 
-  /*
-    ③ 讀手機歷史
-  */
-
   const hasCache =
     loadCache();
 
 
+  if(hasCache){
+
+    setStatus(
+      "🟢 已載入手機保存的 " +
+      history.length +
+      " 期歷史資料",
+      "ok"
+    );
+
+
+    renderAll();
+
+    makeRecommendation();
+
+  }else{
+
+    setStatus(
+      "🟡 手機目前沒有歷史資料，正在連線更新……",
+      "warn"
+    );
+
+  }
+
+
   /*
-    ④ 沒手機資料
-       使用 App 內建資料
+    背景更新
+    不阻塞 App 啟動
   */
 
-  if(
-    !hasCache
-  ){
+  try{
 
-    draws =
-      cleanDraws(
-        BUILTIN_DATA
+    await fetchData();
+
+    makeRecommendation();
+
+  }catch(error){
+
+    console.warn(
+      "背景更新失敗",
+      error
+    );
+
+
+    if(hasCache){
+
+      setStatus(
+        "🟢 網路暫時無法更新，但手機已有 " +
+        history.length +
+        " 期資料，可以正常分析。",
+        "ok"
       );
 
+    }else{
 
-    saveCache();
+      setStatus(
+        "🔴 尚未取得歷史資料，請按「更新資料」。",
+        "error"
+      );
 
-
-    document.getElementById(
-      "badge"
-    ).textContent =
-      "🟢 離線歷史資料";
-
-
-    document.getElementById(
-      "status"
-    ).textContent =
-      "📦 已載入 App 內建歷史資料，推薦可以直接使用。";
+    }
 
   }
-  else{
-
-    document.getElementById(
-      "badge"
-    ).textContent =
-      "🟢 手機歷史資料";
-
-
-    document.getElementById(
-      "status"
-    ).textContent =
-
-      "📱 已先載入手機保存的 "+
-      draws.length+
-      " 期歷史資料。";
-
-  }
-
-
-  /*
-    ⑤ ★ 立即畫面
-  */
-
-  renderAll();
-
-
-  /*
-    ⑥ ★ 最後才更新網路
-       不阻塞任何按鈕
-  */
-
-  fetchLatestData();
 
 }
 
-
-/* =========================================================
-   啟動 App
-========================================================= */
 
 startApp();
 
