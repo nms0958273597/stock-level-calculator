@@ -26,6 +26,46 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
 
+      - name: Python Syntax Check
+        env:
+          PYTHONUNBUFFERED: "1"
+        run: |
+          python <<'PY'
+          import ast
+          import pathlib
+          import re
+
+          workflow = pathlib.Path(
+              ".github/workflows/update-latest.yml"
+          ).read_text(
+              encoding="utf-8"
+          )
+
+          match = re.search(
+              r"python <<'PY'\n(.*?)\n\s*PY",
+              workflow,
+              re.DOTALL
+          )
+
+          if not match:
+              raise SystemExit(
+                  "找不到 Python 程式區塊"
+              )
+
+          code = match.group(1)
+
+          try:
+              ast.parse(code)
+          except SyntaxError as e:
+              print("Python 語法錯誤")
+              print(
+                  f"第 {e.lineno} 行：{e.msg}"
+              )
+              raise
+
+          print("OK：Python 語法檢查通過")
+          PY
+
       - name: Update latest.json and history
         env:
           PYTHONUNBUFFERED: "1"
@@ -33,21 +73,18 @@ jobs:
           python <<'PY'
           import json
           import os
-          import time
           from datetime import datetime, timezone, timedelta
 
           import requests
 
 
-          # ============================================================
-          # 基本設定
-          # ============================================================
-
           STOCK_FILE = "stock-data/stocks.json"
           LATEST_FILE = "stock-data/latest.json"
           HISTORY_DIR = "stock-data/history"
 
-          TW_TZ = timezone(timedelta(hours=8))
+          TW_TZ = timezone(
+              timedelta(hours=8)
+          )
 
           HEADERS = {
               "User-Agent":
@@ -62,16 +99,11 @@ jobs:
           )
 
 
-          # ============================================================
-          # 工具
-          # ============================================================
-
-          def clean(v):
-
-              if v is None:
+          def clean(value):
+              if value is None:
                   return None
 
-              s = str(v).strip()
+              s = str(value).strip()
 
               if s in (
                   "",
@@ -86,14 +118,25 @@ jobs:
 
               s = (
                   s.replace(",", "")
-                   .replace("<p style= color:red>", "")
-                   .replace("</p>", "")
-                   .replace("<p style= color:green>", "")
-                   .replace("<p>", "")
+                  .replace(
+                      "<p style= color:red>",
+                      ""
+                  )
+                  .replace(
+                      "<p style= color:green>",
+                      ""
+                  )
+                  .replace(
+                      "</p>",
+                      ""
+                  )
+                  .replace(
+                      "<p>",
+                      ""
+                  )
               )
 
               try:
-
                   if "." in s:
                       return float(s)
 
@@ -108,44 +151,41 @@ jobs:
               params=None,
               timeout=40
           ):
-
-              r = requests.get(
+              response = requests.get(
                   url,
                   params=params,
                   headers=HEADERS,
                   timeout=timeout
               )
 
-              r.raise_for_status()
+              response.raise_for_status()
 
-              return r.json()
+              return response.json()
 
 
           def first(row, keys):
-
               if not isinstance(row, dict):
                   return None
 
               for key in keys:
+                  if key not in row:
+                      continue
 
-                  if key in row:
+                  value = row.get(key)
 
-                      value = row.get(key)
-
-                      if value not in (
-                          None,
-                          "",
-                          "-",
-                          "--",
-                          "—"
-                      ):
-                          return value
+                  if value not in (
+                      None,
+                      "",
+                      "-",
+                      "--",
+                      "—"
+                  ):
+                      return value
 
               return None
 
 
           def normalize_date(value):
-
               if value is None:
                   return None
 
@@ -154,42 +194,36 @@ jobs:
               if not s:
                   return None
 
-              # 民國日期：1150902
               if len(s) == 7 and s.isdigit():
-
                   return (
                       f"{int(s[:3]) + 1911}-"
                       f"{s[3:5]}-"
                       f"{s[5:7]}"
                   )
 
-              # 西元日期：20260902
               if len(s) == 8 and s.isdigit():
-
                   return (
                       f"{s[:4]}-"
                       f"{s[4:6]}-"
                       f"{s[6:8]}"
                   )
 
-              # 115/09/02
               if "/" in s:
-
                   parts = s.split("/")
 
                   if len(parts) == 3:
-
                       try:
+                          year = int(parts[0])
+                          month = int(parts[1])
+                          day = int(parts[2])
 
-                          y = int(parts[0])
-                          m = int(parts[1])
-                          d = int(parts[2])
-
-                          if y < 1911:
-                              y += 1911
+                          if year < 1911:
+                              year += 1911
 
                           return (
-                              f"{y:04d}-{m:02d}-{d:02d}"
+                              f"{year:04d}-"
+                              f"{month:02d}-"
+                              f"{day:02d}"
                           )
 
                       except Exception:
@@ -198,122 +232,112 @@ jobs:
               return s
 
 
-          def roc_date(iso_date):
-
-              y, m, d = iso_date.split("-")
-
-              return (
-                  f"{int(y) - 1911:03d}/"
-                  f"{m}/{d}"
-              )
-
-
           def recent_weekdays(days=300):
-
               result = []
 
               today = datetime.now(
                   TW_TZ
               ).date()
 
-              for i in range(days):
+              for offset in range(days):
+                  day = (
+                      today -
+                      timedelta(days=offset)
+                  )
 
-                  d = today - timedelta(days=i)
-
-                  if d.weekday() < 5:
-
+                  if day.weekday() < 5:
                       result.append(
-                          d.strftime("%Y%m%d")
+                          day.strftime("%Y%m%d")
                       )
 
               return result
 
 
           def load_json(path):
-
               if not os.path.exists(path):
                   return {}
 
               try:
-
                   with open(
                       path,
                       "r",
                       encoding="utf-8"
-                  ) as f:
-
-                      return json.load(f)
+                  ) as file:
+                      return json.load(file)
 
               except Exception:
-
                   return {}
 
 
           def save_json(path, data):
+              directory = os.path.dirname(path)
 
-              os.makedirs(
-                  os.path.dirname(path),
-                  exist_ok=True
-              )
+              if directory:
+                  os.makedirs(
+                      directory,
+                      exist_ok=True
+                  )
 
-              tmp = path + ".tmp"
+              temp_path = path + ".tmp"
 
               with open(
-                  tmp,
+                  temp_path,
                   "w",
                   encoding="utf-8"
-              ) as f:
-
+              ) as file:
                   json.dump(
                       data,
-                      f,
+                      file,
                       ensure_ascii=False,
                       indent=2
                   )
 
               os.replace(
-                  tmp,
+                  temp_path,
                   path
               )
 
 
-          # ============================================================
-          # 讀取股票搜尋資料庫
-          # ============================================================
-
           print("")
-          print("========================================")
+          print("=" * 50)
           print("開始更新最新股票資料")
-          print("========================================")
+          print("=" * 50)
 
-          if not os.path.exists(STOCK_FILE):
 
+          if not os.path.exists(
+              STOCK_FILE
+          ):
               raise Exception(
                   f"找不到 {STOCK_FILE}"
               )
+
 
           master = load_json(
               STOCK_FILE
           )
 
-          if isinstance(master, dict):
 
+          if isinstance(
+              master,
+              dict
+          ):
               stocks = (
                   master.get("data")
                   or master.get("stocks")
                   or []
               )
-
           else:
-
               stocks = master
 
 
           stock_info = {}
 
-          for item in stocks:
 
-              if not isinstance(item, dict):
+          for item in stocks:
+              if not isinstance(
+                  item,
+                  dict
+              ):
                   continue
 
               code = str(
@@ -363,38 +387,32 @@ jobs:
 
 
           # ============================================================
-          # TWSE：
-          # 找真正最新交易日
-          #
-          # 使用 MI_INDEX 指定日期
-          # 不再單純依賴 STOCK_DAY_ALL
+          # TWSE 最新交易日
           # ============================================================
 
-          print("")
-          print(
-              "尋找 TWSE 最新交易日..."
-          )
-
-          twse_mi_url = (
+          twse_url = (
               "https://www.twse.com.tw/"
               "rwd/zh/afterTrading/MI_INDEX"
           )
 
           twse_date_used = None
-          twse_rows = []
           twse_fields = []
+          twse_rows = []
+
+
+          print("")
+          print("尋找 TWSE 最新完整交易日...")
+
 
           for date_string in recent_weekdays(10):
-
               try:
-
                   print(
                       "嘗試 TWSE 日期：",
                       date_string
                   )
 
                   data = request_json(
-                      twse_mi_url,
+                      twse_url,
                       params={
                           "response": "json",
                           "date": date_string,
@@ -408,7 +426,9 @@ jobs:
                   ):
                       continue
 
-                  if data.get("stat") != "OK":
+                  if data.get(
+                      "stat"
+                  ) != "OK":
                       continue
 
                   fields = data.get(
@@ -424,15 +444,18 @@ jobs:
                   if (
                       isinstance(fields, list)
                       and isinstance(rows, list)
-                      and len(rows) > 0
+                      and rows
                   ):
-
                       twse_fields = fields
                       twse_rows = rows
 
-                      twse_date_used = normalize_date(
-                          data.get("date")
-                          or date_string
+                      twse_date_used = (
+                          normalize_date(
+                              data.get(
+                                  "date"
+                              )
+                              or date_string
+                          )
                       )
 
                       print(
@@ -442,30 +465,24 @@ jobs:
 
                       break
 
-              except Exception as e:
-
+              except Exception as error:
                   print(
                       "TWSE 日期失敗：",
                       date_string,
-                      repr(e)
+                      repr(error)
                   )
 
-          if not twse_rows:
 
-              print(
-                  "TWSE 無法取得最新行情"
+          if not twse_rows:
+              raise Exception(
+                  "TWSE 無法取得最新完整行情"
               )
 
-
-          # ============================================================
-          # TWSE 欄位對應
-          # ============================================================
 
           twse_index = {
-              str(field).strip(): i
-              for i, field in enumerate(
-                  twse_fields
-              )
+              str(field).strip(): index
+              for index, field
+              in enumerate(twse_fields)
           }
 
 
@@ -473,19 +490,15 @@ jobs:
               row,
               names
           ):
-
               for name in names:
-
-                  idx = twse_index.get(
+                  index = twse_index.get(
                       name
                   )
 
-                  if idx is not None:
-
-                      if idx < len(row):
-
+                  if index is not None:
+                      if index < len(row):
                           return clean(
-                              row[idx]
+                              row[index]
                           )
 
               return None
@@ -495,22 +508,23 @@ jobs:
 
 
           # ============================================================
-          # TWSE 最新行情
+          # TWSE 行情
           # ============================================================
 
           twse_count = 0
 
-          for row in twse_rows:
 
-              if not isinstance(row, list):
+          for row in twse_rows:
+              if not isinstance(
+                  row,
+                  list
+              ):
                   continue
 
               code = str(
                   twse_field(
                       row,
-                      [
-                          "證券代號"
-                      ]
+                      ["證券代號"]
                   ) or ""
               ).strip()
 
@@ -522,16 +536,12 @@ jobs:
 
               close = twse_field(
                   row,
-                  [
-                      "收盤價"
-                  ]
+                  ["收盤價"]
               )
 
               change = twse_field(
                   row,
-                  [
-                      "漲跌價差"
-                  ]
+                  ["漲跌價差"]
               )
 
               prev = None
@@ -540,8 +550,10 @@ jobs:
                   close is not None
                   and change is not None
               ):
-
-                  prev = close - change
+                  prev = (
+                      close -
+                      change
+                  )
 
               change_pct = None
 
@@ -550,12 +562,12 @@ jobs:
                   and prev != 0
                   and change is not None
               ):
-
                   change_pct = (
-                      change
-                      / prev
-                      * 100
+                      change /
+                      prev *
+                      100
                   )
+
 
               latest[code] = {
                   **stock_info[code],
@@ -624,15 +636,11 @@ jobs:
                       ]
                   ),
 
-                  "pe": twse_field(
-                      row,
-                      ["本益比"]
-                  ),
-
                   "tradeDate":
                       twse_date_used,
 
-                  "source": "TWSE",
+                  "source":
+                      "TWSE",
 
                   "updatedAt":
                       datetime.now(
@@ -652,11 +660,10 @@ jobs:
                   "dealerBalance": None,
 
                   "institutionTotal": None,
-
                   "institutionDate": None,
-
                   "institutionSource": None,
 
+                  "pe": None,
                   "yield": None,
                   "pbr": None,
 
@@ -698,7 +705,7 @@ jobs:
 
 
           # ============================================================
-          # TPEx 最新行情
+          # TPEx 行情
           # ============================================================
 
           print("")
@@ -706,16 +713,18 @@ jobs:
               "讀取 TPEx 上櫃行情..."
           )
 
+
           tpex_url = (
               "https://www.tpex.org.tw/"
               "openapi/v1/"
               "tpex_mainboard_daily_close_quotes"
           )
 
+
           tpex_rows = []
 
-          try:
 
+          try:
               data = request_json(
                   tpex_url
               )
@@ -724,7 +733,6 @@ jobs:
                   data,
                   dict
               ):
-
                   tpex_rows = (
                       data.get("data")
                       or data.get("aaData")
@@ -735,14 +743,12 @@ jobs:
                   data,
                   list
               ):
-
                   tpex_rows = data
 
-          except Exception as e:
-
+          except Exception as error:
               print(
                   "TPEx 行情失敗：",
-                  repr(e)
+                  repr(error)
               )
 
 
@@ -751,7 +757,6 @@ jobs:
 
 
           for row in tpex_rows:
-
               if not isinstance(
                   row,
                   dict
@@ -805,8 +810,10 @@ jobs:
                   close is not None
                   and change is not None
               ):
-
-                  prev = close - change
+                  prev = (
+                      close -
+                      change
+                  )
 
               change_pct = None
 
@@ -815,11 +822,10 @@ jobs:
                   and prev != 0
                   and change is not None
               ):
-
                   change_pct = (
-                      change
-                      / prev
-                      * 100
+                      change /
+                      prev *
+                      100
                   )
 
               row_date = normalize_date(
@@ -835,6 +841,7 @@ jobs:
 
               if row_date:
                   tpex_date_used = row_date
+
 
               latest[code] = {
                   **stock_info[code],
@@ -959,7 +966,8 @@ jobs:
                       row_date
                       or tpex_date_used,
 
-                  "source": "TPEx",
+                  "source":
+                      "TPEx",
 
                   "updatedAt":
                       datetime.now(
@@ -979,9 +987,7 @@ jobs:
                   "dealerBalance": None,
 
                   "institutionTotal": None,
-
                   "institutionDate": None,
-
                   "institutionSource": None,
 
                   "pe": None,
@@ -1026,9 +1032,7 @@ jobs:
 
 
           # ============================================================
-          # TWSE 法人
-          #
-          # 找與行情相同的交易日
+          # TWSE 三大法人
           # ============================================================
 
           print("")
@@ -1036,39 +1040,46 @@ jobs:
               "讀取 TWSE 三大法人..."
           )
 
-          twse_inst_url = (
+
+          institution_url = (
               "https://www.twse.com.tw/"
               "rwd/zh/fund/T86"
           )
 
-          inst_rows = []
-          inst_fields = []
-          inst_date_used = None
+
+          institution_rows = []
+          institution_fields = []
+          institution_date = None
 
 
-          for date_string in (
-              [
-                  twse_date_used.replace("-", "")
-              ]
-              if twse_date_used
-              else []
-          ) + recent_weekdays(10):
+          candidate_dates = []
 
-              if date_string in (
-                  None,
-                  ""
-              ):
-                  continue
 
+          if twse_date_used:
+              candidate_dates.append(
+                  twse_date_used.replace(
+                      "-",
+                      ""
+                  )
+              )
+
+
+          for date_string in recent_weekdays(10):
+              if date_string not in candidate_dates:
+                  candidate_dates.append(
+                      date_string
+                  )
+
+
+          for date_string in candidate_dates:
               try:
-
                   print(
                       "嘗試法人日期：",
                       date_string
                   )
 
                   data = request_json(
-                      twse_inst_url,
+                      institution_url,
                       params={
                           "response": "json",
                           "date": date_string,
@@ -1107,56 +1118,51 @@ jobs:
                       )
                       and rows
                   ):
-
-                      inst_rows = rows
-                      inst_fields = fields
-                      inst_date_used = date_string
-
+                      institution_rows = rows
+                      institution_fields = fields
+                      institution_date = (
+                          date_string
+                      )
                       break
 
-              except Exception as e:
-
+              except Exception as error:
                   print(
                       "法人讀取失敗：",
-                      repr(e)
+                      repr(error)
                   )
 
 
-          inst_index = {
-              str(field).strip(): i
-              for i, field in enumerate(
-                  inst_fields
+          institution_index = {
+              str(field).strip(): index
+              for index, field
+              in enumerate(
+                  institution_fields
               )
           }
 
 
-          def inst_field(
+          def institution_field(
               row,
               names
           ):
-
               for name in names:
-
-                  idx = inst_index.get(
+                  index = institution_index.get(
                       name
                   )
 
-                  if idx is not None:
-
-                      if idx < len(row):
-
+                  if index is not None:
+                      if index < len(row):
                           return clean(
-                              row[idx]
+                              row[index]
                           )
 
               return None
 
 
-          inst_count = 0
+          institution_count = 0
 
 
-          for row in inst_rows:
-
+          for row in institution_rows:
               if not isinstance(
                   row,
                   list
@@ -1164,7 +1170,7 @@ jobs:
                   continue
 
               code = str(
-                  inst_field(
+                  institution_field(
                       row,
                       ["證券代號"]
                   ) or ""
@@ -1173,10 +1179,11 @@ jobs:
               if code not in latest:
                   continue
 
+
               latest[code].update({
 
                   "foreignBuy":
-                      inst_field(
+                      institution_field(
                           row,
                           [
                               "外陸資買進股數(不含外資自營商)"
@@ -1184,7 +1191,7 @@ jobs:
                       ),
 
                   "foreignSell":
-                      inst_field(
+                      institution_field(
                           row,
                           [
                               "外陸資賣出股數(不含外資自營商)"
@@ -1192,7 +1199,7 @@ jobs:
                       ),
 
                   "foreignBalance":
-                      inst_field(
+                      institution_field(
                           row,
                           [
                               "外陸資買賣超股數(不含外資自營商)"
@@ -1200,7 +1207,7 @@ jobs:
                       ),
 
                   "trustBuy":
-                      inst_field(
+                      institution_field(
                           row,
                           [
                               "投信買進股數"
@@ -1208,7 +1215,7 @@ jobs:
                       ),
 
                   "trustSell":
-                      inst_field(
+                      institution_field(
                           row,
                           [
                               "投信賣出股數"
@@ -1216,7 +1223,7 @@ jobs:
                       ),
 
                   "trustBalance":
-                      inst_field(
+                      institution_field(
                           row,
                           [
                               "投信買賣超股數"
@@ -1224,7 +1231,7 @@ jobs:
                       ),
 
                   "dealerBuy":
-                      inst_field(
+                      institution_field(
                           row,
                           [
                               "自營商買進股數"
@@ -1232,7 +1239,7 @@ jobs:
                       ),
 
                   "dealerSell":
-                      inst_field(
+                      institution_field(
                           row,
                           [
                               "自營商賣出股數"
@@ -1240,7 +1247,7 @@ jobs:
                       ),
 
                   "dealerBalance":
-                      inst_field(
+                      institution_field(
                           row,
                           [
                               "自營商買賣超股數"
@@ -1248,7 +1255,7 @@ jobs:
                       ),
 
                   "institutionTotal":
-                      inst_field(
+                      institution_field(
                           row,
                           [
                               "三大法人買賣超股數"
@@ -1257,19 +1264,19 @@ jobs:
 
                   "institutionDate":
                       normalize_date(
-                          inst_date_used
+                          institution_date
                       ),
 
                   "institutionSource":
                       "TWSE T86"
               })
 
-              inst_count += 1
+              institution_count += 1
 
 
           print(
               "TWSE 法人資料：",
-              inst_count,
+              institution_count,
               "檔"
           )
 
@@ -1283,26 +1290,25 @@ jobs:
               "讀取 TWSE PE / 殖利率 / PBR..."
           )
 
+
           pe_url = (
               "https://openapi.twse.com.tw/"
               "v1/exchangeReport/BWIBBU_ALL"
           )
 
-          try:
 
-              rows = request_json(
+          try:
+              pe_rows = request_json(
                   pe_url
               )
 
               if isinstance(
-                  rows,
+                  pe_rows,
                   list
               ):
-
                   pe_count = 0
 
-                  for row in rows:
-
+                  for row in pe_rows:
                       if not isinstance(
                           row,
                           dict
@@ -1322,6 +1328,7 @@ jobs:
                       if code not in latest:
                           continue
 
+
                       latest[code][
                           "pe"
                       ] = clean(
@@ -1334,6 +1341,7 @@ jobs:
                           )
                       )
 
+
                       latest[code][
                           "yield"
                       ] = clean(
@@ -1344,6 +1352,8 @@ jobs:
                                   "殖利率"
                               ]
                           )
+                      )
+
 
                       latest[code][
                           "pbr"
@@ -1355,8 +1365,11 @@ jobs:
                                   "股價淨值比"
                               ]
                           )
+                      )
+
 
                       pe_count += 1
+
 
                   print(
                       "TWSE PE/PBR：",
@@ -1364,29 +1377,21 @@ jobs:
                       "檔"
                   )
 
-          except Exception as e:
-
+          except Exception as error:
               print(
                   "PE/PBR 讀取失敗：",
-                  repr(e)
+                  repr(error)
               )
 
 
           # ============================================================
-          # 歷史資料
-          #
-          # 先保存今天真正取得的行情
+          # 保存歷史資料
           # ============================================================
 
           if twse_date_used:
-
               history_path = os.path.join(
                   HISTORY_DIR,
                   f"{twse_date_used}.json"
-              )
-
-              old_history = load_json(
-                  history_path
               )
 
               history_data = {
@@ -1404,133 +1409,136 @@ jobs:
                   }
               }
 
-              for code, item in latest.items():
 
+              for code, item in latest.items():
                   if (
                       item.get(
                           "tradeDate"
-                      )
-                      == twse_date_used
-                      or item.get(
+                      ) != twse_date_used
+                      and item.get(
                           "source"
-                      ) == "TWSE"
+                      ) != "TWSE"
                   ):
+                      continue
 
-                      history_data[code] = {
-                          "code":
-                              item.get("code"),
+                  history_data[code] = {
+                      "code":
+                          item.get("code"),
 
-                          "name":
-                              item.get("name"),
+                      "name":
+                          item.get("name"),
 
-                          "market":
-                              item.get("market"),
+                      "market":
+                          item.get("market"),
 
-                          "type":
-                              item.get("type"),
+                      "type":
+                          item.get("type"),
 
-                          "price":
-                              item.get("price"),
+                      "price":
+                          item.get("price"),
 
-                          "prev":
-                              item.get("prev"),
+                      "prev":
+                          item.get("prev"),
 
-                          "open":
-                              item.get("open"),
+                      "open":
+                          item.get("open"),
 
-                          "high":
-                              item.get("high"),
+                      "high":
+                          item.get("high"),
 
-                          "low":
-                              item.get("low"),
+                      "low":
+                          item.get("low"),
 
-                          "change":
-                              item.get("change"),
+                      "change":
+                          item.get("change"),
 
-                          "changePct":
-                              item.get(
-                                  "changePct"
-                              ),
+                      "changePct":
+                          item.get(
+                              "changePct"
+                          ),
 
-                          "volume":
-                              item.get(
-                                  "volume"
-                              ),
+                      "volume":
+                          item.get("volume"),
 
-                          "amount":
-                              item.get(
-                                  "amount"
-                              ),
+                      "amount":
+                          item.get("amount"),
 
-                          "bid":
-                              item.get("bid"),
+                      "bid":
+                          item.get("bid"),
 
-                          "bidVolume":
-                              item.get(
-                                  "bidVolume"
-                              ),
+                      "bidVolume":
+                          item.get(
+                              "bidVolume"
+                          ),
 
-                          "ask":
-                              item.get("ask"),
+                      "ask":
+                          item.get("ask"),
 
-                          "askVolume":
-                              item.get(
-                                  "askVolume"
-                              ),
+                      "askVolume":
+                          item.get(
+                              "askVolume"
+                          ),
 
-                          "foreignBuy":
-                              item.get(
-                                  "foreignBuy"
-                              ),
+                      "foreignBuy":
+                          item.get(
+                              "foreignBuy"
+                          ),
 
-                          "foreignSell":
-                              item.get(
-                                  "foreignSell"
-                              ),
+                      "foreignSell":
+                          item.get(
+                              "foreignSell"
+                          ),
 
-                          "foreignBalance":
-                              item.get(
-                                  "foreignBalance"
-                              ),
+                      "foreignBalance":
+                          item.get(
+                              "foreignBalance"
+                          ),
 
-                          "trustBuy":
-                              item.get(
-                                  "trustBuy"
-                              ),
+                      "trustBuy":
+                          item.get(
+                              "trustBuy"
+                          ),
 
-                          "trustSell":
-                              item.get(
-                                  "trustSell"
-                              ),
+                      "trustSell":
+                          item.get(
+                              "trustSell"
+                          ),
 
-                          "trustBalance":
-                              item.get(
-                                  "trustBalance"
-                              ),
+                      "trustBalance":
+                          item.get(
+                              "trustBalance"
+                          ),
 
-                          "dealerBuy":
-                              item.get(
-                                  "dealerBuy"
-                              ),
+                      "dealerBuy":
+                          item.get(
+                              "dealerBuy"
+                          ),
 
-                          "dealerSell":
-                              item.get(
-                                  "dealerSell"
-                              ),
+                      "dealerSell":
+                          item.get(
+                              "dealerSell"
+                          ),
 
-                          "dealerBalance":
-                              item.get(
-                                  "dealerBalance"
-                              ),
+                      "dealerBalance":
+                          item.get(
+                              "dealerBalance"
+                          ),
 
-                          "institutionTotal":
-                              item.get(
-                                  "institutionTotal"
-                              ),
+                      "institutionTotal":
+                          item.get(
+                              "institutionTotal"
+                          ),
 
-                          "pe":
-                              item.get("pe")
-                      }
+                      "pe":
+                          item.get("pe"),
+
+                      "yield":
+                          item.get("yield"),
+
+                      "pbr":
+                          item.get("pbr")
+                  }
+
 
               save_json(
                   history_path,
@@ -1544,29 +1552,29 @@ jobs:
 
 
           # ============================================================
-          # 讀取歷史檔
+          # 取得歷史檔案
           # ============================================================
 
           history_files = []
 
+
           if os.path.exists(
               HISTORY_DIR
           ):
-
               for filename in os.listdir(
                   HISTORY_DIR
               ):
-
                   if (
                       filename.endswith(
                           ".json"
                       )
+                      and len(filename) >= 8
                       and filename[:4].isdigit()
                   ):
-
                       history_files.append(
                           filename
                       )
+
 
           history_files.sort(
               reverse=True
@@ -1581,21 +1589,19 @@ jobs:
 
 
           # ============================================================
-          # 計算均線與法人累計
+          # 歷史資料
           # ============================================================
 
           def get_history_rows(
               code,
               limit=242
           ):
-
               rows = []
 
               for filename in sorted(
                   history_files,
                   reverse=True
               ):
-
                   path = os.path.join(
                       HISTORY_DIR,
                       filename
@@ -1624,41 +1630,39 @@ jobs:
                   if price is None:
                       continue
 
-                  rows.append(
-                      {
-                          "date":
-                              data.get(
-                                  "_meta",
-                                  {}
-                              ).get(
-                                  "date"
-                              ),
+                  rows.append({
+                      "date":
+                          data.get(
+                              "_meta",
+                              {}
+                          ).get(
+                              "date"
+                          ),
 
-                          "price":
-                              price,
+                      "price":
+                          price,
 
-                          "foreign":
-                              clean(
-                                  item.get(
-                                      "foreignBalance"
-                                  )
-                              ),
-
-                          "trust":
-                              clean(
-                                  item.get(
-                                      "trustBalance"
-                                  )
-                              ),
-
-                          "dealer":
-                              clean(
-                                  item.get(
-                                      "dealerBalance"
-                                  )
+                      "foreign":
+                          clean(
+                              item.get(
+                                  "foreignBalance"
                               )
-                      }
-                  )
+                          ),
+
+                      "trust":
+                          clean(
+                              item.get(
+                                  "trustBalance"
+                              )
+                          ),
+
+                      "dealer":
+                          clean(
+                              item.get(
+                                  "dealerBalance"
+                              )
+                          )
+                  })
 
                   if len(rows) >= limit:
                       break
@@ -1666,23 +1670,25 @@ jobs:
               return rows
 
 
-          def average(
-              values
-          ):
-
-              values = [
-                  v
-                  for v in values
-                  if v is not None
+          def average(values):
+              valid = [
+                  value
+                  for value in values
+                  if value is not None
               ]
 
-              if not values:
+              if not valid:
                   return None
 
-              return sum(values) / len(
-                  values
+              return (
+                  sum(valid) /
+                  len(valid)
               )
 
+
+          # ============================================================
+          # MA + 法人累計
+          # ============================================================
 
           for code, item in latest.items():
 
@@ -1692,11 +1698,12 @@ jobs:
               )
 
               prices = [
-                  r["price"]
-                  for r in rows
+                  row["price"]
+                  for row in rows
               ]
 
-              for n, field in [
+
+              for period, field in [
                   (5, "ma5"),
                   (11, "ma11"),
                   (31, "ma31"),
@@ -1705,112 +1712,110 @@ jobs:
                   (242, "ma242")
               ]:
 
-                  if len(prices) >= n:
-
+                  if len(prices) >= period:
                       ma = average(
-                          prices[:n]
+                          prices[:period]
                       )
 
-                      item[field] = (
-                          round(
+                      if ma is not None:
+                          item[field] = round(
                               ma,
                               4
                           )
-                          if ma is not None
-                          else None
-                      )
 
-                      if (
-                          item.get(
+                          price = item.get(
                               "price"
-                          ) is not None
-                          and ma
-                      ):
+                          )
 
-                          deviation = (
-                              (
-                                  item["price"]
-                                  - ma
+                          if (
+                              price is not None
+                              and ma != 0
+                          ):
+                              deviation = (
+                                  (
+                                      price -
+                                      ma
+                                  )
+                                  / ma
+                                  * 100
                               )
-                              / ma
-                              * 100
-                          )
 
-                          item[
-                              field
-                              + "Deviation"
-                          ] = round(
-                              deviation,
-                              2
-                          )
+                              item[
+                                  field +
+                                  "Deviation"
+                              ] = round(
+                                  deviation,
+                                  2
+                              )
 
-              for n, field in [
+
+              for period, field in [
                   (5, "foreign5"),
                   (11, "foreign11"),
                   (31, "foreign31")
               ]:
 
                   values = [
-                      r["foreign"]
-                      for r in rows[:n]
-                      if r["foreign"]
+                      row["foreign"]
+                      for row in rows[:period]
+                      if row["foreign"]
                       is not None
                   ]
 
-                  if len(values) == n:
-
+                  if len(values) == period:
                       item[field] = sum(
                           values
                       )
 
-              for n, field in [
+
+              for period, field in [
                   (5, "trust5"),
                   (11, "trust11"),
                   (31, "trust31")
               ]:
 
                   values = [
-                      r["trust"]
-                      for r in rows[:n]
-                      if r["trust"]
+                      row["trust"]
+                      for row in rows[:period]
+                      if row["trust"]
                       is not None
                   ]
 
-                  if len(values) == n:
-
+                  if len(values) == period:
                       item[field] = sum(
                           values
                       )
 
-              for n, field in [
+
+              for period, field in [
                   (5, "dealer5"),
                   (11, "dealer11"),
                   (31, "dealer31")
               ]:
 
                   values = [
-                      r["dealer"]
-                      for r in rows[:n]
-                      if r["dealer"]
+                      row["dealer"]
+                      for row in rows[:period]
+                      if row["dealer"]
                       is not None
                   ]
 
-                  if len(values) == n:
-
+                  if len(values) == period:
                       item[field] = sum(
                           values
                       )
 
 
           # ============================================================
-          # 產生最新檔
+          # latest.json
           # ============================================================
 
           run_time = datetime.now(
               TW_TZ
           ).isoformat()
 
-          all_trade_dates = [
+
+          trade_dates = [
               item.get(
                   "tradeDate"
               )
@@ -1820,15 +1825,15 @@ jobs:
               )
           ]
 
+
           latest_trade_date = max(
-              all_trade_dates,
+              trade_dates,
               default=twse_date_used
           )
 
 
           output = {
               "_meta": {
-
                   "updatedAt":
                       run_time,
 
@@ -1863,7 +1868,6 @@ jobs:
           for code in sorted(
               latest
           ):
-
               output[code] = latest[
                   code
               ]
@@ -1876,22 +1880,16 @@ jobs:
 
 
           # ============================================================
-          # 檢查重要股票
+          # 重要股票檢查
           # ============================================================
 
           print("")
-          print(
-              "========================================"
-          )
-          print(
-              "重要股票檢查"
-          )
-          print(
-              "========================================"
-          )
+          print("=" * 50)
+          print("重要股票檢查")
+          print("=" * 50)
 
 
-          for code in [
+          check_codes = [
               "1301",
               "1326",
               "2330",
@@ -1900,8 +1898,10 @@ jobs:
               "00631L",
               "00919",
               "00981A"
-          ]:
+          ]
 
+
+          for code in check_codes:
               print("")
               print(
                   "檢查：",
@@ -1909,12 +1909,10 @@ jobs:
               )
 
               if code not in output:
-
                   print(
                       code,
-                      "搜尋資料庫有，但目前沒有行情"
+                      "搜尋資料庫有，但目前沒有最新行情"
                   )
-
                   continue
 
               item = output[code]
@@ -1923,24 +1921,16 @@ jobs:
                   json.dumps(
                       {
                           "code":
-                              item.get(
-                                  "code"
-                              ),
+                              item.get("code"),
 
                           "name":
-                              item.get(
-                                  "name"
-                              ),
+                              item.get("name"),
 
                           "price":
-                              item.get(
-                                  "price"
-                              ),
+                              item.get("price"),
 
                           "prev":
-                              item.get(
-                                  "prev"
-                              ),
+                              item.get("prev"),
 
                           "tradeDate":
                               item.get(
@@ -1973,39 +1963,31 @@ jobs:
                               ),
 
                           "pe":
-                              item.get(
-                                  "pe"
-                              ),
+                              item.get("pe"),
+
+                          "yield":
+                              item.get("yield"),
+
+                          "pbr":
+                              item.get("pbr"),
 
                           "ma5":
-                              item.get(
-                                  "ma5"
-                              ),
+                              item.get("ma5"),
 
                           "ma11":
-                              item.get(
-                                  "ma11"
-                              ),
+                              item.get("ma11"),
 
                           "ma31":
-                              item.get(
-                                  "ma31"
-                              ),
+                              item.get("ma31"),
 
                           "ma62":
-                              item.get(
-                                  "ma62"
-                              ),
+                              item.get("ma62"),
 
                           "ma122":
-                              item.get(
-                                  "ma122"
-                              ),
+                              item.get("ma122"),
 
                           "ma242":
-                              item.get(
-                                  "ma242"
-                              ),
+                              item.get("ma242"),
 
                           "foreign5":
                               item.get(
@@ -2028,15 +2010,9 @@ jobs:
 
 
           print("")
-          print(
-              "========================================"
-          )
-          print(
-              "完成"
-          )
-          print(
-              "========================================"
-          )
+          print("=" * 50)
+          print("完成")
+          print("=" * 50)
 
           print(
               "latest.json：",
@@ -2065,21 +2041,29 @@ jobs:
 
           PY
 
-
       - name: Validate latest.json
         run: |
-          python - <<'PY'
+          python <<'PY'
           import json
           import os
 
-          latest_path = "stock-data/latest.json"
+          latest_path = (
+              "stock-data/latest.json"
+          )
+
+          if not os.path.exists(
+              latest_path
+          ):
+              raise SystemExit(
+                  "找不到 latest.json"
+              )
 
           with open(
               latest_path,
               "r",
               encoding="utf-8"
-          ) as f:
-              data = json.load(f)
+          ) as file:
+              data = json.load(file)
 
           if not isinstance(
               data,
@@ -2090,40 +2074,42 @@ jobs:
               )
 
           codes = [
-              k
-              for k in data
-              if k != "_meta"
+              code
+              for code in data
+              if code != "_meta"
           ]
+
+          count = len(codes)
 
           print(
               "latest.json 資料筆數：",
-              len(codes)
+              count
           )
 
-          if len(codes) < 100:
+          if count < 100:
               raise SystemExit(
                   "資料少於 100 檔，停止提交"
               )
 
+          meta = data.get(
+              "_meta",
+              {}
+          )
+
           print(
               "最新交易日：",
-              data.get(
-                  "_meta",
-                  {}
-              ).get(
+              meta.get(
                   "tradeDate"
               )
           )
 
           print(
               "歷史資料天數：",
-              data.get(
-                  "_meta",
-                  {}
-              ).get(
+              meta.get(
                   "historyDays"
               )
           )
+
 
           for code in [
               "1301",
@@ -2134,21 +2120,20 @@ jobs:
               "00631L"
           ]:
 
-              if code not in data:
-                  print(
-                      code,
-                      "沒有最新行情"
-                  )
-                  continue
-
-              item = data[code]
-
               print("")
               print(
                   "==========",
                   code,
                   "=========="
               )
+
+              if code not in data:
+                  print(
+                      "搜尋資料庫存在，但目前沒有行情"
+                  )
+                  continue
+
+              item = data[code]
 
               print(
                   "名稱：",
@@ -2199,6 +2184,16 @@ jobs:
               )
 
               print(
+                  "殖利率：",
+                  item.get("yield")
+              )
+
+              print(
+                  "PBR：",
+                  item.get("pbr")
+              )
+
+              print(
                   "MA5：",
                   item.get("ma5")
               )
@@ -2228,12 +2223,12 @@ jobs:
                   item.get("ma242")
               )
 
+
           print("")
           print(
               "OK：latest.json 格式正常"
           )
           PY
-
 
       - name: Commit latest and history
         run: |
@@ -2248,14 +2243,10 @@ jobs:
             stock-data/history/
 
           if git diff --cached --quiet; then
-
             echo "沒有新的資料需要提交"
-
           else
-
             git commit \
               -m "Update latest stock data and history"
 
             git push
-
           fi
