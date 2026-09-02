@@ -25,7 +25,7 @@ jobs:
       - name: Install packages
         run: |
           python -m pip install --upgrade pip
-          pip install requests pandas
+          pip install requests
 
       - name: Update latest.json
         env:
@@ -34,7 +34,6 @@ jobs:
           python <<'PY'
           import json
           import os
-          import time
           from datetime import datetime, timezone, timedelta
 
           import requests
@@ -44,37 +43,74 @@ jobs:
 
           TW_TZ = timezone(timedelta(hours=8))
 
+          HEADERS = {
+              "User-Agent":
+                  "Mozilla/5.0 (GitHub Actions stock data updater)",
+              "Accept":
+                  "application/json,text/plain,*/*"
+          }
+
           def clean_number(v):
               if v is None:
                   return None
 
               s = str(v).strip()
 
-              if s in ("", "-", "--", "—", "null", "None"):
+              if s in (
+                  "",
+                  "-",
+                  "--",
+                  "—",
+                  "null",
+                  "None",
+                  "N/A"
+              ):
                   return None
 
               s = s.replace(",", "")
 
               try:
                   return float(s)
-              except:
+              except Exception:
                   return None
 
-          def get_json(url):
+          def get_json(url, params=None):
               r = requests.get(
                   url,
-                  timeout=30,
-                  headers={
-                      "User-Agent":
-                      "Mozilla/5.0 stock-level-calculator"
-                  }
+                  params=params,
+                  headers=HEADERS,
+                  timeout=40
               )
 
               r.raise_for_status()
 
               return r.json()
 
-          print("開始更新最新行情")
+          def normalize_date(v):
+              if v is None:
+                  return None
+
+              s = str(v).strip()
+
+              if not s:
+                  return None
+
+              # 1150903 → 2026-09-03
+              if len(s) == 7 and s.isdigit():
+                  y = int(s[:3]) + 1911
+                  m = s[3:5]
+                  d = s[5:7]
+                  return f"{y}-{m}-{d}"
+
+              # 20260903 → 2026-09-03
+              if len(s) == 8 and s.isdigit():
+                  return f"{s[:4]}-{s[4:6]}-{s[6:8]}"
+
+              return s
+
+          print("========================================")
+          print("開始更新最新股票資料")
+          print("========================================")
 
           if not os.path.exists(STOCK_FILE):
               raise Exception(
@@ -101,6 +137,9 @@ jobs:
 
           for s in stocks:
 
+              if not isinstance(s, dict):
+                  continue
+
               code = str(
                   s.get("code", "")
               ).strip()
@@ -109,13 +148,25 @@ jobs:
                   stock_codes.add(code)
 
           print(
-              f"股票資料庫共 {len(stock_codes)} 檔"
+              f"股票／ETF 搜尋資料庫："
+              f"{len(stock_codes)} 檔"
           )
+
+          # =====================================================
+          # 完全重新建立 latest
+          #
+          # 重要：
+          # 不再讀取舊 latest.json 合併，
+          # 因此不會再把以前的測試法人、測試 MA、測試 PE
+          # 留在正式資料裡。
+          # =====================================================
 
           latest = {}
 
+          run_time = datetime.now(TW_TZ).isoformat()
+
           # =====================================================
-          # TWSE 上市
+          # TWSE 上市日行情
           # =====================================================
 
           twse_url = (
@@ -125,11 +176,18 @@ jobs:
 
           try:
 
+              print("")
               print("讀取 TWSE 上市行情...")
 
               rows = get_json(twse_url)
 
+              if not isinstance(rows, list):
+                  rows = []
+
               for row in rows:
+
+                  if not isinstance(row, dict):
+                      continue
 
                   code = str(
                       row.get("Code", "")
@@ -140,6 +198,10 @@ jobs:
 
                   if code not in stock_codes:
                       continue
+
+                  trade_date = normalize_date(
+                      row.get("Date")
+                  )
 
                   close = clean_number(
                       row.get("ClosingPrice")
@@ -171,7 +233,10 @@ jobs:
 
                   previous = None
 
-                  if close is not None and change is not None:
+                  if (
+                      close is not None
+                      and change is not None
+                  ):
                       previous = close - change
 
                   change_pct = None
@@ -209,28 +274,32 @@ jobs:
 
                       "amount": amount,
 
+                      "tradeDate": trade_date,
+
                       "source": "TWSE",
 
-                      "updatedAt":
-                          datetime.now(TW_TZ)
-                          .isoformat()
+                      "updatedAt": run_time
 
                   }
 
               print(
-                  f"TWSE 成功取得 "
-                  f"{len(latest)} 檔"
+                  "TWSE 行情：",
+                  len([
+                      x for x in latest
+                      if latest[x].get("source") == "TWSE"
+                  ]),
+                  "檔"
               )
 
           except Exception as e:
 
               print(
-                  "TWSE 讀取失敗：",
+                  "TWSE 行情讀取失敗：",
                   repr(e)
               )
 
           # =====================================================
-          # TPEx 上櫃
+          # TPEx 上櫃行情
           # =====================================================
 
           tpex_url = (
@@ -240,6 +309,7 @@ jobs:
 
           try:
 
+              print("")
               print("讀取 TPEx 上櫃行情...")
 
               rows = get_json(tpex_url)
@@ -251,6 +321,9 @@ jobs:
                       or rows.get("aaData")
                       or []
                   )
+
+              if not isinstance(rows, list):
+                  rows = []
 
               tpex_count = 0
 
@@ -274,6 +347,12 @@ jobs:
 
                   if code not in stock_codes:
                       continue
+
+                  trade_date = normalize_date(
+                      row.get("Date")
+                      or row.get("日期")
+                      or row.get("交易日期")
+                  )
 
                   close = clean_number(
                       row.get("Close")
@@ -361,99 +440,205 @@ jobs:
 
                       "amount": amount,
 
+                      "tradeDate": trade_date,
+
                       "source": "TPEx",
 
-                      "updatedAt":
-                          datetime.now(TW_TZ)
-                          .isoformat()
+                      "updatedAt": run_time
 
                   }
 
                   tpex_count += 1
 
               print(
-                  f"TPEx 成功取得 "
-                  f"{tpex_count} 檔"
+                  "TPEx 行情：",
+                  tpex_count,
+                  "檔"
               )
 
           except Exception as e:
 
               print(
-                  "TPEx 讀取失敗：",
+                  "TPEx 行情讀取失敗：",
                   repr(e)
               )
 
           # =====================================================
-          # 保留原本測試資料中的其他欄位
-          # =====================================================
-
-          old = {}
-
-          if os.path.exists(OUT):
-
-              try:
-
-                  with open(
-                      OUT,
-                      "r",
-                      encoding="utf-8"
-                  ) as f:
-
-                      old = json.load(f)
-
-                  if not isinstance(old, dict):
-                      old = {}
-
-              except:
-
-                  old = {}
-
-          for code, item in latest.items():
-
-              old_item = old.get(code, {})
-
-              if not isinstance(old_item, dict):
-                  old_item = {}
-
-              merged = dict(old_item)
-
-              merged.update(item)
-
-              latest[code] = merged
-
-          # =====================================================
-          # 計算 MA
+          # TWSE 三大法人
           #
-          # 注意：
-          # 目前這一步先建立行情資料。
-          # MA 需要歷史收盤資料，下一階段再由
-          # stock-data/history/ 自動累積計算。
+          # 這裡只加入「真的抓到」的資料。
+          # 抓不到就完全不建立數字。
+          # =====================================================
+
+          try:
+
+              print("")
+              print("讀取 TWSE 三大法人...")
+
+              # 以台灣時間今天作為查詢日期
+              today_tw = datetime.now(TW_TZ)
+
+              date_string = (
+                  today_tw.strftime("%Y%m%d")
+              )
+
+              inst_url = (
+                  "https://openapi.twse.com.tw/v1/"
+                  "fund/T86"
+              )
+
+              inst_rows = get_json(
+                  inst_url,
+                  params={
+                      "date": date_string,
+                      "selectType": "ALLBUT0999"
+                  }
+              )
+
+              if isinstance(inst_rows, dict):
+
+                  inst_rows = (
+                      inst_rows.get("data")
+                      or inst_rows.get("aaData")
+                      or []
+                  )
+
+              if not isinstance(inst_rows, list):
+                  inst_rows = []
+
+              inst_count = 0
+
+              for row in inst_rows:
+
+                  if not isinstance(row, dict):
+                      continue
+
+                  code = (
+                      row.get("證券代號")
+                      or row.get("Code")
+                      or ""
+                  )
+
+                  code = str(code).strip()
+
+                  if not code:
+                      continue
+
+                  if code not in latest:
+                      continue
+
+                  foreign_buy = clean_number(
+                      row.get("外陸資買進股數(不含外資自營商)")
+                  )
+
+                  foreign_sell = clean_number(
+                      row.get("外陸資賣出股數(不含外資自營商)")
+                  )
+
+                  trust_buy = clean_number(
+                      row.get("投信買進股數")
+                  )
+
+                  trust_sell = clean_number(
+                      row.get("投信賣出股數")
+                  )
+
+                  dealer_buy = clean_number(
+                      row.get("自營商買進股數")
+                  )
+
+                  dealer_sell = clean_number(
+                      row.get("自營商賣出股數")
+                  )
+
+                  inst = {}
+
+                  if (
+                      foreign_buy is not None
+                      and foreign_sell is not None
+                  ):
+                      inst["foreign"] = {
+                          "buy": foreign_buy,
+                          "sell": foreign_sell,
+                          "balance":
+                              foreign_buy - foreign_sell
+                      }
+
+                  if (
+                      trust_buy is not None
+                      and trust_sell is not None
+                  ):
+                      inst["trust"] = {
+                          "buy": trust_buy,
+                          "sell": trust_sell,
+                          "balance":
+                              trust_buy - trust_sell
+                      }
+
+                  if (
+                      dealer_buy is not None
+                      and dealer_sell is not None
+                  ):
+                      inst["dealer"] = {
+                          "buy": dealer_buy,
+                          "sell": dealer_sell,
+                          "balance":
+                              dealer_buy - dealer_sell
+                      }
+
+                  if inst:
+
+                      latest[code][
+                          "institutional"
+                      ] = inst
+
+                      latest[code][
+                          "institutionalDate"
+                      ] = date_string
+
+                      inst_count += 1
+
+              print(
+                  "TWSE 法人資料：",
+                  inst_count,
+                  "檔"
+              )
+
+          except Exception as e:
+
+              print(
+                  "TWSE 法人資料目前無法取得：",
+                  repr(e)
+              )
+
+          # =====================================================
+          # 建立輸出
           # =====================================================
 
           output = {
 
               "_meta": {
 
-                  "updatedAt":
-                      datetime.now(TW_TZ)
-                      .isoformat(),
+                  "updatedAt": run_time,
 
-                  "count":
-                      len(latest),
+                  "count": len(latest),
 
                   "source":
-                      "TWSE / TPEx",
+                      "TWSE / TPEx official data",
 
                   "note":
-                      "行情資料由 GitHub Actions 更新；前端不直接呼叫 API。"
+                      "本檔只保存實際取得的行情與法人資料；不保留舊測試數字。",
+
+                  "realtime":
+                      False
 
               }
 
           }
 
-          for code, item in latest.items():
+          for code in sorted(latest):
 
-              output[code] = item
+              output[code] = latest[code]
 
           os.makedirs(
               "stock-data",
@@ -473,13 +658,13 @@ jobs:
                   indent=2
               )
 
-          print(
-              f"已寫入 {OUT}"
-          )
-
-          print(
-              f"最新行情筆數：{len(latest)}"
-          )
+          print("")
+          print("========================================")
+          print("完成")
+          print("latest.json：", OUT)
+          print("資料筆數：", len(latest))
+          print("更新時間：", run_time)
+          print("========================================")
 
           if len(latest) < 100:
 
@@ -488,11 +673,44 @@ jobs:
                   "為避免錯誤資料覆蓋，停止更新。"
               )
 
+          # =====================================================
+          # 顯示幾檔重要股票
+          # =====================================================
+
+          for code in [
+              "1301",
+              "1326",
+              "2330",
+              "0050",
+              "00631L"
+          ]:
+
+              if code in output:
+
+                  print("")
+                  print("檢查：", code)
+                  print(
+                      json.dumps(
+                          output[code],
+                          ensure_ascii=False
+                      )
+                  )
+
+              else:
+
+                  print(
+                      "",
+                      code,
+                      "目前沒有最新行情資料"
+                  )
+
           PY
 
       - name: Check generated file
         run: |
+          echo "========================================"
           echo "檢查 latest.json"
+          echo "========================================"
 
           test -f stock-data/latest.json
 
@@ -518,21 +736,94 @@ jobs:
               len(codes)
           )
 
-          for code in ["1301","1326","2330"]:
+          print(
+              "更新時間：",
+              data.get("_meta", {}).get("updatedAt")
+          )
+
+          for code in [
+              "1301",
+              "1326",
+              "2330",
+              "0050",
+              "00631L"
+          ]:
 
               if code in data:
 
+                  item = data[code]
+
+                  print("")
                   print(
+                      "==========",
                       code,
-                      data[code]
+                      "=========="
+                  )
+
+                  print(
+                      "交易日期：",
+                      item.get("tradeDate")
+                  )
+
+                  print(
+                      "價格：",
+                      item.get("price")
+                  )
+
+                  print(
+                      "法人：",
+                      item.get("institutional")
                   )
 
               else:
 
                   print(
                       code,
-                      "目前沒有行情"
+                      "沒有資料"
                   )
+
+          # 確認舊測試欄位沒有被保留下來
+          test_fields = [
+              "ma5",
+              "ma11",
+              "ma31",
+              "ma62",
+              "ma122",
+              "ma242",
+              "pe",
+              "foreignBalance",
+              "trustBalance",
+              "dealerBalance"
+          ]
+
+          found_test = []
+
+          for code in codes:
+
+              item = data[code]
+
+              for field in test_fields:
+
+                  if field in item:
+                      found_test.append(
+                          (code, field)
+                      )
+
+          if found_test:
+
+              print("")
+              print(
+                  "警告：仍發現舊測試欄位：",
+                  found_test[:20]
+              )
+
+          else:
+
+              print("")
+              print(
+                  "OK：沒有發現舊測試欄位"
+              )
+
           PY
 
       - name: Commit latest.json
@@ -553,7 +844,7 @@ jobs:
           else
 
             git commit \
-              -m "Update latest stock data"
+              -m "Update latest stock data and institutional data"
 
             git push
 
