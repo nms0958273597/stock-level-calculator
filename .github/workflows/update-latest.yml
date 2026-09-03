@@ -33,6 +33,7 @@ jobs:
           python <<'PY'
           import json
           import os
+          import re
           from datetime import datetime, timezone, timedelta
 
           import requests
@@ -62,6 +63,27 @@ jobs:
           )
 
           # ============================================================
+          # 重要股票／ETF
+          # ============================================================
+
+          CORE_QUOTE_CODES = [
+              "1301",
+              "1326",
+              "2330"
+          ]
+
+          IMPORTANT_CODES = [
+              "1301",
+              "1326",
+              "2330",
+              "0050",
+              "0056",
+              "00631L",
+              "00919",
+              "00981A"
+          ]
+
+          # ============================================================
           # 工具函式
           # ============================================================
 
@@ -80,29 +102,49 @@ jobs:
                   "--",
                   "—",
                   "N/A",
+                  "n/a",
                   "null",
-                  "None"
+                  "None",
+                  "NaN"
               ):
                   return None
 
+              # 清除 HTML 標籤
+              s = re.sub(
+                  r"<[^>]+>",
+                  "",
+                  s
+              )
+
               s = (
-                  s.replace(",", "")
-                   .replace(
-                       "<p style= color:red>",
-                       ""
-                   )
-                   .replace(
-                       "<p style= color:green>",
-                       ""
-                   )
-                   .replace(
-                       "</p>",
-                       ""
-                   )
-                   .replace(
-                       "<p>",
-                       ""
-                   )
+                  s.replace(
+                      ",",
+                      ""
+                  )
+                  .replace(
+                      "\u3000",
+                      ""
+                  )
+                  .strip()
+              )
+
+              if s in (
+                  "",
+                  "-",
+                  "--",
+                  "—",
+                  "N/A",
+                  "n/a",
+                  "null",
+                  "None",
+                  "NaN"
+              ):
+                  return None
+
+              # 去除可能存在的空白
+              s = s.replace(
+                  " ",
+                  ""
               )
 
               try:
@@ -114,7 +156,42 @@ jobs:
 
               except Exception:
 
-                  return None
+                  # 有些官方欄位可能含有 + 號
+                  try:
+
+                      return float(
+                          s.replace(
+                              "+",
+                              ""
+                          )
+                      )
+
+                  except Exception:
+
+                      return None
+
+          def normalize_code(value):
+
+              if value is None:
+                  return ""
+
+              s = str(
+                  value
+              ).strip()
+
+              if not s:
+                  return ""
+
+              # 清除 HTML
+              s = re.sub(
+                  r"<[^>]+>",
+                  "",
+                  s
+              ).strip()
+
+              # 不把股票代號轉成 int，
+              # 避免 0050 變成 50
+              return s
 
           def request_json(
               url,
@@ -207,6 +284,41 @@ jobs:
 
                   parts = s.split(
                       "/"
+                  )
+
+                  if len(parts) == 3:
+
+                      try:
+
+                          year = int(
+                              parts[0]
+                          )
+
+                          month = int(
+                              parts[1]
+                          )
+
+                          day = int(
+                              parts[2]
+                          )
+
+                          if year < 1911:
+                              year += 1911
+
+                          return (
+                              f"{year:04d}-"
+                              f"{month:02d}-"
+                              f"{day:02d}"
+                          )
+
+                      except Exception:
+                          pass
+
+              # 115-09-02 或 2026-09-02
+              if "-" in s:
+
+                  parts = s.split(
+                      "-"
                   )
 
                   if len(parts) == 3:
@@ -335,6 +447,154 @@ jobs:
                   path
               )
 
+          def find_table_in_twse_response(
+              data
+          ):
+              """
+              TWSE MI_INDEX 的資料表編號可能改變。
+              不再固定使用 fields9 / data9。
+
+              自動掃描：
+              fields0 + data0
+              fields1 + data1
+              fields2 + data2
+              ...
+              找出同時具有：
+              證券代號
+              收盤價
+              的真正行情表。
+              """
+
+              if not isinstance(
+                  data,
+                  dict
+              ):
+                  return [], []
+
+              candidates = []
+
+              for key, value in data.items():
+
+                  if not str(
+                      key
+                  ).startswith(
+                      "fields"
+                  ):
+                      continue
+
+                  if not isinstance(
+                      value,
+                      list
+                  ):
+                      continue
+
+                  suffix = str(
+                      key
+                  )[6:]
+
+                  rows_key = (
+                      "data" +
+                      suffix
+                  )
+
+                  rows = data.get(
+                      rows_key
+                  )
+
+                  if not isinstance(
+                      rows,
+                      list
+                  ):
+                      continue
+
+                  field_names = [
+                      str(x).strip()
+                      for x in value
+                  ]
+
+                  has_code = (
+                      "證券代號"
+                      in field_names
+                  )
+
+                  has_close = (
+                      "收盤價"
+                      in field_names
+                  )
+
+                  if not (
+                      has_code
+                      and
+                      has_close
+                  ):
+                      continue
+
+                  candidates.append(
+                      (
+                          len(rows),
+                          field_names,
+                          rows
+                      )
+                  )
+
+              if not candidates:
+                  return [], []
+
+              # 通常真正行情表資料筆數最多。
+              candidates.sort(
+                  key=lambda x: x[0],
+                  reverse=True
+              )
+
+              return (
+                  candidates[0][1],
+                  candidates[0][2]
+              )
+
+          def build_index(
+              fields
+          ):
+
+              return {
+                  str(field).strip(): index
+                  for index, field
+                  in enumerate(
+                      fields
+                  )
+              }
+
+          def field_from_row(
+              row,
+              index,
+              names
+          ):
+
+              if not isinstance(
+                  row,
+                  list
+              ):
+                  return None
+
+              for name in names:
+
+                  position = index.get(
+                      name
+                  )
+
+                  if position is None:
+                      continue
+
+                  if position >= len(
+                      row
+                  ):
+                      continue
+
+                  return clean(
+                      row[position]
+                  )
+
+              return None
+
           # ============================================================
           # 開始
           # ============================================================
@@ -385,12 +645,12 @@ jobs:
               ):
                   continue
 
-              code = str(
+              code = normalize_code(
                   item.get(
                       "code",
                       ""
                   )
-              ).strip()
+              )
 
               if not code:
                   continue
@@ -449,9 +709,22 @@ jobs:
               "rwd/zh/afterTrading/MI_INDEX"
           )
 
+          stock_day_all_url = (
+              "https://openapi.twse.com.tw/"
+              "v1/exchangeReport/STOCK_DAY_ALL"
+          )
+
           twse_date_used = None
           twse_fields = []
           twse_rows = []
+
+          # ============================================================
+          # 第一優先：
+          # TWSE MI_INDEX
+          #
+          # 重要修正：
+          # 不再寫死 fields9 / data9
+          # ============================================================
 
           for date_string in recent_weekdays(
               10
@@ -489,14 +762,10 @@ jobs:
                   ) != "OK":
                       continue
 
-                  fields = data.get(
-                      "fields9",
-                      []
-                  )
-
-                  rows = data.get(
-                      "data9",
-                      []
+                  fields, rows = (
+                      find_table_in_twse_response(
+                          data
+                      )
                   )
 
                   if (
@@ -522,6 +791,24 @@ jobs:
                       )
 
                       print(
+                          "TWSE 行情表已找到"
+                      )
+
+                      print(
+                          "TWSE 欄位數：",
+                          len(
+                              twse_fields
+                          )
+                      )
+
+                      print(
+                          "TWSE 行情筆數：",
+                          len(
+                              twse_rows
+                          )
+                      )
+
+                      print(
                           "TWSE 最新交易日：",
                           twse_date_used
                       )
@@ -536,6 +823,89 @@ jobs:
                       repr(error)
                   )
 
+          # ============================================================
+          # 第二優先：
+          # STOCK_DAY_ALL
+          #
+          # 如果 MI_INDEX 失敗，
+          # 使用官方 OpenAPI 的 STOCK_DAY_ALL
+          # ============================================================
+
+          if not twse_rows:
+
+              print("")
+              print(
+                  "MI_INDEX 無法取得行情，"
+                  "改用 TWSE STOCK_DAY_ALL..."
+              )
+
+              try:
+
+                  data = request_json(
+                      stock_day_all_url
+                  )
+
+                  if isinstance(
+                      data,
+                      list
+                  ) and data:
+
+                      twse_rows = data
+
+                      twse_fields = []
+
+                      all_keys = []
+
+                      for row in data:
+
+                          if isinstance(
+                              row,
+                              dict
+                          ):
+
+                              for key in row.keys():
+
+                                  if key not in all_keys:
+
+                                      all_keys.append(
+                                          key
+                                      )
+
+                      twse_fields = all_keys
+
+                      # STOCK_DAY_ALL 本身不一定帶交易日期，
+                      # 取最近工作日作為資料日期。
+                      candidate_date = (
+                          recent_weekdays(
+                              1
+                          )
+                      )
+
+                      if candidate_date:
+
+                          twse_date_used = normalize_date(
+                              candidate_date[0]
+                          )
+
+                      print(
+                          "STOCK_DAY_ALL 行情筆數：",
+                          len(
+                              twse_rows
+                          )
+                      )
+
+                      print(
+                          "STOCK_DAY_ALL 日期：",
+                          twse_date_used
+                      )
+
+              except Exception as error:
+
+                  print(
+                      "STOCK_DAY_ALL 失敗：",
+                      repr(error)
+                  )
+
           if not twse_rows:
 
               print(
@@ -543,42 +913,15 @@ jobs:
               )
 
           # ============================================================
-          # TWSE 欄位對應
+          # 建立 TWSE 欄位對應
           # ============================================================
 
-          twse_index = {
-              str(field).strip(): index
-              for index, field
-              in enumerate(
-                  twse_fields
-              )
-          }
-
-          def twse_field(
-              row,
-              names
-          ):
-
-              for name in names:
-
-                  index = twse_index.get(
-                      name
-                  )
-
-                  if index is not None:
-
-                      if index < len(
-                          row
-                      ):
-
-                          return clean(
-                              row[index]
-                          )
-
-              return None
+          twse_index = build_index(
+              twse_fields
+          )
 
           # ============================================================
-          # 建立最新資料
+          # 最新資料
           # ============================================================
 
           latest = {}
@@ -589,285 +932,612 @@ jobs:
 
           twse_count = 0
 
-          for row in twse_rows:
+          # ------------------------------------------------------------
+          # MI_INDEX 格式：list
+          # ------------------------------------------------------------
 
-              if not isinstance(
-                  row,
-                  list
-              ):
-                  continue
+          if twse_rows and isinstance(
+              twse_rows[0],
+              list
+          ):
 
-              code = str(
-                  twse_field(
+              for row in twse_rows:
+
+                  if not isinstance(
                       row,
+                      list
+                  ):
+                      continue
+
+                  code = normalize_code(
+                      field_from_row(
+                          row,
+                          twse_index,
+                          [
+                              "證券代號"
+                          ]
+                      )
+                  )
+
+                  if not code:
+                      continue
+
+                  if code not in stock_info:
+                      continue
+
+                  close = field_from_row(
+                      row,
+                      twse_index,
                       [
-                          "證券代號"
+                          "收盤價"
                       ]
-                  ) or ""
-              ).strip()
-
-              if not code:
-                  continue
-
-              if code not in stock_info:
-                  continue
-
-              close = twse_field(
-                  row,
-                  [
-                      "收盤價"
-                  ]
-              )
-
-              change = twse_field(
-                  row,
-                  [
-                      "漲跌價差"
-                  ]
-              )
-
-              prev = None
-
-              if (
-                  close is not None
-                  and change is not None
-              ):
-
-                  prev = (
-                      close -
-                      change
                   )
 
-              change_pct = None
+                  if close is None:
+                      continue
 
-              if (
-                  prev is not None
-                  and prev != 0
-                  and change is not None
-              ):
-
-                  change_pct = (
-                      change
-                      / prev
-                      * 100
+                  change = field_from_row(
+                      row,
+                      twse_index,
+                      [
+                          "漲跌價差"
+                      ]
                   )
 
-              latest[code] = {
-                  **stock_info[code],
+                  prev = None
 
-                  "price":
-                      close,
+                  if (
+                      close is not None
+                      and change is not None
+                  ):
 
-                  "prev":
-                      prev,
+                      prev = (
+                          close -
+                          change
+                      )
 
-                  "open":
-                      twse_field(
+                  change_pct = None
+
+                  if (
+                      prev is not None
+                      and prev != 0
+                      and change is not None
+                  ):
+
+                      change_pct = (
+                          change
+                          /
+                          prev
+                          *
+                          100
+                      )
+
+                  latest[code] = {
+                      **stock_info[code],
+
+                      "price":
+                          close,
+
+                      "prev":
+                          prev,
+
+                      "open":
+                          field_from_row(
+                              row,
+                              twse_index,
+                              [
+                                  "開盤價"
+                              ]
+                          ),
+
+                      "high":
+                          field_from_row(
+                              row,
+                              twse_index,
+                              [
+                                  "最高價"
+                              ]
+                          ),
+
+                      "low":
+                          field_from_row(
+                              row,
+                              twse_index,
+                              [
+                                  "最低價"
+                              ]
+                          ),
+
+                      "change":
+                          change,
+
+                      "changePct":
+                          change_pct,
+
+                      "volume":
+                          field_from_row(
+                              row,
+                              twse_index,
+                              [
+                                  "成交股數"
+                              ]
+                          ),
+
+                      "amount":
+                          field_from_row(
+                              row,
+                              twse_index,
+                              [
+                                  "成交金額"
+                              ]
+                          ),
+
+                      "transactions":
+                          field_from_row(
+                              row,
+                              twse_index,
+                              [
+                                  "成交筆數"
+                              ]
+                          ),
+
+                      "bid":
+                          field_from_row(
+                              row,
+                              twse_index,
+                              [
+                                  "最後揭示買價"
+                              ]
+                          ),
+
+                      "bidVolume":
+                          field_from_row(
+                              row,
+                              twse_index,
+                              [
+                                  "最後揭示買量"
+                              ]
+                          ),
+
+                      "ask":
+                          field_from_row(
+                              row,
+                              twse_index,
+                              [
+                                  "最後揭示賣價"
+                              ]
+                          ),
+
+                      "askVolume":
+                          field_from_row(
+                              row,
+                              twse_index,
+                              [
+                                  "最後揭示賣量"
+                              ]
+                          ),
+
+                      "tradeDate":
+                          twse_date_used,
+
+                      "source":
+                          "TWSE",
+
+                      "updatedAt":
+                          datetime.now(
+                              TW_TZ
+                          ).isoformat(),
+
+                      "foreignBuy":
+                          None,
+
+                      "foreignSell":
+                          None,
+
+                      "foreignBalance":
+                          None,
+
+                      "trustBuy":
+                          None,
+
+                      "trustSell":
+                          None,
+
+                      "trustBalance":
+                          None,
+
+                      "dealerBuy":
+                          None,
+
+                      "dealerSell":
+                          None,
+
+                      "dealerBalance":
+                          None,
+
+                      "institutionTotal":
+                          None,
+
+                      "institutionDate":
+                          None,
+
+                      "institutionSource":
+                          None,
+
+                      "pe":
+                          None,
+
+                      "yield":
+                          None,
+
+                      "pbr":
+                          None,
+
+                      "ma5":
+                          None,
+
+                      "ma11":
+                          None,
+
+                      "ma31":
+                          None,
+
+                      "ma62":
+                          None,
+
+                      "ma122":
+                          None,
+
+                      "ma242":
+                          None,
+
+                      "ma5Deviation":
+                          None,
+
+                      "ma11Deviation":
+                          None,
+
+                      "ma31Deviation":
+                          None,
+
+                      "ma62Deviation":
+                          None,
+
+                      "ma122Deviation":
+                          None,
+
+                      "ma242Deviation":
+                          None,
+
+                      "foreign5":
+                          None,
+
+                      "foreign11":
+                          None,
+
+                      "foreign31":
+                          None,
+
+                      "trust5":
+                          None,
+
+                      "trust11":
+                          None,
+
+                      "trust31":
+                          None,
+
+                      "dealer5":
+                          None,
+
+                      "dealer11":
+                          None,
+
+                      "dealer31":
+                          None
+                  }
+
+                  twse_count += 1
+
+          # ------------------------------------------------------------
+          # STOCK_DAY_ALL 格式：dict
+          # ------------------------------------------------------------
+
+          elif twse_rows and isinstance(
+              twse_rows[0],
+              dict
+          ):
+
+              for row in twse_rows:
+
+                  if not isinstance(
+                      row,
+                      dict
+                  ):
+                      continue
+
+                  code = normalize_code(
+                      first(
                           row,
                           [
-                              "開盤價"
+                              "證券代號",
+                              "Code",
+                              "股票代號"
                           ]
-                      ),
+                      )
+                  )
 
-                  "high":
-                      twse_field(
+                  if not code:
+                      continue
+
+                  if code not in stock_info:
+                      continue
+
+                  close = clean(
+                      first(
                           row,
                           [
-                              "最高價"
+                              "收盤價",
+                              "Close"
                           ]
-                      ),
+                      )
+                  )
 
-                  "low":
-                      twse_field(
+                  if close is None:
+                      continue
+
+                  change = clean(
+                      first(
                           row,
                           [
-                              "最低價"
+                              "漲跌價差",
+                              "Change"
                           ]
-                      ),
+                      )
+                  )
 
-                  "change":
-                      change,
+                  prev = None
 
-                  "changePct":
-                      change_pct,
+                  if (
+                      close is not None
+                      and change is not None
+                  ):
 
-                  "volume":
-                      twse_field(
-                          row,
-                          [
-                              "成交股數"
-                          ]
-                      ),
+                      prev = (
+                          close -
+                          change
+                      )
 
-                  "amount":
-                      twse_field(
-                          row,
-                          [
-                              "成交金額"
-                          ]
-                      ),
+                  change_pct = None
 
-                  "transactions":
-                      twse_field(
-                          row,
-                          [
-                              "成交筆數"
-                          ]
-                      ),
+                  if (
+                      prev is not None
+                      and prev != 0
+                      and change is not None
+                  ):
 
-                  "bid":
-                      twse_field(
-                          row,
-                          [
-                              "最後揭示買價"
-                          ]
-                      ),
+                      change_pct = (
+                          change
+                          /
+                          prev
+                          *
+                          100
+                      )
 
-                  "bidVolume":
-                      twse_field(
-                          row,
-                          [
-                              "最後揭示買量"
-                          ]
-                      ),
+                  latest[code] = {
+                      **stock_info[code],
 
-                  "ask":
-                      twse_field(
-                          row,
-                          [
-                              "最後揭示賣價"
-                          ]
-                      ),
+                      "price":
+                          close,
 
-                  "askVolume":
-                      twse_field(
-                          row,
-                          [
-                              "最後揭示賣量"
-                          ]
-                      ),
+                      "prev":
+                          prev,
 
-                  "tradeDate":
-                      twse_date_used,
+                      "open":
+                          clean(
+                              first(
+                                  row,
+                                  [
+                                      "開盤價",
+                                      "Open"
+                                  ]
+                              )
+                          ),
 
-                  "source":
-                      "TWSE",
+                      "high":
+                          clean(
+                              first(
+                                  row,
+                                  [
+                                      "最高價",
+                                      "High"
+                                  ]
+                              )
+                          ),
 
-                  "updatedAt":
-                      datetime.now(
-                          TW_TZ
-                      ).isoformat(),
+                      "low":
+                          clean(
+                              first(
+                                  row,
+                                  [
+                                      "最低價",
+                                      "Low"
+                                  ]
+                              )
+                          ),
 
-                  "foreignBuy":
-                      None,
+                      "change":
+                          change,
 
-                  "foreignSell":
-                      None,
+                      "changePct":
+                          change_pct,
 
-                  "foreignBalance":
-                      None,
+                      "volume":
+                          clean(
+                              first(
+                                  row,
+                                  [
+                                      "成交股數",
+                                      "Volume"
+                                  ]
+                              )
+                          ),
 
-                  "trustBuy":
-                      None,
+                      "amount":
+                          clean(
+                              first(
+                                  row,
+                                  [
+                                      "成交金額",
+                                      "Amount"
+                                  ]
+                              )
+                          ),
 
-                  "trustSell":
-                      None,
+                      "transactions":
+                          clean(
+                              first(
+                                  row,
+                                  [
+                                      "成交筆數",
+                                      "Transactions"
+                                  ]
+                              )
+                          ),
 
-                  "trustBalance":
-                      None,
+                      "bid":
+                          None,
 
-                  "dealerBuy":
-                      None,
+                      "bidVolume":
+                          None,
 
-                  "dealerSell":
-                      None,
+                      "ask":
+                          None,
 
-                  "dealerBalance":
-                      None,
+                      "askVolume":
+                          None,
 
-                  "institutionTotal":
-                      None,
+                      "tradeDate":
+                          twse_date_used,
 
-                  "institutionDate":
-                      None,
+                      "source":
+                          "TWSE",
 
-                  "institutionSource":
-                      None,
+                      "updatedAt":
+                          datetime.now(
+                              TW_TZ
+                          ).isoformat(),
 
-                  "pe":
-                      None,
+                      "foreignBuy":
+                          None,
 
-                  "yield":
-                      None,
+                      "foreignSell":
+                          None,
 
-                  "pbr":
-                      None,
+                      "foreignBalance":
+                          None,
 
-                  "ma5":
-                      None,
+                      "trustBuy":
+                          None,
 
-                  "ma11":
-                      None,
+                      "trustSell":
+                          None,
 
-                  "ma31":
-                      None,
+                      "trustBalance":
+                          None,
 
-                  "ma62":
-                      None,
+                      "dealerBuy":
+                          None,
 
-                  "ma122":
-                      None,
+                      "dealerSell":
+                          None,
 
-                  "ma242":
-                      None,
+                      "dealerBalance":
+                          None,
 
-                  "ma5Deviation":
-                      None,
+                      "institutionTotal":
+                          None,
 
-                  "ma11Deviation":
-                      None,
+                      "institutionDate":
+                          None,
 
-                  "ma31Deviation":
-                      None,
+                      "institutionSource":
+                          None,
 
-                  "ma62Deviation":
-                      None,
+                      "pe":
+                          None,
 
-                  "ma122Deviation":
-                      None,
+                      "yield":
+                          None,
 
-                  "ma242Deviation":
-                      None,
+                      "pbr":
+                          None,
 
-                  "foreign5":
-                      None,
+                      "ma5":
+                          None,
 
-                  "foreign11":
-                      None,
+                      "ma11":
+                          None,
 
-                  "foreign31":
-                      None,
+                      "ma31":
+                          None,
 
-                  "trust5":
-                      None,
+                      "ma62":
+                          None,
 
-                  "trust11":
-                      None,
+                      "ma122":
+                          None,
 
-                  "trust31":
-                      None,
+                      "ma242":
+                          None,
 
-                  "dealer5":
-                      None,
+                      "ma5Deviation":
+                          None,
 
-                  "dealer11":
-                      None,
+                      "ma11Deviation":
+                          None,
 
-                  "dealer31":
-                      None
-              }
+                      "ma31Deviation":
+                          None,
 
-              twse_count += 1
+                      "ma62Deviation":
+                          None,
+
+                      "ma122Deviation":
+                          None,
+
+                      "ma242Deviation":
+                          None,
+
+                      "foreign5":
+                          None,
+
+                      "foreign11":
+                          None,
+
+                      "foreign31":
+                          None,
+
+                      "trust5":
+                          None,
+
+                      "trust11":
+                          None,
+
+                      "trust31":
+                          None,
+
+                      "dealer5":
+                          None,
+
+                      "dealer11":
+                          None,
+
+                      "dealer31":
+                          None
+                  }
+
+                  twse_count += 1
 
           print(
               "TWSE 行情：",
@@ -934,7 +1604,7 @@ jobs:
               ):
                   continue
 
-              code = str(
+              code = normalize_code(
                   first(
                       row,
                       [
@@ -943,8 +1613,8 @@ jobs:
                           "證券代號",
                           "代號"
                       ]
-                  ) or ""
-              ).strip()
+                  )
+              )
 
               if not code:
                   continue
@@ -963,6 +1633,9 @@ jobs:
                       ]
                   )
               )
+
+              if close is None:
+                  continue
 
               change = clean(
                   first(
@@ -997,8 +1670,10 @@ jobs:
 
                   change_pct = (
                       change
-                      / prev
-                      * 100
+                      /
+                      prev
+                      *
+                      100
                   )
 
               row_date = normalize_date(
@@ -1385,36 +2060,9 @@ jobs:
                       repr(error)
                   )
 
-          institution_index = {
-              str(field).strip(): index
-              for index, field
-              in enumerate(
-                  institution_fields
-              )
-          }
-
-          def institution_field(
-              row,
-              names
-          ):
-
-              for name in names:
-
-                  index = institution_index.get(
-                      name
-                  )
-
-                  if index is not None:
-
-                      if index < len(
-                          row
-                      ):
-
-                          return clean(
-                              row[index]
-                          )
-
-              return None
+          institution_index = build_index(
+              institution_fields
+          )
 
           institution_count = 0
 
@@ -1426,14 +2074,15 @@ jobs:
               ):
                   continue
 
-              code = str(
-                  institution_field(
+              code = normalize_code(
+                  field_from_row(
                       row,
+                      institution_index,
                       [
                           "證券代號"
                       ]
-                  ) or ""
-              ).strip()
+                  )
+              )
 
               if code not in latest:
                   continue
@@ -1441,80 +2090,90 @@ jobs:
               latest[code].update({
 
                   "foreignBuy":
-                      institution_field(
+                      field_from_row(
                           row,
+                          institution_index,
                           [
                               "外陸資買進股數(不含外資自營商)"
                           ]
                       ),
 
                   "foreignSell":
-                      institution_field(
+                      field_from_row(
                           row,
+                          institution_index,
                           [
                               "外陸資賣出股數(不含外資自營商)"
                           ]
                       ),
 
                   "foreignBalance":
-                      institution_field(
+                      field_from_row(
                           row,
+                          institution_index,
                           [
                               "外陸資買賣超股數(不含外資自營商)"
                           ]
                       ),
 
                   "trustBuy":
-                      institution_field(
+                      field_from_row(
                           row,
+                          institution_index,
                           [
                               "投信買進股數"
                           ]
                       ),
 
                   "trustSell":
-                      institution_field(
+                      field_from_row(
                           row,
+                          institution_index,
                           [
                               "投信賣出股數"
                           ]
                       ),
 
                   "trustBalance":
-                      institution_field(
+                      field_from_row(
                           row,
+                          institution_index,
                           [
                               "投信買賣超股數"
                           ]
                       ),
 
                   "dealerBuy":
-                      institution_field(
+                      field_from_row(
                           row,
+                          institution_index,
                           [
                               "自營商買進股數"
                           ]
                       ),
 
                   "dealerSell":
-                      institution_field(
+                      field_from_row(
                           row,
+                          institution_index,
                           [
                               "自營商賣出股數"
                           ]
                       ),
 
                   "dealerBalance":
-                      institution_field(
+                      field_from_row(
                           row,
+                          institution_index,
                           [
                               "自營商買賣超股數"
                           ]
                       ),
 
                   "institutionTotal":
-                      institution_field(
+                      field_from_row(
                           row,
+                          institution_index,
                           [
                               "三大法人買賣超股數"
                           ]
@@ -1572,15 +2231,15 @@ jobs:
                       ):
                           continue
 
-                      code = str(
+                      code = normalize_code(
                           first(
                               row,
                               [
                                   "Code",
                                   "證券代號"
                               ]
-                          ) or ""
-                      ).strip()
+                          )
+                      )
 
                       if code not in latest:
                           continue
@@ -2046,8 +2705,10 @@ jobs:
                                       price
                                       - ma
                                   )
-                                  / ma
-                                  * 100
+                                  /
+                                  ma
+                                  *
+                                  100
                               )
 
                               item[
@@ -2181,7 +2842,7 @@ jobs:
 
                   "note":
                       (
-                          "官方收盤資料。"
+                          "官方收盤／最新市場資料。"
                           "前端不直接呼叫 API。"
                           "歷史資料由 GitHub Actions "
                           "持續累積。"
@@ -2211,18 +2872,7 @@ jobs:
           print("重要股票檢查")
           print("=" * 60)
 
-          check_codes = [
-              "1301",
-              "1326",
-              "2330",
-              "0050",
-              "0056",
-              "00631L",
-              "00919",
-              "00981A"
-          ]
-
-          for code in check_codes:
+          for code in IMPORTANT_CODES:
 
               print("")
               print(
@@ -2558,6 +3208,87 @@ jobs:
               )
           )
 
+          # ============================================================
+          # 核心行情完整性保護
+          #
+          # 1301 / 1326 / 2330 是本程式的核心測試股票。
+          # 如果其中任何一檔沒有價格，
+          # 代表行情抓取可能失敗。
+          #
+          # 此時直接讓 Action 失敗，
+          # 避免錯誤的 latest.json 被提交。
+          # ============================================================
+
+          core_missing = []
+
+          for code in [
+              "1301",
+              "1326",
+              "2330"
+          ]:
+
+              if code not in data:
+
+                  core_missing.append(
+                      f"{code}: 不存在"
+                  )
+
+                  continue
+
+              item = data[
+                  code
+              ]
+
+              price = item.get(
+                  "price"
+              )
+
+              if (
+                  price is None
+                  or price == ""
+                  or price == "-"
+              ):
+
+                  core_missing.append(
+                      f"{code}: 沒有價格"
+                  )
+
+          if core_missing:
+
+              print("")
+              print(
+                  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              )
+
+              print(
+                  "核心行情檢查失敗"
+              )
+
+              for message in core_missing:
+
+                  print(
+                      message
+                  )
+
+              print(
+                  "為避免錯誤資料覆蓋 GitHub，"
+                  "本次停止提交。"
+              )
+
+              print(
+                  "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+              )
+
+              raise SystemExit(
+                  "核心股票行情不完整"
+              )
+
+          print("")
+          print(
+              "核心行情檢查 OK：",
+              "1301 / 1326 / 2330"
+          )
+
           check_codes = [
               "1301",
               "1326",
@@ -2818,6 +3549,15 @@ jobs:
           print(
               "OK：latest.json 格式正常"
           )
+
+          print(
+              "OK：核心行情完整"
+          )
+
+          print(
+              "OK：可以進入提交階段"
+          )
+
           PY
 
       - name: Commit latest and history
