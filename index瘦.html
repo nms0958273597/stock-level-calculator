@@ -1,0 +1,2916 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4f7f2">
+<title>每日飲食控制｜體重管理</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+:root{
+  --bg:#f4f7f2;
+  --card:#ffffff;
+  --text:#27372c;
+  --muted:#7b887f;
+  --green:#5c9b70;
+  --green-light:#e8f4ea;
+  --orange:#e39a43;
+  --orange-light:#fff1df;
+  --red:#d66b68;
+  --red-light:#fde9e8;
+  --blue:#6d94c4;
+  --blue-light:#eaf1fa;
+  --border:#e1e8e2;
+  --shadow:0 6px 24px rgba(48,78,54,.08);
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "PingFang TC",
+    "Noto Sans TC",
+    Arial,
+    sans-serif;
+}
+
+button,
+input,
+textarea,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.app{
+  max-width:760px;
+  margin:auto;
+  padding:14px 12px 50px;
+}
+
+.header{
+  padding:10px 5px 17px;
+}
+
+.header h1{
+  margin:0;
+  font-size:25px;
+  font-weight:900;
+}
+
+.header p{
+  margin:6px 0 0;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:var(--shadow);
+}
+
+.card-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:13px;
+  font-size:17px;
+  font-weight:900;
+}
+
+.small{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:500;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.field.full{
+  grid-column:1/-1;
+}
+
+label{
+  color:#607067;
+  font-size:13px;
+  font-weight:700;
+}
+
+input,
+textarea,
+select{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:11px 12px;
+  outline:none;
+  background:#fbfcfb;
+  color:var(--text);
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:#9fc4a6;
+  box-shadow:0 0 0 3px rgba(92,155,112,.10);
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical;
+}
+
+.date-row{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.date-row input{
+  flex:1;
+}
+
+.weekday{
+  min-width:75px;
+  padding:11px 8px;
+  text-align:center;
+  border-radius:12px;
+  background:var(--green-light);
+  color:#447653;
+  font-size:13px;
+  font-weight:900;
+}
+
+.food-section{
+  margin-top:14px;
+}
+
+.food-section:first-child{
+  margin-top:0;
+}
+
+.food-title{
+  margin-bottom:8px;
+  font-size:14px;
+  font-weight:900;
+}
+
+.options{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
+.option{
+  position:relative;
+}
+
+.option input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.option span{
+  display:block;
+  padding:8px 11px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:#f6f8f6;
+  color:#59675e;
+  font-size:13px;
+}
+
+.option input:checked + span{
+  border-color:#99c2a2;
+  background:var(--green-light);
+  color:#397148;
+  font-weight:900;
+}
+
+.custom{
+  margin-top:9px;
+}
+
+.notice{
+  padding:11px 12px;
+  border-radius:12px;
+  background:#f5f7f5;
+  color:#69766d;
+  font-size:12px;
+  line-height:1.7;
+}
+
+.status{
+  margin-top:11px;
+  padding:12px;
+  border-radius:13px;
+  font-size:13px;
+  line-height:1.7;
+}
+
+.status.good{
+  background:var(--green-light);
+  color:#477956;
+}
+
+.status.warn{
+  background:var(--orange-light);
+  color:#97682f;
+}
+
+.status.bad{
+  background:var(--red-light);
+  color:#a34c49;
+}
+
+.status.blue{
+  background:var(--blue-light);
+  color:#4e709c;
+}
+
+.score{
+  text-align:center;
+  padding:18px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#edf7ef,#fafcf9);
+  border:1px solid #dce9df;
+}
+
+.score-number{
+  font-size:43px;
+  line-height:1;
+  font-weight:900;
+}
+
+.score-label{
+  margin-top:7px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.stat{
+  padding:14px;
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:#f8faf8;
+}
+
+.stat-label{
+  color:var(--muted);
+  font-size:11px;
+}
+
+.stat-value{
+  margin-top:4px;
+  font-size:20px;
+  font-weight:900;
+}
+
+.reward-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.reward-card{
+  padding:15px;
+  border-radius:17px;
+  text-align:center;
+  border:1px solid var(--border);
+}
+
+.reward-card h3{
+  margin:0 0 7px;
+  font-size:13px;
+}
+
+.reward-card strong{
+  display:block;
+  font-size:24px;
+}
+
+.reward-card small{
+  color:var(--muted);
+}
+
+.green-bg{
+  background:var(--green-light);
+}
+
+.red-bg{
+  background:var(--red-light);
+}
+
+.orange-bg{
+  background:var(--orange-light);
+}
+
+.blue-bg{
+  background:var(--blue-light);
+}
+
+.rule-box{
+  padding:13px;
+  border-radius:15px;
+  background:#f8faf8;
+  border:1px solid var(--border);
+  line-height:1.9;
+  font-size:13px;
+}
+
+.rule-line{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:1px dashed #dfe6df;
+  padding:5px 0;
+}
+
+.rule-line:last-child{
+  border-bottom:0;
+}
+
+.rule-value{
+  font-weight:900;
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  min-width:700px;
+  border-collapse:collapse;
+}
+
+th,
+td{
+  padding:10px 8px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  font-size:12px;
+}
+
+th{
+  color:var(--muted);
+  font-weight:900;
+}
+
+.history-row{
+  cursor:pointer;
+}
+
+.history-row:hover{
+  background:#f8faf8;
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.btn{
+  border:0;
+  border-radius:13px;
+  padding:12px;
+  font-weight:900;
+}
+
+.btn-primary{
+  background:var(--green);
+  color:#fff;
+}
+
+.btn-secondary{
+  background:#edf1ed;
+  color:#526157;
+}
+
+.btn-danger{
+  background:#f8e3e2;
+  color:#a14c49;
+}
+
+.footer{
+  padding-top:5px;
+  text-align:center;
+  color:#9aa59d;
+  font-size:11px;
+}
+
+@media(max-width:520px){
+  .app{
+    padding:10px 9px 40px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .header h1{
+    font-size:23px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- 標題 -->
+  <div class="header">
+    <h1>🥗 每日飲食控制</h1>
+    <p>飲食・168・體重・睡眠・排便・喝水・獎勵制度</p>
+  </div>
+
+
+  <!-- 日期 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>📅 每日飲食紀錄</span>
+      <span class="small" id="saveStatus">自動儲存</span>
+    </div>
+
+    <div class="date-row">
+      <input type="date" id="recordDate">
+      <div class="weekday" id="weekday">星期一</div>
+    </div>
+
+  </div>
+
+
+  <!-- 早餐 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>🍳 早餐</span>
+      <span class="small">可多選</span>
+    </div>
+
+    <div class="options">
+
+      <label class="option">
+        <input type="checkbox" data-group="breakfast" value="奶昔">
+        <span>奶昔</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="breakfast" value="錠片">
+        <span>錠片</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="breakfast" value="茶">
+        <span>茶</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="breakfast" value="蛋">
+        <span>蛋</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="breakfast" value="水果">
+        <span>水果</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="breakfast" value="其他">
+        <span>其他</span>
+      </label>
+
+    </div>
+
+    <input
+      class="custom"
+      id="breakfastCustom"
+      placeholder="早餐其他內容…"
+    >
+
+  </div>
+
+
+  <!-- 午餐 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>🍱 午餐</span>
+      <span class="small">可多選</span>
+    </div>
+
+    <div class="options">
+
+      <label class="option">
+        <input type="checkbox" data-group="lunch" value="錠片">
+        <span>錠片</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="lunch" value="茶">
+        <span>茶</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="lunch" value="排骨飯">
+        <span>排骨飯</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="lunch" value="飯吃一半">
+        <span>飯吃一半</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="lunch" value="荷包蛋">
+        <span>荷包蛋 1個</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="lunch" value="雞胸肉">
+        <span>雞胸肉 1片</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="lunch" value="蔬菜">
+        <span>蔬菜</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="lunch" value="其他">
+        <span>其他</span>
+      </label>
+
+    </div>
+
+    <input
+      class="custom"
+      id="lunchCustom"
+      placeholder="午餐其他內容…"
+    >
+
+  </div>
+
+
+  <!-- 晚餐 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>🥗 晚餐</span>
+      <span class="small">可多選</span>
+    </div>
+
+    <div class="options">
+
+      <label class="option">
+        <input type="checkbox" data-group="dinner" value="里肌肉沙拉">
+        <span>里肌肉沙拉</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="dinner" value="奶昔">
+        <span>奶昔</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="dinner" value="錠片">
+        <span>錠片</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="dinner" value="茶">
+        <span>茶</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="dinner" value="茶葉蛋">
+        <span>茶葉蛋 1個</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="dinner" value="香草蛋白">
+        <span>香草蛋白</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="dinner" value="蔬菜">
+        <span>蔬菜</span>
+      </label>
+
+      <label class="option">
+        <input type="checkbox" data-group="dinner" value="其他">
+        <span>其他</span>
+      </label>
+
+    </div>
+
+    <input
+      class="custom"
+      id="dinnerCustom"
+      placeholder="晚餐其他內容…"
+    >
+
+  </div>
+
+
+  <!-- 宵夜零食飲料 -->
+  <div class="card">
+
+    <div class="food-section">
+
+      <div class="food-title">🌙 宵夜</div>
+
+      <div class="options">
+
+        <label class="option">
+          <input type="checkbox" data-group="lateNight" value="0">
+          <span>0</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="lateNight" value="有吃">
+          <span>有吃</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="lateNight" value="少量">
+          <span>少量</span>
+        </label>
+
+      </div>
+
+      <input
+        class="custom"
+        id="lateNightCustom"
+        placeholder="宵夜內容…"
+      >
+
+    </div>
+
+
+    <div class="food-section">
+
+      <div class="food-title">🍪 零食</div>
+
+      <div class="options">
+
+        <label class="option">
+          <input type="checkbox" data-group="snack" value="0">
+          <span>0</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="snack" value="水果">
+          <span>水果</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="snack" value="堅果">
+          <span>堅果</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="snack" value="甜食">
+          <span>甜食</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="snack" value="其他">
+          <span>其他</span>
+        </label>
+
+      </div>
+
+      <input
+        class="custom"
+        id="snackCustom"
+        placeholder="零食內容…"
+      >
+
+    </div>
+
+
+    <div class="food-section">
+
+      <div class="food-title">🥤 飲料</div>
+
+      <div class="options">
+
+        <label class="option">
+          <input type="checkbox" data-group="drink" value="0">
+          <span>0</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="drink" value="水">
+          <span>水</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="drink" value="無糖茶">
+          <span>無糖茶</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="drink" value="咖啡">
+          <span>咖啡</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="drink" value="含糖飲料">
+          <span>含糖飲料</span>
+        </label>
+
+        <label class="option">
+          <input type="checkbox" data-group="drink" value="其他">
+          <span>其他</span>
+        </label>
+
+      </div>
+
+      <input
+        class="custom"
+        id="drinkCustom"
+        placeholder="飲料內容…"
+      >
+
+    </div>
+
+  </div>
+
+
+  <!-- 水分、排便、睡眠 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>💧 今日生活紀錄</span>
+    </div>
+
+    <div class="grid">
+
+      <div class="field">
+        <label>今日喝水量（ml）</label>
+        <input
+          type="number"
+          id="water"
+          min="0"
+          step="100"
+          placeholder="例如 4000"
+        >
+      </div>
+
+      <div class="field">
+        <label>今日排便次數</label>
+        <input
+          type="number"
+          id="bowel"
+          min="0"
+          step="1"
+          placeholder="例如 1"
+        >
+      </div>
+
+      <div class="field">
+        <label>今日起床時間</label>
+        <input type="time" id="wakeTime">
+      </div>
+
+      <div class="field">
+        <label>今日睡覺時間</label>
+        <input type="time" id="sleepTime">
+      </div>
+
+      <div class="field">
+        <label>睡眠時間（小時）</label>
+        <input
+          type="number"
+          id="sleepHours"
+          min="0"
+          max="24"
+          step="0.1"
+          placeholder="例如 7.5"
+        >
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- 168 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>🕐 168 斷食</span>
+      <span class="small">偶爾搭配即可</span>
+    </div>
+
+    <div class="grid">
+
+      <div class="field">
+        <label>飲食模式</label>
+
+        <select id="fastingMode">
+          <option value="一般飲食">一般飲食</option>
+          <option value="14:10">14:10</option>
+          <option value="16:8">16:8</option>
+          <option value="18:6">18:6</option>
+          <option value="20:4">20:4</option>
+          <option value="自訂">自訂</option>
+        </select>
+
+      </div>
+
+      <div class="field">
+        <label>最後進食時間</label>
+        <input type="time" id="lastMeal">
+      </div>
+
+      <div class="field">
+        <label>第一餐時間</label>
+        <input type="time" id="firstMeal">
+      </div>
+
+      <div class="field">
+        <label>實際空腹時間（小時）</label>
+        <input
+          type="number"
+          id="fastHours"
+          min="0"
+          max="48"
+          step="0.1"
+          placeholder="自動計算"
+        >
+      </div>
+
+    </div>
+
+    <div class="notice" style="margin-top:10px;">
+      🕐 168 是可選工具，不需要每天完成。系統主要幫你記錄自己的飲食節奏與變化。
+    </div>
+
+  </div>
+
+
+  <!-- 體重 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>⚖️ 今日體重</span>
+      <span class="small">體重變化會影響獎懲</span>
+    </div>
+
+    <div class="grid">
+
+      <div class="field">
+        <label>今日體重（kg）</label>
+        <input
+          type="number"
+          id="weight"
+          min="0"
+          step="0.1"
+          placeholder="例如 56.0"
+        >
+      </div>
+
+      <div class="field">
+        <label>體脂率（%）</label>
+        <input
+          type="number"
+          id="bodyFat"
+          min="0"
+          max="100"
+          step="0.1"
+          placeholder="可不填"
+        >
+      </div>
+
+      <div class="field">
+        <label>腰圍（cm）</label>
+        <input
+          type="number"
+          id="waist"
+          min="0"
+          step="0.1"
+          placeholder="可不填"
+        >
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- 獎懲設定 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>🏆 獎勵／懲罰設定</span>
+      <span class="small">全部可以修改</span>
+    </div>
+
+    <div class="grid">
+
+      <div class="field">
+        <label>原始基準體重（kg）</label>
+        <input
+          type="number"
+          id="baseWeight"
+          value="56"
+          step="0.1"
+        >
+      </div>
+
+      <div class="field">
+        <label>獎勵體重（kg）</label>
+        <input
+          type="number"
+          id="rewardWeight"
+          value="55"
+          step="0.1"
+        >
+      </div>
+
+      <div class="field">
+        <label>達成獎勵金額</label>
+        <input
+          type="number"
+          id="rewardAmount"
+          value="1914"
+          min="0"
+        >
+      </div>
+
+      <div class="field">
+        <label>每增加 1kg 懲罰</label>
+        <input
+          type="number"
+          id="penaltyPerKg"
+          value="413"
+          min="0"
+        >
+      </div>
+
+      <div class="field">
+        <label>每減少 1kg 回饋</label>
+        <input
+          type="number"
+          id="returnPerKg"
+          value="227"
+          min="0"
+        >
+      </div>
+
+    </div>
+
+
+    <div style="margin-top:13px;" class="rule-box">
+
+      <div class="rule-line">
+        <span>🎯 原始基準</span>
+        <span class="rule-value">56 kg</span>
+      </div>
+
+      <div class="rule-line">
+        <span>⬆️ 往上增加</span>
+        <span class="rule-value">+413 / kg</span>
+      </div>
+
+      <div class="rule-line">
+        <span>⬇️ 往下降低</span>
+        <span class="rule-value">回227 / kg</span>
+      </div>
+
+      <div class="rule-line">
+        <span>🎁 達到獎勵體重</span>
+        <span class="rule-value">+1,914</span>
+      </div>
+
+      <div class="rule-line">
+        <span>♾️ 懲罰上限</span>
+        <span class="rule-value">無上限</span>
+      </div>
+
+    </div>
+
+    <div id="rewardAnalysis"></div>
+
+  </div>
+
+
+  <!-- 今日分析 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>📊 今日分析</span>
+    </div>
+
+    <div class="score">
+
+      <div class="score-number" id="score">
+        --
+      </div>
+
+      <div class="score-label">
+        今日飲食生活綜合分數
+      </div>
+
+    </div>
+
+    <div id="dailyAnalysis" class="status good">
+      尚未輸入完整資料。
+    </div>
+
+  </div>
+
+
+  <!-- 體重趨勢 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>📈 體重趨勢</span>
+    </div>
+
+    <div class="summary">
+
+      <div class="stat">
+        <div class="stat-label">今日體重</div>
+        <div class="stat-value" id="todayWeight">--</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">7日平均</div>
+        <div class="stat-value" id="avg7">--</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">30日平均</div>
+        <div class="stat-value" id="avg30">--</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">目前趨勢</div>
+        <div class="stat-value" id="trend">--</div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- 獎懲累計 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>💰 獎懲帳本</span>
+    </div>
+
+    <div class="reward-grid">
+
+      <div class="reward-card green-bg">
+        <h3>🎁 累計獎勵</h3>
+        <strong id="totalReward">0</strong>
+        <small>解鎖次數</small>
+      </div>
+
+      <div class="reward-card red-bg">
+        <h3>⚠️ 累計增加懲罰</h3>
+        <strong id="totalPenalty">0</strong>
+        <small>413 累加</small>
+      </div>
+
+      <div class="reward-card orange-bg">
+        <h3>🔄 累計下降回饋</h3>
+        <strong id="totalReturn">0</strong>
+        <small>227 / kg</small>
+      </div>
+
+      <div class="reward-card blue-bg">
+        <h3>📊 淨結果</h3>
+        <strong id="netResult">0</strong>
+        <small>獎勵＋回饋－懲罰</small>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- 歷史 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>📚 歷史紀錄</span>
+      <span class="small">點日期可載入</span>
+    </div>
+
+    <div class="table-wrap">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>日期</th>
+            <th>體重</th>
+            <th>變化</th>
+            <th>獎／懲</th>
+            <th>喝水</th>
+            <th>排便</th>
+            <th>168</th>
+          </tr>
+        </thead>
+
+        <tbody id="historyBody"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- 心情 -->
+  <div class="card">
+
+    <div class="card-title">
+      <span>💗 心情分享</span>
+    </div>
+
+    <textarea
+      id="mood"
+      placeholder="今天的心情、飲食感受、身體狀態……"
+    ></textarea>
+
+  </div>
+
+
+  <!-- 操作 -->
+  <div class="card">
+
+    <div class="actions">
+
+      <button
+        class="btn btn-primary"
+        id="saveBtn">
+        💾 立即儲存
+      </button>
+
+      <button
+        class="btn btn-secondary"
+        id="clearTodayBtn">
+        🧹 清除今日
+      </button>
+
+      <button
+        class="btn btn-danger"
+        id="clearAllBtn"
+        style="grid-column:1/-1;">
+        🗑️ 全部清除
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="footer">
+    每日飲食控制｜資料自動儲存在此裝置
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   儲存
+========================================================= */
+
+const STORAGE_KEY = "dailyDietControl_V2";
+
+let records =
+  JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+
+
+const $ = id => document.getElementById(id);
+
+
+/* =========================================================
+   日期
+========================================================= */
+
+function localDateString(date = new Date()){
+
+  const y = date.getFullYear();
+
+  const m =
+    String(date.getMonth()+1).padStart(2,"0");
+
+  const d =
+    String(date.getDate()).padStart(2,"0");
+
+  return `${y}-${m}-${d}`;
+
+}
+
+
+function getWeekday(dateString){
+
+  const date =
+    new Date(dateString + "T12:00:00");
+
+  const days = [
+    "星期日",
+    "星期一",
+    "星期二",
+    "星期三",
+    "星期四",
+    "星期五",
+    "星期六"
+  ];
+
+  return days[date.getDay()];
+
+}
+
+
+function updateWeekday(){
+
+  const date = $("recordDate").value;
+
+  $("weekday").textContent =
+    date ? getWeekday(date) : "";
+
+}
+
+
+/* =========================================================
+   Checkbox
+========================================================= */
+
+function getGroup(group){
+
+  return [
+    ...document.querySelectorAll(
+      `input[data-group="${group}"]:checked`
+    )
+  ].map(x => x.value);
+
+}
+
+
+function setGroup(group, values = []){
+
+  document
+    .querySelectorAll(`input[data-group="${group}"]`)
+    .forEach(input => {
+
+      input.checked =
+        values.includes(input.value);
+
+    });
+
+}
+
+
+/* =========================================================
+   表單資料
+========================================================= */
+
+function getFormData(){
+
+  return {
+
+    date:$("recordDate").value,
+
+    breakfast:getGroup("breakfast"),
+    breakfastCustom:$("breakfastCustom").value,
+
+    lunch:getGroup("lunch"),
+    lunchCustom:$("lunchCustom").value,
+
+    dinner:getGroup("dinner"),
+    dinnerCustom:$("dinnerCustom").value,
+
+    lateNight:getGroup("lateNight"),
+    lateNightCustom:$("lateNightCustom").value,
+
+    snack:getGroup("snack"),
+    snackCustom:$("snackCustom").value,
+
+    drink:getGroup("drink"),
+    drinkCustom:$("drinkCustom").value,
+
+    water:$("water").value,
+    bowel:$("bowel").value,
+
+    wakeTime:$("wakeTime").value,
+    sleepTime:$("sleepTime").value,
+    sleepHours:$("sleepHours").value,
+
+    fastingMode:$("fastingMode").value,
+    lastMeal:$("lastMeal").value,
+    firstMeal:$("firstMeal").value,
+    fastHours:$("fastHours").value,
+
+    weight:$("weight").value,
+    bodyFat:$("bodyFat").value,
+    waist:$("waist").value,
+
+    mood:$("mood").value,
+
+    updatedAt:new Date().toISOString()
+
+  };
+
+}
+
+
+/* =========================================================
+   清空畫面
+========================================================= */
+
+function clearForm(){
+
+  document
+    .querySelectorAll('input[type="checkbox"]')
+    .forEach(x => x.checked = false);
+
+  document
+    .querySelectorAll(
+      'input[type="number"],input[type="time"],textarea'
+    )
+    .forEach(x => x.value = "");
+
+  $("exerciseDummy");
+
+  $("fastingMode").value = "一般飲食";
+
+}
+
+
+/* =========================================================
+   載入
+========================================================= */
+
+function loadData(date){
+
+  clearForm();
+
+  $("recordDate").value = date;
+
+  const data = records[date];
+
+  if(!data){
+
+    updateWeekday();
+    updateAll();
+
+    return;
+
+  }
+
+
+  setGroup(
+    "breakfast",
+    data.breakfast || []
+  );
+
+  setGroup(
+    "lunch",
+    data.lunch || []
+  );
+
+  setGroup(
+    "dinner",
+    data.dinner || []
+  );
+
+  setGroup(
+    "lateNight",
+    data.lateNight || []
+  );
+
+  setGroup(
+    "snack",
+    data.snack || []
+  );
+
+  setGroup(
+    "drink",
+    data.drink || []
+  );
+
+
+  $("breakfastCustom").value =
+    data.breakfastCustom || "";
+
+  $("lunchCustom").value =
+    data.lunchCustom || "";
+
+  $("dinnerCustom").value =
+    data.dinnerCustom || "";
+
+  $("lateNightCustom").value =
+    data.lateNightCustom || "";
+
+  $("snackCustom").value =
+    data.snackCustom || "";
+
+  $("drinkCustom").value =
+    data.drinkCustom || "";
+
+
+  $("water").value =
+    data.water || "";
+
+  $("bowel").value =
+    data.bowel || "";
+
+
+  $("wakeTime").value =
+    data.wakeTime || "";
+
+  $("sleepTime").value =
+    data.sleepTime || "";
+
+  $("sleepHours").value =
+    data.sleepHours || "";
+
+
+  $("fastingMode").value =
+    data.fastingMode || "一般飲食";
+
+  $("lastMeal").value =
+    data.lastMeal || "";
+
+  $("firstMeal").value =
+    data.firstMeal || "";
+
+  $("fastHours").value =
+    data.fastHours || "";
+
+
+  $("weight").value =
+    data.weight || "";
+
+  $("bodyFat").value =
+    data.bodyFat || "";
+
+  $("waist").value =
+    data.waist || "";
+
+
+  $("mood").value =
+    data.mood || "";
+
+
+  updateWeekday();
+  updateAll();
+
+}
+
+
+/* =========================================================
+   儲存
+========================================================= */
+
+function saveData(){
+
+  const date =
+    $("recordDate").value;
+
+  if(!date){
+
+    alert("請先選擇日期。");
+
+    return;
+
+  }
+
+
+  records[date] =
+    getFormData();
+
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(records)
+  );
+
+
+  $("saveStatus").textContent =
+    "✓ 已儲存";
+
+  setTimeout(()=>{
+
+    $("saveStatus").textContent =
+      "自動儲存";
+
+  },1200);
+
+
+  updateAll();
+
+}
+
+
+/* =========================================================
+   自動儲存
+========================================================= */
+
+let saveTimer;
+
+function autoSave(){
+
+  clearTimeout(saveTimer);
+
+  saveTimer = setTimeout(()=>{
+
+    if($("recordDate").value){
+
+      saveData();
+
+    }
+
+  },350);
+
+}
+
+
+/* =========================================================
+   168 計算
+========================================================= */
+
+function calculateFast(){
+
+  const first =
+    $("firstMeal").value;
+
+  const last =
+    $("lastMeal").value;
+
+
+  if(!first || !last){
+
+    return;
+
+  }
+
+
+  const [fh,fm] =
+    first.split(":").map(Number);
+
+  const [lh,lm] =
+    last.split(":").map(Number);
+
+
+  const firstMin =
+    fh*60 + fm;
+
+  const lastMin =
+    lh*60 + lm;
+
+
+  let diff =
+    firstMin - lastMin;
+
+
+  if(diff < 0){
+
+    diff += 1440;
+
+  }
+
+
+  $("fastHours").value =
+    (diff/60).toFixed(1);
+
+}
+
+
+/* =========================================================
+   找「前一次有體重紀錄」
+========================================================= */
+
+function getPreviousWeightRecord(date){
+
+  const list =
+    Object.values(records)
+      .filter(r =>
+        r &&
+        r.date &&
+        r.date < date &&
+        r.weight !== "" &&
+        r.weight !== null &&
+        !isNaN(parseFloat(r.weight))
+      )
+      .sort((a,b)=>
+        a.date.localeCompare(b.date)
+      );
+
+  return list.length
+    ? list[list.length-1]
+    : null;
+
+}
+
+
+/* =========================================================
+   今日獎懲
+========================================================= */
+
+function calculateDailyReward(){
+
+  const weight =
+    parseFloat($("weight").value);
+
+  const base =
+    parseFloat($("baseWeight").value) || 56;
+
+  const rewardWeight =
+    parseFloat($("rewardWeight").value) || 55;
+
+  const rewardAmount =
+    parseFloat($("rewardAmount").value) || 1914;
+
+  const penaltyPerKg =
+    parseFloat($("penaltyPerKg").value) || 413;
+
+  const returnPerKg =
+    parseFloat($("returnPerKg").value) || 227;
+
+
+  if(isNaN(weight)){
+
+    return {
+      type:"none",
+      amount:0,
+      html:`
+        <div class="status blue">
+          ⚖️ 請輸入今日體重，系統會自動判斷今天是增加或減少。
+        </div>
+      `
+    };
+
+  }
+
+
+  const date =
+    $("recordDate").value;
+
+
+  const previous =
+    getPreviousWeightRecord(date);
+
+
+  /* 第一次紀錄 */
+
+  if(!previous){
+
+    if(weight <= rewardWeight){
+
+      return {
+        type:"reward",
+        amount:rewardAmount,
+        html:`
+          <div class="status good">
+            🎉 <strong>達成獎勵體重！</strong><br>
+            今日：${weight.toFixed(1)} kg<br>
+            獎勵體重：${rewardWeight.toFixed(1)} kg<br>
+            🎁 獎勵：<strong>${formatMoney(rewardAmount)}</strong>
+          </div>
+        `
+      };
+
+    }
+
+
+    if(weight > base){
+
+      const amount =
+        (weight-base)*penaltyPerKg;
+
+      return {
+        type:"penalty",
+        amount,
+        html:`
+          <div class="status bad">
+            ⚠️ 第一次紀錄高於基準<br>
+            今日：${weight.toFixed(1)} kg<br>
+            基準：${base.toFixed(1)} kg<br>
+            ⚠️ 懲罰：<strong>${formatMoney(amount)}</strong>
+          </div>
+        `
+      };
+
+    }
+
+
+    return {
+      type:"base",
+      amount:0,
+      html:`
+        <div class="status good">
+          🎯 今日位於原始基準體重。
+        </div>
+      `
+    };
+
+  }
+
+
+  const previousWeight =
+    parseFloat(previous.weight);
+
+
+  const difference =
+    weight - previousWeight;
+
+
+  /* =====================================================
+     往上
+  ===================================================== */
+
+  if(difference > 0){
+
+    const amount =
+      difference * penaltyPerKg;
+
+    return {
+      type:"penalty",
+      amount,
+      html:`
+        <div class="status bad">
+          ⬆️ <strong>體重增加</strong><br>
+          前次：${previousWeight.toFixed(1)} kg<br>
+          今日：${weight.toFixed(1)} kg<br>
+          增加：${difference.toFixed(1)} kg<br>
+          ⚠️ 今日懲罰：<strong>${formatMoney(amount)}</strong><br>
+          <span class="small">
+            每增加 1 kg → 413，持續累加，無上限
+          </span>
+        </div>
+      `
+    };
+
+  }
+
+
+  /* =====================================================
+     往下
+  ===================================================== */
+
+  if(difference < 0){
+
+    const decrease =
+      Math.abs(difference);
+
+    const amount =
+      decrease * returnPerKg;
+
+
+    /* 如果今天已經達到獎勵體重 */
+
+    if(weight <= rewardWeight){
+
+      return {
+        type:"reward",
+        amount:rewardAmount,
+        html:`
+          <div class="status good">
+            🎉 <strong>達到獎勵體重！</strong><br>
+            前次：${previousWeight.toFixed(1)} kg<br>
+            今日：${weight.toFixed(1)} kg<br>
+            下降：${decrease.toFixed(1)} kg<br>
+            🎁 進入原本的獎勵制度：<strong>${formatMoney(rewardAmount)}</strong>
+          </div>
+        `
+      };
+
+    }
+
+
+    return {
+      type:"return",
+      amount,
+      html:`
+        <div class="status good">
+          ⬇️ <strong>體重下降</strong><br>
+          前次：${previousWeight.toFixed(1)} kg<br>
+          今日：${weight.toFixed(1)} kg<br>
+          下降：${decrease.toFixed(1)} kg<br>
+          🔄 回饋：<strong>${formatMoney(amount)}</strong><br>
+          <span class="small">
+            每減少 1 kg → 227
+          </span>
+        </div>
+      `
+    };
+
+  }
+
+
+  /* =====================================================
+     持平
+  ===================================================== */
+
+  if(weight <= rewardWeight){
+
+    return {
+      type:"reward",
+      amount:rewardAmount,
+      html:`
+        <div class="status good">
+          🎁 目前維持在獎勵體重區間。<br>
+          獎勵制度：<strong>${formatMoney(rewardAmount)}</strong>
+        </div>
+      `
+    };
+
+  }
+
+
+  return {
+    type:"base",
+    amount:0,
+    html:`
+      <div class="status blue">
+        ➡️ 今日體重維持不變。<br>
+        目前：${weight.toFixed(1)} kg
+      </div>
+    `
+  };
+
+}
+
+
+/* =========================================================
+   顯示今日獎懲
+========================================================= */
+
+function updateRewardAnalysis(){
+
+  const result =
+    calculateDailyReward();
+
+  $("rewardAnalysis").innerHTML =
+    result.html;
+
+}
+
+
+/* =========================================================
+   飲食分數
+========================================================= */
+
+function calculateScore(){
+
+  let score = 50;
+
+
+  const breakfast =
+    getGroup("breakfast");
+
+  const lunch =
+    getGroup("lunch");
+
+  const dinner =
+    getGroup("dinner");
+
+  const snack =
+    getGroup("snack");
+
+  const drinks =
+    getGroup("drink");
+
+  const water =
+    parseFloat($("water").value) || 0;
+
+  const bowel =
+    parseFloat($("bowel").value) || 0;
+
+  const sleep =
+    parseFloat($("sleepHours").value) || 0;
+
+  const fasting =
+    $("fastingMode").value;
+
+
+  if(breakfast.length) score += 6;
+  if(lunch.length) score += 6;
+  if(dinner.length) score += 6;
+
+
+  const allFoods =
+    [
+      ...breakfast,
+      ...lunch,
+      ...dinner
+    ].join(" ");
+
+
+  if(
+    /蛋|雞胸|里肌|蛋白|排骨|肉/.test(allFoods)
+  ){
+
+    score += 8;
+
+  }
+
+
+  if(
+    snack.includes("0") ||
+    snack.length === 0
+  ){
+
+    score += 6;
+
+  }
+
+
+  if(
+    snack.includes("甜食")
+  ){
+
+    score -= 8;
+
+  }
+
+
+  if(
+    drinks.includes("0") ||
+    drinks.length === 0
+  ){
+
+    score += 4;
+
+  }
+
+
+  if(
+    drinks.includes("含糖飲料")
+  ){
+
+    score -= 8;
+
+  }
+
+
+  if(water >= 2000){
+
+    score += 5;
+
+  }
+
+
+  if(water >= 3000){
+
+    score += 2;
+
+  }
+
+
+  if(bowel >= 1){
+
+    score += 3;
+
+  }
+
+
+  if(sleep >= 7){
+
+    score += 5;
+
+  }
+  else if(
+    sleep > 0 &&
+    sleep < 5
+  ){
+
+    score -= 5;
+
+  }
+
+
+  if(
+    fasting !== "一般飲食"
+  ){
+
+    score += 3;
+
+  }
+
+
+  return Math.max(
+    0,
+    Math.min(100,score)
+  );
+
+}
+
+
+/* =========================================================
+   今日分析
+========================================================= */
+
+function updateDailyAnalysis(){
+
+  const score =
+    calculateScore();
+
+
+  $("score").textContent =
+    score;
+
+
+  const water =
+    parseFloat($("water").value) || 0;
+
+  const bowel =
+    parseFloat($("bowel").value) || 0;
+
+  const sleep =
+    parseFloat($("sleepHours").value) || 0;
+
+  const snack =
+    getGroup("snack");
+
+  const drink =
+    getGroup("drink");
+
+
+  const messages = [];
+
+
+  if(water >= 3000){
+
+    messages.push(
+      "💧 喝水紀錄良好"
+    );
+
+  }
+  else if(water > 0){
+
+    messages.push(
+      "💧 可以繼續注意水分"
+    );
+
+  }
+
+
+  if(bowel >= 1){
+
+    messages.push(
+      "🚽 今天有排便紀錄"
+    );
+
+  }
+
+
+  if(
+    snack.includes("0") ||
+    snack.length === 0
+  ){
+
+    messages.push(
+      "🍪 零食控制良好"
+    );
+
+  }
+
+
+  if(
+    snack.includes("甜食")
+  ){
+
+    messages.push(
+      "🍰 今天有甜食，可以留意份量"
+    );
+
+  }
+
+
+  if(
+    drink.includes("含糖飲料")
+  ){
+
+    messages.push(
+      "🥤 含糖飲料可以減少"
+    );
+
+  }
+
+
+  if(sleep >= 7){
+
+    messages.push(
+      "😴 睡眠時間良好"
+    );
+
+  }
+  else if(
+    sleep > 0 &&
+    sleep < 6
+  ){
+
+    messages.push(
+      "🌙 睡眠時間偏少"
+    );
+
+  }
+
+
+  if(!messages.length){
+
+    messages.push(
+      "🌱 持續記錄，累積資料後會更容易看出自己的規律。"
+    );
+
+  }
+
+
+  let cls = "good";
+
+
+  if(score < 60){
+
+    cls = "bad";
+
+  }
+  else if(score < 75){
+
+    cls = "warn";
+
+  }
+
+
+  $("dailyAnalysis").className =
+    "status " + cls;
+
+  $("dailyAnalysis").innerHTML =
+    messages.join("<br>");
+
+}
+
+
+/* =========================================================
+   體重趨勢
+========================================================= */
+
+function getWeightRecords(){
+
+  return Object.values(records)
+    .filter(r =>
+      r &&
+      r.weight !== "" &&
+      r.weight !== null &&
+      !isNaN(parseFloat(r.weight))
+    )
+    .sort((a,b)=>
+      a.date.localeCompare(b.date)
+    );
+
+}
+
+
+function average(arr){
+
+  if(!arr.length){
+
+    return null;
+
+  }
+
+  return arr.reduce(
+    (a,b)=>a+b,
+    0
+  ) / arr.length;
+
+}
+
+
+function updateTrend(){
+
+  const list =
+    getWeightRecords();
+
+
+  const today =
+    parseFloat($("weight").value);
+
+
+  $("todayWeight").textContent =
+    !isNaN(today)
+      ? today.toFixed(1) + " kg"
+      : "--";
+
+
+  const a7 =
+    average(
+      list
+        .slice(-7)
+        .map(r=>parseFloat(r.weight))
+    );
+
+
+  const a30 =
+    average(
+      list
+        .slice(-30)
+        .map(r=>parseFloat(r.weight))
+    );
+
+
+  $("avg7").textContent =
+    a7 !== null
+      ? a7.toFixed(1) + " kg"
+      : "--";
+
+
+  $("avg30").textContent =
+    a30 !== null
+      ? a30.toFixed(1) + " kg"
+      : "--";
+
+
+  if(list.length < 2){
+
+    $("trend").textContent =
+      "資料不足";
+
+    return;
+
+  }
+
+
+  const current =
+    parseFloat(
+      list[list.length-1].weight
+    );
+
+  const previous =
+    parseFloat(
+      list[list.length-2].weight
+    );
+
+
+  const diff =
+    current - previous;
+
+
+  if(diff < 0){
+
+    $("trend").textContent =
+      "📉 ↓ " +
+      Math.abs(diff).toFixed(1);
+
+  }
+  else if(diff > 0){
+
+    $("trend").textContent =
+      "📈 ↑ " +
+      diff.toFixed(1);
+
+  }
+  else{
+
+    $("trend").textContent =
+      "➡️ 持平";
+
+  }
+
+}
+
+
+/* =========================================================
+   累計帳本
+========================================================= */
+
+function updateTotals(){
+
+  const base =
+    parseFloat($("baseWeight").value) || 56;
+
+  const rewardWeight =
+    parseFloat($("rewardWeight").value) || 55;
+
+  const rewardAmount =
+    parseFloat($("rewardAmount").value) || 1914;
+
+  const penaltyPerKg =
+    parseFloat($("penaltyPerKg").value) || 413;
+
+  const returnPerKg =
+    parseFloat($("returnPerKg").value) || 227;
+
+
+  const list =
+    getWeightRecords();
+
+
+  let totalReward = 0;
+  let totalPenalty = 0;
+  let totalReturn = 0;
+
+
+  /*
+    這裡按照「前一次體重 → 今日體重」
+    計算每一天的變化。
+  */
+
+  list.forEach((r,index)=>{
+
+    const w =
+      parseFloat(r.weight);
+
+
+    if(index === 0){
+
+      if(w <= rewardWeight){
+
+        totalReward += rewardAmount;
+
+      }
+
+      else if(w > base){
+
+        totalPenalty +=
+          (w-base)*penaltyPerKg;
+
+      }
+
+      return;
+
+    }
+
+
+    const previous =
+      parseFloat(
+        list[index-1].weight
+      );
+
+
+    const diff =
+      w-previous;
+
+
+    if(diff > 0){
+
+      totalPenalty +=
+        diff*penaltyPerKg;
+
+    }
+
+
+    if(diff < 0){
+
+      if(w <= rewardWeight){
+
+        totalReward +=
+          rewardAmount;
+
+      }
+      else{
+
+        totalReturn +=
+          Math.abs(diff)*returnPerKg;
+
+      }
+
+    }
+
+
+    if(
+      diff === 0 &&
+      w <= rewardWeight
+    ){
+
+      totalReward +=
+        rewardAmount;
+
+    }
+
+  });
+
+
+  $("totalReward").textContent =
+    formatMoney(totalReward);
+
+
+  $("totalPenalty").textContent =
+    formatMoney(totalPenalty);
+
+
+  $("totalReturn").textContent =
+    formatMoney(totalReturn);
+
+
+  const net =
+    totalReward +
+    totalReturn -
+    totalPenalty;
+
+
+  $("netResult").textContent =
+    formatMoney(net);
+
+}
+
+
+/* =========================================================
+   歷史
+========================================================= */
+
+function updateHistory(){
+
+  const body =
+    $("historyBody");
+
+
+  const list =
+    getWeightRecords()
+      .slice()
+      .sort((a,b)=>
+        b.date.localeCompare(a.date)
+      );
+
+
+  if(!list.length){
+
+    body.innerHTML = `
+      <tr>
+        <td colspan="7"
+          style="text-align:center;color:#9aa59d;">
+          尚無體重歷史紀錄
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  body.innerHTML =
+    list.map((r)=>{
+
+      const weight =
+        parseFloat(r.weight);
+
+
+      const previous =
+        getPreviousWeightRecord(r.date);
+
+
+      let change = "—";
+      let reward = "—";
+
+
+      if(previous){
+
+        const pw =
+          parseFloat(previous.weight);
+
+        const diff =
+          weight-pw;
+
+
+        if(diff > 0){
+
+          change =
+            "⬆️ +" +
+            diff.toFixed(1);
+
+
+          reward =
+            "⚠️ -" +
+            formatMoney(
+              diff *
+              (parseFloat($("penaltyPerKg").value)||413)
+            );
+
+        }
+
+        else if(diff < 0){
+
+          const decrease =
+            Math.abs(diff);
+
+
+          change =
+            "⬇️ -" +
+            decrease.toFixed(1);
+
+
+          if(
+            weight <=
+            (parseFloat($("rewardWeight").value)||55)
+          ){
+
+            reward =
+              "🎁 +" +
+              formatMoney(
+                parseFloat($("rewardAmount").value)||1914
+              );
+
+          }
+          else{
+
+            reward =
+              "🔄 +" +
+              formatMoney(
+                decrease *
+                (parseFloat($("returnPerKg").value)||227)
+              );
+
+          }
+
+        }
+
+        else{
+
+          change = "➡️ 0";
+
+          if(
+            weight <=
+            (parseFloat($("rewardWeight").value)||55)
+          ){
+
+            reward =
+              "🎁 +" +
+              formatMoney(
+                parseFloat($("rewardAmount").value)||1914
+              );
+
+          }
+
+        }
+
+      }
+      else{
+
+        if(
+          weight <=
+          (parseFloat($("rewardWeight").value)||55)
+        ){
+
+          reward =
+            "🎁 +" +
+            formatMoney(
+              parseFloat($("rewardAmount").value)||1914
+            );
+
+        }
+        else if(
+          weight >
+          (parseFloat($("baseWeight").value)||56)
+        ){
+
+          reward =
+            "⚠️ -" +
+            formatMoney(
+              (
+                weight -
+                (parseFloat($("baseWeight").value)||56)
+              ) *
+              (parseFloat($("penaltyPerKg").value)||413)
+            );
+
+        }
+
+      }
+
+
+      return `
+        <tr
+          class="history-row"
+          onclick="loadData('${r.date}')"
+        >
+
+          <td>
+            ${r.date}<br>
+            ${getWeekday(r.date)}
+          </td>
+
+          <td>
+            ${weight.toFixed(1)} kg
+          </td>
+
+          <td>
+            ${change}
+          </td>
+
+          <td>
+            ${reward}
+          </td>
+
+          <td>
+            ${r.water ? r.water+" ml" : "—"}
+          </td>
+
+          <td>
+            ${r.bowel || "—"}
+          </td>
+
+          <td>
+            ${r.fastingMode || "一般"}
+          </td>
+
+        </tr>
+      `;
+
+    })
+    .join("");
+
+}
+
+
+/* =========================================================
+   金額格式
+========================================================= */
+
+function formatMoney(value){
+
+  return Number(value || 0)
+    .toLocaleString(
+      "zh-TW",
+      {
+        maximumFractionDigits:0
+      }
+    );
+
+}
+
+
+/* =========================================================
+   更新全部
+========================================================= */
+
+function updateAll(){
+
+  calculateFast();
+
+  updateRewardAnalysis();
+
+  updateDailyAnalysis();
+
+  updateTrend();
+
+  updateTotals();
+
+  updateHistory();
+
+}
+
+
+/* =========================================================
+   日期變更
+========================================================= */
+
+$("recordDate")
+  .addEventListener(
+    "change",
+    function(){
+
+      if(this.value){
+
+        loadData(this.value);
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   所有輸入自動儲存
+========================================================= */
+
+document.addEventListener(
+  "input",
+  function(e){
+
+    if(
+      e.target.matches("input") ||
+      e.target.matches("textarea")
+    ){
+
+      calculateFast();
+
+      updateAll();
+
+      autoSave();
+
+    }
+
+  }
+);
+
+
+document.addEventListener(
+  "change",
+  function(e){
+
+    if(
+      e.target.matches("input") ||
+      e.target.matches("select")
+    ){
+
+      calculateFast();
+
+      updateAll();
+
+      autoSave();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   立即儲存
+========================================================= */
+
+$("saveBtn")
+  .addEventListener(
+    "click",
+    function(){
+
+      saveData();
+
+      alert("✅ 今日紀錄已儲存！");
+
+    }
+  );
+
+
+/* =========================================================
+   清除今日
+========================================================= */
+
+$("clearTodayBtn")
+  .addEventListener(
+    "click",
+    function(){
+
+      const date =
+        $("recordDate").value;
+
+
+      if(!date){
+
+        alert("請先選擇日期。");
+
+        return;
+
+      }
+
+
+      if(
+        !confirm(
+          "確定要清除「" +
+          date +
+          "」的紀錄嗎？\n\n" +
+          "只會刪除這一天。"
+        )
+      ){
+
+        return;
+
+      }
+
+
+      delete records[date];
+
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(records)
+      );
+
+
+      loadData(date);
+
+    }
+  );
+
+
+/* =========================================================
+   全部清除
+========================================================= */
+
+$("clearAllBtn")
+  .addEventListener(
+    "click",
+    function(){
+
+      if(
+        !confirm(
+          "⚠️ 確定要全部清除嗎？\n\n" +
+          "所有日期的飲食、體重、168、睡眠與歷史資料都會刪除！"
+        )
+      ){
+
+        return;
+
+      }
+
+
+      if(
+        !confirm(
+          "🚨 再確認一次！\n\n" +
+          "全部資料刪除後無法復原。\n\n" +
+          "確定全部清除？"
+        )
+      ){
+
+        return;
+
+      }
+
+
+      records = {};
+
+
+      localStorage.removeItem(
+        STORAGE_KEY
+      );
+
+
+      const today =
+        localDateString();
+
+
+      loadData(today);
+
+
+      alert(
+        "🗑️ 所有紀錄已全部清除。"
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   初始
+========================================================= */
+
+(function init(){
+
+  const today =
+    localDateString();
+
+
+  $("recordDate").value =
+    today;
+
+
+  loadData(today);
+
+})();
+
+</script>
+
+</body>
+</html>
