@@ -6,2072 +6,1367 @@
 <meta name="theme-color" content="#f5f7f4">
 <title>每日飲食控制｜體重管理</title>
 <style>
-:root{
-  --bg:#f4f7f3;--card:#fff;--text:#26342d;--muted:#7b8780;
-  --line:#e2e8e3;--green:#dfeee2;--blue:#e7eef9;--orange:#fff0dc;
-  --red:#f9e4e6;--accent:#5d8069;--shadow:0 8px 24px rgba(38,52,45,.07);
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif
-}
-.wrap{
-  max-width:760px;
-  margin:auto;
-  padding:18px 14px 80px
-}
-h1{font-size:27px;margin:8px 4px 5px}
-.sub{color:var(--muted);margin:0 4px 18px}
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:24px;
-  padding:18px;
-  margin:14px 0;
-  box-shadow:var(--shadow)
-}
-h2{font-size:20px;margin:0 0 15px}
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px
-}
-label{
-  display:block;
-  font-weight:700;
-  margin:10px 0 7px
-}
-input,textarea,select{
-  width:100%;
-  border:1px solid #dfe5e1;
-  border-radius:15px;
-  padding:13px 14px;
-  font-size:17px;
-  background:#fff;
-  color:var(--text);
-  outline:none
-}
-textarea{
-  min-height:90px;
-  resize:vertical
-}
-input:focus,textarea:focus,select:focus{
-  border-color:#8baa96
-}
-.options{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px
-}
-.opt{
-  border:1px solid #dce4df;
-  background:#fafcfb;
-  border-radius:999px;
-  padding:9px 12px;
-  cursor:pointer
-}
-.opt.on{
-  background:var(--green);
-  border-color:#a8c5b0;
-  font-weight:700
-}
-.small{
-  font-size:13px;
-  color:var(--muted)
-}
-.btns{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px
-}
-button{
-  border:0;
-  border-radius:15px;
-  padding:13px 14px;
-  font-size:16px;
-  font-weight:800;
-  cursor:pointer
-}
-.primary{
-  background:#dcecdf;
-  color:#274232
-}
-.secondary{
-  background:#e9eef8;
-  color:#30425c
-}
-.danger{
-  background:#f8e0e2;
-  color:#7a3036
-}
-.ghost{
-  background:#f1f4f2;
-  color:#435048
-}
-.notice{
-  background:#edf4fb;
-  border-radius:18px;
-  padding:14px;
-  color:#58708a;
-  line-height:1.6
-}
-.rule{
-  background:#fafbfa;
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:10px 14px
-}
-.row{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  padding:10px 0;
-  border-bottom:1px dashed #e1e6e2
-}
-.row:last-child{
-  border-bottom:0
-}
-.money{
-  font-weight:900;
-  font-size:21px
-}
-.stats{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px
-}
-.stat{
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:15px;
-  background:#fbfcfb
-}
-.stat .v{
-  font-size:25px;
-  font-weight:900;
-  margin-top:5px
-}
-.green{background:#e4f2e7}
-.pink{background:#fae7e9}
-.yellow{background:#fff0dd}
-.blue{background:#e8eef9}
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:14px
-}
-th,td{
-  padding:11px 6px;
-  border-bottom:1px solid var(--line);
-  text-align:center
-}
-tr.clickable{
-  cursor:pointer
-}
-.history{
-  overflow-x:auto
-}
-.tag{
-  display:inline-block;
-  padding:5px 8px;
-  border-radius:999px;
-  background:#eef3ef
-}
-.hidden{
-  display:none!important
-}
-
-/* =========================
-   固定快速跳轉按鈕
-========================= */
-.quick-nav{
-  position:fixed;
-  left:50%;
-  bottom:18px;
-  transform:translateX(-50%);
-  z-index:9999;
-  display:flex;
-  gap:10px;
-  padding:7px;
-  background:rgba(255,255,255,.94);
-  border:1px solid #dfe6e1;
-  border-radius:999px;
-  box-shadow:0 8px 28px rgba(38,52,45,.16);
-  backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px)
-}
-.quick-nav button{
-  padding:11px 16px;
-  border:0;
-  border-radius:999px;
-  background:#eef4ef;
-  color:#304239;
-  font-size:15px;
-  font-weight:800;
-  white-space:nowrap
-}
-.quick-nav button:active{
-  transform:scale(.97)
-}
-
-@media(max-width:520px){
-  .grid,.stats,.btns{
-    grid-template-columns:1fr
-  }
-
-  h1{
-    font-size:24px
-  }
-
-  .card{
-    border-radius:20px;
-    padding:15px
-  }
-
-  .quick-nav{
-    bottom:12px;
-    gap:6px;
-    padding:6px
-  }
-
-  .quick-nav button{
-    padding:10px 12px;
-    font-size:14px
-  }
-}
+:root{--bg:#f4f7f3;--card:#fff;--text:#26342d;--muted:#7b8780;--line:#e2e8e3;--green:#dfeee2;--blue:#e7eef9;--orange:#fff0dc;--red:#f9e4e6;--accent:#5d8069;--shadow:0 8px 24px rgba(38,52,45,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",sans-serif}.wrap{max-width:760px;margin:auto;padding:18px 14px 90px}
+h1{font-size:27px;margin:8px 4px 5px}.sub{color:var(--muted);margin:0 4px 18px}.card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:18px;margin:14px 0;box-shadow:var(--shadow)}h2{font-size:20px;margin:0 0 15px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:block;font-weight:700;margin:8px 0 6px}input,textarea{width:100%;border:1px solid #d8e0da;border-radius:13px;padding:12px;font-size:16px;background:#fff;color:var(--text)}input:focus,textarea:focus{outline:2px solid #cfe1d3;border-color:#9db8a5}input[readonly]{background:#f0f3f0;color:#526057;font-weight:700}textarea{min-height:105px;resize:vertical}
+.options{display:flex;flex-wrap:wrap;gap:8px}.opt{padding:9px 12px;border:1px solid #d7e0d9;border-radius:999px;background:#fff;cursor:pointer;font-size:15px}.opt.on{background:#dcecdf;border-color:#9bbba3;font-weight:700}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{border:0;border-radius:14px;padding:13px 12px;font-size:16px;font-weight:700;cursor:pointer}.primary{background:#5d8069;color:white}.secondary{background:#e8eee9;color:#304238}.ghost{background:#f2f4f2;color:#47564d}.danger{background:#f6dfe1;color:#8b353b}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#f5f7f5;border-radius:17px;padding:14px;text-align:center}.stat.green{background:var(--green)}.stat.pink{background:var(--red)}.stat.yellow{background:var(--orange)}.stat.blue{background:var(--blue)}.v{font-size:22px;font-weight:800;margin-top:5px}.small{font-size:13px;color:var(--muted);line-height:1.5}
+.result{margin-top:12px;padding:15px;border-radius:17px;background:#f2f6f3}.result.reward{background:#e1f1e4}.result.penalty{background:#fae3e5}.result.return{background:#fff0dc}.result .big{font-size:25px;font-weight:900;margin:5px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:10px 7px;border-bottom:1px solid var(--line);text-align:center}th{background:#f3f6f3;position:sticky;top:0}tbody tr{cursor:pointer}tbody tr:hover{background:#f6f8f6}.history{overflow:auto;border:1px solid var(--line);border-radius:14px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}.bup{background:#f7dfe1;color:#8b353b}.bdown{background:#dcefe0;color:#356642}.breturn{background:#ffefd8;color:#855b1c}.same{background:#e8ece9;color:#536159}
+.rule{background:#f7faf7;border:1px dashed #cbd9ce;border-radius:16px;padding:14px;line-height:1.8}.rule strong{font-size:18px}
+.quick{position:fixed;z-index:20;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;background:rgba(255,255,255,.93);padding:7px;border-radius:999px;box-shadow:0 5px 20px rgba(0,0,0,.12);border:1px solid #e2e7e3}.quick button{font-size:13px;padding:8px 11px;border-radius:999px}
+.notice{padding:12px 14px;border-radius:14px;background:#eef5ef;color:#405449;font-size:14px;line-height:1.6}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.btns{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}h1{font-size:24px}}
 </style>
 </head>
-
 <body>
 
-<!-- =========================
-     固定快速跳轉按鈕
-========================= -->
-<div class="quick-nav" aria-label="快速跳轉">
-  <button
-    type="button"
-    onclick="window.scrollTo({top:0,behavior:'smooth'})">
-    ⬆️ 回到最上面
-  </button>
-
-  <button
-    type="button"
-    onclick="window.scrollTo({top:document.documentElement.scrollHeight,behavior:'smooth'})">
-    ⬇️ 跳到最下面
-  </button>
+<div class="quick">
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆️ 回到最上面</button>
+<button onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})">⬇️ 跳到最下面</button>
 </div>
 
 <div class="wrap">
 
-  <h1>🥗 每日飲食控制｜體重管理</h1>
-  <p class="sub">
-    記錄每天飲食、作息與體重，獎懲金額自動計算。
-  </p>
-
-  <!-- =========================
-       今日體重
-  ========================= -->
-  <div class="card">
-    <h2>⚖️ 今日體重</h2>
-
-    <div class="grid">
-
-      <div>
-        <label>日期</label>
-        <input id="date" type="date">
-      </div>
-
-      <div>
-        <label>星期</label>
-        <input id="weekday" readonly>
-      </div>
-
-    </div>
-
-    <label>今日體重（kg）</label>
-
-    <input
-      id="weight"
-      type="number"
-      step="0.1"
-      placeholder="例如 56.0">
-
-    <div
-      id="weightResult"
-      class="notice"
-      style="margin-top:12px">
-      請輸入今日體重，系統會自動判斷今天是增加或減少。
-    </div>
-
-  </div>
-
-  <!-- =========================
-       獎懲設定
-  ========================= -->
-  <div class="card">
-
-    <h2>💰 獎懲設定</h2>
-
-    <div class="grid">
-
-      <div>
-        <label>原始基準體重（kg）</label>
-        <input
-          id="baseWeight"
-          type="number"
-          step="0.1"
-          value="56">
-      </div>
-
-      <div>
-        <label>獎勵體重（kg）</label>
-        <input
-          id="rewardWeight"
-          type="number"
-          step="0.1"
-          value="55">
-      </div>
-
-      <div>
-        <label>達成獎勵金額</label>
-        <input
-          id="rewardAmount"
-          type="number"
-          step="1"
-          value="1914">
-      </div>
-
-      <div>
-        <label>每增加 1kg 懲罰</label>
-        <input
-          id="upPenalty"
-          type="number"
-          step="1"
-          value="413">
-      </div>
-
-      <div>
-        <label>每減少 1kg 回饋</label>
-        <input
-          id="downReturn"
-          type="number"
-          step="1"
-          value="227">
-      </div>
-
-    </div>
-
-    <div
-      class="rule"
-      style="margin-top:14px">
+<h1>🥗 每日飲食控制｜體重管理</h1>
+<p class="sub">每天記錄飲食、生活與體重，獎勵／懲罰自動計算並保存。</p>
 
-      <div class="row">
-        <span>🎯 原始基準</span>
-        <strong id="rBase">56 kg</strong>
-      </div>
+<div class="card">
+<h2>⚖️ 今日體重</h2>
 
-      <div class="row">
-        <span>⬆️ 往上增加</span>
-        <strong id="rUp">+413 / kg</strong>
-      </div>
+<div class="grid">
+<div>
+<label>日期</label>
+<input id="date" type="date">
+</div>
 
-      <div class="row">
-        <span>⬇️ 往下降低</span>
-        <strong id="rDown">回227 / kg</strong>
-      </div>
+<div>
+<label>今天體重（kg）</label>
+<input id="weight" type="number" step="0.1" min="0" placeholder="例如 57.2">
+</div>
+</div>
 
-      <div class="row">
-        <span>🎁 達到獎勵體重</span>
-        <strong id="rReward">+1,914</strong>
-      </div>
+<div id="weightResult" class="result">
+<div class="small">輸入今天體重後，自動計算獎勵／回饋／懲罰。</div>
+</div>
+</div>
 
-      <div class="row">
-        <span>∞ 懲罰上限</span>
-        <strong>無上限</strong>
-      </div>
+<div class="card">
 
-    </div>
+<h2>💰 固定獎懲規則</h2>
 
-  </div>
+<div class="rule">
 
-  <!-- =========================
-       早餐
-  ========================= -->
-  <div class="card">
+<div class="grid">
 
-    <h2>🍳 早餐</h2>
+<div>
+<label>原固定體重（kg）</label>
+<input id="baseWeight" type="number" step="0.1" min="0" value="56" placeholder="例如 56">
+</div>
 
-    <div
-      id="breakfast"
-      class="options">
-    </div>
+<div>
+<label>今天扣完體重（kg）</label>
+<input id="weightRulePreview" type="number" step="0.1" readonly placeholder="自動帶入今天體重">
+</div>
 
-    <input
-      id="breakfastOther"
-      style="margin-top:9px"
-      placeholder="其他（可不填）">
+</div>
 
-  </div>
+<div id="ruleText" class="rule" style="margin-top:10px">
 
-  <!-- =========================
-       午餐
-  ========================= -->
-  <div class="card">
+<div>原固定體重：<strong>56 kg</strong></div>
+<div>🟢 <strong>56 → 55 kg：＋1,914 元獎勵</strong></div>
+<div>🟠 <strong>57 → 56 kg：＋227 元回饋</strong></div>
+<div>🔴 <strong>高於 56 kg：每增加 1 kg −413 元</strong></div>
 
-    <h2>🍱 午餐</h2>
+<div class="small">
+固定體重可以手動修改；修改後，獎勵／回饋／懲罰會依新的固定體重自動重新計算。
+</div>
 
-    <div
-      id="lunch"
-      class="options">
-    </div>
-
-    <input
-      id="lunchOther"
-      style="margin-top:9px"
-      placeholder="其他（可不填）">
-
-  </div>
-
-  <!-- =========================
-       晚餐
-  ========================= -->
-  <div class="card">
-
-    <h2>🥗 晚餐</h2>
-
-    <div
-      id="dinner"
-      class="options">
-    </div>
-
-    <input
-      id="dinnerOther"
-      style="margin-top:9px"
-      placeholder="其他（可不填）">
-
-  </div>
-
-  <!-- =========================
-       宵夜・零食・飲料
-  ========================= -->
-  <div class="card">
-
-    <h2>🍪 宵夜・零食・飲料</h2>
-
-    <label>宵夜</label>
-
-    <div
-      id="late"
-      class="options">
-    </div>
-
-    <input
-      id="lateOther"
-      style="margin-top:8px"
-      placeholder="其他（可不填）">
-
-    <label>零食</label>
-
-    <div
-      id="snack"
-      class="options">
-    </div>
-
-    <input
-      id="snackOther"
-      style="margin-top:8px"
-      placeholder="其他（可不填）">
-
-    <label>飲料</label>
-
-    <div
-      id="drink"
-      class="options">
-    </div>
-
-    <input
-      id="drinkOther"
-      style="margin-top:8px"
-      placeholder="其他（可不填）">
-
-  </div>
-
-  <!-- =========================
-       生活紀錄
-  ========================= -->
-  <div class="card">
-
-    <h2>⏰ 生活紀錄</h2>
-
-    <div class="grid">
-
-      <div>
-        <label>今日喝水量（ml）</label>
-        <input
-          id="water"
-          type="number"
-          placeholder="例如 4000">
-      </div>
-
-      <div>
-        <label>今日排便次數</label>
-        <input
-          id="bowel"
-          type="number"
-          min="0"
-          step="1"
-          placeholder="例如 1">
-      </div>
-
-      <div>
-        <label>起床時間</label>
-        <input
-          id="wake"
-          type="time">
-      </div>
-
-      <div>
-        <label>睡覺時間</label>
-        <input
-          id="sleep"
-          type="time">
-      </div>
-
-      <div>
-        <label>睡眠時數</label>
-        <input
-          id="sleepHours"
-          type="number"
-          step="0.1"
-          placeholder="例如 7.5">
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- =========================
-       168
-  ========================= -->
-  <div class="card">
-
-    <h2>🕐 168 間歇性斷食（可選）</h2>
-
-    <label>模式</label>
-
-    <div
-      id="fastMode"
-      class="options">
-    </div>
-
-    <div
-      class="grid"
-      style="margin-top:10px">
-
-      <div>
-        <label>第一餐時間</label>
-        <input
-          id="firstMeal"
-          type="time">
-      </div>
-
-      <div>
-        <label>最後一餐時間</label>
-        <input
-          id="lastMeal"
-          type="time">
-      </div>
-
-    </div>
-
-    <label>實際空腹時數</label>
-
-    <input
-      id="fastHours"
-      readonly
-      placeholder="輸入第一餐與最後一餐時間後自動計算">
-
-  </div>
-
-  <!-- =========================
-       心情
-  ========================= -->
-  <div class="card">
-
-    <h2>💬 今日心情分享</h2>
-
-    <textarea
-      id="mood"
-      placeholder="今天的心情、飲食感受、想對自己說的話……">
-    </textarea>
-
-  </div>
-
-  <!-- =========================
-       操作
-  ========================= -->
-  <div class="card">
-
-    <div class="btns">
-
-      <button
-        class="primary"
-        onclick="saveRecord()">
-        💾 儲存今天
-      </button>
-
-      <button
-        class="secondary"
-        onclick="loadCurrent()">
-        ↻ 重新載入
-      </button>
-
-      <button
-        class="ghost"
-        onclick="clearToday()">
-        🧹 清除今天
-      </button>
-
-      <button
-        class="danger"
-        onclick="clearAll()">
-        ⚠️ 全部清除
-      </button>
-
-    </div>
-
-  </div>
-
-  <!-- =========================
-       體重趨勢
-  ========================= -->
-  <div class="card">
-
-    <h2>📈 體重趨勢</h2>
-
-    <div class="stats">
-
-      <div class="stat">
-        <div class="small">今日體重</div>
-        <div
-          id="todayAvg"
-          class="v">
-          —
-        </div>
-      </div>
-
-      <div class="stat">
-        <div class="small">7日平均</div>
-        <div
-          id="avg7"
-          class="v">
-          —
-        </div>
-      </div>
-
-      <div class="stat">
-        <div class="small">30日平均</div>
-        <div
-          id="avg30"
-          class="v">
-          —
-        </div>
-      </div>
-
-      <div class="stat">
-        <div class="small">目前趨勢</div>
-        <div
-          id="trend"
-          class="v">
-          資料不足
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- =========================
-       獎懲帳本
-  ========================= -->
-  <div class="card">
-
-    <h2>💰 獎懲帳本</h2>
-
-    <div class="stats">
-
-      <div class="stat green">
-
-        <div>🎁 累計獎勵</div>
+</div>
+</div>
+</div>
 
-        <div
-          id="sumReward"
-          class="v">
-          0
-        </div>
-
-        <div class="small">
-          達成次數
-        </div>
-
-      </div>
-
-      <div class="stat pink">
-
-        <div>⚠️ 累計增加懲罰</div>
-
-        <div
-          id="sumPenalty"
-          class="v">
-          0
-        </div>
-
-        <div
-          id="penaltyDetail"
-          class="small">
-          413 累加
-        </div>
-
-      </div>
-
-      <div class="stat yellow">
-
-        <div>🔄 累計下降回饋</div>
-
-        <div
-          id="sumReturn"
-          class="v">
-          0
-        </div>
-
-        <div
-          id="returnDetail"
-          class="small">
-          227 / kg
-        </div>
-
-      </div>
-
-      <div class="stat blue">
-
-        <div>📊 淨結果</div>
-
-        <div
-          id="net"
-          class="v">
-          0
-        </div>
-
-        <div class="small">
-          獎勵＋回饋－懲罰
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- =========================
-       歷史紀錄
-  ========================= -->
-  <div class="card">
-
-    <h2>
-      📚 歷史紀錄
-      <span class="small">
-        點日期可載入
-      </span>
-    </h2>
-
-    <div class="history">
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>日期</th>
-            <th>體重</th>
-            <th>變化</th>
-            <th>當日金額</th>
-          </tr>
-        </thead>
-
-        <tbody id="historyBody"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
+<div class="card">
+<h2>🍳 早餐</h2>
+<div id="breakfast" class="options"></div>
+<input id="breakfastOther" style="margin-top:9px" placeholder="其他（可不填）">
+</div>
+
+<div class="card">
+<h2>🍱 午餐</h2>
+<div id="lunch" class="options"></div>
+<input id="lunchOther" style="margin-top:9px" placeholder="其他（可不填）">
+</div>
+
+<div class="card">
+<h2>🥗 晚餐</h2>
+<div id="dinner" class="options"></div>
+<input id="dinnerOther" style="margin-top:9px" placeholder="其他（可不填）">
+</div>
+
+<div class="card">
+
+<h2>🍪 宵夜・零食・飲料</h2>
+
+<label>宵夜</label>
+<div id="late" class="options"></div>
+<input id="lateOther" style="margin-top:8px" placeholder="其他（可不填）">
+
+<label>零食</label>
+<div id="snack" class="options"></div>
+<input id="snackOther" style="margin-top:8px" placeholder="其他（可不填）">
+
+<label>飲料</label>
+<div id="drink" class="options"></div>
+<input id="drinkOther" style="margin-top:8px" placeholder="其他（可不填）">
+
+</div>
+
+<div class="card">
+
+<h2>⏰ 生活紀錄</h2>
+
+<div class="grid">
+
+<div>
+<label>今日喝水量（ml）</label>
+<input id="water" type="number" placeholder="例如 2000">
+</div>
+
+<div>
+<label>今日排便次數</label>
+<input id="bowel" type="number" min="0" step="1" placeholder="例如 1">
+</div>
+
+<div>
+<label>起床時間</label>
+<input id="wake" type="time">
+</div>
+
+<div>
+<label>睡覺時間</label>
+<input id="sleep" type="time">
+</div>
+
+<div>
+<label>睡眠時數</label>
+<input id="sleepHours" type="number" step="0.1" placeholder="例如 7.5">
+</div>
+
+</div>
+</div>
+
+<div class="card">
+
+<h2>🕐 168 間歇性斷食（可選）</h2>
+
+<label>模式</label>
+<div id="fastMode" class="options"></div>
+
+<div class="grid" style="margin-top:10px">
+
+<div>
+<label>第一餐時間</label>
+<input id="firstMeal" type="time">
+</div>
+
+<div>
+<label>最後一餐時間</label>
+<input id="lastMeal" type="time">
+</div>
+
+</div>
+
+<label>實際空腹時數</label>
+<input id="fastHours" readonly placeholder="輸入第一餐與最後一餐時間後自動計算">
+
+</div>
+
+<div class="card">
+
+<h2>💬 今日心情分享</h2>
+
+<textarea id="mood" placeholder="今天的心情、飲食感受、想對自己說的話……"></textarea>
+
+</div>
+
+<div class="card">
+
+<div class="btns">
+
+<button class="primary" onclick="saveRecord()">💾 儲存今天</button>
+
+<button class="secondary" onclick="loadCurrent()">↻ 重新載入</button>
+
+<button class="ghost" onclick="clearToday()">🧹 清除今天</button>
+
+<button class="danger" onclick="clearAll()">⚠️ 全部清除</button>
+
+</div>
+
+<div id="saveMsg" class="small" style="text-align:center;margin-top:10px"></div>
+
+</div>
+
+<div class="card">
+
+<h2>📈 體重趨勢</h2>
+
+<div class="stats">
+
+<div class="stat">
+<div class="small">今日體重</div>
+<div id="todayAvg" class="v">—</div>
+</div>
+
+<div class="stat">
+<div class="small">7日平均</div>
+<div id="avg7" class="v">—</div>
+</div>
+
+<div class="stat">
+<div class="small">30日平均</div>
+<div id="avg30" class="v">—</div>
+</div>
+
+<div class="stat">
+<div class="small">目前趨勢</div>
+<div id="trend" class="v">資料不足</div>
+</div>
+
+</div>
+</div>
+
+<div class="card">
+
+<h2>💰 獎懲帳本</h2>
+
+<div class="stats">
+
+<div class="stat green">
+<div>🎁 累計下降獎勵</div>
+<div id="sumReward" class="v">0</div>
+<div class="small">每次由固定體重向下跨入獎勵區</div>
+</div>
+
+<div class="stat pink">
+<div>⚠️ 累計增加懲罰</div>
+<div id="sumPenalty" class="v">0</div>
+<div class="small">高於固定體重，每 kg −413</div>
+</div>
+
+<div class="stat yellow">
+<div>🔄 累計下降回饋</div>
+<div id="sumReturn" class="v">0</div>
+<div class="small">固定體重以上下降，每 kg ＋227</div>
+</div>
+
+<div class="stat blue">
+<div>📊 淨結果</div>
+<div id="net" class="v">0</div>
+<div class="small">獎勵＋回饋－懲罰</div>
+</div>
+
+</div>
+</div>
+
+<div class="card">
+
+<h2>📚 歷史紀錄 <span class="small">點日期可載入</span></h2>
+
+<div class="history">
+
+<table>
+
+<thead>
+<tr>
+<th>日期</th>
+<th>體重</th>
+<th>相對固定基準</th>
+<th>當日金額</th>
+</tr>
+</thead>
+
+<tbody id="historyBody"></tbody>
+
+</table>
+
+</div>
+</div>
 
 </div>
 
 <script>
 
-const KEY="dailyDietWeight_v2";
-const SETTINGS="dailyDietSettings_v2";
+const KEY="dailyDietWeight_v3";
+const SETTINGS_KEY="dailyDietSettings_v1";
+
+let FIXED_BASE=56;
+
+const REWARD_WEIGHT_OFFSET=1;
+const REWARD_AMOUNT=1914;
+const RETURN_AMOUNT=227;
+const UP_PENALTY=413;
 
 const defs={
 
-  breakfast:[
-    "奶昔",
-    "錠片",
-    "茶",
-    "蛋",
-    "水果"
-  ],
+breakfast:[
+"奶昔",
+"錠片",
+"茶",
+"蛋",
+"水果",
+"其他"
+],
 
-  lunch:[
-    "錠片",
-    "茶",
-    "排骨飯",
-    "飯吃一半",
-    "荷包蛋1個",
-    "雞胸肉1片",
-    "蔬菜"
-  ],
+lunch:[
+"錠片",
+"茶",
+"排骨飯",
+"飯吃一半",
+"荷包蛋1個",
+"雞胸肉1片",
+"蔬菜",
+"其他"
+],
 
-  dinner:[
-    "里肌肉沙拉",
-    "奶昔",
-    "錠片",
-    "茶",
-    "茶葉蛋1個",
-    "香草蛋白",
-    "蔬菜"
-  ],
+dinner:[
+"里肌肉沙拉",
+"奶昔",
+"錠片",
+"茶",
+"茶葉蛋1個",
+"香草蛋白",
+"蔬菜",
+"其他"
+],
 
-  late:[
-    "0",
-    "有吃",
-    "少量"
-  ],
+late:[
+"0",
+"有吃",
+"少量"
+],
 
-  snack:[
-    "0",
-    "水果",
-    "堅果",
-    "甜食"
-  ],
+snack:[
+"0",
+"水果",
+"堅果",
+"甜食",
+"其他"
+],
 
-  drink:[
-    "0",
-    "水",
-    "無糖茶",
-    "咖啡",
-    "含糖飲料"
-  ],
+drink:[
+"0",
+"水",
+"無糖茶",
+"咖啡",
+"含糖飲料",
+"其他"
+],
 
-  fastMode:[
-    "一般",
-    "14:10",
-    "16:8",
-    "18:6",
-    "20:4",
-    "自訂"
-  ]
+fastMode:[
+"一般",
+"14:10",
+"16:8",
+"18:6",
+"20:4",
+"自訂"
+]
 
 };
 
-let records=
-  JSON.parse(
-    localStorage.getItem(KEY)||"{}"
-  );
+let records=JSON.parse(localStorage.getItem(KEY)||"{}");
 
-let settings=
-  JSON.parse(
-    localStorage.getItem(SETTINGS)||"{}"
-  );
+function fmt(n){
 
-
-function fmtMoney(n){
-
-  return Math.round(n)
-    .toLocaleString("zh-TW");
+return Number(n).toLocaleString(
+"zh-TW",
+{
+minimumFractionDigits:Number(n)%1?1:0,
+maximumFractionDigits:1
+}
+);
 
 }
-
 
 function todayStr(){
 
-  return new Date()
-    .toISOString()
-    .slice(0,10);
+let d=new Date();
+
+return new Date(
+d.getTime()-d.getTimezoneOffset()*60000
+).toISOString().slice(0,10);
 
 }
-
 
 function weekday(s){
 
-  return [
-    "日",
-    "一",
-    "二",
-    "三",
-    "四",
-    "五",
-    "六"
-  ][
-    new Date(s+"T00:00:00").getDay()
-  ];
+return [
+"日",
+"一",
+"二",
+"三",
+"四",
+"五",
+"六"
+][new Date(s+"T00:00:00").getDay()];
 
 }
-
 
 function makeOptions(id,arr){
 
-  const el=
-    document.getElementById(id);
+let el=document.getElementById(id);
 
-  el.innerHTML=
-    arr.map(
-      x=>`
-        <span
-          class="opt"
-          data-v="${x}">
-          ${x}
-        </span>
-      `
-    ).join("");
+el.innerHTML=arr.map(
+x=>`<span class="opt" data-v="${x}">${x}</span>`
+).join("");
 
-  el.querySelectorAll(".opt")
-    .forEach(
-      o=>
-        o.onclick=
-          ()=>
-            o.classList.toggle("on")
-    );
+el.querySelectorAll(".opt").forEach(
+o=>o.onclick=()=>{
+o.classList.toggle("on");
+autoSaveWeight();
+}
+);
 
 }
-
-
-Object.entries(defs)
-  .forEach(
-    ([k,v])=>
-      makeOptions(k,v)
-  );
-
 
 function vals(id){
 
-  return [
-    ...document.querySelectorAll(
-      "#"+id+" .opt.on"
-    )
-  ].map(
-    x=>x.dataset.v
-  );
+return [
+...document.querySelectorAll("#"+id+" .opt.on")
+].map(x=>x.dataset.v);
 
 }
-
 
 function setVals(id,a=[]){
 
-  document
-    .querySelectorAll(
-      "#"+id+" .opt"
-    )
-    .forEach(
-      x=>
-        x.classList.toggle(
-          "on",
-          a.includes(x.dataset.v)
-        )
-    );
+document.querySelectorAll("#"+id+" .opt")
+.forEach(
+x=>x.classList.toggle(
+"on",
+a.includes(x.dataset.v)
+)
+);
 
 }
-
 
 function value(id){
 
-  return document
-    .getElementById(id)
-    .value;
+return document.getElementById(id).value;
 
 }
-
 
 function set(id,v){
 
-  document
-    .getElementById(id)
-    .value=
-      v??"";
+document.getElementById(id).value=v??"";
 
 }
 
-
-function settingsFromUI(){
-
-  return {
-
-    base:
-      +value("baseWeight")||56,
-
-    rewardWeight:
-      +value("rewardWeight")||55,
-
-    rewardAmount:
-      +value("rewardAmount")||1914,
-
-    upPenalty:
-      +value("upPenalty")||413,
-
-    downReturn:
-      +value("downReturn")||227
-
-  };
-
-}
-
-
-function updateRules(){
-
-  const s=
-    settingsFromUI();
-
-  document
-    .getElementById("rBase")
-    .textContent=
-      s.base+" kg";
-
-  document
-    .getElementById("rUp")
-    .textContent=
-      "+"+
-      fmtMoney(s.upPenalty)+
-      " / kg";
-
-  document
-    .getElementById("rDown")
-    .textContent=
-      "回"+
-      fmtMoney(s.downReturn)+
-      " / kg";
-
-  document
-    .getElementById("rReward")
-    .textContent=
-      "+"+
-      fmtMoney(s.rewardAmount);
-
-  localStorage.setItem(
-    SETTINGS,
-    JSON.stringify(s)
-  );
-
-  updateAnalysis();
-
-}
-
-
-[
-  "baseWeight",
-  "rewardWeight",
-  "rewardAmount",
-  "upPenalty",
-  "downReturn"
-]
-.forEach(
-  id=>{
-    document
-      .getElementById(id)
-      .addEventListener(
-        "input",
-        updateRules
-      );
-  }
+Object.entries(defs).forEach(
+([k,v])=>makeOptions(k,v)
 );
 
+function saveSettings(){
 
-function getForm(){
+const n=Number(
+document.getElementById("baseWeight").value
+);
 
-  return {
+if(isFinite(n)&&n>0){
 
-    date:value("date"),
+FIXED_BASE=n;
 
-    weight:
-      value("weight")===""
-      ?null
-      :+value("weight"),
-
-    breakfast:
-      vals("breakfast"),
-
-    breakfastOther:
-      value("breakfastOther"),
-
-    lunch:
-      vals("lunch"),
-
-    lunchOther:
-      value("lunchOther"),
-
-    dinner:
-      vals("dinner"),
-
-    dinnerOther:
-      value("dinnerOther"),
-
-    late:
-      vals("late"),
-
-    lateOther:
-      value("lateOther"),
-
-    snack:
-      vals("snack"),
-
-    snackOther:
-      value("snackOther"),
-
-    drink:
-      vals("drink"),
-
-    drinkOther:
-      value("drinkOther"),
-
-    water:
-      value("water"),
-
-    bowel:
-      value("bowel"),
-
-    wake:
-      value("wake"),
-
-    sleep:
-      value("sleep"),
-
-    sleepHours:
-      value("sleepHours"),
-
-    fastMode:
-      vals("fastMode"),
-
-    firstMeal:
-      value("firstMeal"),
-
-    lastMeal:
-      value("lastMeal"),
-
-    fastHours:
-      value("fastHours"),
-
-    mood:
-      value("mood")
-
-  };
+localStorage.setItem(
+SETTINGS_KEY,
+JSON.stringify({
+baseWeight:n
+})
+);
 
 }
 
+}
 
-function fill(r){
+function loadSettings(){
 
-  if(!r){
+try{
 
-    clearForm(false);
+const x=JSON.parse(
+localStorage.getItem(SETTINGS_KEY)||"{}"
+);
 
-    return;
+const n=Number(x.baseWeight);
 
-  }
+if(isFinite(n)&&n>0)
+FIXED_BASE=n;
 
-  set("date",r.date);
+}catch(e){}
 
-  set(
-    "weekday",
-    weekday(r.date)
-  );
+document.getElementById("baseWeight").value=FIXED_BASE;
 
-  set("weight",r.weight);
-
-  [
-    "breakfast",
-    "lunch",
-    "dinner",
-    "late",
-    "snack",
-    "drink",
-    "fastMode"
-  ]
-  .forEach(
-    id=>
-      setVals(
-        id,
-        r[id]||[]
-      )
-  );
-
-  [
-    "breakfastOther",
-    "lunchOther",
-    "dinnerOther",
-    "lateOther",
-    "snackOther",
-    "drinkOther",
-    "water",
-    "bowel",
-    "wake",
-    "sleep",
-    "sleepHours",
-    "firstMeal",
-    "lastMeal",
-    "fastHours",
-    "mood"
-  ]
-  .forEach(
-    id=>
-      set(
-        id,
-        r[id]
-      )
-  );
-
-  updateWeightResult();
-
-  updateFastHours();
+updateRuleText();
 
 }
 
+function updateRuleText(){
 
-function clearForm(keepDate=true){
+const b=FIXED_BASE;
+const rw=b-REWARD_WEIGHT_OFFSET;
 
-  const d=
-    keepDate
-    ?(
-      value("date")||
-      todayStr()
-    )
-    :todayStr();
+document.getElementById("ruleText").innerHTML=
 
-  document
-    .querySelectorAll(
-      "input:not([readonly]),textarea"
-    )
-    .forEach(
-      x=>{
-        if(x.id!=="date")
-          x.value="";
-      }
-    );
+`<div>原固定體重：<strong>${fmt(b)} kg</strong></div>
 
-  [
-    "breakfast",
-    "lunch",
-    "dinner",
-    "late",
-    "snack",
-    "drink",
-    "fastMode"
-  ]
-  .forEach(
-    id=>
-      setVals(id,[])
-  );
+<div>
+🟢 <strong>
+${fmt(b)} → ${fmt(rw)} kg：＋${fmt(REWARD_AMOUNT)} 元獎勵
+</strong>
+</div>
 
-  set("date",d);
+<div>
+🟠 <strong>
+${fmt(b+1)} → ${fmt(b)} kg：＋${fmt(RETURN_AMOUNT)} 元回饋
+</strong>
+</div>
 
-  set(
-    "weekday",
-    weekday(d)
-  );
+<div>
+🔴 <strong>
+高於 ${fmt(b)} kg：每增加 1 kg −${fmt(UP_PENALTY)} 元
+</strong>
+</div>
 
-  updateWeightResult();
+<div class="small">
+固定體重可以手動修改；修改後，獎勵／回饋／懲罰會依新的固定體重自動重新計算。
+</div>`;
 
-  updateFastHours();
+const p=document.getElementById("weightRulePreview");
+
+if(p)
+p.value=value("weight")||"";
 
 }
 
+function updateBaseWeight(){
 
-function loadCurrent(){
+const n=Number(
+document.getElementById("baseWeight").value
+);
 
-  const d=
-    value("date")||
-    todayStr();
+if(!isFinite(n)||n<=0){
 
-  fill(
-    records[d]||null
-  );
+document.getElementById("baseWeight").value=FIXED_BASE;
 
-  updateAnalysis();
-
-}
-
-
-function saveRecord(){
-
-  const r=
-    getForm();
-
-  if(!r.weight && r.weight!==0){
-
-    alert(
-      "請先填寫今日體重。"
-    );
-
-    return;
-
-  }
-
-  records[r.date]=r;
-
-  localStorage.setItem(
-    KEY,
-    JSON.stringify(records)
-  );
-
-  updateWeightResult();
-
-  updateAnalysis();
-
-  alert(
-    "已儲存今天的紀錄 ❤️"
-  );
+return;
 
 }
 
+FIXED_BASE=n;
 
-function clearToday(){
+localStorage.setItem(
+SETTINGS_KEY,
+JSON.stringify({
+baseWeight:n
+})
+);
 
-  const d=
-    value("date")||
-    todayStr();
+updateRuleText();
 
-  if(
-    confirm(
-      "確定要清除今天的紀錄嗎？"
-    )
-  ){
-
-    delete records[d];
-
-    localStorage.setItem(
-      KEY,
-      JSON.stringify(records)
-    );
-
-    clearForm(true);
-
-    updateAnalysis();
-
-  }
+updateAll();
 
 }
 
+function movementBetween(prev,w){
 
-function clearAll(){
+if(prev==null){
 
-  if(
-    !confirm(
-      "⚠️ 確定要刪除全部歷史紀錄嗎？"
-    )
-  )
-    return;
+if(w>FIXED_BASE)
 
-  if(
-    !confirm(
-      "⚠️ 第二次確認：全部紀錄刪除後無法復原，確定嗎？"
-    )
-  )
-    return;
+return {
+type:"penalty",
+amount:(w-FIXED_BASE)*UP_PENALTY,
+kg:w-FIXED_BASE
+};
 
-  records={};
+if(w<FIXED_BASE)
 
-  localStorage.removeItem(
-    KEY
-  );
+return {
+type:"reward",
+amount:(FIXED_BASE-w)*REWARD_AMOUNT,
+kg:FIXED_BASE-w
+};
 
-  clearForm(true);
-
-  updateAnalysis();
-
-}
-
-
-function previousWeight(date){
-
-  return Object.keys(records)
-    .filter(
-      d=>
-        d<date &&
-        records[d].weight!=null
-    )
-    .sort()
-    .pop();
+return {
+type:"same",
+amount:0,
+kg:0
+};
 
 }
 
+if(w>prev){
 
-function movement(date){
-
-  const r=
-    records[date];
-
-  if(
-    !r||
-    r.weight==null
-  )
-    return{
-      change:null,
-      amount:0,
-      type:""
-    };
-
-  const pd=
-    previousWeight(date);
-
-  if(!pd)
-    return{
-      change:null,
-      amount:0,
-      type:""
-    };
-
-  const diff=
-    +(
-      r.weight-
-      records[pd].weight
-    ).toFixed(2);
-
-  const s=
-    settingsFromUI();
-
-  if(diff>0)
-
-    return{
-      change:diff,
-      amount:
-        -diff*s.upPenalty,
-      type:"penalty"
-    };
-
-  if(diff<0)
-
-    return{
-      change:diff,
-      amount:
-        (-diff)*s.downReturn,
-      type:"return"
-    };
-
-  return{
-    change:0,
-    amount:0,
-    type:""
-  };
+return {
+type:"penalty",
+amount:(w-prev)*UP_PENALTY,
+kg:w-prev
+};
 
 }
 
+if(w<prev){
 
-function rewardTransactions(){
+let amount=0;
+let from=prev;
+let to=w;
 
-  const dates=
-    Object.keys(records)
-      .filter(
-        d=>
-          records[d].weight!=null
-      )
-      .sort();
+/*
+每跨過固定體重以上的區段：
+57 → 56 = 每 kg ＋227
 
-  const s=
-    settingsFromUI();
+進入固定體重以下：
+56 → 55 = 每 kg ＋1,914
+*/
 
-  let got=0;
+if(from>FIXED_BASE){
 
-  let eligible=false;
+let drop=Math.min(
+from-FIXED_BASE,
+from-to
+);
 
-  const tx=[];
+amount+=drop*RETURN_AMOUNT;
 
-  for(
-    const d of dates
-  ){
-
-    const w=
-      records[d].weight;
-
-    if(
-      w>s.rewardWeight
-    )
-      eligible=true;
-
-    if(
-      w<=s.rewardWeight &&
-      eligible
-    ){
-
-      got++;
-
-      tx.push({
-        date:d,
-        amount:s.rewardAmount
-      });
-
-      eligible=false;
-
-    }
-
-  }
-
-  return tx;
+from-=drop;
 
 }
 
+if(to<FIXED_BASE){
+
+let drop=FIXED_BASE-Math.max(to,0);
+
+amount+=drop*REWARD_AMOUNT;
+
+}
+
+return {
+type:to<FIXED_BASE?"reward":"return",
+amount,
+kg:prev-w
+};
+
+}
+
+return {
+type:"same",
+amount:0,
+kg:0
+};
+
+}
+
+function getSortedWeights(){
+
+return Object.keys(records)
+.filter(
+d=>
+records[d] &&
+records[d].weight!==null &&
+records[d].weight!=="" &&
+isFinite(records[d].weight)
+)
+.sort();
+
+}
+
+function currentMovement(date){
+
+let dates=getSortedWeights();
+
+let i=dates.indexOf(date);
+
+let prev=
+i>0
+?records[dates[i-1]].weight
+:null;
+
+let w=records[date].weight;
+
+return movementBetween(prev,w);
+
+}
 
 function updateWeightResult(){
 
-  const d=
-    value("date")||
-    todayStr();
+const el=document.getElementById("weightResult");
 
-  const r=
-    records[d]||
-    getForm();
+const w=Number(value("weight"));
+const date=value("date");
 
-  const w=
-    r.weight;
+if(!w){
 
-  if(
-    w==null||
-    w===""
-  ){
+el.className="result";
 
-    document
-      .getElementById(
-        "weightResult"
-      )
-      .textContent=
-        "請輸入今日體重，系統會自動判斷今天是增加或減少。";
+el.innerHTML=
+'<div class="small">輸入今天體重後，自動計算獎勵／回饋／懲罰。</div>';
 
-    return;
-
-  }
-
-  const pd=
-    previousWeight(d);
-
-  const s=
-    settingsFromUI();
-
-  if(!pd){
-
-    document
-      .getElementById(
-        "weightResult"
-      )
-      .textContent=
-        `今日 ${w} kg｜目前以此筆作為第一筆紀錄。`;
-
-    return;
-
-  }
-
-  const old=
-    records[pd].weight;
-
-  const diff=
-    +(w-old).toFixed(2);
-
-  let text=
-    `前次 ${old} kg → 今日 ${w} kg｜`;
-
-  if(diff>0)
-
-    text+=
-      `⬆️ 增加 ${diff} kg，懲罰 ${fmtMoney(diff*s.upPenalty)}`;
-
-  else if(diff<0)
-
-    text+=
-      `⬇️ 減少 ${-diff} kg，回饋 ${fmtMoney((-diff)*s.downReturn)}`;
-
-  else
-
-    text+=
-      "➡️ 沒有變化，金額 0";
-
-  if(
-    w<=s.rewardWeight &&
-    old>s.rewardWeight
-  )
-
-    text+=
-      `｜🎁 達成 ${s.rewardWeight} kg 獎勵 +${fmtMoney(s.rewardAmount)}`;
-
-  document
-    .getElementById(
-      "weightResult"
-    )
-    .textContent=
-      text;
+return;
 
 }
 
+/*
+先把目前輸入視為今天資料，
+找出今天以前最近的一筆體重。
+*/
 
-function avg(days){
+const dates=
+getSortedWeights()
+.filter(d=>d!==date)
+.sort();
 
-  const cutoff=
-    new Date();
+const prev=
+dates.length
+?records[dates[dates.length-1]].weight
+:null;
 
-  cutoff.setDate(
-    cutoff.getDate()-
-    days+
-    1
-  );
+const m=movementBetween(prev,w);
 
-  const arr=
-    Object.entries(records)
-      .filter(
-        ([d,r])=>
-          r.weight!=null &&
-          new Date(
-            d+"T23:59:59"
-          )>=cutoff
-      )
-      .map(
-        ([,r])=>
-          r.weight
-      );
+let title="";
+let detail="";
 
-  return arr.length
-    ?(
-      arr.reduce(
-        (a,b)=>a+b,
-        0
-      )/
-      arr.length
-    ).toFixed(1)
-    :"—";
+if(m.type==="penalty"){
+
+title="🔴 今日懲罰";
+
+detail=
+`比上一筆增加 ${fmt(m.kg)} kg（若無上一筆則以固定 ${fmt(FIXED_BASE)} kg 為基準）`;
 
 }
 
+else if(m.type==="reward"){
 
-function updateAnalysis(){
+title="🟢 今日獎勵";
 
-  const d=
-    value("date")||
-    todayStr();
-
-  const r=
-    records[d];
-
-  document
-    .getElementById(
-      "todayAvg"
-    )
-    .textContent=
-      r&&r.weight!=null
-      ?r.weight.toFixed(1)+" kg"
-      :"—";
-
-  const a7=
-    avg(7);
-
-  const a30=
-    avg(30);
-
-  document
-    .getElementById(
-      "avg7"
-    )
-    .textContent=
-      a7==="—"
-      ?"—"
-      :a7+" kg";
-
-  document
-    .getElementById(
-      "avg30"
-    )
-    .textContent=
-      a30==="—"
-      ?"—"
-      :a30+" kg";
-
-  const dates=
-    Object.keys(records)
-      .filter(
-        x=>
-          records[x].weight!=null
-      )
-      .sort();
-
-  let trend=
-    "資料不足";
-
-  if(dates.length>=2){
-
-    const a=
-      records[
-        dates[dates.length-2]
-      ].weight;
-
-    const b=
-      records[
-        dates[dates.length-1]
-      ].weight;
-
-    trend=
-      b<a
-      ?"下降 ↓"
-      :b>a
-      ?"上升 ↑"
-      :"持平 →";
-
-  }
-
-  document
-    .getElementById(
-      "trend"
-    )
-    .textContent=
-      trend;
-
-  const s=
-    settingsFromUI();
-
-  const rewards=
-    rewardTransactions();
-
-  let penalty=0;
-
-  let ret=0;
-
-  dates.forEach(
-    x=>{
-
-      const m=
-        movement(x);
-
-      if(
-        m.type==="penalty"
-      )
-        penalty+=
-          Math.abs(m.amount);
-
-      if(
-        m.type==="return"
-      )
-        ret+=
-          m.amount;
-
-    }
-  );
-
-  const rewardSum=
-    rewards.reduce(
-      (a,b)=>
-        a+b.amount,
-      0
-    );
-
-  document
-    .getElementById(
-      "sumReward"
-    )
-    .textContent=
-      fmtMoney(rewardSum);
-
-  document
-    .getElementById(
-      "sumPenalty"
-    )
-    .textContent=
-      fmtMoney(penalty);
-
-  document
-    .getElementById(
-      "sumReturn"
-    )
-    .textContent=
-      fmtMoney(ret);
-
-  document
-    .getElementById(
-      "net"
-    )
-    .textContent=
-      fmtMoney(
-        rewardSum+
-        ret-
-        penalty
-      );
-
-  document
-    .getElementById(
-      "penaltyDetail"
-    )
-    .textContent=
-      s.upPenalty+
-      " 累加";
-
-  document
-    .getElementById(
-      "returnDetail"
-    )
-    .textContent=
-      s.downReturn+
-      " / kg";
-
-  renderHistory();
+detail=
+`跨入 ${fmt(FIXED_BASE)} → ${fmt(FIXED_BASE-1)} 以下，依每公斤 ${fmt(REWARD_AMOUNT)} 元計算`;
 
 }
 
+else if(m.type==="return"){
 
-function renderHistory(){
+title="🟠 今日下降回饋";
 
-  const body=
-    document
-      .getElementById(
-        "historyBody"
-      );
-
-  body.innerHTML="";
-
-  const dates=
-    Object.keys(records)
-      .filter(
-        d=>
-          records[d].weight!=null
-      )
-      .sort()
-      .reverse();
-
-  if(!dates.length){
-
-    body.innerHTML=
-      '<tr><td colspan="4">目前還沒有紀錄</td></tr>';
-
-    return;
-
-  }
-
-  dates.forEach(
-    d=>{
-
-      const r=
-        records[d];
-
-      const m=
-        movement(d);
-
-      const reward=
-        rewardTransactions()
-          .find(
-            x=>
-              x.date===d
-          );
-
-      let ch=
-        m.change==null
-        ?"—"
-        :
-          (
-            m.change>0
-            ?"+"+m.change
-            :m.change
-          )+
-          " kg";
-
-      let amt=
-        m.amount;
-
-      if(reward)
-        amt+=
-          reward.amount;
-
-      body.insertAdjacentHTML(
-        "beforeend",
-        `
-        <tr
-          class="clickable"
-          onclick="fill(records['${d}'])">
-
-          <td>${d}</td>
-
-          <td>
-            <strong>
-              ${r.weight.toFixed(1)}
-            </strong>
-            kg
-          </td>
-
-          <td>
-            ${ch}
-          </td>
-
-          <td>
-            ${
-              amt>0
-              ?"+"
-              :""
-            }${fmtMoney(amt)}
-          </td>
-
-        </tr>
-        `
-      );
-
-    }
-  );
+detail=
+`由 ${fmt(FIXED_BASE)} kg 以上下降，每公斤 ${fmt(RETURN_AMOUNT)} 元回饋`;
 
 }
 
+else{
+
+title="⚪ 今日無變化";
+
+detail="體重與上一筆相同";
+
+}
+
+el.className="result "+m.type;
+
+el.innerHTML=
+
+`<div>
+<b>固定基準：${fmt(FIXED_BASE)} kg</b>
+　　
+<b>今天：${fmt(w)} kg</b>
+</div>
+
+<div class="big">
+${title}
+${m.amount>0?"+":""}${fmt(m.amount)} 元
+</div>
+
+<div class="small">
+${detail}
+</div>`;
+
+}
+
+function collect(){
+
+let date=value("date")||todayStr();
+
+return {
+
+date,
+
+weight:
+value("weight")===""
+?null
+:Number(value("weight")),
+
+breakfast:vals("breakfast"),
+breakfastOther:value("breakfastOther"),
+
+lunch:vals("lunch"),
+lunchOther:value("lunchOther"),
+
+dinner:vals("dinner"),
+dinnerOther:value("dinnerOther"),
+
+late:vals("late"),
+lateOther:value("lateOther"),
+
+snack:vals("snack"),
+snackOther:value("snackOther"),
+
+drink:vals("drink"),
+drinkOther:value("drinkOther"),
+
+water:value("water"),
+bowel:value("bowel"),
+
+wake:value("wake"),
+sleep:value("sleep"),
+sleepHours:value("sleepHours"),
+
+fastMode:vals("fastMode"),
+firstMeal:value("firstMeal"),
+lastMeal:value("lastMeal"),
+fastHours:value("fastHours"),
+
+mood:value("mood")
+
+};
+
+}
+
+function saveRecord(silent=false){
+
+let r=collect();
+
+records[r.date]=r;
+
+localStorage.setItem(
+KEY,
+JSON.stringify(records)
+);
+
+renderAll();
+
+document.getElementById("saveMsg").textContent=
+
+silent
+?"已自動保存"
+:"✅ 已保存 "+r.date+"（週"+weekday(r.date)+"）";
+
+}
+
+function autoSaveWeight(){
+
+updateFastHours();
+
+if(
+value("date") &&
+value("weight")!==""
+){
+
+saveRecord(true);
+
+}
+else{
+
+updateAll();
+
+}
+
+}
+
+function loadRecord(date){
+
+let r=records[date];
+
+set("date",date);
+
+if(!r){
+
+clearForm(false);
+
+set("date",date);
+
+return;
+
+}
+
+set("weight",r.weight);
+
+[
+"breakfastOther",
+"lunchOther",
+"dinnerOther",
+"lateOther",
+"snackOther",
+"drinkOther",
+"water",
+"bowel",
+"wake",
+"sleep",
+"sleepHours",
+"firstMeal",
+"lastMeal",
+"mood"
+].forEach(
+id=>set(id,r[id])
+);
+
+[
+"breakfast",
+"lunch",
+"dinner",
+"late",
+"snack",
+"drink",
+"fastMode"
+].forEach(
+id=>setVals(id,r[id]||[])
+);
+
+set("fastHours",r.fastHours||"");
+
+updateFastHours();
+
+updateAll();
+
+}
+
+function loadCurrent(){
+
+loadRecord(
+value("date")||todayStr()
+);
+
+}
+
+function clearForm(remove=true){
+
+[
+"weight",
+"breakfastOther",
+"lunchOther",
+"dinnerOther",
+"lateOther",
+"snackOther",
+"drinkOther",
+"water",
+"bowel",
+"wake",
+"sleep",
+"sleepHours",
+"firstMeal",
+"lastMeal",
+"mood",
+"fastHours"
+].forEach(
+id=>set(id,"")
+);
+
+[
+"breakfast",
+"lunch",
+"dinner",
+"late",
+"snack",
+"drink",
+"fastMode"
+].forEach(
+id=>setVals(id,[])
+);
+
+if(remove){
+
+let d=value("date");
+
+delete records[d];
+
+localStorage.setItem(
+KEY,
+JSON.stringify(records)
+);
+
+}
+
+updateAll();
+
+}
+
+function clearToday(){
+
+let d=value("date")||todayStr();
+
+if(
+confirm("確定要清除今天的紀錄嗎？")
+){
+
+delete records[d];
+
+localStorage.setItem(
+KEY,
+JSON.stringify(records)
+);
+
+clearForm(false);
+
+set("date",d);
+
+document.getElementById("saveMsg").textContent=
+"已清除 "+d;
+
+renderAll();
+
+}
+
+}
+
+function clearAll(){
+
+if(
+!confirm("確定要全部清除嗎？")
+)
+return;
+
+if(
+!confirm("⚠️ 再確認一次：所有歷史紀錄都會刪除，確定嗎？")
+)
+return;
+
+records={};
+
+localStorage.removeItem(KEY);
+
+clearForm(false);
+
+set("date",todayStr());
+
+document.getElementById("saveMsg").textContent=
+"已全部清除";
+
+renderAll();
+
+}
 
 function updateFastHours(){
 
-  const a=
-    value("firstMeal");
+let a=value("firstMeal");
+let b=value("lastMeal");
 
-  const b=
-    value("lastMeal");
+if(!a||!b){
 
-  if(!a||!b){
+set("fastHours","");
 
-    set(
-      "fastHours",
-      ""
-    );
-
-    return;
-
-  }
-
-  let x=
-    new Date(
-      "2000-01-01T"+
-      a
-    );
-
-  let y=
-    new Date(
-      "2000-01-01T"+
-      b
-    );
-
-  let h=
-    (x-y)/
-    3600000;
-
-  if(h<0)
-    h+=24;
-
-  set(
-    "fastHours",
-    h.toFixed(1)+
-    " 小時"
-  );
+return;
 
 }
 
+let [ah,am]=a.split(":").map(Number);
+let [bh,bm]=b.split(":").map(Number);
 
-document
-  .getElementById("date")
-  .addEventListener(
-    "change",
-    ()=>{
-      set(
-        "weekday",
-        weekday(
-          value("date")
-        )
-      );
+let x=ah*60+am;
+let y=bh*60+bm;
 
-      loadCurrent();
+if(y<x)
+y+=1440;
 
-    }
-  );
+set(
+"fastHours",
+((y-x)/60).toFixed(1)+" 小時"
+);
 
+}
 
-document
-  .getElementById("weight")
-  .addEventListener(
-    "input",
-    updateWeightResult
-  );
+function updateTrends(){
 
+let ds=getSortedWeights();
 
-document
-  .getElementById("firstMeal")
-  .addEventListener(
-    "change",
-    updateFastHours
-  );
+let now=value("date")||todayStr();
 
+let w=Number(value("weight"));
 
-document
-  .getElementById("lastMeal")
-  .addEventListener(
-    "change",
-    updateFastHours
-  );
+if(w){
 
+records[now]=records[now]||{};
+records[now].weight=w;
 
-(function init(){
+}
 
-  set(
-    "date",
-    todayStr()
-  );
+let last=
+ds
+.filter(d=>d<=now)
+.slice(-30);
 
-  set(
-    "weekday",
-    weekday(
-      todayStr()
-    )
-  );
+let weights=
+last
+.map(d=>Number(records[d].weight))
+.filter(isFinite);
 
-  if(
-    settings.base!=null
-  ){
+document.getElementById("todayAvg").textContent=
+w
+?fmt(w)+" kg"
+:"—";
 
-    set(
-      "baseWeight",
-      settings.base
-    );
+let a7=weights.slice(-7);
+let a30=weights.slice(-30);
 
-    set(
-      "rewardWeight",
-      settings.rewardWeight
-    );
+document.getElementById("avg7").textContent=
+a7.length
+?(a7.reduce((a,b)=>a+b,0)/a7.length).toFixed(1)+" kg"
+:"—";
 
-    set(
-      "rewardAmount",
-      settings.rewardAmount
-    );
+document.getElementById("avg30").textContent=
+a30.length
+?(a30.reduce((a,b)=>a+b,0)/a30.length).toFixed(1)+" kg"
+:"—";
 
-    set(
-      "upPenalty",
-      settings.upPenalty
-    );
+if(weights.length<2){
 
-    set(
-      "downReturn",
-      settings.downReturn
-    );
+document.getElementById("trend").textContent=
+"資料不足";
 
-  }
+}
+else{
 
-  updateRules();
+let diff=
+weights[weights.length-1]-
+weights[0];
 
-  if(
-    records[todayStr()]
-  )
+document.getElementById("trend").textContent=
+diff<-.05
+?"下降 ↘"
+:diff>.05
+?"上升 ↗"
+:"持平 →";
 
-    fill(
-      records[todayStr()]
-    );
+}
 
-  else
+}
 
-    clearForm(true);
+function calculateLedger(){
 
-  updateAnalysis();
+let ds=getSortedWeights();
 
-})();
+let reward=0;
+let penalty=0;
+let ret=0;
+
+for(let i=0;i<ds.length;i++){
+
+let prev=
+i
+?records[ds[i-1]].weight
+:null;
+
+let m=
+movementBetween(
+prev,
+records[ds[i]].weight
+);
+
+if(m.type==="penalty")
+penalty+=m.amount;
+
+else if(m.type==="reward")
+reward+=m.amount;
+
+else if(m.type==="return")
+ret+=m.amount;
+
+}
+
+return {
+reward,
+penalty,
+ret,
+net:reward+ret-penalty
+};
+
+}
+
+function renderLedger(){
+
+let x=calculateLedger();
+
+document.getElementById("sumReward").textContent=
+"+"+fmt(x.reward);
+
+document.getElementById("sumPenalty").textContent=
+"-"+fmt(x.penalty);
+
+document.getElementById("sumReturn").textContent=
+"+"+fmt(x.ret);
+
+document.getElementById("net").textContent=
+(x.net>=0?"+":"")+fmt(x.net);
+
+}
+
+function renderHistory(){
+
+let body=document.getElementById("historyBody");
+
+let ds=
+getSortedWeights()
+.reverse();
+
+body.innerHTML=
+ds.map(
+d=>{
+
+let w=records[d].weight;
+
+let m=currentMovement(d);
+
+let diff=w-FIXED_BASE;
+
+let cls=
+diff>0
+?"bup"
+:diff<0
+?"bdown"
+:"same";
+
+let txt=
+diff>0
+?"+"+fmt(diff)+" kg"
+:diff<0
+?fmt(diff)+" kg"
+:"0 kg";
+
+let money=
+m.amount
+?(
+m.amount>0
+?"+"
+:"-"
+)+fmt(Math.abs(m.amount))+" 元"
+:"—";
+
+return `
+
+<tr onclick="loadRecord('${d}')">
+
+<td>
+${d}
+<br>
+<span class="small">
+週${weekday(d)}
+</span>
+</td>
+
+<td>
+<b>${fmt(w)}</b>
+</td>
+
+<td>
+<span class="badge ${cls}">
+${txt}
+</span>
+</td>
+
+<td>
+${money}
+</td>
+
+</tr>
+
+`;
+
+}
+).join("")
+
+||
+
+'<tr><td colspan="4" class="small">尚無體重紀錄</td></tr>';
+
+}
+
+function renderAll(){
+
+updateFastHours();
+
+updateWeightResult();
+
+updateTrends();
+
+renderLedger();
+
+renderHistory();
+
+}
+
+loadSettings();
+
+document.getElementById("date").value=
+todayStr();
+
+document.getElementById("baseWeight")
+.addEventListener(
+"input",
+updateBaseWeight
+);
+
+document.getElementById("date")
+.addEventListener(
+"change",
+loadCurrent
+);
+
+document.getElementById("weight")
+.addEventListener(
+"input",
+autoSaveWeight
+);
+
+[
+"firstMeal",
+"lastMeal"
+].forEach(
+id=>
+document.getElementById(id)
+.addEventListener(
+"input",
+()=>{
+updateFastHours();
+autoSaveWeight();
+}
+)
+);
+
+document.querySelectorAll(
+"input,textarea"
+).forEach(
+el=>{
+
+if(
+![
+"date",
+"weight",
+"firstMeal",
+"lastMeal"
+].includes(el.id)
+){
+
+el.addEventListener(
+"change",
+()=>autoSaveWeight()
+);
+
+}
+
+}
+);
+
+loadCurrent();
+
+updateAll();
 
 </script>
 
