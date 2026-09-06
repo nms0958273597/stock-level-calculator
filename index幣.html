@@ -2,655 +2,581 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-               maximum-scale=1.0, user-scalable=no">
-
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b0a">
 <title>🐰 Crypto AI 虛擬貨幣智慧儀表板</title>
 
 <style>
+*{box-sizing:border-box}
 :root{
-    --bg:#050607;
-    --panel:#0d0f11;
-    --panel2:#111416;
-    --line:#292d30;
-    --gold:#e9c66a;
-    --gold2:#fff0a5;
-    --green:#21d46b;
-    --green2:#0b6b38;
-    --red:#ff4e5e;
-    --yellow:#f4c84d;
-    --text:#f4f4f4;
-    --muted:#858b90;
+  --bg:#070908;
+  --panel:#101411;
+  --panel2:#151a17;
+  --line:#263129;
+  --text:#f4f7f5;
+  --muted:#8e9a92;
+  --green:#19d77b;
+  --green2:#0b9f58;
+  --red:#ff5570;
+  --gold:#f5c84c;
+  --cyan:#4fdcff;
+  --orange:#ff9f43;
 }
 
-*{
-    box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent;
+html{
+  scroll-behavior:smooth;
 }
 
 body{
-    margin:0;
-    background:
-        radial-gradient(circle at 50% -10%,#211d0d 0,#080909 35%,#030404 100%);
-    color:var(--text);
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Noto Sans TC",
-        "PingFang TC",
-        Arial,
-        sans-serif;
+  margin:0;
+  background:
+    radial-gradient(circle at 50% -10%,#152219 0,#070908 42%);
+  color:var(--text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Display",
+    "PingFang TC",
+    "Noto Sans TC",
+    Arial,
+    sans-serif;
 }
 
-button,
-input,
-select{
-    font:inherit;
+button,input,select{
+  font:inherit;
 }
 
 button{
-    cursor:pointer;
+  cursor:pointer;
 }
 
 .app{
-    width:100%;
-    max-width:680px;
-    margin:auto;
-    padding-bottom:90px;
+  width:min(100%,720px);
+  margin:auto;
+  padding:12px 12px 92px;
 }
 
-/* =========================
-   HEADER
-========================= */
-
-.header{
-    position:sticky;
-    top:0;
-    z-index:50;
-    background:rgba(5,6,7,.94);
-    backdrop-filter:blur(15px);
-    border-bottom:1px solid #29230e;
-    padding:15px;
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:10px;
 }
 
 .brand{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+  font-weight:900;
+  font-size:19px;
+  letter-spacing:.5px;
+  color:var(--gold);
 }
 
-.logo{
-    font-size:21px;
-    font-weight:900;
-    color:var(--gold);
-}
-
-.status{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:12px;
-    color:var(--muted);
+.live{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  color:var(--green);
+  font-size:12px;
+  font-weight:800;
 }
 
 .dot{
-    width:8px;
-    height:8px;
-    border-radius:50%;
-    background:var(--green);
-    box-shadow:0 0 12px var(--green);
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--green);
+  box-shadow:0 0 12px var(--green);
 }
 
-/* =========================
-   SEARCH
-========================= */
-
-.searchBox{
-    display:flex;
-    gap:8px;
-    margin-top:13px;
+.searchbar{
+  display:flex;
+  gap:7px;
+  margin-bottom:9px;
 }
 
-.searchBox input{
-    flex:1;
-    min-width:0;
-    background:#101214;
-    color:white;
-    border:1px solid #35302a;
-    border-radius:13px;
-    padding:13px 14px;
-    outline:none;
+.searchbar input{
+  flex:1;
+  min-width:0;
+  background:#0d110f;
+  border:1px solid var(--line);
+  color:#fff;
+  border-radius:10px;
+  padding:10px 11px;
+  outline:none;
+  text-transform:uppercase;
 }
 
-.searchBox input:focus{
-    border-color:var(--gold);
-    box-shadow:0 0 15px rgba(233,198,106,.15);
+.searchbar input:focus{
+  border-color:#4a775d;
+  box-shadow:0 0 12px rgba(25,215,123,.08);
+}
+
+.btn{
+  border:1px solid var(--line);
+  background:#111713;
+  color:#dfe7e2;
+  border-radius:10px;
+  padding:10px 12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.btn:hover,
+.btn.active{
+  border-color:#356b4d;
+  background:#16301f;
+  color:#fff;
 }
 
 .goldBtn{
-    border:1px solid #826c2e;
-    background:linear-gradient(180deg,#6c5720,#30250d);
-    color:var(--gold2);
-    border-radius:13px;
-    padding:0 16px;
-    font-weight:800;
+  border-color:#765d22;
+  color:#fff0a5;
+  background:linear-gradient(180deg,#624d1c,#30250d);
 }
 
-/* =========================
-   PRESETS
-========================= */
-
-.presets{
-    display:flex;
-    gap:7px;
-    overflow-x:auto;
-    padding:11px 0 2px;
+.switch{
+  display:flex;
+  background:#0c100e;
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:3px;
 }
 
-.presets::-webkit-scrollbar{
-    display:none;
+.switch button{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  padding:8px 10px;
+  border-radius:8px;
+  font-weight:800;
 }
 
-.coinBtn{
-    flex:0 0 auto;
-    padding:8px 12px;
-    border-radius:20px;
-    border:1px solid #34383a;
-    background:#111416;
-    color:#c8c8c8;
+.switch .on{
+  background:#193a26;
+  color:var(--green);
 }
 
-.coinBtn.active{
-    border-color:var(--gold);
-    color:var(--gold2);
-    box-shadow:0 0 12px rgba(233,198,106,.18);
+.presets,
+.tf{
+  display:flex;
+  gap:6px;
+  overflow:auto;
+  padding-bottom:5px;
 }
 
-/* =========================
-   TIMEFRAME
-========================= */
-
-.tabs{
-    display:flex;
-    gap:7px;
-    margin-top:12px;
+.presets::-webkit-scrollbar,
+.tf::-webkit-scrollbar{
+  display:none;
 }
 
-.tab{
-    flex:1;
-    padding:10px 4px;
-    background:#111416;
-    border:1px solid #292d30;
-    color:#969da1;
-    border-radius:10px;
+.presets button,
+.tf button{
+  white-space:nowrap;
 }
-
-.tab.active{
-    color:#17130a;
-    background:linear-gradient(180deg,#ffe58a,#b88e28);
-    border-color:var(--gold);
-    font-weight:900;
-}
-
-/* =========================
-   CARDS
-========================= */
 
 .card{
-    margin:13px 12px;
-    background:
-        linear-gradient(180deg,
-        rgba(21,23,25,.97),
-        rgba(10,12,13,.98));
-    border:1px solid #292d30;
-    border-radius:18px;
-    padding:16px;
-    box-shadow:
-        0 12px 35px rgba(0,0,0,.25),
-        inset 0 0 25px rgba(255,255,255,.015);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(20,26,22,.97),
+      rgba(11,14,12,.97)
+    );
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:13px;
+  margin:9px 0;
+  box-shadow:0 10px 35px rgba(0,0,0,.18);
 }
 
 .goldCard{
-    border-color:#5c4b20;
-    box-shadow:
-        0 0 30px rgba(233,198,106,.08),
-        inset 0 0 25px rgba(233,198,106,.025);
+  border-color:#59491f;
 }
 
-.sectionTitle{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:13px;
+.symbolrow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.sectionTitle strong{
-    font-size:17px;
+.symbol{
+  font-size:20px;
+  font-weight:950;
 }
 
-.sectionTitle span{
-    color:var(--muted);
-    font-size:12px;
-}
-
-/* =========================
-   PRICE
-========================= */
-
-.coinHeader{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-}
-
-.coinName{
-    font-size:25px;
-    font-weight:900;
-}
-
-.coinType{
-    color:var(--muted);
-    font-size:12px;
-    margin-top:3px;
+.badge{
+  font-size:11px;
+  color:var(--green);
+  background:#10311e;
+  border:1px solid #205b38;
+  padding:5px 8px;
+  border-radius:999px;
 }
 
 .price{
-    font-size:37px;
-    font-weight:900;
-    letter-spacing:-1px;
-    margin:15px 0 3px;
+  font-size:36px;
+  font-weight:950;
+  margin-top:4px;
+  letter-spacing:-1px;
+  word-break:break-all;
 }
 
 .change{
-    font-size:15px;
-    font-weight:900;
+  font-size:14px;
+  font-weight:900;
+  margin-top:2px;
 }
 
-.up{
-    color:var(--green);
+.up{color:var(--green)}
+.down{color:var(--red)}
+.neutral{color:var(--muted)}
+
+.meta{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+  margin-top:12px;
 }
 
-.down{
-    color:var(--red);
+.mini{
+  background:#0b0f0d;
+  border:1px solid #1d251f;
+  border-radius:10px;
+  padding:8px;
+  min-width:0;
 }
 
-.neutral{
-    color:var(--yellow);
+.mini span{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
 }
 
-/* =========================
-   CHART
-========================= */
+.mini b{
+  display:block;
+  margin-top:4px;
+  font-size:12px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 
-.chartWrap{
-    margin-top:15px;
-    height:260px;
-    position:relative;
-    border-radius:14px;
-    overflow:hidden;
-    background:#090b0c;
-    border:1px solid #202427;
+.chartbox{
+  position:relative;
+  height:260px;
+  margin-top:8px;
+  border-radius:12px;
+  overflow:hidden;
+  background:#080b09;
 }
 
 canvas{
-    width:100%;
-    height:100%;
-    display:block;
+  width:100%;
+  height:100%;
+  display:block;
 }
 
-.chartInfo{
-    position:absolute;
-    left:12px;
-    top:10px;
-    font-size:12px;
-    color:#9ca2a6;
-    pointer-events:none;
+.chartlegend{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  color:var(--muted);
+  font-size:10px;
+  margin-top:5px;
 }
 
-/* =========================
-   AI SCORE
-========================= */
-
-.aiHero{
-    text-align:center;
-    padding:5px 0 14px;
+.sectiontitle{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:900;
+  margin-bottom:10px;
 }
 
-.aiLabel{
-    color:var(--gold);
-    font-size:13px;
-    letter-spacing:2px;
+.sectiontitle small{
+  color:var(--muted);
+  font-weight:600;
 }
 
-.aiScore{
-    font-size:68px;
-    font-weight:1000;
-    line-height:1;
-    margin:8px 0;
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
 }
 
-.aiStatus{
-    display:inline-block;
-    border-radius:30px;
-    padding:8px 22px;
-    font-size:18px;
-    font-weight:900;
+.metricgrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:7px;
 }
 
-.aiStatus.bull{
-    color:#071b0e;
-    background:var(--green);
+.metric{
+  background:#0b0f0d;
+  border:1px solid #1d251f;
+  border-radius:11px;
+  padding:9px;
+  min-width:0;
 }
 
-.aiStatus.bear{
-    color:#240609;
-    background:var(--red);
+.metric .k{
+  color:var(--muted);
+  font-size:10px;
 }
 
-.aiStatus.wait{
-    color:#271f04;
-    background:var(--yellow);
+.metric .v{
+  font-weight:900;
+  font-size:15px;
+  margin-top:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
-.aiReason{
-    color:#aeb4b8;
-    line-height:1.7;
-    margin-top:12px;
-    font-size:14px;
+.score{
+  font-size:46px;
+  font-weight:950;
+  line-height:1;
+  color:var(--green);
 }
 
-/* =========================
-   RADAR
-========================= */
-
-.radarGrid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:9px;
+.progress{
+  height:8px;
+  background:#202720;
+  border-radius:99px;
+  overflow:hidden;
+  margin:10px 0;
 }
 
-.radar{
-    text-align:center;
-    padding:13px 5px;
-    border:1px solid #252a2d;
-    background:#0b0e0f;
-    border-radius:13px;
+.progress i{
+  display:block;
+  height:100%;
+  background:
+    linear-gradient(
+      90deg,
+      var(--red),
+      var(--gold),
+      var(--green)
+    );
+  width:50%;
+  transition:width .35s ease;
 }
-
-.radarName{
-    color:#8e969b;
-    font-size:12px;
-}
-
-.radarScore{
-    font-size:22px;
-    font-weight:900;
-    margin-top:5px;
-}
-
-/* =========================
-   DATA GRID
-========================= */
-
-.dataGrid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:9px;
-}
-
-.dataItem{
-    background:#0b0e0f;
-    border:1px solid #24282a;
-    border-radius:12px;
-    padding:11px;
-}
-
-.dataLabel{
-    font-size:11px;
-    color:#858d92;
-}
-
-.dataValue{
-    margin-top:5px;
-    font-size:17px;
-    font-weight:900;
-}
-
-/* =========================
-   LEVELS
-========================= */
-
-.level{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:13px 0;
-    border-bottom:1px solid #222629;
-}
-
-.level:last-child{
-    border-bottom:none;
-}
-
-.levelName{
-    color:#a4aaae;
-}
-
-.levelPrice{
-    font-size:18px;
-    font-weight:900;
-}
-
-.support{
-    color:var(--green);
-}
-
-.resistance{
-    color:var(--red);
-}
-
-.entry{
-    color:var(--gold);
-}
-
-/* =========================
-   SIGNAL
-========================= */
 
 .signal{
-    padding:14px;
-    border-radius:14px;
-    margin-bottom:9px;
-    border:1px solid #282d30;
-    background:#0a0d0e;
+  padding:10px;
+  border-radius:11px;
+  background:#0c110e;
+  border:1px solid #233027;
+  line-height:1.55;
+  font-size:12px;
 }
 
-.signal:last-child{
-    margin-bottom:0;
+.signal strong{
+  color:var(--gold);
 }
 
-.signalTop{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+.tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
 }
 
-.signalTitle{
-    font-weight:900;
+.tag{
+  font-size:11px;
+  padding:6px 8px;
+  border-radius:999px;
+  background:#121814;
+  border:1px solid #273229;
+  color:#dce5df;
 }
 
-.signalDesc{
-    color:#969da1;
-    font-size:13px;
-    line-height:1.6;
-    margin-top:5px;
+.levels{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:7px;
 }
 
-.signal.green{
-    border-left:4px solid var(--green);
+.level{
+  padding:10px;
+  border-radius:11px;
+  background:#0b0f0d;
+  border:1px solid #1d251f;
+  text-align:center;
 }
 
-.signal.red{
-    border-left:4px solid var(--red);
+.level span{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
 }
 
-.signal.yellow{
-    border-left:4px solid var(--yellow);
+.level b{
+  display:block;
+  margin-top:5px;
+  font-size:13px;
 }
 
-/* =========================
-   SCRIPT
-========================= */
+.alert{
+  border-left:3px solid var(--gold);
+  background:#17150d;
+  padding:9px;
+  border-radius:8px;
+  font-size:12px;
+  line-height:1.5;
+  margin-bottom:7px;
+}
+
+.alert:last-child{
+  margin-bottom:0;
+}
+
+.alert.green{
+  border-left-color:var(--green);
+}
+
+.alert.red{
+  border-left-color:var(--red);
+}
+
+.alert.cyan{
+  border-left-color:var(--cyan);
+}
+
+.good{color:var(--green)}
+.warn{color:var(--gold)}
+.bad{color:var(--red)}
 
 .scenario{
-    padding:15px;
-    border-radius:15px;
-    margin-bottom:10px;
-    background:#0a0d0e;
-    border:1px solid #262b2d;
+  padding:10px;
+  border-radius:11px;
+  background:#0c110e;
+  border:1px solid #233027;
+  margin-bottom:8px;
+  line-height:1.6;
+  font-size:12px;
 }
 
-.scenario h3{
-    margin:0 0 7px;
-    font-size:16px;
+.scenario:last-child{
+  margin-bottom:0;
 }
 
-.scenario p{
-    margin:0;
-    color:#a4aaae;
-    font-size:13px;
-    line-height:1.7;
+.scenario.up{
+  border-left:3px solid var(--green);
 }
 
-.scenario.upScenario{
-    border-left:4px solid var(--green);
+.scenario.wait{
+  border-left:3px solid var(--gold);
 }
 
-.scenario.flatScenario{
-    border-left:4px solid var(--yellow);
+.scenario.down{
+  border-left:3px solid var(--red);
 }
 
-.scenario.downScenario{
-    border-left:4px solid var(--red);
+.calcGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
 }
 
-/* =========================
-   CAPITAL CALCULATOR
-========================= */
-
-.inputRow{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
+.calcItem{
+  background:#0b0f0d;
+  border:1px solid #1d251f;
+  border-radius:11px;
+  padding:9px;
 }
 
-.inputGroup label{
-    display:block;
-    color:#858d91;
-    font-size:12px;
-    margin-bottom:5px;
+.calcItem label{
+  display:block;
+  color:var(--muted);
+  font-size:10px;
+  margin-bottom:5px;
 }
 
-.inputGroup input{
-    width:100%;
-    background:#0b0e0f;
-    border:1px solid #2a2f32;
-    color:white;
-    border-radius:10px;
-    padding:11px;
-    outline:none;
+.calcItem input{
+  width:100%;
+  background:#080b09;
+  color:#fff;
+  border:1px solid #283129;
+  border-radius:8px;
+  padding:8px;
+  outline:none;
 }
 
-.calcResult{
-    margin-top:12px;
-    padding:15px;
-    background:#0a0d0e;
-    border:1px solid #40351c;
-    border-radius:13px;
-    line-height:1.8;
+.calcItem input:focus{
+  border-color:#3f7655;
 }
 
-/* =========================
-   FOOTER
-========================= */
+.statusline{
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.5;
+  margin-top:8px;
+}
 
 .footer{
-    text-align:center;
-    color:#666d71;
-    font-size:11px;
-    line-height:1.7;
-    padding:20px;
+  text-align:center;
+  color:#626c65;
+  font-size:10px;
+  line-height:1.6;
+  padding:15px 5px;
 }
 
-.bottomNav{
-    position:fixed;
-    bottom:0;
-    left:50%;
-    transform:translateX(-50%);
-    width:min(680px,100%);
-    z-index:60;
-    background:rgba(8,9,10,.96);
-    backdrop-filter:blur(15px);
-    border-top:1px solid #292d30;
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    padding:8px 5px calc(8px + env(safe-area-inset-bottom));
+.bottom{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(7,9,8,.94);
+  backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);
+  padding:
+    8px
+    12px
+    calc(8px + env(safe-area-inset-bottom));
+  display:flex;
+  justify-content:center;
+  z-index:5;
 }
 
-.navItem{
-    text-align:center;
-    color:#747b7f;
-    font-size:11px;
-    padding:5px;
+.bottom span{
+  color:var(--muted);
+  font-size:10px;
 }
 
-.navItem.active{
-    color:var(--gold);
+.hidden{
+  display:none!important;
 }
 
-.navIcon{
-    font-size:19px;
-    margin-bottom:2px;
+@media(max-width:430px){
+
+  .app{
+    padding-left:9px;
+    padding-right:9px;
+  }
+
+  .price{
+    font-size:31px;
+  }
+
+  .meta{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .levels{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .grid2{
+    grid-template-columns:1fr;
+  }
+
+  .chartbox{
+    height:245px;
+  }
+
 }
 
-/* =========================
-   LOADING
-========================= */
+@media(min-width:650px){
 
-.loading{
-    text-align:center;
-    padding:35px;
-    color:#858d91;
-}
-
-.error{
-    color:var(--red);
-    text-align:center;
-    padding:15px;
-}
-
-/* =========================
-   MOBILE
-========================= */
-
-@media(max-width:420px){
-
-    .price{
-        font-size:31px;
-    }
-
-    .aiScore{
-        font-size:58px;
-    }
-
-    .radarGrid{
-        gap:6px;
-    }
-
-    .radar{
-        padding:10px 3px;
-    }
+  .chartbox{
+    height:310px;
+  }
 
 }
 </style>
@@ -660,356 +586,1403 @@ canvas{
 
 <div class="app">
 
-<!-- HEADER -->
-<header class="header">
+  <div class="top">
+    <div class="brand">🐰 CRYPTO AI LIVE</div>
 
-    <div class="brand">
-        <div class="logo">🐰 AI CRYPTO</div>
+    <div class="live">
+      <i class="dot" id="liveDot"></i>
+      <span id="liveText">連線中</span>
+    </div>
+  </div>
 
-        <div class="status">
-            <span class="dot"></span>
-            <span id="statusText">即時資料</span>
+
+  <!-- 搜尋 -->
+  <div class="searchbar">
+
+    <input
+      id="symbolInput"
+      value="BTCUSDT"
+      placeholder="BTCUSDT / ETHUSDT / SOLUSDT">
+
+    <button
+      class="btn goldBtn"
+      id="loadBtn">
+      查詢
+    </button>
+
+  </div>
+
+
+  <!-- 現貨／合約 -->
+  <div class="switch">
+
+    <button
+      id="spotBtn"
+      class="on">
+      現貨
+    </button>
+
+    <button
+      id="futBtn">
+      合約
+    </button>
+
+  </div>
+
+
+  <!-- 常用幣種 -->
+  <div class="presets">
+
+    <button
+      class="btn active"
+      data-symbol="BTCUSDT">
+      BTC
+    </button>
+
+    <button
+      class="btn"
+      data-symbol="ETHUSDT">
+      ETH
+    </button>
+
+    <button
+      class="btn"
+      data-symbol="SOLUSDT">
+      SOL
+    </button>
+
+    <button
+      class="btn"
+      data-symbol="BNBUSDT">
+      BNB
+    </button>
+
+    <button
+      class="btn"
+      data-symbol="XRPUSDT">
+      XRP
+    </button>
+
+    <button
+      class="btn"
+      data-symbol="DOGEUSDT">
+      DOGE
+    </button>
+
+    <button
+      class="btn"
+      data-symbol="TRUMPUSDT">
+      TRUMP
+    </button>
+
+  </div>
+
+
+  <!-- 週期 -->
+  <div class="tf">
+
+    <button
+      class="btn"
+      data-tf="5m">
+      5M
+    </button>
+
+    <button
+      class="btn active"
+      data-tf="15m">
+      15M
+    </button>
+
+    <button
+      class="btn"
+      data-tf="1h">
+      1H
+    </button>
+
+    <button
+      class="btn"
+      data-tf="4h">
+      4H
+    </button>
+
+    <button
+      class="btn"
+      data-tf="1d">
+      1D
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       即時行情
+  ====================================================== -->
+
+  <div class="card goldCard">
+
+    <div class="symbolrow">
+
+      <div>
+        <div
+          class="symbol"
+          id="symbolName">
+          BTCUSDT
         </div>
+
+        <div
+          style="font-size:10px;color:#7f8882;margin-top:3px"
+          id="marketName">
+          Binance Spot
+        </div>
+      </div>
+
+      <span
+        class="badge"
+        id="marketBadge">
+        SPOT
+      </span>
+
     </div>
 
-    <div class="searchBox">
+
+    <div
+      class="price"
+      id="price">
+      --
+    </div>
+
+
+    <div
+      class="change neutral"
+      id="change">
+      等待即時行情…
+    </div>
+
+
+    <div class="meta">
+
+      <div class="mini">
+        <span>24H 高</span>
+        <b id="high">--</b>
+      </div>
+
+      <div class="mini">
+        <span>24H 低</span>
+        <b id="low">--</b>
+      </div>
+
+      <div class="mini">
+        <span>24H 成交量</span>
+        <b id="volume">--</b>
+      </div>
+
+      <div class="mini">
+        <span>更新時間</span>
+        <b id="updated">--</b>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       價格圖
+  ====================================================== -->
+
+  <div class="card">
+
+    <div class="sectiontitle">
+
+      <strong>
+        📈 即時價格圖
+      </strong>
+
+      <small id="chartInfo">
+        15M
+      </small>
+
+    </div>
+
+    <div class="chartbox">
+
+      <canvas id="chart"></canvas>
+
+    </div>
+
+    <div class="chartlegend">
+
+      <span>● 價格</span>
+      <span>━ MA5</span>
+      <span>━ MA20</span>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       AI
+  ====================================================== -->
+
+  <div class="card goldCard">
+
+    <div class="sectiontitle">
+
+      <strong>
+        🤖 AI 綜合判斷
+      </strong>
+
+      <small>
+        0–100
+      </small>
+
+    </div>
+
+
+    <div
+      style="text-align:center">
+
+      <div
+        class="score"
+        id="aiScore">
+        --
+      </div>
+
+      <div
+        class="progress">
+
+        <i id="scoreBar"></i>
+
+      </div>
+
+      <div
+        class="signal"
+        id="aiState">
+        正在分析市場…
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       追高
+  ====================================================== -->
+
+  <div class="card">
+
+    <div class="sectiontitle">
+
+      <strong>
+        ⚠️ 追高風險
+      </strong>
+
+      <small>
+        0–100
+      </small>
+
+    </div>
+
+    <div
+      class="score"
+      id="chaseScore">
+      --
+    </div>
+
+    <div
+      class="signal"
+      id="chaseText">
+      分析中…
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       技術指標
+  ====================================================== -->
+
+  <div class="card">
+
+    <div class="sectiontitle">
+
+      <strong>
+        📊 技術指標
+      </strong>
+
+      <small>
+        Technical
+      </small>
+
+    </div>
+
+    <div class="metricgrid">
+
+      <div class="metric">
+        <div class="k">MA5</div>
+        <div class="v" id="ma5">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">MA20</div>
+        <div class="v" id="ma20">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">MA60</div>
+        <div class="v" id="ma60">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">RSI14</div>
+        <div class="v" id="rsi">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">MACD</div>
+        <div class="v" id="macd">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">ATR14</div>
+        <div class="v" id="atr">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">成交量比</div>
+        <div class="v" id="volRatio">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">波動</div>
+        <div class="v" id="volatility">--</div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       六維 AI
+  ====================================================== -->
+
+  <div class="card">
+
+    <div class="sectiontitle">
+
+      <strong>
+        🧠 AI 六維雷達
+      </strong>
+
+      <small>
+        Multi Factor
+      </small>
+
+    </div>
+
+    <div class="metricgrid">
+
+      <div class="metric">
+        <div class="k">趨勢</div>
+        <div class="v" id="trendScore">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">動能</div>
+        <div class="v" id="momentumScore">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">成交量</div>
+        <div class="v" id="volumeScore">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">位置</div>
+        <div class="v" id="positionScore">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">衍生品</div>
+        <div class="v" id="derivScore">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">風險</div>
+        <div class="v" id="riskScore">--</div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       支撐壓力
+  ====================================================== -->
+
+  <div class="card">
+
+    <div class="sectiontitle">
+
+      <strong>
+        🎯 關鍵價位
+      </strong>
+
+      <small>
+        Support / Resistance
+      </small>
+
+    </div>
+
+    <div class="levels">
+
+      <div class="level">
+        <span>壓力 R2</span>
+        <b id="r2">--</b>
+      </div>
+
+      <div class="level">
+        <span>壓力 R1</span>
+        <b id="r1">--</b>
+      </div>
+
+      <div class="level">
+        <span>目前價格</span>
+        <b id="lvPrice">--</b>
+      </div>
+
+      <div class="level">
+        <span>支撐 S1</span>
+        <b id="s1">--</b>
+      </div>
+
+      <div class="level">
+        <span>支撐 S2</span>
+        <b id="s2">--</b>
+      </div>
+
+      <div class="level">
+        <span>風險停損</span>
+        <b id="stop">--</b>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       合約
+  ====================================================== -->
+
+  <div
+    class="card"
+    id="derivativesCard">
+
+    <div class="sectiontitle">
+
+      <strong>
+        🐋 合約／主力數據
+      </strong>
+
+      <small>
+        Futures
+      </small>
+
+    </div>
+
+    <div class="metricgrid">
+
+      <div class="metric">
+        <div class="k">Funding Rate</div>
+        <div class="v" id="funding">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">Open Interest</div>
+        <div class="v" id="oi">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">多空比</div>
+        <div class="v" id="lsr">--</div>
+      </div>
+
+      <div class="metric">
+        <div class="k">Mark Price</div>
+        <div class="v" id="mark">--</div>
+      </div>
+
+    </div>
+
+    <div
+      class="statusline"
+      id="derivStatus">
+      切換「合約」後讀取 Funding / OI / 多空比。
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       交易區域
+  ====================================================== -->
+
+  <div class="card goldCard">
+
+    <div class="sectiontitle">
+
+      <strong>
+        🐰 AI 交易觀察區
+      </strong>
+
+      <small>
+        不追高
+      </small>
+
+    </div>
+
+    <div class="levels">
+
+      <div class="level">
+        <span>第一觀察區</span>
+        <b id="entry1">--</b>
+      </div>
+
+      <div class="level">
+        <span>第二觀察區</span>
+        <b id="entry2">--</b>
+      </div>
+
+      <div class="level">
+        <span>突破確認</span>
+        <b id="breakout">--</b>
+      </div>
+
+    </div>
+
+    <div
+      class="signal"
+      id="tradePlan"
+      style="margin-top:9px">
+      等待行情分析…
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       警報
+  ====================================================== -->
+
+  <div class="card">
+
+    <div class="sectiontitle">
+
+      <strong>
+        🚨 AI 市場警報
+      </strong>
+
+      <small>
+        Alerts
+      </small>
+
+    </div>
+
+    <div id="alerts">
+
+      <div class="alert">
+        正在等待市場資料…
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       情境
+  ====================================================== -->
+
+  <div class="card">
+
+    <div class="sectiontitle">
+
+      <strong>
+        🔮 三種情境
+      </strong>
+
+      <small>
+        Scenario
+      </small>
+
+    </div>
+
+    <div
+      class="scenario up">
+
+      <strong class="good">
+        🟢 多方情境
+      </strong>
+
+      <div id="upScenario">
+        等待分析…
+      </div>
+
+    </div>
+
+    <div
+      class="scenario wait">
+
+      <strong class="warn">
+        🟡 震盪情境
+      </strong>
+
+      <div id="waitScenario">
+        等待分析…
+      </div>
+
+    </div>
+
+    <div
+      class="scenario down">
+
+      <strong class="bad">
+        🔴 空方情境
+      </strong>
+
+      <div id="downScenario">
+        等待分析…
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       資金試算
+  ====================================================== -->
+
+  <div class="card">
+
+    <div class="sectiontitle">
+
+      <strong>
+        💰 資金試算
+      </strong>
+
+      <small>
+        Simulation
+      </small>
+
+    </div>
+
+    <div class="calcGrid">
+
+      <div class="calcItem">
+
+        <label>
+          投入資金
+        </label>
 
         <input
-            id="symbolInput"
-            value="BTCUSDT"
-            placeholder="輸入 BTCUSDT / ETHUSDT / TRUMPUSDT">
+          id="capital"
+          type="number"
+          value="10000"
+          min="0">
 
-        <button
-            class="goldBtn"
-            onclick="searchCoin()">
-            搜尋
-        </button>
+      </div>
 
-    </div>
 
-    <div class="presets">
+      <div class="calcItem">
 
-        <button class="coinBtn active"
-                onclick="quickCoin('BTCUSDT',this)">
-            BTC
-        </button>
+        <label>
+          預計進場
+        </label>
 
-        <button class="coinBtn"
-                onclick="quickCoin('ETHUSDT',this)">
-            ETH
-        </button>
+        <input
+          id="entryInput"
+          type="number"
+          placeholder="自動">
 
-        <button class="coinBtn"
-                onclick="quickCoin('SOLUSDT',this)">
-            SOL
-        </button>
+      </div>
 
-        <button class="coinBtn"
-                onclick="quickCoin('BNBUSDT',this)">
-            BNB
-        </button>
 
-        <button class="coinBtn"
-                onclick="quickCoin('XRPUSDT',this)">
-            XRP
-        </button>
+      <div class="calcItem">
 
-        <button class="coinBtn"
-                onclick="quickCoin('DOGEUSDT',this)">
-            DOGE
-        </button>
+        <label>
+          目標價格
+        </label>
 
-        <button class="coinBtn"
-                onclick="quickCoin('TRUMPUSDT',this)">
-            TRUMP
-        </button>
+        <input
+          id="targetInput"
+          type="number"
+          placeholder="例如 R1">
 
-    </div>
+      </div>
 
-    <div class="tabs">
 
-        <button class="tab"
-                onclick="changeInterval('5m',this)">
-            5M
-        </button>
+      <div class="calcItem">
 
-        <button class="tab active"
-                onclick="changeInterval('15m',this)">
-            15M
-        </button>
+        <label>
+          停損價格
+        </label>
 
-        <button class="tab"
-                onclick="changeInterval('1h',this)">
-            1H
-        </button>
+        <input
+          id="stopInput"
+          type="number"
+          placeholder="自動">
 
-        <button class="tab"
-                onclick="changeInterval('4h',this)">
-            4H
-        </button>
-
-        <button class="tab"
-                onclick="changeInterval('1d',this)">
-            1D
-        </button>
+      </div>
 
     </div>
 
-</header>
+
+    <div
+      class="signal"
+      id="calc"
+      style="margin-top:9px">
+
+      輸入資料即可試算。
+
+    </div>
+
+  </div>
 
 
-<!-- MAIN -->
-<main id="main">
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
 
-<div class="loading">
-    正在載入虛擬貨幣資料...
-</div>
+  <div class="footer">
 
-</main>
+    🐰 Crypto AI 虛擬貨幣智慧儀表板<br>
 
+    即時市場資料：Binance 公開 API / WebSocket<br>
 
-<footer class="footer">
+    AI 為規則式技術分析模型，不保證獲利。<br>
 
-    🐰 Crypto AI 智慧儀表板<br>
+    虛擬貨幣具有高度波動與本金損失風險。
 
-    資料來源：Binance 公開市場行情 API<br>
-
-    AI 分析為技術指標規則模型，不代表保證獲利。<br>
-
-    虛擬貨幣具有高度波動與損失風險。
-
-</footer>
+  </div>
 
 </div>
 
 
-<!-- BOTTOM NAV -->
+<!-- 底部 -->
+<div class="bottom">
 
-<nav class="bottomNav">
+  <span id="connection">
+    WebSocket：連線中　｜　REST：15 秒更新
+  </span>
 
-    <div class="navItem active">
-        <div class="navIcon">🏠</div>
-        儀表板
-    </div>
-
-    <div class="navItem">
-        <div class="navIcon">🤖</div>
-        AI偵測
-    </div>
-
-    <div class="navItem">
-        <div class="navIcon">📊</div>
-        行情
-    </div>
-
-    <div class="navItem">
-        <div class="navIcon">🔔</div>
-        警報
-    </div>
-
-    <div class="navItem">
-        <div class="navIcon">⚙️</div>
-        設定
-    </div>
-
-</nav>
+</div>
 
 
 <script>
 
-/* ==========================================================
-   CONFIG
-========================================================== */
+/* =========================================================
+   STATE
+========================================================= */
 
-const API = "https://api.binance.com";
+const state = {
 
-let symbol = "BTCUSDT";
-let interval = "15m";
+    symbol:"BTCUSDT",
 
-let klines = [];
-let ticker = null;
+    market:"spot",
+
+    tf:"15m",
+
+    candles:[],
+
+    ticker:null,
+
+    ws:null,
+
+    timer:null,
+
+    reconnectTimer:null,
+
+    funding:null,
+
+    oi:null,
+
+    lsr:null,
+
+    mark:null,
+
+    lastLive:0,
+
+    reconnecting:false
+
+};
 
 
-/* ==========================================================
-   HELPERS
-========================================================== */
+/* =========================================================
+   ELEMENT
+========================================================= */
 
-function fmt(num, digits=2){
+const $ = id =>
+    document.getElementById(id);
 
-    if(num === null || num === undefined || isNaN(num)){
+
+/* =========================================================
+   FORMAT
+========================================================= */
+
+function fmt(n,d=2){
+
+    if(
+        n===null ||
+        n===undefined ||
+        !isFinite(n)
+    ){
         return "--";
     }
 
-    return Number(num).toLocaleString(
+    const abs=Math.abs(n);
+
+    let digits=d;
+
+    if(abs<1 && abs>0){
+        digits=6;
+    }
+
+    return Number(n).toLocaleString(
         "en-US",
         {
-            minimumFractionDigits:digits,
             maximumFractionDigits:digits
         }
     );
+
 }
 
 
-function pct(num){
+function percent(n,d=2){
 
-    if(num === null || num === undefined || isNaN(num)){
+    if(
+        n===null ||
+        n===undefined ||
+        !isFinite(n)
+    ){
         return "--";
     }
 
-    return (num >= 0 ? "+" : "") +
-           Number(num).toFixed(2) +
-           "%";
-}
-
-
-function clamp(v,min,max){
-
-    return Math.max(min,Math.min(max,v));
+    return (
+        n>=0 ? "+" : ""
+    )+
+    n.toFixed(d)+
+    "%";
 
 }
 
 
-/* ==========================================================
-   FETCH TICKER
-========================================================== */
+/* =========================================================
+   CLAMP
+========================================================= */
 
-async function fetchTicker(){
+function clamp(
+    value,
+    min,
+    max
+){
 
-    const url =
-        API +
-        "/api/v3/ticker/24hr?symbol=" +
-        symbol;
+    return Math.max(
+        min,
+        Math.min(max,value)
+    );
 
-    const res = await fetch(url);
+}
 
-    if(!res.ok){
-        throw new Error("行情取得失敗");
+
+/* =========================================================
+   API
+========================================================= */
+
+function apiBase(){
+
+    if(state.market==="futures"){
+
+        return "https://fapi.binance.com";
+
     }
 
-    return await res.json();
+    return "https://api.binance.com";
 
 }
 
 
-/* ==========================================================
-   FETCH KLINES
-========================================================== */
+/* =========================================================
+   WEBSOCKET
+========================================================= */
 
-async function fetchKlines(){
+function wsBase(){
 
-    const url =
-        API +
-        "/api/v3/klines?symbol=" +
-        symbol +
-        "&interval=" +
-        interval +
-        "&limit=180";
+    if(state.market==="futures"){
 
-    const res = await fetch(url);
+        return "wss://fstream.binance.com";
 
-    if(!res.ok){
-        throw new Error("K線資料取得失敗");
     }
 
-    return await res.json();
+    return "wss://stream.binance.com:9443";
 
 }
 
 
-/* ==========================================================
-   CALCULATIONS
-========================================================== */
+/* =========================================================
+   FETCH JSON
+========================================================= */
 
-function closes(){
+async function getJSON(url){
 
-    return klines.map(x => Number(x[4]));
+    const response =
+        await fetch(
+            url,
+            {
+                cache:"no-store"
+            }
+        );
+
+    if(!response.ok){
+
+        throw new Error(
+            response.status+
+            " "+
+            response.statusText
+        );
+
+    }
+
+    return await response.json();
 
 }
 
 
-function volumes(){
+/* =========================================================
+   LOAD KLINES
+========================================================= */
 
-    return klines.map(x => Number(x[5]));
+async function loadKlines(){
+
+    const base=apiBase();
+
+    let url;
+
+    if(state.market==="spot"){
+
+        url =
+            base+
+            "/api/v3/klines?symbol="+
+            encodeURIComponent(state.symbol)+
+            "&interval="+
+            encodeURIComponent(state.tf)+
+            "&limit=180";
+
+    }else{
+
+        url =
+            base+
+            "/fapi/v1/klines?symbol="+
+            encodeURIComponent(state.symbol)+
+            "&interval="+
+            encodeURIComponent(state.tf)+
+            "&limit=180";
+
+    }
+
+    const data =
+        await getJSON(url);
+
+    state.candles =
+        data.map(
+            item => ({
+
+                t:Number(item[0]),
+
+                o:Number(item[1]),
+
+                h:Number(item[2]),
+
+                l:Number(item[3]),
+
+                c:Number(item[4]),
+
+                v:Number(item[5])
+
+            })
+        );
 
 }
 
 
-/* SMA */
+/* =========================================================
+   LOAD TICKER
+========================================================= */
 
-function SMA(arr,period){
+async function loadTicker(){
 
-    if(arr.length < period){
+    const base=apiBase();
+
+    let url;
+
+    if(state.market==="spot"){
+
+        url =
+            base+
+            "/api/v3/ticker/24hr?symbol="+
+            encodeURIComponent(state.symbol);
+
+    }else{
+
+        url =
+            base+
+            "/fapi/v1/ticker/24hr?symbol="+
+            encodeURIComponent(state.symbol);
+
+    }
+
+    state.ticker =
+        await getJSON(url);
+
+    renderTicker();
+
+}
+
+
+/* =========================================================
+   LOAD FUTURES
+========================================================= */
+
+async function loadDerivatives(){
+
+    if(state.market!=="futures"){
+
+        return;
+
+    }
+
+    try{
+
+        const s =
+            encodeURIComponent(
+                state.symbol
+            );
+
+        const results =
+            await Promise.allSettled([
+
+                getJSON(
+                    "https://fapi.binance.com/fapi/v1/premiumIndex?symbol="+s
+                ),
+
+                getJSON(
+                    "https://fapi.binance.com/fapi/v1/openInterest?symbol="+s
+                ),
+
+                getJSON(
+                    "https://fapi.binance.com/futures/data/globalLongShortAccountRatio?symbol="+
+                    s+
+                    "&period=5m&limit=1"
+                )
+
+            ]);
+
+
+        if(
+            results[0].status==="fulfilled"
+        ){
+
+            const x =
+                results[0].value;
+
+            state.funding =
+                Number(x.lastFundingRate);
+
+            state.mark =
+                Number(x.markPrice);
+
+        }
+
+
+        if(
+            results[1].status==="fulfilled"
+        ){
+
+            state.oi =
+                Number(
+                    results[1].value.openInterest
+                );
+
+        }
+
+
+        if(
+            results[2].status==="fulfilled"
+        ){
+
+            const x =
+                results[2].value;
+
+            if(
+                Array.isArray(x) &&
+                x.length
+            ){
+
+                state.lsr =
+                    Number(
+                        x[x.length-1]
+                         .longShortRatio
+                    );
+
+            }
+
+        }
+
+
+        renderDerivatives();
+
+
+    }catch(error){
+
+        $("derivStatus").textContent =
+            "合約資料暫時無法取得。";
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER TICKER
+========================================================= */
+
+function renderTicker(){
+
+    if(!state.ticker){
+
+        return;
+
+    }
+
+    const t =
+        state.ticker;
+
+    const price =
+        Number(
+            t.lastPrice ??
+            t.c
+        );
+
+    const change =
+        Number(
+            t.priceChangePercent ??
+            t.P ??
+            0
+        );
+
+    $("symbolName").textContent =
+        state.symbol;
+
+    $("marketName").textContent =
+        state.market==="spot"
+        ? "Binance Spot"
+        : "Binance USDⓈ-M Futures";
+
+    $("marketBadge").textContent =
+        state.market.toUpperCase();
+
+    $("price").textContent =
+        fmt(
+            price,
+            price>=100 ? 2 : 6
+        );
+
+    $("change").textContent =
+        percent(change);
+
+    $("change").className =
+        "change "+
+        (
+            change>0
+            ? "up"
+            : change<0
+            ? "down"
+            : "neutral"
+        );
+
+
+    $("high").textContent =
+        fmt(
+            Number(
+                t.highPrice ??
+                t.h
+            )
+        );
+
+
+    $("low").textContent =
+        fmt(
+            Number(
+                t.lowPrice ??
+                t.l
+            )
+        );
+
+
+    $("volume").textContent =
+        fmt(
+            Number(
+                t.volume ??
+                t.v
+            ),
+            2
+        );
+
+
+    $("updated").textContent =
+        new Date()
+        .toLocaleTimeString();
+
+
+    $("lvPrice").textContent =
+        fmt(price);
+
+}
+
+
+/* =========================================================
+   DERIVATIVES RENDER
+========================================================= */
+
+function renderDerivatives(){
+
+    if(state.market!=="futures"){
+
+        $("funding").textContent="--";
+        $("oi").textContent="--";
+        $("lsr").textContent="--";
+        $("mark").textContent="--";
+
+        $("derivStatus").textContent =
+            "切換至「合約」查看衍生品資料。";
+
+        return;
+
+    }
+
+
+    $("funding").textContent =
+        state.funding===null
+        ? "--"
+        :
+        (
+            state.funding*100
+        ).toFixed(4)+"%";
+
+
+    $("oi").textContent =
+        state.oi===null
+        ? "--"
+        :
+        fmt(
+            state.oi,
+            3
+        );
+
+
+    $("lsr").textContent =
+        state.lsr===null
+        ? "--"
+        :
+        state.lsr.toFixed(3);
+
+
+    $("mark").textContent =
+        state.mark===null
+        ? "--"
+        :
+        fmt(
+            state.mark
+        );
+
+
+    $("derivStatus").textContent =
+        "Funding / OI / 多空比已更新";
+
+}
+
+
+/* =========================================================
+   SMA
+========================================================= */
+
+function SMA(arr,n){
+
+    if(
+        !Array.isArray(arr) ||
+        arr.length<n
+    ){
+
         return null;
+
     }
 
-    let slice =
-        arr.slice(arr.length-period);
-
-    return slice.reduce((a,b)=>a+b,0)/period;
-
-}
-
-
-/* RSI */
-
-function RSI(arr,period=14){
-
-    if(arr.length < period+1){
-        return 50;
-    }
-
-    let gains = 0;
-    let losses = 0;
+    let sum=0;
 
     for(
-        let i=arr.length-period;
+        let i=arr.length-n;
         i<arr.length;
         i++
     ){
 
-        let diff =
-            arr[i]-arr[i-1];
-
-        if(diff>=0){
-            gains += diff;
-        }else{
-            losses += Math.abs(diff);
-        }
+        sum+=arr[i];
 
     }
 
-    if(losses === 0){
-        return 100;
-    }
-
-    const rs =
-        (gains/period) /
-        (losses/period);
-
-    return 100-(100/(1+rs));
+    return sum/n;
 
 }
 
 
-/* EMA */
+/* =========================================================
+   EMA
+========================================================= */
 
-function EMA(arr,period){
+function EMA(arr,n){
 
-    if(arr.length < period){
+    if(arr.length<n){
+
         return null;
+
     }
 
-    const multiplier =
-        2/(period+1);
-
     let ema =
-        arr.slice(0,period)
-            .reduce((a,b)=>a+b,0)/period;
+        arr
+        .slice(0,n)
+        .reduce(
+            (a,b)=>a+b,
+            0
+        )/n;
 
-    for(let i=period;i<arr.length;i++){
+    const k =
+        2/(n+1);
+
+    for(
+        let i=n;
+        i<arr.length;
+        i++
+    ){
 
         ema =
-            (arr[i]-ema)*multiplier+ema;
+            (
+                arr[i]-ema
+            )*k+
+            ema;
 
     }
 
@@ -1018,382 +1991,2693 @@ function EMA(arr,period){
 }
 
 
-/* MACD */
+/* =========================================================
+   EMA SERIES
+========================================================= */
+
+function emaSeries(arr,n){
+
+    if(arr.length<n){
+
+        return [];
+
+    }
+
+    let ema =
+        arr
+        .slice(0,n)
+        .reduce(
+            (a,b)=>a+b,
+            0
+        )/n;
+
+    const k =
+        2/(n+1);
+
+    const result=[ema];
+
+    for(
+        let i=n;
+        i<arr.length;
+        i++
+    ){
+
+        ema =
+            (
+                arr[i]-ema
+            )*k+
+            ema;
+
+        result.push(ema);
+
+    }
+
+    return result;
+
+}
+
+
+/* =========================================================
+   RSI
+========================================================= */
+
+function RSI(arr,n=14){
+
+    if(
+        arr.length<n+1
+    ){
+
+        return null;
+
+    }
+
+    let gain=0;
+
+    let loss=0;
+
+
+    for(
+        let i=1;
+        i<=n;
+        i++
+    ){
+
+        const diff =
+            arr[i]-arr[i-1];
+
+        if(diff>0){
+
+            gain+=diff;
+
+        }else{
+
+            loss+=Math.abs(diff);
+
+        }
+
+    }
+
+
+    gain/=n;
+
+    loss/=n;
+
+
+    for(
+        let i=n+1;
+        i<arr.length;
+        i++
+    ){
+
+        const diff =
+            arr[i]-arr[i-1];
+
+        const g =
+            Math.max(
+                diff,
+                0
+            );
+
+        const l =
+            Math.max(
+                -diff,
+                0
+            );
+
+        gain =
+            (
+                gain*(n-1)+g
+            )/n;
+
+        loss =
+            (
+                loss*(n-1)+l
+            )/n;
+
+    }
+
+
+    if(loss===0){
+
+        return 100;
+
+    }
+
+
+    const rs =
+        gain/loss;
+
+
+    return 100-
+        100/(1+rs);
+
+}
+
+
+/* =========================================================
+   MACD
+========================================================= */
 
 function MACD(arr){
 
-    const ema12 = EMA(arr,12);
-    const ema26 = EMA(arr,26);
+    if(arr.length<35){
 
-    if(!ema12 || !ema26){
-        return 0;
+        return null;
+
     }
 
-    return ema12-ema26;
-
-}
-
-
-/* ATR */
-
-function ATR(data,period=14){
-
-    if(data.length < period+1){
-        return 0;
-    }
-
-    let trs=[];
-
-    for(let i=1;i<data.length;i++){
-
-        const high=Number(data[i][2]);
-        const low=Number(data[i][3]);
-        const prevClose=Number(data[i-1][4]);
-
-        const tr=Math.max(
-            high-low,
-            Math.abs(high-prevClose),
-            Math.abs(low-prevClose)
+    const fast =
+        emaSeries(
+            arr,
+            12
         );
 
-        trs.push(tr);
+    const slow =
+        emaSeries(
+            arr,
+            26
+        );
+
+
+    const macdLine=[];
+
+    const offset=25;
+
+    for(
+        let i=0;
+        i<slow.length;
+        i++
+    ){
+
+        macdLine.push(
+            fast[i+offset]-
+            slow[i]
+        );
 
     }
 
-    return SMA(trs,period) || 0;
+
+    const signalSeries =
+        emaSeries(
+            macdLine,
+            9
+        );
+
+
+    if(!signalSeries.length){
+
+        return null;
+
+    }
+
+
+    const line =
+        macdLine[
+            macdLine.length-1
+        ];
+
+    const signal =
+        signalSeries[
+            signalSeries.length-1
+        ];
+
+    return {
+
+        line,
+
+        signal,
+
+        histogram:
+            line-signal
+
+    };
 
 }
 
 
-/* volume ratio */
+/* =========================================================
+   ATR
+========================================================= */
 
-function volumeRatio(data){
+function ATR(data,n=14){
 
-    if(data.length < 21){
-        return 1;
+    if(
+        data.length<n+1
+    ){
+
+        return null;
+
+    }
+
+    const tr=[];
+
+
+    for(
+        let i=1;
+        i<data.length;
+        i++
+    ){
+
+        const high=data[i].h;
+
+        const low=data[i].l;
+
+        const previous=data[i-1].c;
+
+
+        tr.push(
+
+            Math.max(
+
+                high-low,
+
+                Math.abs(
+                    high-previous
+                ),
+
+                Math.abs(
+                    low-previous
+                )
+
+            )
+
+        );
+
+    }
+
+
+    return SMA(
+        tr,
+        n
+    );
+
+}
+
+
+/* =========================================================
+   VOLUME RATIO
+========================================================= */
+
+function volumeRatio(data,n=20){
+
+    if(
+        data.length<n+1
+    ){
+
+        return null;
+
     }
 
     const current =
-        Number(data[data.length-1][5]);
+        data[
+            data.length-1
+        ].v;
+
 
     const previous =
         data
-        .slice(data.length-21,data.length-1)
-        .map(x=>Number(x[5]));
+        .slice(
+            data.length-n-1,
+            data.length-1
+        )
+        .map(
+            x=>x.v
+        );
+
 
     const avg =
-        previous.reduce((a,b)=>a+b,0) /
-        previous.length;
+        previous.reduce(
+            (a,b)=>a+b,
+            0
+        )/previous.length;
+
 
     if(avg===0){
-        return 1;
+
+        return null;
+
     }
+
 
     return current/avg;
 
 }
 
 
-/* ==========================================================
-   SUPPORT / RESISTANCE
-========================================================== */
+/* =========================================================
+   LEVELS
+========================================================= */
 
 function levels(data){
 
+    if(data.length<30){
+
+        return null;
+
+    }
+
     const recent =
-        data.slice(-60);
+        data.slice(-80);
 
-    const highs =
-        recent.map(x=>Number(x[2]));
-
-    const lows =
-        recent.map(x=>Number(x[3]));
 
     const high =
-        Math.max(...highs);
+        Math.max(
+            ...recent.map(
+                x=>x.h
+            )
+        );
+
 
     const low =
-        Math.min(...lows);
+        Math.min(
+            ...recent.map(
+                x=>x.l
+            )
+        );
+
 
     const current =
-        Number(data[data.length-1][4]);
+        recent[
+            recent.length-1
+        ].c;
+
 
     const range =
         high-low;
 
-    let support =
-        low + range*0.25;
 
-    let resistance =
-        low + range*0.75;
+    if(range<=0){
 
-    if(current > resistance){
-        resistance = high;
+        return null;
+
     }
 
-    if(current < support){
-        support = low;
+
+    /*
+       區間型支撐壓力
+    */
+
+    let r2 =
+        low+
+        range*.90;
+
+    let r1 =
+        low+
+        range*.72;
+
+    let s1 =
+        low+
+        range*.28;
+
+    let s2 =
+        low+
+        range*.10;
+
+
+    /*
+       如果突破，保留高點
+    */
+
+    if(current>r1){
+
+        r1=
+            Math.max(
+                r1,
+                high-range*.08
+            );
+
+        r2=high;
+
     }
+
+
+    if(current<s1){
+
+        s1=
+            Math.min(
+                s1,
+                low+range*.08
+            );
+
+        s2=low;
+
+    }
+
 
     return {
+
         high,
+
         low,
-        support,
-        resistance
+
+        r1,
+
+        r2,
+
+        s1,
+
+        s2,
+
+        current
+
     };
 
 }
 
 
-/* ==========================================================
-   AI SCORE
-========================================================== */
+/* =========================================================
+   CALCULATE
+========================================================= */
 
 function analyze(){
 
-    const arr=closes();
+    const data =
+        state.candles;
+
+
+    if(data.length<30){
+
+        return;
+
+    }
+
+
+    const arr =
+        data.map(
+            x=>x.c
+        );
+
 
     const current =
         arr[arr.length-1];
 
-    const ma5=SMA(arr,5);
-    const ma20=SMA(arr,20);
-    const ma60=SMA(arr,60);
 
-    const rsi=RSI(arr,14);
+    const ma5 =
+        SMA(arr,5);
 
-    const macd=MACD(arr);
+    const ma20 =
+        SMA(arr,20);
 
-    const atr=ATR(klines,14);
+    const ma60 =
+        SMA(arr,60);
 
-    const volRatio=volumeRatio(klines);
 
-    const lv=levels(klines);
+    const rsi =
+        RSI(arr,14);
 
-    let score=50;
 
-    /* trend */
+    const macd =
+        MACD(arr);
+
+
+    const atr =
+        ATR(data,14);
+
+
+    const vr =
+        volumeRatio(data,20);
+
+
+    const lv =
+        levels(data);
+
+
+    if(!lv){
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       TREND
+    ====================================================== */
 
     let trend=50;
 
-    if(current>ma5) trend+=12;
-    else trend-=12;
 
-    if(current>ma20) trend+=13;
-    else trend-=13;
+    if(
+        ma5!==null &&
+        current>ma5
+    ){
 
-    if(current>ma60) trend+=10;
-    else trend-=10;
+        trend+=12;
 
-    trend=clamp(trend,0,100);
+    }else{
+
+        trend-=12;
+
+    }
 
 
-    /* momentum */
+    if(
+        ma20!==null &&
+        current>ma20
+    ){
+
+        trend+=13;
+
+    }else{
+
+        trend-=13;
+
+    }
+
+
+    if(
+        ma60!==null &&
+        current>ma60
+    ){
+
+        trend+=10;
+
+    }else if(
+        ma60!==null
+    ){
+
+        trend-=10;
+
+    }
+
+
+    trend=
+        clamp(
+            trend,
+            0,
+            100
+        );
+
+
+    /* =====================================================
+       MOMENTUM
+    ====================================================== */
 
     let momentum=50;
 
-    if(rsi>=55 && rsi<70){
-        momentum+=22;
-    }
 
-    if(rsi>=70){
-        momentum-=10;
-    }
+    if(rsi!==null){
 
-    if(rsi<45){
-        momentum-=20;
-    }
+        if(
+            rsi>=55 &&
+            rsi<70
+        ){
 
-    if(macd>0){
-        momentum+=15;
-    }else{
-        momentum-=15;
-    }
+            momentum+=20;
 
-    momentum=clamp(momentum,0,100);
+        }
 
 
-    /* volume */
+        if(rsi>=70){
 
-    let volume=50;
+            momentum-=5;
 
-    if(volRatio>=1.5){
-        volume+=25;
-    }else if(volRatio>=1.15){
-        volume+=12;
-    }else if(volRatio<0.7){
-        volume-=12;
-    }
-
-    volume=clamp(volume,0,100);
+        }
 
 
-    /* position */
+        if(rsi<45){
 
-    const range=lv.high-lv.low;
+            momentum-=20;
 
-    let position=50;
+        }
 
-    if(range>0){
 
-        const pos =
-            (current-lv.low)/range;
+        if(rsi<30){
 
-        if(pos<0.35){
-            position+=25;
-        }else if(pos>0.82){
-            position-=20;
+            momentum-=8;
+
         }
 
     }
 
-    position=clamp(position,0,100);
-
-
-    /* risk */
-
-    let risk=65;
-
-    if(rsi>75){
-        risk-=25;
-    }
-
-    if(rsi<25){
-        risk-=10;
-    }
-
-    if(volRatio>2.5){
-        risk-=10;
-    }
-
-    risk=clamp(risk,0,100);
-
-
-    /* overall */
-
-    score =
-        trend*0.30 +
-        momentum*0.25 +
-        volume*0.15 +
-        position*0.20 +
-        risk*0.10;
-
-    score=Math.round(score);
-
-    let state="wait";
-
-    if(score>=70){
-        state="bull";
-    }else if(score<=38){
-        state="bear";
-    }
-
-    /* Don't chase */
-
-    let chase=false;
 
     if(
-        current>lv.resistance*0.985 ||
-        rsi>=72
+        macd &&
+        macd.hist>0
     ){
-        chase=true;
+
+        momentum+=15;
+
+    }else if(macd){
+
+        momentum-=15;
+
     }
 
-    /* Entry */
 
-    let entry1 =
-        Math.min(
-            current*0.985,
-            lv.support+(lv.resistance-lv.support)*0.35
+    momentum=
+        clamp(
+            momentum,
+            0,
+            100
         );
 
-    let entry2 =
-        lv.support+(lv.resistance-lv.support)*0.15;
 
-    let stop =
-        lv.support-atr*0.5;
+    /* =====================================================
+       VOLUME
+    ====================================================== */
 
-    if(stop<=0){
-        stop=current*0.92;
+    let volume=50;
+
+
+    if(vr!==null){
+
+        if(vr>=2){
+
+            volume+=35;
+
+        }else if(vr>=1.5){
+
+            volume+=25;
+
+        }else if(vr>=1.15){
+
+            volume+=12;
+
+        }else if(vr<.7){
+
+            volume-=15;
+
+        }
+
     }
 
-    return {
-        current,
-        ma5,
-        ma20,
-        ma60,
-        rsi,
-        macd,
-        atr,
-        volRatio,
-        levels:lv,
-        trend,
-        momentum,
-        volume,
-        position,
-        risk,
-        score,
-        state,
-        chase,
-        entry1,
-        entry2,
-        stop
-    };
+
+    volume=
+        clamp(
+            volume,
+            0,
+            100
+        );
+
+
+    /* =====================================================
+       POSITION
+    ====================================================== */
+
+    let position=50;
+
+
+    const range =
+        lv.high-lv.low;
+
+
+    if(range>0){
+
+        const relative =
+            (
+                current-lv.low
+            )/range;
+
+
+        if(relative<.30){
+
+            position=82;
+
+        }else if(relative<.45){
+
+            position=72;
+
+        }else if(relative<.65){
+
+            position=60;
+
+        }else if(relative<.82){
+
+            position=50;
+
+        }else{
+
+            position=30;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       DERIVATIVES
+    ====================================================== */
+
+    let deriv=50;
+
+
+    if(state.market==="futures"){
+
+        if(
+            state.funding!==null
+        ){
+
+            /*
+              Funding 正值太高：
+              多單擁擠，降低分數
+            */
+
+            if(
+                state.funding>0.0008
+            ){
+
+                deriv-=18;
+
+            }else if(
+                state.funding>0.0003
+            ){
+
+                deriv-=8;
+
+            }else if(
+                state.funding< -0.0005
+            ){
+
+                deriv+=12;
+
+            }
+
+        }
+
+
+        if(
+            state.lsr!==null
+        ){
+
+            if(
+                state.lsr<.9
+            ){
+
+                deriv+=12;
+
+            }else if(
+                state.lsr>1.25
+            ){
+
+                deriv-=12;
+
+            }
+
+        }
+
+    }
+
+
+    deriv=
+        clamp(
+            deriv,
+            0,
+            100
+        );
+
+
+    /* =====================================================
+       RISK
+    ====================================================== */
+
+    let risk=70;
+
+
+    if(
+        rsi!==null &&
+        rsi>75
+    ){
+
+        risk-=25;
+
+    }
+
+
+    if(
+        rsi!==null &&
+        rsi<25
+    ){
+
+        risk-=10;
+
+    }
+
+
+    if(
+        vr!==null &&
+        vr>2.5
+    ){
+
+        risk-=15;
+
+    }
+
+
+    if(
+        atr!==null &&
+        current>0
+    ){
+
+        const atrPct =
+            atr/current*100;
+
+
+        if(atrPct>5){
+
+            risk-=15;
+
+        }else if(atrPct>3){
+
+            risk-=8;
+
+        }
+
+    }
+
+
+    risk=
+        clamp(
+            risk,
+            0,
+            100
+        );
+
+
+    /* =====================================================
+       AI TOTAL
+    ====================================================== */
+
+    let total =
+        trend*.27+
+        momentum*.23+
+        volume*.14+
+        position*.14+
+        deriv*.08+
+        risk*.14;
+
+
+    total =
+        Math.round(
+            clamp(
+                total,
+                0,
+                100
+            )
+        );
+
+
+    /* =====================================================
+       CHASE RISK
+    ====================================================== */
+
+    let chase=20;
+
+
+    if(
+        rsi!==null
+    ){
+
+        if(rsi>=75){
+
+            chase+=45;
+
+        }else if(rsi>=70){
+
+            chase+=30;
+
+        }else if(rsi>=65){
+
+            chase+=15;
+
+        }
+
+    }
+
+
+    if(
+        ma5 &&
+        current>ma5
+    ){
+
+        const distance =
+            (
+                current-ma5
+            )/ma5*100;
+
+
+        if(distance>5){
+
+            chase+=25;
+
+        }else if(distance>3){
+
+            chase+=15;
+
+        }
+
+    }
+
+
+    if(
+        vr &&
+        vr>2
+    ){
+
+        chase+=10;
+
+    }
+
+
+    if(
+        current>=lv.r1
+    ){
+
+        chase+=15;
+
+    }
+
+
+    chase =
+        Math.round(
+            clamp(
+                chase,
+                0,
+                100
+            )
+        );
+
+
+    /* =====================================================
+       ENTRY
+    ====================================================== */
+
+    const entry1 =
+        lv.s1+
+        (
+            lv.r1-lv.s1
+        )*.35;
+
+
+    const entry2 =
+        lv.s1+
+        (
+            lv.r1-lv.s1
+        )*.15;
+
+
+    let stop =
+        lv.s1-
+        (
+            atr||
+            current*.02
+        )*.35;
+
+
+    if(stop<=0){
+
+        stop=
+            current*.92;
+
+    }
+
+
+    /* =====================================================
+       RENDER TECHNICAL
+    ====================================================== */
+
+    $("ma5").textContent =
+        fmt(ma5);
+
+    $("ma20").textContent =
+        fmt(ma20);
+
+    $("ma60").textContent =
+        fmt(ma60);
+
+
+    $("rsi").textContent =
+        rsi===null
+        ? "--"
+        :
+        rsi.toFixed(1);
+
+
+    $("macd").textContent =
+        macd
+        ?
+        fmt(macd.line,5)+
+        " / "+
+        fmt(macd.hist,5)
+        :
+        "--";
+
+
+    $("atr").textContent =
+        fmt(atr,4);
+
+
+    $("volRatio").textContent =
+        vr===null
+        ? "--"
+        :
+        vr.toFixed(2)+"x";
+
+
+    const volatility =
+        atr &&
+        current
+        ?
+        atr/current*100
+        :
+        null;
+
+
+    $("volatility").textContent =
+        volatility===null
+        ? "--"
+        :
+        volatility.toFixed(2)+"%";
+
+
+    /* =====================================================
+       AI
+    ====================================================== */
+
+    $("aiScore").textContent =
+        total;
+
+
+    $("scoreBar").style.width =
+        total+"%";
+
+
+    if(total>=72){
+
+        $("aiState").innerHTML =
+            "<strong class='good'>偏多：</strong> "+
+            "趨勢與動能較佳，但仍以回踩確認優先，不建議因為 AI 分數高就追價。";
+
+    }else if(total>=55){
+
+        $("aiState").innerHTML =
+            "<strong class='warn'>中性偏多：</strong> "+
+            "多方條件尚可，目前比較適合等待關鍵支撐附近確認。";
+
+    }else if(total<=38){
+
+        $("aiState").innerHTML =
+            "<strong class='bad'>偏弱：</strong> "+
+            "短線結構較弱，先觀察支撐與反彈量能。";
+
+    }else{
+
+        $("aiState").innerHTML =
+            "<strong class='warn'>等待：</strong> "+
+            "目前多空訊號不夠集中，等待突破或回踩確認。";
+
+    }
+
+
+    /* =====================================================
+       CHASE
+    ====================================================== */
+
+    $("chaseScore").textContent =
+        chase;
+
+
+    if(chase>=75){
+
+        $("chaseText").innerHTML =
+            "<strong class='bad'>高追高風險</strong>："+
+            "價格可能已經離短期合理位置較遠，優先等待回踩。";
+
+    }else if(chase>=55){
+
+        $("chaseText").innerHTML =
+            "<strong class='warn'>中等追高風險</strong>："+
+            "可以觀察，但不建議一次投入，等待價格回到觀察區。";
+
+    }else{
+
+        $("chaseText").innerHTML =
+            "<strong class='good'>較低追高風險</strong>："+
+            "目前位置相對沒有明顯過熱。";
+
+    }
+
+
+    /* =====================================================
+       RADAR
+    ====================================================== */
+
+    $("trendScore").textContent =
+        Math.round(trend);
+
+    $("momentumScore").textContent =
+        Math.round(momentum);
+
+    $("volumeScore").textContent =
+        Math.round(volume);
+
+    $("positionScore").textContent =
+        Math.round(position);
+
+    $("derivScore").textContent =
+        Math.round(deriv);
+
+    $("riskScore").textContent =
+        Math.round(risk);
+
+
+    /* =====================================================
+       LEVELS
+    ====================================================== */
+
+    $("r2").textContent =
+        fmt(lv.r2);
+
+    $("r1").textContent =
+        fmt(lv.r1);
+
+    $("lvPrice").textContent =
+        fmt(current);
+
+    $("s1").textContent =
+        fmt(lv.s1);
+
+    $("s2").textContent =
+        fmt(lv.s2);
+
+    $("stop").textContent =
+        fmt(stop);
+
+
+    $("entry1").textContent =
+        fmt(entry1);
+
+    $("entry2").textContent =
+        fmt(entry2);
+
+    $("breakout").textContent =
+        fmt(lv.r1);
+
+
+    /* =====================================================
+       TRADE PLAN
+    ====================================================== */
+
+    if(chase>=70){
+
+        $("tradePlan").innerHTML =
+            "⚠️ <strong class='bad'>目前不建議追高。</strong><br>"+
+            "第一觀察區：<strong>"+
+            fmt(entry1)+
+            "</strong><br>"+
+            "第二觀察區：<strong>"+
+            fmt(entry2)+
+            "</strong><br>"+
+            "若突破 <strong>"+
+            fmt(lv.r1)+
+            "</strong>，等待 K 線與成交量確認真假突破。";
+
+    }else{
+
+        $("tradePlan").innerHTML =
+            "🐰 第一觀察區：<strong>"+
+            fmt(entry1)+
+            "</strong><br>"+
+            "第二觀察區：<strong>"+
+            fmt(entry2)+
+            "</strong><br>"+
+            "突破確認：<strong>"+
+            fmt(lv.r1)+
+            "</strong><br>"+
+            "風險參考：<strong>"+
+            fmt(stop)+
+            "</strong>";
+
+    }
+
+
+    /* =====================================================
+       ALERTS
+    ====================================================== */
+
+    const alerts=[];
+
+
+    if(
+        rsi!==null &&
+        rsi>=75
+    ){
+
+        alerts.push({
+            cls:"red",
+            text:
+            "RSI ≥ 75，短線過熱，追價風險提高。"
+        });
+
+    }
+
+
+    if(
+        rsi!==null &&
+        rsi<=30
+    ){
+
+        alerts.push({
+            cls:"green",
+            text:
+            "RSI ≤ 30，短線偏超賣，留意反彈，但不能單靠 RSI 進場。"
+        });
+
+    }
+
+
+    if(
+        vr!==null &&
+        vr>=2
+    ){
+
+        alerts.push({
+            cls:"cyan",
+            text:
+            "成交量明顯放大，市場波動可能提高，留意突破或假突破。"
+        });
+
+    }
+
+
+    if(
+        current>lv.r1
+    ){
+
+        alerts.push({
+            cls:"green",
+            text:
+            "價格站上 R1，進入突破觀察區，等待回踩與量能確認。"
+        });
+
+    }
+
+
+    if(
+        current<lv.s1
+    ){
+
+        alerts.push({
+            cls:"red",
+            text:
+            "價格跌破 S1，短線結構轉弱，先注意風險。"
+        });
+
+    }
+
+
+    if(
+        ma5 &&
+        ma20 &&
+        ma5>ma20
+    ){
+
+        alerts.push({
+            cls:"green",
+            text:
+            "MA5 位於 MA20 上方，短線均線結構偏多。"
+        });
+
+    }
+
+
+    if(
+        ma5 &&
+        ma20 &&
+        ma5<ma20
+    ){
+
+        alerts.push({
+            cls:"red",
+            text:
+            "MA5 位於 MA20 下方，短線均線結構偏弱。"
+        });
+
+    }
+
+
+    if(!alerts.length){
+
+        alerts.push({
+            cls:"",
+            text:
+            "目前沒有觸發明顯技術警報。"
+        });
+
+    }
+
+
+    $("alerts").innerHTML =
+        alerts
+        .map(
+            x =>
+            `
+            <div class="alert ${x.cls}">
+                ${x.text}
+            </div>
+            `
+        )
+        .join("");
+
+
+    /* =====================================================
+       SCENARIOS
+    ====================================================== */
+
+    $("upScenario").innerHTML =
+        "若價格站穩 <strong>"+
+        fmt(lv.r1)+
+        "</strong>，且成交量持續放大，"+
+        "多方突破情境增加。";
+
+
+    $("waitScenario").innerHTML =
+        "若價格在 <strong>"+
+        fmt(lv.s1)+
+        "</strong>～<strong>"+
+        fmt(lv.r1)+
+        "</strong>之間震盪，"+
+        "以等待關鍵價位為主，不急著追價。";
+
+
+    $("downScenario").innerHTML =
+        "若價格跌破 <strong>"+
+        fmt(lv.s1)+
+        "</strong>，"+
+        "短線轉弱機率提高，注意 <strong>"+
+        fmt(lv.s2)+
+        "</strong>附近支撐。";
+
+
+    /* =====================================================
+       AUTO INPUT
+    ====================================================== */
+
+    if(
+        !$("entryInput").value
+    ){
+
+        $("entryInput").value =
+            entry1.toFixed(8);
+
+    }
+
+
+    if(
+        !$("targetInput").value
+    ){
+
+        $("targetInput").value =
+            lv.r1.toFixed(8);
+
+    }
+
+
+    $("stopInput").value =
+        stop.toFixed(8);
+
+
+    calculateCapital();
+
+
+    drawChart();
 
 }
 
 
-/* ==========================================================
-   DRAW CHART
-========================================================== */
+/* =========================================================
+   CHART
+========================================================= */
 
 function drawChart(){
 
-    const canvas=
-        document.getElementById("chart");
+    const canvas =
+        $("chart");
+
 
     if(!canvas){
+
         return;
+
     }
 
-    const ctx=
+
+    const box =
+        canvas.parentElement;
+
+
+    const width =
+        box.clientWidth;
+
+
+    const height =
+        box.clientHeight;
+
+
+    const dpr =
+        Math.min(
+            window.devicePixelRatio||1,
+            2
+        );
+
+
+    canvas.width =
+        width*dpr;
+
+    canvas.height =
+        height*dpr;
+
+
+    const ctx =
         canvas.getContext("2d");
 
-    const rect=
-        canvas.getBoundingClientRect();
 
-    const dpr=
-        window.devicePixelRatio || 1;
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
 
-    canvas.width=
-        rect.width*dpr;
 
-    canvas.height=
-        rect.height*dpr;
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
 
-    ctx.scale(dpr,dpr);
 
-    const W=rect.width;
-    const H=rect.height;
+    const arr =
+        state.candles
+        .slice(-100);
 
-    ctx.clearRect(0,0,W,H);
-
-    const arr=
-        closes().slice(-80);
 
     if(arr.length<2){
+
         return;
+
     }
 
-    const min=
-        Math.min(...arr);
 
-    const max=
-        Math.max(...arr);
+    const prices =
+        arr.map(
+            x=>x.c
+        );
 
-    const range=
-        max-min || 1;
 
-    /* grid */
+    const ma5 =
+        prices.map(
+            (_,i)=>
+            i>=4
+            ?
+            SMA(
+                prices.slice(
+                    0,
+                    i+1
+                ),
+                5
+            )
+            :
+            null
+        );
 
-    ctx.strokeStyle="#202
+
+    const ma20 =
+        prices.map(
+            (_,i)=>
+            i>=19
+            ?
+            SMA(
+                prices.slice(
+                    0,
+                    i+1
+                ),
+                20
+            )
+            :
+            null
+        );
+
+
+    const values =
+        prices
+        .concat(
+            ma5.filter(
+                x=>x!==null
+            )
+        )
+        .concat(
+            ma20.filter(
+                x=>x!==null
+            )
+        );
+
+
+    let min =
+        Math.min(
+            ...values
+        );
+
+
+    let max =
+        Math.max(
+            ...values
+        );
+
+
+    let range =
+        max-min;
+
+
+    if(range<=0){
+
+        range=1;
+
+    }
+
+
+    const padding =
+        range*.12;
+
+
+    min-=padding;
+
+    max+=padding;
+
+
+    function x(i){
+
+        return (
+            i*
+            (
+                width-8
+            )/
+            (
+                arr.length-1
+            )
+        )+4;
+
+    }
+
+
+    function y(value){
+
+        return (
+            height-8
+        )-
+        (
+            (
+                value-min
+            )/
+            (
+                max-min
+            )
+        )*
+        (
+            height-16
+        );
+
+    }
+
+
+    /* =====================================================
+       GRID
+    ====================================================== */
+
+    ctx.lineWidth=1;
+
+    ctx.strokeStyle="#1b221e";
+
+
+    for(
+        let i=1;
+        i<=4;
+        i++
+    ){
+
+        const gy =
+            height*i/5;
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            gy
+        );
+
+        ctx.lineTo(
+            width,
+            gy
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    /* =====================================================
+       PRICE
+    ====================================================== */
+
+    ctx.beginPath();
+
+    prices.forEach(
+        (value,i)=>{
+
+            if(i===0){
+
+                ctx.moveTo(
+                    x(i),
+                    y(value)
+                );
+
+            }else{
+
+                ctx.lineTo(
+                    x(i),
+                    y(value)
+                );
+
+            }
+
+        }
+    );
+
+
+    ctx.strokeStyle="#19d77b";
+
+    ctx.lineWidth=2.3;
+
+    ctx.stroke();
+
+
+    /* =====================================================
+       PRICE AREA
+    ====================================================== */
+
+    const lastX =
+        x(
+            prices.length-1
+        );
+
+
+    ctx.lineTo(
+        lastX,
+        height
+    );
+
+    ctx.lineTo(
+        x(0),
+        height
+    );
+
+    ctx.closePath();
+
+
+    const gradient =
+        ctx.createLinearGradient(
+            0,
+            0,
+            0,
+            height
+        );
+
+
+    gradient.addColorStop(
+        0,
+        "rgba(25,215,123,.16)"
+    );
+
+    gradient.addColorStop(
+        1,
+        "rgba(25,215,123,0)"
+    );
+
+
+    ctx.fillStyle=gradient;
+
+    ctx.fill();
+
+
+    /* =====================================================
+       MA5
+    ====================================================== */
+
+    ctx.beginPath();
+
+    let started5=false;
+
+
+    ma5.forEach(
+        (value,i)=>{
+
+            if(value===null){
+
+                return;
+
+            }
+
+
+            if(!started5){
+
+                ctx.moveTo(
+                    x(i),
+                    y(value)
+                );
+
+                started5=true;
+
+            }else{
+
+                ctx.lineTo(
+                    x(i),
+                    y(value)
+                );
+
+            }
+
+        }
+    );
+
+
+    ctx.strokeStyle="#f5c84c";
+
+    ctx.lineWidth=1.1;
+
+    ctx.stroke();
+
+
+    /* =====================================================
+       MA20
+    ====================================================== */
+
+    ctx.beginPath();
+
+    let started20=false;
+
+
+    ma20.forEach(
+        (value,i)=>{
+
+            if(value===null){
+
+                return;
+
+            }
+
+
+            if(!started20){
+
+                ctx.moveTo(
+                    x(i),
+                    y(value)
+                );
+
+                started20=true;
+
+            }else{
+
+                ctx.lineTo(
+                    x(i),
+                    y(value)
+                );
+
+            }
+
+        }
+    );
+
+
+    ctx.strokeStyle="#4fdcff";
+
+    ctx.lineWidth=1.1;
+
+    ctx.stroke();
+
+
+    /* =====================================================
+       CURRENT DOT
+    ====================================================== */
+
+    const last =
+        prices[
+            prices.length-1
+        ];
+
+
+    ctx.beginPath();
+
+    ctx.arc(
+        lastX,
+        y(last),
+        4,
+        0,
+        Math.PI*2
+    );
+
+
+    ctx.fillStyle="#19d77b";
+
+    ctx.fill();
+
+
+}
+
+
+/* =========================================================
+   CALCULATOR
+========================================================= */
+
+function calculateCapital(){
+
+    const capital =
+        Number(
+            $("capital").value
+        );
+
+
+    const entry =
+        Number(
+            $("entryInput").value
+        );
+
+
+    const target =
+        Number(
+            $("targetInput").value
+        );
+
+
+    const stop =
+        Number(
+            $("stopInput").value
+        );
+
+
+    if(
+        !capital ||
+        !entry ||
+        !target
+    ){
+
+        $("calc").innerHTML =
+            "輸入投入資金、進場價、目標價即可試算。";
+
+        return;
+
+    }
+
+
+    const quantity =
+        capital/entry;
+
+
+    const targetProfit =
+        (
+            target-entry
+        )*
+        quantity;
+
+
+    let stopLoss=null;
+
+
+    if(stop>0){
+
+        stopLoss =
+            (
+                entry-stop
+            )*
+            quantity;
+
+    }
+
+
+    const targetPercent =
+        (
+            target-entry
+        )/
+        entry*
+        100;
+
+
+    const stopPercent =
+        stop>0
+        ?
+        (
+            stop-entry
+        )/
+        entry*
+        100
+        :
+        null;
+
+
+    $("calc").innerHTML =
+
+        "預估持有數量：<strong>"+
+        fmt(quantity,6)+
+        "</strong><br>"+
+
+        "目標報酬：<strong class='"+
+        (
+            targetProfit>=0
+            ?"good"
+            :"bad"
+        )+
+        "'>"+
+        (
+            targetProfit>=0
+            ?"+"
+            :""
+        )+
+        fmt(targetProfit,2)+
+        "</strong>　"+
+        "（"+
+        (
+            targetPercent>=0
+            ?"+"
+            :""
+        )+
+        targetPercent.toFixed(2)+
+        "%）"+
+        (
+            stopLoss!==null
+            ?
+            "<br>停損風險：<strong class='bad'>"+
+            "-"+
+            fmt(
+                Math.abs(stopLoss),
+                2
+            )+
+            "</strong>　"+
+            "（"+
+            stopPercent.toFixed(2)+
+            "%）"
+            :
+            ""
+        );
+
+}
+
+
+/* =========================================================
+   WEBSOCKET CONNECT
+========================================================= */
+
+function connectWS(){
+
+    if(state.ws){
+
+        try{
+
+            state.ws.close();
+
+        }catch(e){}
+
+    }
+
+
+    clearTimeout(
+        state.reconnectTimer
+    );
+
+
+    const s =
+        state.symbol.toLowerCase();
+
+
+    let streams;
+
+
+    if(
+        state.market==="spot"
+    ){
+
+        streams =
+            s+
+            "@ticker/"+
+            s+
+            "@kline_"+
+            state.tf;
+
+    }else{
+
+        streams =
+            s+
+            "@ticker/"+
+            s+
+            "@markPrice@1s/"+
+            s+
+            "@forceOrder";
+
+    }
+
+
+    /*
+       Binance Combined Stream
+    */
+
+    const url =
+        wsBase()+
+        "/stream?streams="+
+        streams;
+
+
+    try{
+
+        state.ws =
+            new WebSocket(url);
+
+    }catch(error){
+
+        scheduleReconnect();
+
+        return;
+
+    }
+
+
+    state.ws.onopen =
+        function(){
+
+            state.reconnecting=false;
+
+            state.lastLive=
+                Date.now();
+
+            $("liveText").textContent=
+                "LIVE";
+
+            $("liveDot").classList.remove(
+                "off"
+            );
+
+            $("connection").textContent =
+                "WebSocket：即時連線　｜　REST：15 秒更新";
+
+        };
+
+
+    state.ws.onmessage =
+        function(event){
+
+            try{
+
+                const packet =
+                    JSON.parse(
+                        event.data
+                    );
+
+
+                const data =
+                    packet.data ||
+                    packet;
+
+
+                state.lastLive=
+                    Date.now();
+
+
+                /* =========================
+                   24H TICKER
+                ========================= */
+
+                if(
+                    data.e==="24hrTicker"
+                ){
+
+                    state.ticker=data;
+
+                    renderTicker();
+
+                }
+
+
+                /* =========================
+                   KLINE
+                ========================= */
+
+                if(
+                    data.e==="kline"
+                ){
+
+                    const k =
+                        data.k;
+
+
+                    if(k){
+
+                        const item={
+
+                            t:Number(k.t),
+
+                            o:Number(k.o),
+
+                            h:Number(k.h),
+
+                            l:Number(k.l),
+
+                            c:Number(k.c),
+
+                            v:Number(k.v)
+
+                        };
+
+
+                        const last =
+                            state.candles[
+                                state.candles.length-1
+                            ];
+
+
+                        if(
+                            last &&
+                            last.t===item.t
+                        ){
+
+                            state.candles[
+                                state.candles.length-1
+                            ]=item;
+
+                        }else{
+
+                            state.candles.push(
+                                item
+                            );
+
+                        }
+
+
+                        state.candles =
+                            state.candles.slice(
+                                -180
+                            );
+
+
+                        analyze();
+
+                        drawChart();
+
+                    }
+
+                }
+
+
+                /* =========================
+                   MARK PRICE
+                ========================= */
+
+                if(
+                    data.e==="markPriceUpdate"
+                ){
+
+                    state.mark =
+                        Number(data.p);
+
+                    $("mark").textContent =
+                        fmt(
+                            state.mark
+                        );
+
+                }
+
+
+                /* =========================
+                   FORCE ORDER
+                ========================= */
+
+                if(
+                    data.e==="forceOrder"
+                ){
+
+                    const order =
+                        data.o ||
+                        {};
+
+
+                    const side =
+                        order.S ||
+                        "--";
+
+
+                    const quantity =
+                        Number(
+                            order.q ||
+                            0
+                        );
+
+
+                    $("derivStatus").textContent =
+                        "最新強平："+
+
+                        (
+                            side==="BUY"
+                            ?"多單被強平"
+                            :
+                            side==="SELL"
+                            ?"空單被強平"
+                            :
+                            side
+                        )+
+
+                        "　數量："+
+                        fmt(
+                            quantity,
+                            3
+                        )+
+
+                        "　"+
+                        new Date()
+                        .toLocaleTimeString();
+
+                }
+
+
+            }catch(error){
+
+                console.log(
+                    "WS parse error",
+                    error
+                );
+
+            }
+
+        };
+
+
+    state.ws.onerror =
+        function(){
+
+            $("liveText").textContent=
+                "ERROR";
+
+            $("liveDot").classList.add(
+                "off"
+            );
+
+            $("connection").textContent =
+                "WebSocket：連線異常，準備重新連線";
+
+        };
+
+
+    state.ws.onclose =
+        function(){
+
+            $("liveText").textContent=
+                "重連中";
+
+            $("liveDot").classList.add(
+                "off"
+            );
+
+            scheduleReconnect();
+
+        };
+
+}
+
+
+/* =========================================================
+   RECONNECT
+========================================================= */
+
+function scheduleReconnect(){
+
+    clearTimeout(
+        state.reconnectTimer
+    );
+
+
+    state.reconnectTimer =
+        setTimeout(
+            function(){
+
+                connectWS();
+
+            },
+            3000
+        );
+
+}
+
+
+/* =========================================================
+   REST UPDATE
+========================================================= */
+
+async function refresh(){
+
+    try{
+
+        await loadKlines();
+
+        await loadTicker();
+
+        if(
+            state.market==="futures"
+        ){
+
+            await loadDerivatives();
+
+        }else{
+
+            renderDerivatives();
+
+        }
+
+
+        analyze();
+
+        drawChart();
+
+
+        $("updated").textContent =
+            new Date()
+            .toLocaleTimeString();
+
+
+        $("connection").textContent =
+            "WebSocket：即時連線　｜　REST：15 秒更新";
+
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
+
+        $("liveText").textContent=
+            "資料異常";
+
+
+        $("connection").textContent =
+            "資料讀取失敗：請確認幣種、網路或 Binance API。";
+
+
+        $("aiState").innerHTML =
+            "<strong class='bad'>資料讀取失敗</strong>："+
+            "請確認交易對是否存在。";
+
+    }
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+function start(){
+
+    clearInterval(
+        state.timer
+    );
+
+
+    refresh();
+
+    connectWS();
+
+
+    state.timer =
+        setInterval(
+            refresh,
+            15000
+        );
+
+}
+
+
+/* =========================================================
+   SYMBOL
+========================================================= */
+
+function selectSymbol(symbol){
+
+    const clean =
+        String(symbol)
+        .trim()
+        .toUpperCase()
+        .replace(
+            /[^A-Z0-9]/g,
+            ""
+        );
+
+
+    if(!clean){
+
+        return;
+
+    }
+
+
+    state.symbol=
+        clean;
+
+
+    $("symbolInput").value =
+        state.symbol;
+
+
+    document
+    .querySelectorAll(
+        "[data-symbol]"
+    )
+    .forEach(
+        button => {
+
+            button.classList.toggle(
+                "active",
+                button.dataset.symbol===
+                state.symbol
+            );
+
+        }
+    );
+
+
+    start();
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+function searchSymbol(){
+
+    const value =
+        $("symbolInput").value;
+
+
+    selectSymbol(
+        value
+    );
+
+}
+
+
+/* =========================================================
+   MARKET
+========================================================= */
+
+function setMarket(market){
+
+    state.market =
+        market;
+
+
+    $("spotBtn")
+    .classList.toggle(
+        "on",
+        market==="spot"
+    );
+
+
+    $("futBtn")
+    .classList.toggle(
+        "on",
+        market==="futures"
+    );
+
+
+    $("derivativesCard").style.opacity =
+        market==="futures"
+        ?"1"
+        :".72";
+
+
+    start();
+
+}
+
+
+/* =========================================================
+   EVENTS
+========================================================= */
+
+$("loadBtn")
+.onclick =
+    searchSymbol;
+
+
+$("symbolInput")
+.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.key==="Enter"
+        ){
+
+            searchSymbol();
+
+        }
+
+    }
+);
+
+
+$("spotBtn")
+.onclick =
+    function(){
+
+        setMarket(
+            "spot"
+        );
+
+    };
+
+
+$("futBtn")
+.onclick =
+    function(){
+
+        setMarket(
+            "futures"
+        );
+
+    };
+
+
+document
+.querySelectorAll(
+    "[data-symbol]"
+)
+.forEach(
+    button => {
+
+        button.onclick =
+            function(){
+
+                selectSymbol(
+                    button.dataset.symbol
+                );
+
+            };
+
+    }
+);
+
+
+document
+.querySelectorAll(
+    "[data-tf]"
+)
+.forEach(
+    button => {
+
+        button.onclick =
+            function(){
+
+                state.tf =
+                    button.dataset.tf;
+
+
+                document
+                .querySelectorAll(
+                    "[data-tf]"
+                )
+                .forEach(
+                    x =>
+                    x.classList.toggle(
+                        "active",
+                        x===button
+                    )
+                );
+
+
+                $("chartInfo")
+                .textContent =
+                    state.tf
+                    .toUpperCase();
+
+
+                start();
+
+            };
+
+    }
+);
+
+
+/* =========================================================
+   CALCULATOR EVENTS
+========================================================= */
+
+[
+    "capital",
+    "entryInput",
+    "targetInput",
+    "stopInput"
+]
+.forEach(
+    id => {
+
+        $(id)
+        .addEventListener(
+            "input",
+            calculateCapital
+        );
+
+    }
+);
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
+
+window.addEventListener(
+    "resize",
+    function(){
+
+        drawChart();
+
+    }
+);
+
+
+/* =========================================================
+   INITIAL
+========================================================= */
+
+$("derivativesCard").style.opacity=".72";
+
+start();
+
+setTimeout(
+    drawChart,
+    300
+);
+
+</script>
+
+</body>
+</html>
