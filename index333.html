@@ -2,873 +2,702 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080a0c">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-<title>台股股票搜尋器 V40｜法人共振＋爆量＋拉回再攻＋AI肉度分析</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>台股股票搜尋器 V41｜法人共振＋爆量突破＋拉回再攻＋AI肉度分析</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    -webkit-tap-highlight-color:transparent;
+:root{
+  --bg:#070b14;
+  --panel:#0e1524;
+  --panel2:#111b2e;
+  --line:#24324b;
+  --text:#f4f7fb;
+  --muted:#91a0b8;
+  --red:#ff5364;
+  --green:#36d39a;
+  --yellow:#ffd166;
+  --orange:#ff9f43;
+  --blue:#5da9ff;
+  --purple:#a78bfa;
+  --shadow:0 12px 35px rgba(0,0,0,.25);
 }
 
-html,body{
-    margin:0;
-    padding:0;
-    width:100%;
-    min-height:100%;
-    background:#080a0c;
-    color:#f5f5f5;
-    font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "SF Pro Display",
-        "PingFang TC",
-        "Noto Sans TC",
-        Arial,
-        sans-serif;
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Noto Sans TC",
+    Arial,
+    sans-serif;
 }
 
 body{
-    overflow-x:hidden;
-    padding-bottom:100px;
+  min-height:100vh;
 }
 
-button,input,select{
-    font:inherit;
+button,
+input,
+select{
+  font:inherit;
 }
 
 button{
-    cursor:pointer;
-}
-
-button:active{
-    transform:scale(.97);
-}
-
-button:disabled{
-    opacity:.5;
-    cursor:not-allowed;
-}
-
-.hidden{
-    display:none!important;
-}
-
-:root{
-    --bg:#080a0c;
-    --card:#181a1e;
-    --card2:#101214;
-    --line:#3b3f45;
-    --text:#f5f5f5;
-    --muted:#969aa1;
-
-    --red:#ff5966;
-    --green:#35e56b;
-    --orange:#ff9f1c;
-    --yellow:#ffd447;
-    --blue:#36b9ff;
-    --purple:#bd83ff;
-    --cyan:#45d8df;
+  cursor:pointer;
 }
 
 .app{
-    width:100%;
-    max-width:920px;
-    margin:auto;
+  max-width:960px;
+  margin:0 auto;
+  padding:12px 12px 90px;
 }
 
 .topbar{
-    position:sticky;
-    top:0;
-    z-index:100;
-    padding:
-        calc(env(safe-area-inset-top) + 10px)
-        14px
-        11px;
-    background:rgba(8,10,12,.95);
-    backdrop-filter:blur(18px);
-    border-bottom:1px solid #25282c;
+  position:sticky;
+  top:0;
+  z-index:20;
+  margin:-12px -12px 12px;
+  padding:14px 12px;
+  background:rgba(7,11,20,.94);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
 }
 
-.top-title{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
+.topbar-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
 }
 
-.logo{
-    font-size:19px;
-    font-weight:950;
+.brand{
+  font-weight:900;
+  font-size:18px;
 }
 
 .version{
-    color:var(--cyan);
-    border:1px solid rgba(69,216,223,.35);
-    border-radius:999px;
-    padding:4px 8px;
-    font-size:10px;
-    white-space:nowrap;
-}
-
-.subtitle{
-    color:var(--muted);
-    font-size:11px;
-    margin-top:5px;
-    line-height:1.5;
-}
-
-.main{
-    padding:12px;
-}
-
-.card{
-    background:
-        linear-gradient(
-            145deg,
-            rgba(28,30,34,.98),
-            rgba(16,18,21,.98)
-        );
-    border:1px solid var(--line);
-    border-radius:16px;
-    padding:14px;
-    margin-bottom:12px;
-    box-shadow:0 8px 25px rgba(0,0,0,.18);
-}
-
-.section-title{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:8px;
-    margin-bottom:11px;
-    font-size:15px;
-    font-weight:950;
-}
-
-.section-title small{
-    color:var(--muted);
-    font-size:10px;
-    font-weight:500;
-}
-
-.search-row{
-    display:flex;
-    gap:8px;
-}
-
-.search-input{
-    flex:1;
-    min-width:0;
-    height:48px;
-    padding:0 14px;
-    border-radius:12px;
-    border:1px solid #4a4e55;
-    background:#0d0f11;
-    color:white;
-    outline:none;
-}
-
-.search-input:focus{
-    border-color:var(--cyan);
-    box-shadow:0 0 0 3px rgba(69,216,223,.1);
-}
-
-.search-btn{
-    width:76px;
-    height:48px;
-    border:0;
-    border-radius:12px;
-    background:#f0f0f0;
-    color:#111;
-    font-weight:950;
+  font-size:11px;
+  color:var(--muted);
+  margin-top:3px;
 }
 
 .status{
-    min-height:20px;
-    margin-top:8px;
-    color:var(--muted);
-    font-size:11px;
-    line-height:1.5;
+  font-size:12px;
+  color:var(--muted);
+  text-align:right;
 }
 
-.search-results{
-    margin-top:8px;
+.card{
+  background:
+    linear-gradient(
+      180deg,
+      var(--panel),
+      #0b1220
+    );
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:var(--shadow);
 }
 
-.search-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:8px;
-    padding:10px;
-    margin-top:6px;
-    border-radius:11px;
-    background:#0f1113;
-    border:1px solid #30343a;
+.card-title{
+  font-weight:900;
+  margin-bottom:10px;
 }
 
-.search-name{
-    font-weight:900;
+.search-row{
+  display:flex;
+  gap:8px;
 }
 
-.search-code{
-    color:var(--cyan);
-    margin-right:6px;
-    font-size:12px;
+.search-row input{
+  flex:1;
+  min-width:0;
 }
 
-.search-meta{
-    color:var(--muted);
-    font-size:10px;
-    margin-top:3px;
+input,
+select{
+  width:100%;
+  background:#09111f;
+  color:var(--text);
+  border:1px solid #2a3a56;
+  border-radius:12px;
+  padding:12px;
+  outline:none;
 }
 
-.search-go{
-    border:1px solid #484c53;
-    border-radius:8px;
-    background:#181b1f;
-    color:white;
-    padding:7px 10px;
-    font-size:11px;
-    font-weight:900;
+input:focus,
+select:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(93,169,255,.12);
+}
+
+.btn{
+  border:1px solid #30415f;
+  background:#142039;
+  color:#fff;
+  border-radius:12px;
+  padding:10px 13px;
+  font-weight:800;
+}
+
+.btn:hover{
+  filter:brightness(1.12);
+}
+
+.btn.primary{
+  background:#1b5ca8;
+  border-color:#3179d0;
+}
+
+.btn.red{
+  background:#65202a;
+  border-color:#9b3341;
+}
+
+.btn.green{
+  background:#124b3a;
+  border-color:#207d5f;
+}
+
+.btn.yellow{
+  background:#584716;
+  border-color:#896f20;
+}
+
+.quick-grid,
+.feature-grid,
+.metric-grid,
+.level-grid{
+  display:grid;
+  gap:8px;
 }
 
 .quick-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:7px;
-}
-
-.quick-btn{
-    min-height:46px;
-    border-radius:11px;
-    border:1px solid #383c42;
-    background:#101214;
-    color:#fff;
-    font-size:11px;
-    font-weight:900;
-}
-
-.quick-btn span{
-    display:block;
-    color:var(--muted);
-    font-size:9px;
-    margin-top:2px;
+  grid-template-columns:repeat(4,1fr);
 }
 
 .feature-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:8px;
-}
-
-.feature-btn{
-    min-height:66px;
-    border-radius:13px;
-    border:1px solid #41454b;
-    background:linear-gradient(145deg,#191c20,#101214);
-    color:white;
-    text-align:left;
-    padding:11px;
-}
-
-.feature-icon{
-    font-size:18px;
-}
-
-.feature-name{
-    margin-top:4px;
-    font-weight:950;
-}
-
-.feature-desc{
-    margin-top:2px;
-    color:var(--muted);
-    font-size:9px;
-}
-
-.hero{
-    border-radius:17px;
-    border:1px solid #393d43;
-    background:
-        radial-gradient(circle at top right,rgba(69,216,223,.12),transparent 35%),
-        radial-gradient(circle at bottom left,rgba(189,131,255,.08),transparent 40%),
-        #121416;
-    padding:16px;
-}
-
-.hero-top{
-    display:flex;
-    justify-content:space-between;
-    gap:12px;
-}
-
-.hero-name{
-    font-size:23px;
-    font-weight:950;
-}
-
-.hero-code{
-    color:var(--cyan);
-    font-size:11px;
-    margin-top:3px;
-}
-
-.price{
-    font-size:32px;
-    font-weight:950;
-    letter-spacing:-1px;
-}
-
-.change{
-    font-size:14px;
-    font-weight:900;
-    margin-top:3px;
-}
-
-.up{
-    color:var(--red)!important;
-}
-
-.down{
-    color:var(--green)!important;
-}
-
-.flat{
-    color:#c7c9cc!important;
-}
-
-.market-state{
-    display:inline-flex;
-    border-radius:999px;
-    padding:5px 9px;
-    margin-top:8px;
-    font-size:10px;
-    border:1px solid #41444a;
-    color:var(--muted);
+  grid-template-columns:repeat(4,1fr);
 }
 
 .metric-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:7px;
-    margin-top:12px;
-}
-
-.metric{
-    min-width:0;
-    padding:8px;
-    border-radius:10px;
-    background:#0d0f11;
-    border:1px solid #2d3035;
-}
-
-.metric-label{
-    color:var(--muted);
-    font-size:9px;
-}
-
-.metric-value{
-    margin-top:4px;
-    font-size:13px;
-    font-weight:950;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-
-.tag-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
-    margin-top:10px;
-}
-
-.tag{
-    display:inline-flex;
-    border-radius:999px;
-    padding:5px 8px;
-    background:#111315;
-    border:1px solid #3c4045;
-    color:#d7d9dc;
-    font-size:10px;
-}
-
-.tag.good{
-    color:var(--red);
-    border-color:rgba(255,89,102,.4);
-}
-
-.tag.bad{
-    color:var(--green);
-    border-color:rgba(53,229,107,.4);
-}
-
-.tag.warn{
-    color:var(--orange);
-    border-color:rgba(255,159,28,.4);
-}
-
-.tag.info{
-    color:var(--cyan);
-    border-color:rgba(69,216,223,.4);
-}
-
-.tag.purple{
-    color:var(--purple);
-    border-color:rgba(189,131,255,.4);
-}
-
-.analysis-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:8px;
-}
-
-.analysis-box{
-    padding:11px;
-    border-radius:11px;
-    background:#0e1012;
-    border:1px solid #303338;
-}
-
-.analysis-label{
-    color:var(--muted);
-    font-size:10px;
-}
-
-.analysis-value{
-    margin-top:5px;
-    font-size:15px;
-    font-weight:950;
-}
-
-.analysis-note{
-    margin-top:5px;
-    color:#b8bbc0;
-    font-size:10px;
-    line-height:1.55;
-}
-
-.score-wrap{
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.score-num{
-    font-size:32px;
-    font-weight:950;
-    min-width:65px;
-}
-
-.score-bar{
-    flex:1;
-    height:10px;
-    border-radius:999px;
-    background:#282b30;
-    overflow:hidden;
-}
-
-.score-fill{
-    width:0;
-    height:100%;
-    background:var(--cyan);
-    transition:width .4s ease;
-}
-
-.score-text{
-    margin-top:7px;
-    color:var(--muted);
-    font-size:10px;
-}
-
-.signal-box{
-    padding:15px;
-    border-radius:15px;
-    background:
-        radial-gradient(circle at top right,rgba(69,216,223,.12),transparent 45%),
-        #0d0f11;
-    border:1px solid #41454b;
-}
-
-.signal-title{
-    font-size:20px;
-    font-weight:950;
-}
-
-.signal-main{
-    margin-top:7px;
-    font-size:14px;
-    font-weight:900;
-}
-
-.signal-desc{
-    margin-top:7px;
-    color:#bfc2c7;
-    font-size:11px;
-    line-height:1.6;
-}
-
-.meat{
-    margin-top:12px;
-    padding:12px;
-    border-radius:12px;
-    border:1px solid rgba(255,159,28,.4);
-    background:rgba(255,159,28,.08);
-}
-
-.meat-title{
-    color:var(--orange);
-    font-size:13px;
-    font-weight:950;
-}
-
-.meat-value{
-    margin-top:5px;
-    font-size:21px;
-    font-weight:950;
+  grid-template-columns:repeat(4,1fr);
 }
 
 .level-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:7px;
+  grid-template-columns:repeat(3,1fr);
 }
 
-.level{
-    padding:10px;
-    border-radius:10px;
-    background:#0d0f11;
-    border:1px solid #303338;
+.quick,
+.feature{
+  padding:11px 7px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#0c1526;
+  color:#eaf0f8;
+  text-align:center;
+  font-weight:800;
 }
 
-.level-label{
-    color:var(--muted);
-    font-size:9px;
+.quick small,
+.feature small{
+  display:block;
+  color:var(--muted);
+  font-weight:500;
+  margin-top:3px;
 }
 
-.level-value{
-    margin-top:4px;
-    font-size:14px;
-    font-weight:950;
+.suggestions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
 }
 
-.entry .level-value{
-    color:var(--cyan);
+.suggestion{
+  padding:6px 9px;
+  border-radius:999px;
+  border:1px solid #2b3d5c;
+  background:#0d1729;
+  color:#b9c8dc;
+  font-size:12px;
 }
 
-.stop .level-value{
-    color:var(--green);
+.hero{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
 }
 
-.target .level-value{
-    color:var(--red);
+.stock-name{
+  font-size:25px;
+  font-weight:950;
 }
 
-.two-col{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
+.stock-code{
+  color:var(--muted);
+  font-size:13px;
+  margin-top:3px;
+}
+
+.price{
+  font-size:38px;
+  font-weight:950;
+  line-height:1.05;
+  margin-top:10px;
+}
+
+.up{
+  color:var(--red)!important;
+}
+
+.down{
+  color:var(--green)!important;
+}
+
+.flat{
+  color:var(--yellow)!important;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:6px 9px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  border:1px solid #32435f;
+  background:#121d31;
+}
+
+.badge.good{
+  color:var(--green);
+  border-color:#236c56;
+  background:#0e2a23;
+}
+
+.badge.bad{
+  color:var(--red);
+  border-color:#75303b;
+  background:#30151b;
+}
+
+.badge.warn{
+  color:var(--yellow);
+  border-color:#6f5a20;
+  background:#30270f;
+}
+
+.badge.info{
+  color:var(--blue);
+  border-color:#315f92;
+  background:#10243b;
+}
+
+.metric{
+  background:#0b1424;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:10px;
+}
+
+.metric-label{
+  font-size:11px;
+  color:var(--muted);
+}
+
+.metric-value{
+  font-size:16px;
+  font-weight:900;
+  margin-top:4px;
+  word-break:break-word;
+}
+
+.signal{
+  padding:15px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:#0b1424;
+}
+
+.signal-main{
+  font-size:22px;
+  font-weight:950;
+}
+
+.signal-sub{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+  margin-top:6px;
+}
+
+.meat{
+  display:grid;
+  grid-template-columns:120px 1fr;
+  gap:12px;
+  align-items:center;
+}
+
+.meat-grade{
+  font-size:50px;
+  font-weight:1000;
+  text-align:center;
+}
+
+.meat-desc{
+  font-size:18px;
+  font-weight:900;
+}
+
+.score-wrap{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.score{
+  font-size:42px;
+  font-weight:1000;
+}
+
+.scorebar{
+  height:12px;
+  background:#18243a;
+  border-radius:99px;
+  overflow:hidden;
+  flex:1;
+}
+
+.scorebar i{
+  display:block;
+  height:100%;
+  background:
+    linear-gradient(
+      90deg,
+      #4b6cb7,
+      #36d39a,
+      #ffd166
+    );
+  width:0;
 }
 
 .table-wrap{
-    width:100%;
-    overflow-x:auto;
+  overflow:auto;
 }
 
-.data-table{
-    width:100%;
-    min-width:580px;
-    border-collapse:collapse;
-    font-size:10px;
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:560px;
 }
 
-.data-table th,
-.data-table td{
-    padding:8px 6px;
-    border-bottom:1px solid #292c30;
-    text-align:right;
-    white-space:nowrap;
+th,
+td{
+  padding:9px 7px;
+  border-bottom:1px solid #20304a;
+  text-align:right;
+  font-size:13px;
 }
 
-.data-table th{
-    color:var(--muted);
-    font-weight:700;
+th:first-child,
+td:first-child{
+  text-align:left;
 }
 
-.data-table th:first-child,
-.data-table td:first-child{
-    text-align:left;
+th{
+  color:#9eabc0;
+  font-weight:800;
 }
 
-.good-text{
-    color:var(--red);
+.analysis-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
 }
 
-.bad-text{
-    color:var(--green);
+.analysis-box{
+  background:#0b1424;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
 }
 
-.warn-text{
-    color:var(--orange);
+.analysis-title{
+  font-weight:900;
+  margin-bottom:8px;
 }
 
-.info-text{
-    color:var(--cyan);
+.kv{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:5px 0;
+  border-bottom:1px dashed #1e2b42;
 }
 
-.purple-text{
-    color:var(--purple);
+.kv:last-child{
+  border-bottom:0;
 }
 
-.muted{
-    color:var(--muted);
+.kv span:first-child{
+  color:var(--muted);
 }
 
-.rule-list{
-    display:flex;
-    flex-direction:column;
-    gap:7px;
+.kv span:last-child{
+  font-weight:800;
+  text-align:right;
+}
+
+.level{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  background:#0b1424;
+}
+
+.level b{
+  display:block;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.level strong{
+  display:block;
+  font-size:21px;
+  margin-top:4px;
 }
 
 .rule{
-    display:flex;
-    align-items:flex-start;
-    gap:8px;
-    padding:9px;
-    border-radius:10px;
-    background:#0e1012;
-    border:1px solid #303338;
+  display:flex;
+  gap:8px;
+  align-items:flex-start;
+  padding:7px 0;
+  border-bottom:1px dashed #1d2a40;
+  font-size:13px;
+  line-height:1.5;
 }
 
-.rule-icon{
-    flex:none;
-    width:23px;
-    height:23px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:50%;
-    background:#181b1f;
+.rule:last-child{
+  border-bottom:0;
 }
 
-.rule-main{
-    flex:1;
+.dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:#50627e;
+  margin-top:5px;
+  flex:0 0 auto;
 }
 
-.rule-title{
-    font-size:11px;
-    font-weight:900;
+.dot.ok{
+  background:var(--green);
 }
 
-.rule-desc{
-    margin-top:3px;
-    color:var(--muted);
-    font-size:9px;
-    line-height:1.5;
+.dot.no{
+  background:var(--red);
 }
 
-.rule-score{
-    font-size:11px;
-    font-weight:950;
+.dot.warn{
+  background:var(--yellow);
 }
 
-.list{
-    display:flex;
-    flex-direction:column;
-    gap:7px;
+.conclusion{
+  font-size:15px;
+  line-height:1.8;
 }
 
-.list-item{
-    display:flex;
-    align-items:center;
-    gap:9px;
-    padding:10px;
-    border-radius:11px;
-    background:#0e1012;
-    border:1px solid #303338;
+.scan-row{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+  margin-bottom:7px;
 }
 
-.list-main{
-    min-width:0;
-    flex:1;
+.progress{
+  height:9px;
+  background:#17233a;
+  border-radius:99px;
+  overflow:hidden;
 }
 
-.list-title{
-    font-size:12px;
-    font-weight:950;
+.progress i{
+  display:block;
+  height:100%;
+  width:0;
+  background:var(--blue);
 }
 
-.list-sub{
-    margin-top:3px;
-    color:var(--muted);
-    font-size:9px;
+.scan-list{
+  max-height:340px;
+  overflow:auto;
+  margin-top:10px;
 }
 
-.list-right{
-    text-align:right;
+.scan-item{
+  display:grid;
+  grid-template-columns:70px 1fr 70px;
+  gap:8px;
+  align-items:center;
+  padding:9px 0;
+  border-bottom:1px solid #1b2940;
+  font-size:12px;
 }
 
-.list-price{
-    font-weight:950;
+.scan-item strong{
+  text-align:right;
 }
 
-.list-change{
-    margin-top:3px;
-    font-size:9px;
+.empty{
+  padding:28px 10px;
+  text-align:center;
+  color:var(--muted);
 }
 
-.small-btn{
-    flex:none;
-    padding:6px 9px;
-    border-radius:8px;
-    border:1px solid #44484e;
-    background:#15171a;
-    color:#fff;
-    font-size:10px;
-    font-weight:800;
+.loading{
+  animation:pulse 1.1s infinite alternate;
 }
 
-.action-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:7px;
-    margin-top:10px;
+@keyframes pulse{
+  to{
+    opacity:.45;
+  }
 }
 
-.action-btn{
-    border:1px solid #42464c;
-    background:#15171a;
-    color:#fff;
-    border-radius:9px;
-    padding:8px 11px;
-    font-size:10px;
-    font-weight:800;
+.small{
+  font-size:12px;
+  color:var(--muted);
 }
 
-.scan-btn{
-    width:100%;
-    min-height:48px;
-    border-radius:12px;
-    border:1px solid rgba(255,159,28,.45);
-    background:rgba(255,159,28,.1);
-    color:var(--orange);
-    font-weight:950;
+.muted{
+  color:var(--muted);
 }
 
-.progress-wrap{
-    margin-top:10px;
+.green{
+  color:var(--green);
 }
 
-.progress-info{
-    display:flex;
-    justify-content:space-between;
-    color:var(--muted);
-    font-size:10px;
-    margin-bottom:6px;
+.red{
+  color:var(--red);
 }
 
-.progress-bar{
-    height:6px;
-    border-radius:999px;
-    overflow:hidden;
-    background:#272a2e;
+.yellow{
+  color:var(--yellow);
 }
 
-.progress-fill{
-    width:0;
-    height:100%;
-    background:var(--cyan);
-    transition:width .2s ease;
-}
-
-.notice{
-    padding:10px;
-    border-radius:10px;
-    background:#101214;
-    border:1px solid #303338;
-    color:#b9bdc3;
-    font-size:10px;
-    line-height:1.6;
+.blue{
+  color:var(--blue);
 }
 
 .footer{
-    text-align:center;
-    padding:20px 10px;
-    color:#62666d;
-    font-size:9px;
-    line-height:1.7;
+  text-align:center;
+  color:#687892;
+  font-size:11px;
+  line-height:1.6;
+  padding:15px;
 }
 
 .bottom-nav{
-    position:fixed;
-    left:0;
-    right:0;
-    bottom:0;
-    z-index:200;
-    padding:
-        8px
-        10px
-        calc(env(safe-area-inset-bottom) + 8px);
-    background:rgba(10,12,14,.96);
-    backdrop-filter:blur(18px);
-    border-top:1px solid #272a2e;
+  position:fixed;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:min(960px,100%);
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:5px;
+  padding:
+    8px
+    10px
+    calc(8px + env(safe-area-inset-bottom));
+  background:rgba(7,11,20,.96);
+  backdrop-filter:blur(16px);
+  border-top:1px solid var(--line);
+  z-index:30;
 }
 
-.bottom-inner{
-    max-width:920px;
-    margin:auto;
-    display:grid;
+.bottom-nav button{
+  border:0;
+  background:transparent;
+  color:#93a2b8;
+  font-size:11px;
+  padding:5px;
+}
+
+.bottom-nav button b{
+  display:block;
+  font-size:18px;
+  margin-bottom:2px;
+}
+
+@media(max-width:700px){
+
+  .quick-grid{
     grid-template-columns:repeat(4,1fr);
-    gap:6px;
+  }
+
+  .feature-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .metric-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .analysis-grid{
+    grid-template-columns:1fr;
+  }
+
+  .level-grid{
+    grid-template-columns:1fr;
+  }
+
+  .hero{
+    display:block;
+  }
+
+  .hero-right{
+    margin-top:10px;
+  }
+
+  .search-row{
+    flex-wrap:wrap;
+  }
+
+  .search-row .btn{
+    flex:1;
+  }
 }
 
-.nav-btn{
-    min-height:42px;
-    border:1px solid #33373d;
-    border-radius:10px;
-    background:#121416;
-    color:#aeb2b8;
-    font-size:10px;
-    font-weight:900;
-}
+@media(max-width:390px){
 
-.nav-btn.active{
-    color:var(--cyan);
-    border-color:rgba(69,216,223,.4);
-}
+  .quick-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
 
-@media(max-width:600px){
+  .stock-name{
+    font-size:22px;
+  }
 
-    .metric-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .quick-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .level-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .two-col{
-        grid-template-columns:1fr;
-    }
-
-    .hero-top{
-        align-items:flex-start;
-    }
-
-    .price{
-        font-size:28px;
-    }
+  .price{
+    font-size:34px;
+  }
 }
 </style>
 </head>
@@ -877,4555 +706,4938 @@ button:disabled{
 
 <div class="app">
 
-<header class="topbar">
-    <div class="top-title">
-        <div class="logo">📊 台股股票搜尋器</div>
-        <div class="version">V40 AI肉度版</div>
+  <div class="topbar">
+
+    <div class="topbar-row">
+
+      <div>
+
+        <div class="brand">
+          📈 台股股票搜尋器
+        </div>
+
+        <div class="version">
+          V41｜法人共振＋爆量突破＋拉回再攻＋AI肉度
+        </div>
+
+      </div>
+
+      <div
+        class="status"
+        id="systemStatus">
+        準備中
+      </div>
+
     </div>
 
-    <div class="subtitle">
-        三大法人＋爆量＋拉回再攻＋突破＋支撐壓力＋進場策略
-    </div>
-</header>
+  </div>
 
-<main class="main">
 
-<section class="card">
+  <section
+    class="card"
+    id="searchSection">
 
-    <div class="section-title">
-        <span>🔎 股票搜尋</span>
-        <small>代號／名稱皆可</small>
+    <div class="card-title">
+      🔎 股票搜尋
     </div>
 
     <div class="search-row">
-        <input
-            id="searchInput"
-            class="search-input"
-            placeholder="例如 2330、台積電、1326、台化、3685"
-            autocomplete="off"
-        >
-        <button id="searchBtn" class="search-btn">
-            搜尋
-        </button>
+
+      <input
+        id="searchInput"
+        autocomplete="off"
+        placeholder="輸入 2330、台積電、1326、台化、0050">
+
+      <button
+        class="btn primary"
+        id="searchBtn">
+        搜尋
+      </button>
+
+      <button
+        class="btn"
+        id="refreshBtn">
+        刷新
+      </button>
+
     </div>
 
-    <div id="status" class="status">
-        請輸入股票代號或名稱
+    <div
+      class="suggestions"
+      id="suggestions">
     </div>
 
-    <div id="searchResults" class="search-results"></div>
+  </section>
 
-</section>
 
-<section class="card">
+  <section class="card">
 
-    <div class="section-title">
-        <span>⚡ 快速搜尋</span>
-        <small>常用股票</small>
+    <div class="card-title">
+      ⚡ 快速搜尋
     </div>
 
     <div class="quick-grid">
 
-        <button class="quick-btn" data-code="2330">
-            2330
-            <span>台積電</span>
-        </button>
+      <button
+        class="quick"
+        data-code="2330">
+        2330
+        <small>台積電</small>
+      </button>
 
-        <button class="quick-btn" data-code="2317">
-            2317
-            <span>鴻海</span>
-        </button>
+      <button
+        class="quick"
+        data-code="2317">
+        2317
+        <small>鴻海</small>
+      </button>
 
-        <button class="quick-btn" data-code="1326">
-            1326
-            <span>台化</span>
-        </button>
+      <button
+        class="quick"
+        data-code="1326">
+        1326
+        <small>台化</small>
+      </button>
 
-        <button class="quick-btn" data-code="3685">
-            3685
-            <span>元創精密</span>
-        </button>
+      <button
+        class="quick"
+        data-code="3685">
+        3685
+        <small>元創精密</small>
+      </button>
 
-        <button class="quick-btn" data-code="2308">
-            2308
-            <span>台達電</span>
-        </button>
+      <button
+        class="quick"
+        data-code="2308">
+        2308
+        <small>台達電</small>
+      </button>
 
-        <button class="quick-btn" data-code="2303">
-            2303
-            <span>聯電</span>
-        </button>
+      <button
+        class="quick"
+        data-code="2303">
+        2303
+        <small>聯電</small>
+      </button>
 
-        <button class="quick-btn" data-code="0050">
-            0050
-            <span>元大台灣50</span>
-        </button>
+      <button
+        class="quick"
+        data-code="0050">
+        0050
+        <small>元大台灣50</small>
+      </button>
 
-        <button class="quick-btn" data-code="0056">
-            0056
-            <span>高股息</span>
-        </button>
+      <button
+        class="quick"
+        data-code="0056">
+        0056
+        <small>元大高股息</small>
+      </button>
 
     </div>
 
-</section>
+  </section>
 
-<section class="card">
 
-    <div class="section-title">
-        <span>🎯 分析模式</span>
-        <small>尋找有肉的位置</small>
+  <section class="card">
+
+    <div class="card-title">
+      🧠 分析模式
     </div>
 
     <div class="feature-grid">
 
-        <button class="feature-btn" id="modeBreakout">
-            <div class="feature-icon">🚀</div>
-            <div class="feature-name">爆量突破</div>
-            <div class="feature-desc">突破＋量價確認</div>
-        </button>
+      <button
+        class="feature"
+        data-mode="breakout">
+        🚀 爆量突破
+        <small>突破＋量能＋法人</small>
+      </button>
 
-        <button class="feature-btn" id="modeInstitution">
-            <div class="feature-icon">🏦</div>
-            <div class="feature-name">法人共振</div>
-            <div class="feature-desc">三大法人同步買進</div>
-        </button>
+      <button
+        class="feature"
+        data-mode="institution">
+        🏦 法人共振
+        <small>三大法人同步</small>
+      </button>
 
-        <button class="feature-btn" id="modePullback">
-            <div class="feature-icon">🟢</div>
-            <div class="feature-name">拉回再攻</div>
-            <div class="feature-desc">長高後拉回＋法人承接</div>
-        </button>
+      <button
+        class="feature"
+        data-mode="pullback">
+        🟢 回檔承接
+        <small>長高＋拉回＋再攻</small>
+      </button>
 
-        <button class="feature-btn" id="modeMeat">
-            <div class="feature-icon">🍖</div>
-            <div class="feature-name">找有肉股票</div>
-            <div class="feature-desc">綜合條件評分</div>
-        </button>
-
-    </div>
-
-</section>
-
-<section class="card">
-
-    <div class="section-title">
-        <span>🔍 突破掃描</span>
-        <small>規則式掃描</small>
-    </div>
-
-    <button id="scanBtn" class="scan-btn">
-        🚀 掃描熱門股票：找「爆量＋法人＋突破」
-    </button>
-
-    <div class="progress-wrap">
-
-        <div class="progress-info">
-            <span id="progressText">尚未開始</span>
-            <span id="progressPercent">0%</span>
-        </div>
-
-        <div class="progress-bar">
-            <div id="progressFill" class="progress-fill"></div>
-        </div>
+      <button
+        class="feature"
+        data-mode="meat">
+        🍖 肉度分析
+        <small>A～D 等級</small>
+      </button>
 
     </div>
 
-    <div id="scanResults" class="list" style="margin-top:10px;"></div>
+  </section>
 
-</section>
 
-<div id="homePanel">
+  <section
+    class="card"
+    id="scanCard">
 
-    <section class="card">
+    <div class="card-title">
+      🔭 強勢股掃描
+    </div>
 
-        <div class="section-title">
-            <span>📌 股票分析</span>
-            <small id="analysisTime">等待搜尋</small>
-        </div>
+    <div class="scan-row">
 
-        <div class="hero">
+      <span
+        class="small"
+        id="scanStatus">
+        尚未掃描
+      </span>
 
-            <div class="hero-top">
+      <button
+        class="btn green"
+        id="scanBtn">
+        開始掃描
+      </button>
 
-                <div>
-                    <div id="stockName" class="hero-name">尚未選擇股票</div>
-                    <div id="stockCode" class="hero-code">----</div>
-                    <div id="marketState" class="market-state">
-                        等待資料
-                    </div>
-                </div>
+    </div>
 
-                <div style="text-align:right;">
-                    <div id="price" class="price">--</div>
-                    <div id="change" class="change flat">--</div>
-                </div>
+    <div class="progress">
+      <i id="scanProgress"></i>
+    </div>
 
-            </div>
+    <div
+      class="scan-list"
+      id="scanList">
 
-            <div class="metric-grid">
+      <div class="empty">
+        按「開始掃描」找出法人、量價、突破共振股
+      </div>
 
-                <div class="metric">
-                    <div class="metric-label">開盤</div>
-                    <div id="open" class="metric-value">--</div>
-                </div>
+    </div>
 
-                <div class="metric">
-                    <div class="metric-label">最高</div>
-                    <div id="high" class="metric-value">--</div>
-                </div>
+  </section>
 
-                <div class="metric">
-                    <div class="metric-label">最低</div>
-                    <div id="low" class="metric-value">--</div>
-                </div>
 
-                <div class="metric">
-                    <div class="metric-label">成交量</div>
-                    <div id="volume" class="metric-value">--</div>
-                </div>
-
-                <div class="metric">
-                    <div class="metric-label">MA5</div>
-                    <div id="ma5" class="metric-value">--</div>
-                </div>
-
-                <div class="metric">
-                    <div class="metric-label">MA20</div>
-                    <div id="ma20" class="metric-value">--</div>
-                </div>
-
-                <div class="metric">
-                    <div class="metric-label">MA60</div>
-                    <div id="ma60" class="metric-value">--</div>
-                </div>
-
-                <div class="metric">
-                    <div class="metric-label">MA120</div>
-                    <div id="ma120" class="metric-value">--</div>
-                </div>
-
-            </div>
-
-            <div id="tagRow" class="tag-row"></div>
-
-        </div>
-
-    </section>
+  <main id="homePanel">
 
     <section class="card">
 
-        <div class="section-title">
-            <span>🚨 核心進場訊號</span>
-            <small>系統判斷</small>
-        </div>
+      <div class="hero">
 
-        <div class="signal-box">
+        <div>
 
-            <div id="signalTitle" class="signal-title">
-                等待分析
-            </div>
+          <div
+            class="stock-name"
+            id="stockName">
+            尚未選擇股票
+          </div>
 
-            <div id="signalMain" class="signal-main">
-                請先搜尋股票
-            </div>
+          <div
+            class="stock-code"
+            id="stockMeta">
+            請搜尋股票代號或名稱
+          </div>
 
-            <div id="signalDesc" class="signal-desc">
-                系統會依據趨勢、量價、三大法人、突破與拉回條件判斷。
-            </div>
+          <div
+            class="price"
+            id="stockPrice">
+            --
+          </div>
 
-        </div>
-
-        <div class="meat">
-
-            <div class="meat-title">
-                🍖 潛在肉度
-            </div>
-
-            <div id="meatValue" class="meat-value">
-                尚未分析
-            </div>
-
-            <div id="meatDesc" class="analysis-note">
-                綜合法人、成交量、趨勢與位置判斷。
-            </div>
+          <div
+            id="changeText"
+            class="small">
+            --
+          </div>
 
         </div>
 
-    </section>
 
-    <section class="card">
+        <div class="hero-right">
 
-        <div class="section-title">
-            <span>🤖 AI規則綜合評分</span>
-            <small>100分制</small>
-        </div>
-
-        <div class="score-wrap">
-
-            <div id="scoreNum" class="score-num">
-                --
-            </div>
-
-            <div style="flex:1;">
-                <div class="score-bar">
-                    <div id="scoreFill" class="score-fill"></div>
-                </div>
-
-                <div id="scoreText" class="score-text">
-                    尚未分析
-                </div>
-            </div>
-
-        </div>
-
-    </section>
-
-    <section class="card">
-
-        <div class="section-title">
-            <span>🏦 三大法人</span>
-            <small>今日／5日／20日</small>
-        </div>
-
-        <div class="table-wrap">
-
-            <table class="data-table">
-
-                <thead>
-                    <tr>
-                        <th>法人</th>
-                        <th>今日</th>
-                        <th>5日</th>
-                        <th>20日</th>
-                        <th>方向</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    <tr>
-                        <td>外資</td>
-                        <td id="foreignToday">暫無資料</td>
-                        <td id="foreign5">暫無資料</td>
-                        <td id="foreign20">暫無資料</td>
-                        <td id="foreignDir">--</td>
-                    </tr>
-
-                    <tr>
-                        <td>投信</td>
-                        <td id="trustToday">暫無資料</td>
-                        <td id="trust5">暫無資料</td>
-                        <td id="trust20">暫無資料</td>
-                        <td id="trustDir">--</td>
-                    </tr>
-
-                    <tr>
-                        <td>自營商</td>
-                        <td id="dealerToday">暫無資料</td>
-                        <td id="dealer5">暫無資料</td>
-                        <td id="dealer20">暫無資料</td>
-                        <td id="dealerDir">--</td>
-                    </tr>
-
-                    <tr>
-                        <td><strong>三大法人合計</strong></td>
-                        <td id="totalToday">暫無資料</td>
-                        <td id="total5">暫無資料</td>
-                        <td id="total20">暫無資料</td>
-                        <td id="totalDir">--</td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-        <div id="institutionTags" class="tag-row"></div>
-
-    </section>
-
-    <section class="card">
-
-        <div class="section-title">
-            <span>🔥 法人進場強度</span>
-            <small>共振判斷</small>
-        </div>
-
-        <div class="analysis-grid">
-
-            <div class="analysis-box">
-                <div class="analysis-label">三大法人同步買進</div>
-                <div id="institutionSync" class="analysis-value">--</div>
-                <div id="institutionSyncNote" class="analysis-note">
-                    等待法人資料
-                </div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">法人連續買超</div>
-                <div id="institutionStreak" class="analysis-value">--</div>
-                <div id="institutionStreakNote" class="analysis-note">
-                    等待歷史資料
-                </div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">法人成本區</div>
-                <div id="institutionCost" class="analysis-value">--</div>
-                <div id="institutionCostNote" class="analysis-note">
-                    模型估算
-                </div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">法人籌碼狀態</div>
-                <div id="institutionState" class="analysis-value">--</div>
-                <div id="institutionStateNote" class="analysis-note">
-                    等待資料
-                </div>
-            </div>
-
-        </div>
-
-    </section>
-
-    <section class="card">
-
-        <div class="section-title">
-            <span>📊 量價分析</span>
-            <small>爆量是否有效</small>
-        </div>
-
-        <div class="analysis-grid">
-
-            <div class="analysis-box">
-                <div class="analysis-label">5日平均量</div>
-                <div id="avgVol5" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">20日平均量</div>
-                <div id="avgVol20" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">今日量比5日</div>
-                <div id="volumeRatio5" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">今日量比20日</div>
-                <div id="volumeRatio20" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">量價關係</div>
-                <div id="volumePriceState" class="analysis-value">--</div>
-                <div id="volumePriceNote" class="analysis-note">
-                    等待分析
-                </div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">爆量判斷</div>
-                <div id="volumeState" class="analysis-value">--</div>
-                <div id="volumeStateNote" class="analysis-note">
-                    等待分析
-                </div>
-            </div>
-
-        </div>
-
-    </section>
-
-    <section class="card">
-
-        <div class="section-title">
-            <span>📈 趨勢分析</span>
-            <small>均線結構</small>
-        </div>
-
-        <div class="analysis-grid">
-
-            <div class="analysis-box">
-                <div class="analysis-label">MA5位置</div>
-                <div id="ma5State" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">MA20位置</div>
-                <div id="ma20State" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">MA60位置</div>
-                <div id="ma60State" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">均線排列</div>
-                <div id="maArrange" class="analysis-value">--</div>
-            </div>
-
-        </div>
-
-        <div id="trendTags" class="tag-row"></div>
-
-    </section>
-
-    <section class="card">
-
-        <div class="section-title">
-            <span>🟢 長高拉回再攻</span>
-            <small>你指定的重點模式</small>
-        </div>
-
-        <div class="signal-box">
-
-            <div id="pullbackTitle" class="signal-title">
-                等待分析
-            </div>
-
-            <div id="pullbackMain" class="signal-main">
-                --
-            </div>
-
-            <div id="pullbackDesc" class="signal-desc">
-                系統會尋找「先上漲 → 拉回 → 法人承接 → 量能重新放大」。
-            </div>
-
-        </div>
-
-        <div class="tag-row">
-
-            <span id="pullbackUpTag" class="tag">
-                長高：--
+          <div id="signalBadge">
+            <span class="badge info">
+              等待搜尋
             </span>
-
-            <span id="pullbackRetraceTag" class="tag">
-                拉回：--
-            </span>
-
-            <span id="pullbackInstTag" class="tag">
-                法人：--
-            </span>
-
-            <span id="pullbackVolTag" class="tag">
-                量能：--
-            </span>
+          </div>
 
         </div>
 
+      </div>
+
     </section>
+
 
     <section class="card">
 
-        <div class="section-title">
-            <span>🚀 突破有效性</span>
-            <small>避免假突破</small>
+      <div class="card-title">
+        📌 核心進場訊號
+      </div>
+
+      <div
+        class="signal"
+        id="signalBox">
+
+        <div class="signal-main">
+          等待分析
         </div>
 
-        <div class="analysis-grid">
-
-            <div class="analysis-box">
-                <div class="analysis-label">近期壓力</div>
-                <div id="resistance" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">目前支撐</div>
-                <div id="support" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">距離壓力</div>
-                <div id="distanceResistance" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">距離支撐</div>
-                <div id="distanceSupport" class="analysis-value">--</div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">突破狀態</div>
-                <div id="breakoutState" class="analysis-value">--</div>
-                <div id="breakoutNote" class="analysis-note">
-                    等待分析
-                </div>
-            </div>
-
-            <div class="analysis-box">
-                <div class="analysis-label">假突破風險</div>
-                <div id="falseBreakout" class="analysis-value">--</div>
-                <div id="falseBreakoutNote" class="analysis-note">
-                    等待分析
-                </div>
-            </div>
-
+        <div class="signal-sub">
+          搜尋股票後，系統會自動計算量價、均線、法人、突破與回檔結構。
         </div>
+
+      </div>
 
     </section>
+
 
     <section class="card">
 
-        <div class="section-title">
-            <span>🎯 交易計畫</span>
-            <small>模型價格</small>
+      <div class="card-title">
+        🍖 AI 肉度
+      </div>
+
+      <div class="meat">
+
+        <div
+          class="meat-grade"
+          id="meatGrade">
+          --
         </div>
 
-        <div class="level-grid">
+        <div>
 
-            <div class="level entry">
-                <div class="level-label">第一進場</div>
-                <div id="entry1" class="level-value">--</div>
-            </div>
+          <div
+            class="meat-desc"
+            id="meatDesc">
+            尚未分析
+          </div>
 
-            <div class="level entry">
-                <div class="level-label">第二進場</div>
-                <div id="entry2" class="level-value">--</div>
-            </div>
-
-            <div class="level stop">
-                <div class="level-label">停損</div>
-                <div id="stopLoss" class="level-value">--</div>
-            </div>
-
-            <div class="level target">
-                <div class="level-label">TP1</div>
-                <div id="tp1" class="level-value">--</div>
-            </div>
-
-            <div class="level target">
-                <div class="level-label">TP2</div>
-                <div id="tp2" class="level-value">--</div>
-            </div>
-
-            <div class="level">
-                <div class="level-label">風報比</div>
-                <div id="riskReward" class="level-value">--</div>
-            </div>
+          <div
+            class="small"
+            id="meatReason">
+            三大法人、爆量、突破、回檔承接會共同影響肉度。
+          </div>
 
         </div>
 
-        <div id="tradeAdvice" class="notice" style="margin-top:10px;">
-            等待股票分析。
-        </div>
+      </div>
 
     </section>
+
 
     <section class="card">
 
-        <div class="section-title">
-            <span>🧠 訊號拆解</span>
-            <small>為什麼系統這樣判斷</small>
+      <div class="card-title">
+        ⭐ AI 綜合分數
+      </div>
+
+      <div class="score-wrap">
+
+        <div
+          class="score"
+          id="score">
+          --
         </div>
 
-        <div id="ruleList" class="rule-list">
-
-            <div class="rule">
-                <div class="rule-icon">⏳</div>
-                <div class="rule-main">
-                    <div class="rule-title">等待資料</div>
-                    <div class="rule-desc">
-                        搜尋股票後系統會自動分析。
-                    </div>
-                </div>
-                <div class="rule-score">--</div>
-            </div>
-
+        <div class="scorebar">
+          <i id="scoreBar"></i>
         </div>
+
+      </div>
+
+      <div
+        class="small"
+        id="scoreText">
+        尚未分析
+      </div>
 
     </section>
+
 
     <section class="card">
 
-        <div class="section-title">
-            <span>📝 最後結論</span>
-            <small>一句話看懂</small>
+      <div class="card-title">
+        📊 即時行情
+      </div>
+
+      <div class="metric-grid">
+
+        <div class="metric">
+          <div class="metric-label">開盤</div>
+          <div
+            class="metric-value"
+            id="mOpen">
+            --
+          </div>
         </div>
 
-        <div id="finalConclusion" class="signal-box">
-
-            <div class="signal-title">
-                尚未分析
-            </div>
-
-            <div class="signal-desc">
-                請先搜尋股票。
-            </div>
-
+        <div class="metric">
+          <div class="metric-label">最高</div>
+          <div
+            class="metric-value"
+            id="mHigh">
+            --
+          </div>
         </div>
+
+        <div class="metric">
+          <div class="metric-label">最低</div>
+          <div
+            class="metric-value"
+            id="mLow">
+            --
+          </div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">成交量</div>
+          <div
+            class="metric-value"
+            id="mVolume">
+            --
+          </div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">MA5</div>
+          <div
+            class="metric-value"
+            id="mMA5">
+            --
+          </div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">MA20</div>
+          <div
+            class="metric-value"
+            id="mMA20">
+            --
+          </div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">MA60</div>
+          <div
+            class="metric-value"
+            id="mMA60">
+            --
+          </div>
+        </div>
+
+        <div class="metric">
+          <div class="metric-label">量比 5日</div>
+          <div
+            class="metric-value"
+            id="mVolRatio">
+            --
+          </div>
+        </div>
+
+      </div>
 
     </section>
+
 
     <section class="card">
 
-        <div class="section-title">
-            <span>ℹ️ 分析規則</span>
-        </div>
+      <div class="card-title">
+        🏦 三大法人
+      </div>
 
-        <div class="notice">
+      <div class="table-wrap">
 
-            <strong>🍖 A級有肉</strong><br>
-            通常需要多項條件同時成立，例如：
-            趨勢向上＋法人偏多＋量價確認＋突破或拉回承接。
-            <br><br>
+        <table>
 
-            <strong>🚀 爆量突破</strong><br>
-            不是單純成交量大，而是要搭配價格突破壓力，
-            並觀察法人方向。
-            <br><br>
+          <thead>
 
-            <strong>🟢 長高拉回</strong><br>
-            先漲一段，再回到重要均線或支撐附近，
-            如果法人重新買進且量能回升，訊號加分。
-            <br><br>
+            <tr>
+              <th>法人</th>
+              <th>今日</th>
+              <th>5日</th>
+              <th>20日</th>
+              <th>狀態</th>
+            </tr>
 
-            <strong>🔴 爆量不漲</strong><br>
-            成交量非常大但價格沒有有效上攻，
-            同時法人轉賣，系統會提高出貨風險。
-            <br><br>
+          </thead>
 
-            所有價格位置都是模型估算，實際交易仍需自行確認盤面。
+          <tbody id="institutionTable">
 
-        </div>
+            <tr>
+              <td
+                colspan="5"
+                class="empty">
+                尚無資料
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+      <div
+        class="small"
+        id="institutionNote">
+        法人資料來源為公開資料；查不到時顯示「暫無資料」，不以 0 假裝。
+      </div>
 
     </section>
+
+
+    <section class="card">
+
+      <div class="card-title">
+        💪 法人強度
+      </div>
+
+      <div class="analysis-grid">
+
+        <div class="analysis-box">
+
+          <div class="analysis-title">
+            同步狀態
+          </div>
+
+          <div
+            id="instSync"
+            class="signal-sub">
+            --
+          </div>
+
+        </div>
+
+        <div class="analysis-box">
+
+          <div class="analysis-title">
+            買賣力道
+          </div>
+
+          <div
+            id="instPower"
+            class="signal-sub">
+            --
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <div class="card-title">
+        📦 成交量分析
+      </div>
+
+      <div class="analysis-grid">
+
+        <div class="analysis-box">
+
+          <div class="kv">
+            <span>今日量</span>
+            <span id="vToday">--</span>
+          </div>
+
+          <div class="kv">
+            <span>5日均量</span>
+            <span id="vMA5">--</span>
+          </div>
+
+          <div class="kv">
+            <span>20日均量</span>
+            <span id="vMA20">--</span>
+          </div>
+
+          <div class="kv">
+            <span>5日量比</span>
+            <span id="vRatio5">--</span>
+          </div>
+
+          <div class="kv">
+            <span>20日量比</span>
+            <span id="vRatio20">--</span>
+          </div>
+
+        </div>
+
+        <div class="analysis-box">
+
+          <div class="analysis-title">
+            量價解讀
+          </div>
+
+          <div
+            id="vText"
+            class="signal-sub">
+            --
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <div class="card-title">
+        📈 趨勢分析
+      </div>
+
+      <div class="analysis-grid">
+
+        <div class="analysis-box">
+
+          <div class="kv">
+            <span>MA5</span>
+            <span id="tMA5">--</span>
+          </div>
+
+          <div class="kv">
+            <span>MA20</span>
+            <span id="tMA20">--</span>
+          </div>
+
+          <div class="kv">
+            <span>MA60</span>
+            <span id="tMA60">--</span>
+          </div>
+
+          <div class="kv">
+            <span>MA120</span>
+            <span id="tMA120">--</span>
+          </div>
+
+        </div>
+
+        <div class="analysis-box">
+
+          <div class="analysis-title">
+            均線位置
+          </div>
+
+          <div
+            id="trendText"
+            class="signal-sub">
+            --
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <div class="card-title">
+        🟢 拉回承接
+      </div>
+
+      <div class="analysis-grid">
+
+        <div class="analysis-box">
+
+          <div class="kv">
+            <span>20日高點</span>
+            <span id="pHigh">--</span>
+          </div>
+
+          <div class="kv">
+            <span>距高點</span>
+            <span id="pDrop">--</span>
+          </div>
+
+          <div class="kv">
+            <span>20日漲幅</span>
+            <span id="pGain">--</span>
+          </div>
+
+        </div>
+
+        <div class="analysis-box">
+
+          <div class="analysis-title">
+            拉回判定
+          </div>
+
+          <div
+            id="pullbackText"
+            class="signal-sub">
+            --
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <div class="card-title">
+        🚀 突破有效性
+      </div>
+
+      <div class="analysis-grid">
+
+        <div class="analysis-box">
+
+          <div class="kv">
+            <span>前20日壓力</span>
+            <span id="bResistance">--</span>
+          </div>
+
+          <div class="kv">
+            <span>突破幅度</span>
+            <span id="bPct">--</span>
+          </div>
+
+          <div class="kv">
+            <span>量能確認</span>
+            <span id="bVol">--</span>
+          </div>
+
+        </div>
+
+        <div class="analysis-box">
+
+          <div class="analysis-title">
+            突破結論
+          </div>
+
+          <div
+            id="breakoutText"
+            class="signal-sub">
+            --
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <div class="card-title">
+        🎯 交易計畫
+      </div>
+
+      <div class="level-grid">
+
+        <div class="level">
+          <b>第一進場</b>
+          <strong id="entry1">--</strong>
+        </div>
+
+        <div class="level">
+          <b>第二進場</b>
+          <strong id="entry2">--</strong>
+        </div>
+
+        <div class="level">
+          <b>停損</b>
+          <strong id="stop">--</strong>
+        </div>
+
+        <div class="level">
+          <b>TP1</b>
+          <strong id="tp1">--</strong>
+        </div>
+
+        <div class="level">
+          <b>TP2</b>
+          <strong id="tp2">--</strong>
+        </div>
+
+        <div class="level">
+          <b>風報比</b>
+          <strong id="rr">--</strong>
+        </div>
+
+      </div>
+
+      <div
+        class="small"
+        style="margin-top:10px">
+        交易計畫是模型估算，不是保證獲利；爆量追高時優先等待拉回確認。
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <div class="card-title">
+        🧩 規則拆解
+      </div>
+
+      <div id="rules"></div>
+
+    </section>
+
+
+    <section class="card">
+
+      <div class="card-title">
+        📝 最終結論
+      </div>
+
+      <div
+        class="conclusion"
+        id="conclusion">
+        搜尋股票後顯示完整結論。
+      </div>
+
+    </section>
+
+
+    <section class="card">
+
+      <div class="card-title">
+        📚 分析規則
+      </div>
+
+      <div class="small">
+
+        🟢 法人共振：三大法人今日同步買進。
+        <br>
+
+        🚀 爆量突破：價格突破前20日壓力，
+        同時量能達5日均量約1.5倍以上，
+        並搭配法人買超。
+        <br>
+
+        🟢 回檔承接：前段上漲後回撤約2～18%，
+        法人重新買進且量能回升。
+        <br>
+
+        🔥 二次起漲：拉回結構再次突破短線壓力並放量。
+        <br>
+
+        🟡 等待確認：條件尚未全部成立，不追價。
+        <br>
+
+        🔴 假突破／出貨：爆量但法人賣超，
+        或價格跌破重要支撐。
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <div class="footer">
+
+    V41｜資料優先使用公開行情／FinMind，
+    資料來源異常時不虛構法人數字。
+    <br>
+
+    本工具僅供研究與決策輔助，不構成投資建議。
+
+  </div>
 
 </div>
 
-<div class="footer">
-    台股股票搜尋器 V40｜法人共振＋爆量＋拉回再攻<br>
-    規則式 AI 分析｜僅供研究與交易決策輔助
-</div>
-
-</main>
-
-</div>
 
 <nav class="bottom-nav">
 
-    <div class="bottom-inner">
+  <button onclick="scrollToId('searchSection')">
+    <b>🔎</b>
+    搜尋
+  </button>
 
-        <button class="nav-btn active" data-nav="search">
-            🔎 搜尋
-        </button>
+  <button onclick="scrollToId('scanCard')">
+    <b>🔭</b>
+    掃描
+  </button>
 
-        <button class="nav-btn" data-nav="analysis">
-            📊 分析
-        </button>
+  <button onclick="scrollToId('homePanel')">
+    <b>📊</b>
+    分析
+  </button>
 
-        <button class="nav-btn" data-nav="signal">
-            🚀 訊號
-        </button>
-
-        <button class="nav-btn" data-nav="top">
-            ⬆️ 回頂
-        </button>
-
-    </div>
+  <button onclick="refreshCurrent()">
+    <b>🔄</b>
+    刷新
+  </button>
 
 </nav>
 
+
 <script>
 
+"use strict";
+
+
 /* =========================================================
-   台股股票搜尋器 V40
-   核心：
-   三大法人＋爆量＋突破＋長高拉回＋再攻＋肉度
+   V41 DATA SOURCES
    ========================================================= */
 
 const FINMIND =
-    "https://api.finmindtrade.com/api/v4/data";
+  "https://api.finmindtrade.com/api/v4/data";
 
 const MIS =
-    "https://mis.twse.com.tw/stock/api/getStockInfo.jsp";
+  "https://mis.twse.com.tw/stock/api/getStockInfo.jsp";
 
 const PROXIES = [
 
-    u =>
-        "https://api.allorigins.win/raw?url=" +
-        encodeURIComponent(u),
+  u =>
+    "https://api.allorigins.win/raw?url=" +
+    encodeURIComponent(u),
 
-    u =>
-        "https://corsproxy.io/?url=" +
-        encodeURIComponent(u)
-
-];
-
-/* =========================================================
-   股票資料
-   ========================================================= */
-
-const KNOWN = [
-
-    {
-        code:"2330",
-        name:"台積電",
-        market:"twse",
-        industry:"半導體"
-    },
-
-    {
-        code:"2317",
-        name:"鴻海",
-        market:"twse",
-        industry:"電子"
-    },
-
-    {
-        code:"2308",
-        name:"台達電",
-        market:"twse",
-        industry:"電子"
-    },
-
-    {
-        code:"2303",
-        name:"聯電",
-        market:"twse",
-        industry:"半導體"
-    },
-
-    {
-        code:"1326",
-        name:"台化",
-        market:"twse",
-        industry:"塑化"
-    },
-
-    {
-        code:"1301",
-        name:"台塑",
-        market:"twse",
-        industry:"塑化"
-    },
-
-    {
-        code:"1303",
-        name:"南亞",
-        market:"twse",
-        industry:"塑化"
-    },
-
-    {
-        code:"2002",
-        name:"中鋼",
-        market:"twse",
-        industry:"鋼鐵"
-    },
-
-    {
-        code:"2313",
-        name:"華通",
-        market:"twse",
-        industry:"電子"
-    },
-
-    {
-        code:"3481",
-        name:"群創",
-        market:"twse",
-        industry:"面板"
-    },
-
-    {
-        code:"3711",
-        name:"日月光投控",
-        market:"twse",
-        industry:"半導體"
-    },
-
-    {
-        code:"2618",
-        name:"長榮航",
-        market:"twse",
-        industry:"航運"
-    },
-
-    {
-        code:"2367",
-        name:"燿華",
-        market:"twse",
-        industry:"電子"
-    },
-
-    {
-        code:"3324",
-        name:"雙鴻",
-        market:"twse",
-        industry:"散熱"
-    },
-
-    {
-        code:"6770",
-        name:"力積電",
-        market:"twse",
-        industry:"半導體"
-    },
-
-    {
-        code:"5425",
-        name:"台半",
-        market:"tpex",
-        industry:"半導體"
-    },
-
-    {
-        code:"6244",
-        name:"茂迪",
-        market:"tpex",
-        industry:"綠能"
-    },
-
-    {
-        code:"3685",
-        name:"元創精密",
-        market:"tpex",
-        industry:"電機機械"
-    },
-
-    {
-        code:"0050",
-        name:"元大台灣50",
-        market:"twse",
-        industry:"ETF"
-    },
-
-    {
-        code:"0056",
-        name:"元大高股息",
-        market:"twse",
-        industry:"ETF"
-    },
-
-    {
-        code:"00919",
-        name:"群益台灣精選高息",
-        market:"twse",
-        industry:"ETF"
-    },
-
-    {
-        code:"00891",
-        name:"中信關鍵半導體",
-        market:"twse",
-        industry:"ETF"
-    }
+  u =>
+    "https://corsproxy.io/?url=" +
+    encodeURIComponent(u)
 
 ];
 
-const ALIAS = {
-
-    "台積":"2330",
-    "台積電":"2330",
-    "2330":"2330",
-
-    "鴻海":"2317",
-    "2317":"2317",
-
-    "台達":"2308",
-    "台達電":"2308",
-    "2308":"2308",
-
-    "聯電":"2303",
-    "2303":"2303",
-
-    "台化":"1326",
-    "1326":"1326",
-
-    "台塑":"1301",
-    "1301":"1301",
-
-    "南亞":"1303",
-    "1303":"1303",
-
-    "中鋼":"2002",
-    "2002":"2002",
-
-    "華通":"2313",
-    "2313":"2313",
-
-    "群創":"3481",
-    "3481":"3481",
-
-    "日月光":"3711",
-    "日月光投控":"3711",
-    "3711":"3711",
-
-    "長榮航":"2618",
-    "2618":"2618",
-
-    "燿華":"2367",
-    "2367":"2367",
-
-    "雙鴻":"3324",
-    "3324":"3324",
-
-    "力積電":"6770",
-    "6770":"6770",
-
-    "台半":"5425",
-    "5425":"5425",
-
-    "茂迪":"6244",
-    "6244":"6244",
-
-    "元創精密":"3685",
-    "政翔精密":"3685",
-    "3685":"3685",
-
-    "元大台灣50":"0050",
-    "0050":"0050",
-
-    "元大高股息":"0056",
-    "0056":"0056",
-
-    "群益台灣精選高息":"00919",
-    "00919":"00919",
-
-    "中信關鍵半導體":"00891",
-    "00891":"00891"
-
-};
-
-const SCAN_CODES = [
-
-    "2330",
-    "2317",
-    "2308",
-    "2303",
-    "1326",
-    "1301",
-    "1303",
-    "2002",
-    "2313",
-    "3481",
-    "3711",
-    "2618",
-    "2367",
-    "3324",
-    "6770",
-    "5425",
-    "6244",
-    "3685"
-
-];
-
-/* =========================================================
-   狀態
-   ========================================================= */
-
-let currentStock = null;
-let currentData = null;
-
-const cache = new Map();
 
 const TTL = {
 
-    realtime:8000,
-    history:120000,
-    institution:180000,
-    analysis:30000
+  realtime:8000,
+
+  history:120000,
+
+  institution:180000
 
 };
 
-/* =========================================================
-   DOM
-   ========================================================= */
-
-const $ = id => document.getElementById(id);
-
-const searchInput = $("searchInput");
-const searchBtn = $("searchBtn");
-const statusEl = $("status");
-const searchResults = $("searchResults");
 
 /* =========================================================
-   工具
+   STOCK DATABASE
    ========================================================= */
 
-function num(v){
+const KNOWN = {
 
-    if(
-        v === null ||
-        v === undefined ||
-        v === "" ||
-        v === "--"
-    ){
-        return null;
-    }
+  "2330":{
+    code:"2330",
+    name:"台積電",
+    market:"twse",
+    sector:"半導體"
+  },
 
-    const n =
-        Number(
-            String(v)
-                .replace(/,/g,"")
-                .replace(/%/g,"")
-                .trim()
-        );
+  "2317":{
+    code:"2317",
+    name:"鴻海",
+    market:"twse",
+    sector:"電子"
+  },
 
-    return Number.isFinite(n) ? n : null;
-}
+  "2308":{
+    code:"2308",
+    name:"台達電",
+    market:"twse",
+    sector:"電子"
+  },
+
+  "2303":{
+    code:"2303",
+    name:"聯電",
+    market:"twse",
+    sector:"半導體"
+  },
+
+  "1326":{
+    code:"1326",
+    name:"台化",
+    market:"twse",
+    sector:"塑化"
+  },
+
+  "1301":{
+    code:"1301",
+    name:"台塑",
+    market:"twse",
+    sector:"塑化"
+  },
+
+  "1303":{
+    code:"1303",
+    name:"南亞",
+    market:"twse",
+    sector:"塑化"
+  },
+
+  "2002":{
+    code:"2002",
+    name:"中鋼",
+    market:"twse",
+    sector:"鋼鐵"
+  },
+
+  "2313":{
+    code:"2313",
+    name:"華通",
+    market:"twse",
+    sector:"電子"
+  },
+
+  "3481":{
+    code:"3481",
+    name:"群創",
+    market:"twse",
+    sector:"面板"
+  },
+
+  "3711":{
+    code:"3711",
+    name:"日月光投控",
+    market:"twse",
+    sector:"半導體"
+  },
+
+  "2618":{
+    code:"2618",
+    name:"長榮航",
+    market:"twse",
+    sector:"航運"
+  },
+
+  "2367":{
+    code:"2367",
+    name:"燿華",
+    market:"twse",
+    sector:"電子"
+  },
+
+  "3324":{
+    code:"3324",
+    name:"雙鴻",
+    market:"twse",
+    sector:"散熱"
+  },
+
+  "6770":{
+    code:"6770",
+    name:"力積電",
+    market:"twse",
+    sector:"半導體"
+  },
+
+  "5425":{
+    code:"5425",
+    name:"台半",
+    market:"tpex",
+    sector:"半導體"
+  },
+
+  "6244":{
+    code:"6244",
+    name:"茂迪",
+    market:"tpex",
+    sector:"綠能"
+  },
+
+  "3685":{
+    code:"3685",
+    name:"元創精密",
+    market:"tpex",
+    sector:"電機機械"
+  },
+
+  "0050":{
+    code:"0050",
+    name:"元大台灣50",
+    market:"twse",
+    sector:"ETF"
+  },
+
+  "0056":{
+    code:"0056",
+    name:"元大高股息",
+    market:"twse",
+    sector:"ETF"
+  },
+
+  "00919":{
+    code:"00919",
+    name:"群益台灣精選高息",
+    market:"twse",
+    sector:"ETF"
+  },
+
+  "00891":{
+    code:"00891",
+    name:"中信關鍵半導體",
+    market:"twse",
+    sector:"ETF"
+  }
+
+};
+
+
+const ALIAS = {
+
+  "台積電":"2330",
+  "台積":"2330",
+
+  "鴻海":"2317",
+
+  "台達電":"2308",
+  "台達":"2308",
+
+  "聯電":"2303",
+
+  "台化":"1326",
+
+  "台塑":"1301",
+
+  "南亞":"1303",
+
+  "中鋼":"2002",
+
+  "華通":"2313",
+
+  "群創":"3481",
+
+  "日月光投控":"3711",
+  "日月光":"3711",
+
+  "長榮航":"2618",
+
+  "燿華":"2367",
+
+  "雙鴻":"3324",
+
+  "力積電":"6770",
+
+  "台半":"5425",
+
+  "茂迪":"6244",
+
+  "元創精密":"3685",
+  "政翔精密":"3685",
+
+  "元大台灣50":"0050",
+
+  "元大高股息":"0056",
+
+  "群益台灣精選高息":"00919",
+
+  "中信關鍵半導體":"00891"
+
+};
+
+
+const SCAN_CODES = [
+
+  "2330",
+  "2317",
+  "2308",
+  "2303",
+  "1326",
+  "1301",
+  "1303",
+  "2002",
+  "2313",
+  "3481",
+  "3711",
+  "2618",
+  "2367",
+  "3324",
+  "6770",
+  "5425",
+  "6244",
+  "3685"
+
+];
+
+
+let currentStock = null;
+
+let currentData = null;
+
+let autoTimer = null;
+
+let lastFullRefresh = 0;
+
+let loading = false;
+
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+const $ =
+  id => document.getElementById(id);
+
+
+const n =
+  v =>
+    Number.isFinite(Number(v))
+      ? Number(v)
+      : null;
+
 
 function fmt(v,d=2){
 
-    const n=num(v);
+  if(
+    v===null ||
+    v===undefined ||
+    v==="" ||
+    !Number.isFinite(Number(v))
+  ){
+    return "--";
+  }
 
-    if(n===null){
-        return "--";
+  return Number(v).toLocaleString(
+    "zh-TW",
+    {
+      minimumFractionDigits:d,
+      maximumFractionDigits:d
     }
+  );
 
-    return n.toLocaleString(
-        "zh-TW",
-        {
-            minimumFractionDigits:d,
-            maximumFractionDigits:d
-        }
-    );
 }
+
 
 function fmtInt(v){
 
-    const n=num(v);
+  if(
+    v===null ||
+    v===undefined ||
+    !Number.isFinite(Number(v))
+  ){
+    return "--";
+  }
 
-    if(n===null){
-        return "--";
+  return Number(v).toLocaleString(
+    "zh-TW",
+    {
+      maximumFractionDigits:0
     }
+  );
 
-    return Math.round(n).toLocaleString("zh-TW");
 }
 
-function pct(v){
 
-    const n=num(v);
+function pct(v,d=2){
 
-    if(n===null){
-        return "--";
-    }
+  if(
+    v===null ||
+    v===undefined ||
+    !Number.isFinite(Number(v))
+  ){
+    return "--";
+  }
 
-    return n.toFixed(1)+"%";
+  return Number(v).toFixed(d)+"%";
+
 }
 
-function safeAvg(arr){
 
-    const a =
-        arr
-            .map(num)
-            .filter(v=>v!==null);
+function sign(v){
 
-    if(!a.length){
-        return null;
-    }
+  if(
+    v===null ||
+    v===undefined ||
+    !Number.isFinite(Number(v))
+  ){
+    return "--";
+  }
 
-    return a.reduce((a,b)=>a+b,0)/a.length;
+  return (v>0?"+":"")+fmt(v,2);
+
 }
 
-function median(arr){
 
-    const a =
-        arr
-            .map(num)
-            .filter(v=>v!==null)
-            .sort((a,b)=>a-b);
+function todayStr(){
 
-    if(!a.length){
-        return null;
-    }
+  const d = new Date();
 
-    const mid=Math.floor(a.length/2);
+  const y = d.getFullYear();
 
-    return a.length%2
-        ? a[mid]
-        : (a[mid-1]+a[mid])/2;
+  const m =
+    String(d.getMonth()+1)
+      .padStart(2,"0");
+
+  const day =
+    String(d.getDate())
+      .padStart(2,"0");
+
+  return `${y}-${m}-${day}`;
+
 }
+
+
+function dateDaysAgo(days){
+
+  const d = new Date();
+
+  d.setDate(
+    d.getDate()-days
+  );
+
+  const y =
+    d.getFullYear();
+
+  const m =
+    String(d.getMonth()+1)
+      .padStart(2,"0");
+
+  const day =
+    String(d.getDate())
+      .padStart(2,"0");
+
+  return `${y}-${m}-${day}`;
+
+}
+
+
+function escapeHtml(s){
+
+  return String(s??"")
+    .replace(
+      /[&<>"']/g,
+      c =>
+        ({
+          "&":"&amp;",
+          "<":"&lt;",
+          ">":"&gt;",
+          '"':"&quot;",
+          "'":"&#039;"
+        }[c])
+    );
+
+}
+
+
+function marketText(m){
+
+  return m==="twse"
+    ? "上市"
+    : m==="tpex"
+      ? "上櫃"
+      : "市場待確認";
+
+}
+
+
+function directionClass(v){
+
+  if(
+    v===null ||
+    v===undefined ||
+    !Number.isFinite(Number(v))
+  ){
+    return "";
+  }
+
+  return Number(v)>0
+    ? "up"
+    : Number(v)<0
+      ? "down"
+      : "flat";
+
+}
+
+
+function setText(id,text,cls=""){
+
+  const el = $(id);
+
+  if(!el)return;
+
+  el.textContent = text;
+
+  el.classList.remove(
+    "up",
+    "down",
+    "flat",
+    "green",
+    "red",
+    "yellow",
+    "blue"
+  );
+
+  if(cls){
+    el.classList.add(cls);
+  }
+
+}
+
+
+function setHTML(id,html){
+
+  const el = $(id);
+
+  if(el){
+    el.innerHTML = html;
+  }
+
+}
+
+
+function sleep(ms){
+
+  return new Promise(
+    r => setTimeout(r,ms)
+  );
+
+}
+
+
+/* =========================================================
+   MEMORY CACHE
+   ========================================================= */
+
+const memoryCache = new Map();
+
 
 function cacheGet(key,ttl){
 
-    const item=cache.get(key);
+  const x =
+    memoryCache.get(key);
 
-    if(!item){
-        return null;
-    }
+  if(!x){
+    return null;
+  }
 
-    if(
-        Date.now()-item.time >
-        ttl
-    ){
-        cache.delete(key);
-        return null;
-    }
+  if(
+    Date.now()-x.time >
+    ttl
+  ){
+    memoryCache.delete(key);
+    return null;
+  }
 
-    return item.value;
+  return x.value;
+
 }
+
 
 function cacheSet(key,value){
 
-    cache.set(
-        key,
-        {
-            time:Date.now(),
-            value
-        }
-    );
+  memoryCache.set(
+    key,
+    {
+      time:Date.now(),
+      value
+    }
+  );
 
-    return value;
 }
 
-async function fetchJson(url){
+
+/* =========================================================
+   FETCH JSON
+   ========================================================= */
+
+async function fetchJson(
+  url,
+  timeout=10000
+){
+
+  const urls = [
+    url,
+    ...PROXIES.map(
+      fn => fn(url)
+    )
+  ];
+
+  let lastError = null;
+
+  for(
+    const target of urls
+  ){
+
+    const ctrl =
+      new AbortController();
+
+    const timer =
+      setTimeout(
+        () => ctrl.abort(),
+        timeout
+      );
 
     try{
 
-        const r =
-            await fetch(
-                url,
-                {
-                    cache:"no-store"
-                }
-            );
+      const res =
+        await fetch(
+          target,
+          {
+            signal:ctrl.signal,
+            cache:"no-store"
+          }
+        );
 
-        if(r.ok){
+      clearTimeout(timer);
 
-            const text =
-                await r.text();
+      if(!res.ok){
+        throw new Error(
+          "HTTP "+res.status
+        );
+      }
 
-            if(!text){
-                throw new Error("empty");
-            }
+      const text =
+        await res.text();
 
-            return JSON.parse(text);
-        }
+      if(!text){
+        throw new Error(
+          "空白回應"
+        );
+      }
 
-    }catch(e){}
+      return JSON.parse(text);
 
-    for(const proxy of PROXIES){
+    }catch(e){
 
-        try{
+      clearTimeout(timer);
 
-            const r =
-                await fetch(
-                    proxy(url),
-                    {
-                        cache:"no-store"
-                    }
-                );
-
-            if(!r.ok){
-                continue;
-            }
-
-            const text =
-                await r.text();
-
-            if(!text){
-                continue;
-            }
-
-            return JSON.parse(text);
-
-        }catch(e){}
+      lastError = e;
 
     }
 
-    return null;
+  }
+
+  throw (
+    lastError ||
+    new Error("資料取得失敗")
+  );
+
 }
 
+
 /* =========================================================
-   股票解析
+   STOCK RESOLUTION
    ========================================================= */
 
 function resolveStock(q){
 
-    const s =
-        String(q || "")
-            .trim()
-            .toUpperCase();
+  const raw =
+    String(q||"").trim();
 
-    if(!s){
-        return null;
-    }
-
-    const alias =
-        ALIAS[s] ||
-        ALIAS[q];
-
-    if(alias){
-
-        return KNOWN.find(
-            x=>x.code===alias
-        ) || {
-            code:alias,
-            name:alias,
-            market:"unknown",
-            industry:""
-        };
-
-    }
-
-    const exact =
-        KNOWN.find(
-            x =>
-                x.code===s ||
-                x.name===q
-        );
-
-    if(exact){
-        return exact;
-    }
-
-    const partial =
-        KNOWN.find(
-            x =>
-                x.name.includes(q) ||
-                x.code.includes(s)
-        );
-
-    if(partial){
-        return partial;
-    }
-
-    if(/^\d{4,6}$/.test(s)){
-
-        return {
-            code:s,
-            name:s,
-            market:"unknown",
-            industry:""
-        };
-
-    }
-
+  if(!raw){
     return null;
+  }
+
+  const key =
+    raw.toUpperCase();
+
+  if(KNOWN[key]){
+    return {
+      ...KNOWN[key]
+    };
+  }
+
+  if(
+    ALIAS[raw] &&
+    KNOWN[ALIAS[raw]]
+  ){
+    return {
+      ...KNOWN[ALIAS[raw]]
+    };
+  }
+
+  const normalized =
+    raw.replace(
+      /\s+/g,
+      ""
+    );
+
+  if(
+    ALIAS[normalized] &&
+    KNOWN[ALIAS[normalized]]
+  ){
+    return {
+      ...KNOWN[ALIAS[normalized]]
+    };
+  }
+
+  if(
+    /^\d{4,6}$/.test(key)
+  ){
+
+    return {
+      code:key,
+      name:"股票 "+key,
+      market:key.startsWith("0")
+        ? "twse"
+        : "unknown",
+      sector:"待確認"
+    };
+
+  }
+
+  return null;
+
 }
+
 
 function searchLocal(q){
 
-    const s=
-        String(q||"")
-            .trim()
-            .toUpperCase();
-
-    if(!s){
-        return [];
-    }
-
-    return KNOWN
-        .filter(
-            x =>
-                x.code.includes(s) ||
-                x.name.includes(q)
-        )
-        .slice(0,10);
-}
-
-/* =========================================================
-   TWSE 即時
-   ========================================================= */
-
-async function getRealtime(code){
-
-    const cached =
-        cacheGet(
-            "rt:"+code,
-            TTL.realtime
-        );
-
-    if(cached){
-        return cached;
-    }
-
-    const url =
-        MIS+
-        "?ex_ch=tse_"+
-        code+
-        ".tw";
-
-    const raw =
-        await fetchJson(url);
-
-    if(
-        raw &&
-        Array.isArray(raw.msgArray) &&
-        raw.msgArray.length
-    ){
-
-        const x=raw.msgArray[0];
-
-        const data={
-
-            code,
-
-            name:x.n || code,
-
-            price:num(x.z),
-
-            prev:num(x.y),
-
-            open:num(x.o),
-
-            high:num(x.h),
-
-            low:num(x.l),
-
-            volume:num(x.v),
-
-            market:"twse"
-
-        };
-
-        return cacheSet(
-            "rt:"+code,
-            data
-        );
-
-    }
-
-    return null;
-}
-
-/* =========================================================
-   FinMind 歷史行情
-   ========================================================= */
-
-async function getHistory(code){
-
-    const cached =
-        cacheGet(
-            "history:"+code,
-            TTL.history
-        );
-
-    if(cached){
-        return cached;
-    }
-
-    const end =
-        new Date();
-
-    const start =
-        new Date();
-
-    start.setDate(
-        start.getDate()-180
-    );
-
-    const pad=n =>
-        String(n).padStart(2,"0");
-
-    const dateStr=d =>
-        d.getFullYear()+
-        "-"+
-        pad(d.getMonth()+1)+
-        "-"+
-        pad(d.getDate());
-
-    const url =
-        FINMIND+
-        "?dataset=TaiwanStockPrice"+
-        "&data_id="+
-        encodeURIComponent(code)+
-        "&start_date="+
-        dateStr(start)+
-        "&end_date="+
-        dateStr(end);
-
-    const raw =
-        await fetchJson(url);
-
-    if(
-        !raw ||
-        !Array.isArray(raw.data)
-    ){
-        return [];
-    }
-
-    const rows =
-        raw.data
-            .map(x=>({
-
-                date:x.date,
-
-                open:num(x.open),
-
-                high:num(x.max),
-
-                low:num(x.min),
-
-                close:num(x.close),
-
-                volume:num(x.Trading_Volume)
-
-            }))
-            .filter(
-                x=>x.close!==null
-            )
-            .sort(
-                (a,b)=>
-                    String(a.date)
-                    .localeCompare(String(b.date))
-            );
-
-    return cacheSet(
-        "history:"+code,
-        rows
-    );
-
-}
-
-/* =========================================================
-   法人資料
-   ========================================================= */
-
-function institutionRowsFromFinMind(raw){
-
-    if(
-        !raw ||
-        !Array.isArray(raw.data)
-    ){
-        return [];
-    }
-
-    const grouped={};
-
-    for(const r of raw.data){
-
-        const date =
-            r.date ||
-            r.Date;
-
-        if(!date){
-            continue;
-        }
-
-        if(!grouped[date]){
-
-            grouped[date]={
-
-                date,
-
-                foreign:0,
-
-                trust:0,
-
-                dealer:0,
-
-                total:0
-
-            };
-
-        }
-
-        const type =
-            String(
-                r.name ||
-                r.Investor_Type ||
-                r.institutional_investors ||
-                ""
-            );
-
-        const buy =
-            num(
-                r.buy ||
-                r.Buy ||
-                r.buy_volume ||
-                r.buy_volume_lots
-            ) || 0;
-
-        const sell =
-            num(
-                r.sell ||
-                r.Sell ||
-                r.sell_volume ||
-                r.sell_volume_lots
-            ) || 0;
-
-        let net =
-            num(
-                r.net ||
-                r.Net ||
-                r.net_buy_sell ||
-                r.net_buy
-            );
-
-        if(net===null){
-            net=buy-sell;
-        }
-
-        if(
-            type.includes("外資") ||
-            type.toLowerCase().includes("foreign")
-        ){
-
-            grouped[date].foreign += net;
-
-        }else if(
-            type.includes("投信") ||
-            type.toLowerCase().includes("trust")
-        ){
-
-            grouped[date].trust += net;
-
-        }else if(
-            type.includes("自營") ||
-            type.toLowerCase().includes("dealer")
-        ){
-
-            grouped[date].dealer += net;
-
-        }
-
-    }
-
-    return Object
-        .values(grouped)
-        .map(x=>{
-
-            x.total =
-                x.foreign+
-                x.trust+
-                x.dealer;
-
-            return x;
-
-        })
-        .sort(
-            (a,b)=>
-                String(a.date)
-                .localeCompare(String(b.date))
-        );
-
-}
-
-async function getInstitution(code){
-
-    const cached =
-        cacheGet(
-            "institution:"+code,
-            TTL.institution
-        );
-
-    if(cached){
-        return cached;
-    }
-
-    const url =
-        FINMIND+
-        "?dataset=TaiwanStockInstitutionalInvestorsBuySell"+
-        "&data_id="+
-        encodeURIComponent(code);
-
-    const raw =
-        await fetchJson(url);
-
-    const rows =
-        institutionRowsFromFinMind(raw);
-
-    if(rows.length){
-
-        return cacheSet(
-            "institution:"+code,
-            rows
-        );
-
-    }
-
+  const raw =
+    String(q||"")
+      .trim()
+      .toLowerCase();
+
+  if(!raw){
     return [];
+  }
+
+  return Object.values(
+    KNOWN
+  ).filter(
+    x =>
+      x.code
+        .toLowerCase()
+        .includes(raw) ||
+      x.name
+        .toLowerCase()
+        .includes(raw)
+  );
 
 }
 
-/* =========================================================
-   數學分析
-   ========================================================= */
 
-function movingAverage(rows,n){
+function renderSuggestions(){
 
-    if(!rows.length){
-        return null;
-    }
+  const q =
+    $("searchInput")
+      .value
+      .trim();
 
-    const values =
-        rows
-            .slice(-n)
-            .map(x=>x.close)
-            .filter(v=>v!==null);
+  const list =
+    searchLocal(q);
 
-    if(values.length<n){
-        return null;
-    }
+  $("suggestions").innerHTML =
+    list
+      .slice(0,8)
+      .map(
+        x =>
+          `<button
+             class="suggestion"
+             data-suggest="${x.code}">
+             ${x.code}
+             ${escapeHtml(x.name)}
+           </button>`
+      )
+      .join("");
 
-    return safeAvg(values);
-}
-
-function averageVolume(rows,n){
-
-    if(!rows.length){
-        return null;
-    }
-
-    const values =
-        rows
-            .slice(-n)
-            .map(x=>x.volume)
-            .filter(v=>v!==null);
-
-    if(!values.length){
-        return null;
-    }
-
-    return safeAvg(values);
-}
-
-function highestHigh(rows,n){
-
-    const values =
-        rows
-            .slice(-n)
-            .map(x=>x.high)
-            .filter(v=>v!==null);
-
-    return values.length
-        ? Math.max(...values)
-        : null;
-}
-
-function lowestLow(rows,n){
-
-    const values =
-        rows
-            .slice(-n)
-            .map(x=>x.low)
-            .filter(v=>v!==null);
-
-    return values.length
-        ? Math.min(...values)
-        : null;
-}
-
-function percentChange(a,b){
-
-    if(
-        a===null ||
-        b===null ||
-        !a
-    ){
-        return null;
-    }
-
-    return (
-        (b-a)/a
-    )*100;
-
-}
-
-/* =========================================================
-   法人分析
-   ========================================================= */
-
-function sumInstitution(rows,key,n){
-
-    const r =
-        rows.slice(-n);
-
-    if(!r.length){
-        return null;
-    }
-
-    return r.reduce(
-        (sum,x)=>
-            sum+(num(x[key])||0),
-        0
+  document
+    .querySelectorAll(
+      "[data-suggest]"
+    )
+    .forEach(
+      b =>
+        b.onclick =
+          () =>
+            loadStockByCode(
+              b.dataset.suggest
+            )
     );
 
 }
 
-function consecutiveDirection(rows,key){
-
-    if(!rows.length){
-        return {
-            direction:"none",
-            days:0
-        };
-    }
-
-    let direction=null;
-    let days=0;
-
-    for(
-        let i=rows.length-1;
-        i>=0;
-        i--
-    ){
-
-        const v=num(rows[i][key]);
-
-        if(v===null || v===0){
-            break;
-        }
-
-        const d =
-            v>0
-                ? "buy"
-                : "sell";
-
-        if(!direction){
-            direction=d;
-        }
-
-        if(direction!==d){
-            break;
-        }
-
-        days++;
-
-    }
-
-    return {
-        direction,
-        days
-    };
-
-}
-
-function institutionAnalysis(rows){
-
-    if(!rows.length){
-
-        return {
-
-            available:false,
-
-            foreignToday:null,
-            trustToday:null,
-            dealerToday:null,
-            totalToday:null,
-
-            foreign5:null,
-            trust5:null,
-            dealer5:null,
-            total5:null,
-
-            foreign20:null,
-            trust20:null,
-            dealer20:null,
-            total20:null
-
-        };
-
-    }
-
-    const latest =
-        rows[rows.length-1];
-
-    return {
-
-        available:true,
-
-        foreignToday:num(latest.foreign),
-        trustToday:num(latest.trust),
-        dealerToday:num(latest.dealer),
-        totalToday:num(latest.total),
-
-        foreign5:sumInstitution(rows,"foreign",5),
-        trust5:sumInstitution(rows,"trust",5),
-        dealer5:sumInstitution(rows,"dealer",5),
-        total5:sumInstitution(rows,"total",5),
-
-        foreign20:sumInstitution(rows,"foreign",20),
-        trust20:sumInstitution(rows,"trust",20),
-        dealer20:sumInstitution(rows,"dealer",20),
-        total20:sumInstitution(rows,"total",20),
-
-        foreignStreak:consecutiveDirection(rows,"foreign"),
-        trustStreak:consecutiveDirection(rows,"trust"),
-        dealerStreak:consecutiveDirection(rows,"dealer"),
-        totalStreak:consecutiveDirection(rows,"total")
-
-    };
-
-}
 
 /* =========================================================
-   長高拉回
+   REALTIME DATA
    ========================================================= */
 
-function pullbackAnalysis(rows,price,ma20,inst){
+function parseMisRow(r,stock){
 
-    if(rows.length<20 || price===null){
+  if(!r){
+    return null;
+  }
 
-        return {
-            score:0,
-            up:false,
-            retrace:false,
-            institution:false,
-            volume:false,
-            title:"資料不足",
-            main:"暫時無法判斷",
-            desc:"需要更多歷史行情資料。"
-        };
+  const price = n(r.z);
 
-    }
+  const prev = n(r.y);
 
-    const recent =
-        rows.slice(-20);
+  const open = n(r.o);
 
-    const start =
-        recent[0].close;
+  const high = n(r.h);
 
-    const high =
-        Math.max(
-            ...recent.map(x=>x.high||x.close)
-        );
+  const low = n(r.l);
 
-    const gain =
-        percentChange(
-            start,
-            high
-        );
+  const volume = n(r.v);
 
-    const fromHigh =
-        percentChange(
-            high,
-            price
-        );
+  return {
 
-    const up =
-        gain!==null &&
-        gain>=8;
+    code:stock.code,
 
-    const retrace =
-        fromHigh!==null &&
-        fromHigh<=-2 &&
-        fromHigh>=-18;
+    name:
+      r.n ||
+      stock.name,
 
-    const institution =
-        inst.available &&
-        (
-            (inst.total5||0)>0 ||
-            (inst.totalToday||0)>0
-        );
-
-    const avgVol5 =
-        averageVolume(rows,5);
-
-    const latestVol =
-        rows[rows.length-1].volume;
-
-    const volume =
-        avgVol5 &&
-        latestVol &&
-        latestVol>=avgVol5*1.2;
-
-    let score=0;
-
-    if(up) score+=30;
-    if(retrace) score+=25;
-    if(institution) score+=25;
-    if(volume) score+=20;
-
-    let title="尚未形成";
-
-    let main=
-        "目前沒有完整的長高拉回再攻結構";
-
-    let desc=
-        "等待先上漲、拉回，再出現法人承接與量能回升。";
-
-    if(
-        up &&
-        retrace &&
-        institution &&
-        volume
-    ){
-
-        title="🟢 拉回再攻";
-
-        main=
-            "🔥 長高後拉回＋法人承接＋量能回升";
-
-        desc=
-            "這是系統最重視的二次起漲型態之一，可等待確認後分批布局。";
-
-    }else if(
-        up &&
-        retrace &&
-        institution
-    ){
-
-        title="🟡 回檔承接";
-
-        main=
-            "法人正在接，但量能還沒有完全放大";
-
-        desc=
-            "可以觀察是否出現重新放量突破。";
-
-    }else if(
-        up &&
-        retrace
-    ){
-
-        title="🟡 長高後拉回";
-
-        main=
-            "股價已經漲高，目前正在回檔";
-
-        desc=
-            "不要急著追，觀察支撐與法人是否重新進場。";
-
-    }
-
-    return {
-
-        score,
-        up,
-        retrace,
-        institution,
-        volume,
-        gain,
-        fromHigh,
-        title,
-        main,
-        desc
-
-    };
-
-}
-
-/* =========================================================
-   突破分析
-   ========================================================= */
-
-function breakoutAnalysis(
-    rows,
     price,
-    avgVol5,
-    inst
+
+    prev,
+
+    open,
+
+    high,
+
+    low,
+
+    volume:
+      volume!==null
+        ? volume
+        : null,
+
+    time:r.t||"",
+
+    source:"TWSE MIS"
+
+  };
+
+}
+
+
+async function getRealtime(
+  stock,
+  force=false
 ){
 
-    if(
-        rows.length<20 ||
-        price===null
-    ){
+  const key =
+    "rt:"+stock.code;
 
-        return {
-            state:"資料不足",
-            score:0,
-            resistance:null,
-            support:null,
-            falseRisk:"--"
-        };
+  if(!force){
 
+    const cached =
+      cacheGet(
+        key,
+        TTL.realtime
+      );
+
+    if(cached){
+      return cached;
     }
 
-    const before =
-        rows.slice(
-            -21,
-            -1
-        );
-
-    const resistance =
-        highestHigh(
-            before,
-            20
-        );
-
-    const support =
-        lowestLow(
-            before,
-            20
-        );
-
-    const latest =
-        rows[rows.length-1];
-
-    const vol =
-        latest.volume;
-
-    const ratio =
-        avgVol5 && vol
-            ? vol/avgVol5
-            : null;
-
-    const breakout =
-        resistance &&
-        price>resistance;
-
-    const volumeConfirm =
-        ratio!==null &&
-        ratio>=1.5;
-
-    const institutionConfirm =
-        inst.available &&
-        (inst.totalToday||0)>0;
-
-    let score=0;
-
-    if(breakout) score+=40;
-    if(volumeConfirm) score+=30;
-    if(institutionConfirm) score+=30;
-
-    let state="尚未突破";
-
-    if(
-        breakout &&
-        volumeConfirm &&
-        institutionConfirm
-    ){
-
-        state="🚀 有效突破";
-
-    }else if(
-        breakout &&
-        volumeConfirm
-    ){
-
-        state="🟡 突破但法人未確認";
-
-    }else if(
-        breakout
-    ){
-
-        state="🟡 突破量能不足";
-
-    }
-
-    let falseRisk="低";
-
-    if(
-        breakout &&
-        !volumeConfirm
-    ){
-
-        falseRisk="中";
-
-    }
-
-    if(
-        breakout &&
-        ratio!==null &&
-        ratio>=2 &&
-        (inst.totalToday||0)<0
-    ){
-
-        falseRisk="高";
-
-    }
-
-    return {
-
-        state,
-        score,
-        resistance,
-        support,
-        ratio,
-        breakout,
-        volumeConfirm,
-        institutionConfirm,
-        falseRisk
-
-    };
-
-}
-
-/* =========================================================
-   AI評分
-   ========================================================= */
-
-function buildAnalysis(
-    stock,
-    realtime,
-    history,
-    institutions
-){
-
-    const rows =
-        history || [];
-
-    const price =
-        realtime?.price ??
-        rows.at(-1)?.close ??
-        null;
-
-    const prev =
-        realtime?.prev ??
-        rows.at(-2)?.close ??
-        null;
-
-    const change =
-        percentChange(
-            prev,
-            price
-        );
-
-    const ma5 =
-        movingAverage(rows,5);
-
-    const ma20 =
-        movingAverage(rows,20);
-
-    const ma60 =
-        movingAverage(rows,60);
-
-    const ma120 =
-        movingAverage(rows,120);
-
-    const avgVol5 =
-        averageVolume(rows,5);
-
-    const avgVol20 =
-        averageVolume(rows,20);
-
-    const latestVol =
-        realtime?.volume ??
-        rows.at(-1)?.volume ??
-        null;
-
-    const volumeRatio5 =
-        avgVol5 && latestVol
-            ? latestVol/avgVol5
-            : null;
-
-    const volumeRatio20 =
-        avgVol20 && latestVol
-            ? latestVol/avgVol20
-            : null;
-
-    const inst =
-        institutionAnalysis(
-            institutions
-        );
-
-    const breakout =
-        breakoutAnalysis(
-            rows,
-            price,
-            avgVol5,
-            inst
-        );
-
-    const pullback =
-        pullbackAnalysis(
-            rows,
-            price,
-            ma20,
-            inst
-        );
-
-    let score=0;
-
-    const rules=[];
-
-    function addRule(
-        icon,
-        title,
-        desc,
-        points,
-        good
-    ){
-
-        if(good){
-
-            score+=points;
-
-            rules.push({
-                icon,
-                title,
-                desc,
-                points
-            });
-
-        }else{
-
-            rules.push({
-                icon:"⚪",
-                title,
-                desc,
-                points:0
-            });
-
-        }
-
-    }
-
-    addRule(
-        "📈",
-        "股價站上MA20",
-        "中期趨勢偏多。",
-        10,
-        ma20!==null &&
-        price!==null &&
-        price>ma20
-    );
-
-    addRule(
-        "🚀",
-        "MA5站上MA20",
-        "短線動能轉強。",
-        8,
-        ma5!==null &&
-        ma20!==null &&
-        ma5>ma20
-    );
-
-    addRule(
-        "📊",
-        "均線多頭排列",
-        "MA5＞MA20＞MA60。",
-        10,
-        ma5!==null &&
-        ma20!==null &&
-        ma60!==null &&
-        ma5>ma20 &&
-        ma20>ma60
-    );
-
-    addRule(
-        "🔥",
-        "成交量放大",
-        "今日成交量至少高於5日均量。",
-        10,
-        volumeRatio5!==null &&
-        volumeRatio5>=1.5
-    );
-
-    addRule(
-        "🏦",
-        "三大法人今日合計買超",
-        "法人短線方向偏多。",
-        12,
-        inst.available &&
-        (inst.totalToday||0)>0
-    );
-
-    addRule(
-        "🏦",
-        "三大法人5日買超",
-        "法人短期籌碼偏多。",
-        10,
-        inst.available &&
-        (inst.total5||0)>0
-    );
-
-    addRule(
-        "🏦",
-        "三大法人同步買進",
-        "外資、投信、自營商同方向買超。",
-        15,
-        inst.available &&
-        (inst.foreignToday||0)>0 &&
-        (inst.trustToday||0)>0 &&
-        (inst.dealerToday||0)>0
-    );
-
-    addRule(
-        "🚀",
-        "有效突破",
-        "突破近期壓力且量價配合。",
-        15,
-        breakout.breakout &&
-        breakout.volumeConfirm
-    );
-
-    addRule(
-        "🟢",
-        "長高後拉回",
-        "近期曾明顯上漲後回檔。",
-        8,
-        pullback.up &&
-        pullback.retrace
-    );
-
-    addRule(
-        "🍖",
-        "法人拉回承接",
-        "拉回期間法人仍偏多。",
-        7,
-        pullback.up &&
-        pullback.retrace &&
-        pullback.institution
-    );
-
-    let penalty=0;
-
-    if(
-        volumeRatio5!==null &&
-        volumeRatio5>=2 &&
-        change!==null &&
-        change<1
-    ){
-
-        penalty+=12;
-
-        rules.push({
-
-            icon:"⚠️",
-            title:"爆量但價格沒有明顯上攻",
-            desc:"可能存在高檔換手或賣壓。",
-            points:-12
-
-        });
-
-    }
-
-    if(
-        inst.available &&
-        (inst.totalToday||0)<0 &&
-        volumeRatio5!==null &&
-        volumeRatio5>=1.5
-    ){
-
-        penalty+=15;
-
-        rules.push({
-
-            icon:"🔴",
-            title:"爆量＋法人賣超",
-            desc:"需提防短線出貨壓力。",
-            points:-15
-
-        });
-
-    }
-
-    score-=penalty;
-
-    score =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                score
-            )
-        );
-
-    let grade="D";
-    let meat="🍖 D級｜暫時沒有肉";
-    let meatDesc="條件不足，先觀察。";
-
-    if(score>=80){
-
-        grade="A";
-        meat="🍖🍖🍖 A級｜有肉可以吃";
-        meatDesc=
-            "多項條件同步成立，屬於值得重點觀察的型態。";
-
-    }else if(score>=65){
-
-        grade="B";
-        meat="🍖🍖 B級｜有肉";
-        meatDesc=
-            "條件偏多，可等待更好的進場位置。";
-
-    }else if(score>=50){
-
-        grade="C";
-        meat="🍖 C級｜小肉";
-        meatDesc=
-            "有部分訊號，但還需要確認。";
-
-    }
-
-    if(
-        breakout.breakout &&
-        breakout.volumeConfirm &&
-        inst.available &&
-        (inst.totalToday||0)>0
-    ){
-
-        grade="A";
-
-        meat=
-            "🚀🍖 A級｜爆量突破＋法人進場";
-
-        meatDesc=
-            "突破、量能與法人方向同步，是強勢訊號。";
-
-    }
-
-    if(
-        pullback.up &&
-        pullback.retrace &&
-        pullback.institution &&
-        pullback.volume
-    ){
-
-        grade="A";
-
-        meat=
-            "🟢🍖 A級｜長高拉回再攻";
-
-        meatDesc=
-            "這是你指定的型態：先長高、拉回、法人承接、量能重新放大。";
-
-    }
-
-    if(
-        volumeRatio5!==null &&
-        volumeRatio5>=2 &&
-        inst.available &&
-        (inst.totalToday||0)<0
-    ){
-
-        grade="D";
-
-        meat=
-            "🔴 D級｜爆量法人反賣";
-
-        meatDesc=
-            "爆量不代表安全，法人賣超時不要因為紅K追高。";
-
-    }
-
-    let signalTitle="🟡 等待確認";
-    let signalMain="目前沒有強烈進場訊號";
-    let signalDesc=
-        "等待法人、量價與價格位置進一步確認。";
-
-    if(
-        breakout.breakout &&
-        breakout.volumeConfirm &&
-        inst.available &&
-        (inst.totalToday||0)>0
-    ){
-
-        signalTitle="🚀 強勢進場訊號";
-
-        signalMain=
-            "突破＋爆量＋法人買超";
-
-        signalDesc=
-            "不要盲目追最高點，可觀察突破位置附近是否出現回踩承接。";
-
-    }else if(
-        pullback.up &&
-        pullback.retrace &&
-        pullback.institution &&
-        pullback.volume
-    ){
-
-        signalTitle="🟢 回檔再攻進場訊號";
-
-        signalMain=
-            "長高後拉回＋法人重新進場＋爆量";
-
-        signalDesc=
-            "這類型通常比追第一根突破紅K更適合等待位置確認。";
-
-    }else if(
-        inst.available &&
-        (inst.totalToday||0)>0 &&
-        volumeRatio5!==null &&
-        volumeRatio5>=1.5
-    ){
-
-        signalTitle="🟢 法人量價共振";
-
-        signalMain=
-            "法人買超＋成交量放大";
-
-        signalDesc=
-            "可以列入觀察名單，等待突破或回踩確認。";
-
-    }else if(
-        volumeRatio5!==null &&
-        volumeRatio5>=2 &&
-        inst.available &&
-        (inst.totalToday||0)<0
-    ){
-
-        signalTitle="🔴 爆量警戒";
-
-        signalMain=
-            "爆量但法人偏賣";
-
-        signalDesc=
-            "不要只看到成交量放大就追價，先觀察是否為出貨。";
-
-    }
-
-    const resistance =
-        breakout.resistance ??
-        highestHigh(rows,20);
-
-    const support =
-        breakout.support ??
-        lowestLow(rows,20);
-
-    let entry1=null;
-    let entry2=null;
-    let stop=null;
-    let tp1=null;
-    let tp2=null;
-    let rr=null;
-
-    if(price!==null){
-
-        const supportBase =
-            support ||
-            ma20 ||
-            price*0.95;
-
-        const resistanceBase =
-            resistance ||
-            price*1.08;
-
-        entry1 =
-            Math.max(
-                supportBase,
-                price*0.97
-            );
-
-        entry2 =
-            Math.max(
-                supportBase,
-                price*0.94
-            );
-
-        stop =
-            Math.min(
-                supportBase*0.96,
-                price*0.91
-            );
-
-        tp1 =
-            Math.max(
-                resistanceBase,
-                price*1.06
-            );
-
-        tp2 =
-            Math.max(
-                resistanceBase*1.05,
-                price*1.12
-            );
-
-        const risk =
-            price-stop;
-
-        const reward =
-            tp1-price;
-
-        if(
-            risk>0 &&
-            reward>0
-        ){
-
-            rr=
-                reward/risk;
-
-        }
-
-    }
-
-    return {
-
-        stock,
-        realtime,
-        rows,
-
-        price,
-        prev,
-        change,
-
-        ma5,
-        ma20,
-        ma60,
-        ma120,
-
-        avgVol5,
-        avgVol20,
-        latestVol,
-
-        volumeRatio5,
-        volumeRatio20,
-
-        inst,
-        breakout,
-        pullback,
-
-        resistance,
-        support,
-
-        score,
-        grade,
-        meat,
-        meatDesc,
-
-        signalTitle,
-        signalMain,
-        signalDesc,
-
-        entry1,
-        entry2,
-        stop,
-        tp1,
-        tp2,
-        rr,
-
-        rules
-
-    };
-
-}
-
-/* =========================================================
-   UI
-   ========================================================= */
-
-function setClass(el,cls){
-
-    if(!el){
-        return;
-    }
-
-    el.classList.remove(
-        "up",
-        "down",
-        "flat",
-        "good-text",
-        "bad-text",
-        "warn-text",
-        "info-text",
-        "purple-text"
-    );
-
-    if(cls){
-        el.classList.add(cls);
-    }
-
-}
-
-function directionText(v){
-
-    if(v===null){
-        return "--";
-    }
-
-    if(v>0){
-        return "買超";
-    }
-
-    if(v<0){
-        return "賣超";
-    }
-
-    return "持平";
-
-}
-
-function directionClass(v){
-
-    if(v===null){
-        return "";
-    }
-
-    if(v>0){
-        return "good-text";
-    }
-
-    if(v<0){
-        return "bad-text";
-    }
-
-    return "muted";
-}
-
-function paintDirection(
-    id,
-    value
-){
-
-    const el=$(id);
-
-    if(!el){
-        return;
-    }
-
-    el.textContent=
-        directionText(value);
-
-    el.classList.remove(
-        "good-text",
-        "bad-text",
-        "warn-text"
-    );
-
-    el.classList.add(
-        directionClass(value)
-    );
-
-}
-
-function renderSearchResults(list){
-
-    if(!list.length){
-
-        searchResults.innerHTML="";
-
-        return;
-    }
-
-    searchResults.innerHTML =
-        list.map(
-            x=>`
-
-            <div class="search-item">
-
-                <div>
-                    <div class="search-name">
-                        <span class="search-code">
-                            ${x.code}
-                        </span>
-                        ${x.name}
-                    </div>
-
-                    <div class="search-meta">
-                        ${x.market==="tpex" ? "上櫃" : "上市"}
-                        ${x.industry ? "｜"+x.industry : ""}
-                    </div>
-                </div>
-
-                <button
-                    class="search-go"
-                    data-code="${x.code}"
-                >
-                    分析
-                </button>
-
-            </div>
-
-            `
-        ).join("");
-
-    searchResults
-        .querySelectorAll(".search-go")
-        .forEach(
-            btn =>
-                btn.addEventListener(
-                    "click",
-                    ()=>loadStock(btn.dataset.code)
-                )
-        );
-
-}
-
-function renderBasic(a){
-
-    const s=a.stock;
-
-    $("stockName").textContent =
-        a.realtime?.name ||
-        s.name ||
-        s.code;
-
-    $("stockCode").textContent =
-        s.code+
-        "｜"+
-        (
-            s.market==="tpex"
-                ? "上櫃"
-                : "上市／市場待確認"
-        );
-
-    $("price").textContent =
-        fmt(a.price);
-
-    const changeText =
-        a.change===null
-            ? "--"
-            :
-            (
-                a.change>0 ? "▲ " :
-                a.change<0 ? "▼ " :
-                "• "
-            )+
-            pct(Math.abs(a.change));
-
-    $("change").textContent =
-        changeText;
-
-    setClass(
-        $("change"),
-        a.change>0
-            ? "up"
-            : a.change<0
-                ? "down"
-                : "flat"
-    );
-
-    $("open").textContent =
-        fmt(a.realtime?.open);
-
-    $("high").textContent =
-        fmt(a.realtime?.high);
-
-    $("low").textContent =
-        fmt(a.realtime?.low);
-
-    $("volume").textContent =
-        fmtInt(a.latestVol);
-
-    $("ma5").textContent =
-        fmt(a.ma5);
-
-    $("ma20").textContent =
-        fmt(a.ma20);
-
-    $("ma60").textContent =
-        fmt(a.ma60);
-
-    $("ma120").textContent =
-        fmt(a.ma120);
-
-    $("marketState").textContent =
-        "資料更新："+new Date().toLocaleTimeString(
-            "zh-TW",
-            {
-                hour:"2-digit",
-                minute:"2-digit",
-                second:"2-digit"
-            }
-        );
-
-    $("analysisTime").textContent =
-        new Date().toLocaleTimeString(
-            "zh-TW"
-        );
-
-    const tags=[];
-
-    if(
-        a.price!==null &&
-        a.ma20!==null
-    ){
-
-        if(a.price>a.ma20){
-
-            tags.push(
-                `<span class="tag good">
-                    🟢 站上MA20
-                </span>`
-            );
-
-        }else{
-
-            tags.push(
-                `<span class="tag bad">
-                    🔴 跌破MA20
-                </span>`
-            );
-
-        }
-
-    }
-
-    if(
-        a.volumeRatio5!==null &&
-        a.volumeRatio5>=1.5
-    ){
-
-        tags.push(
-            `<span class="tag warn">
-                🔥 爆量 ${a.volumeRatio5.toFixed(1)}倍
-            </span>`
-        );
-
-    }
-
-    if(
-        a.inst.available &&
-        (a.inst.totalToday||0)>0
-    ){
-
-        tags.push(
-            `<span class="tag info">
-                🏦 法人今日買超
-            </span>`
-        );
-
-    }
-
-    if(
-        a.inst.available &&
-        (a.inst.foreignToday||0)>0 &&
-        (a.inst.trustToday||0)>0 &&
-        (a.inst.dealerToday||0)>0
-    ){
-
-        tags.push(
-            `<span class="tag good">
-                🔥 三大法人共振
-            </span>`
-        );
-
-    }
-
-    if(a.pullback.up){
-
-        tags.push(
-            `<span class="tag purple">
-                📈 最近曾長高
-            </span>`
-        );
-
-    }
-
-    if(a.pullback.retrace){
-
-        tags.push(
-            `<span class="tag warn">
-                ↘️ 正在拉回
-            </span>`
-        );
-
-    }
-
-    $("tagRow").innerHTML =
-        tags.join("");
-
-}
-
-function renderInstitution(a){
-
-    const i=a.inst;
-
-    const fields={
-
-        foreignToday:i.foreignToday,
-        foreign5:i.foreign5,
-        foreign20:i.foreign20,
-
-        trustToday:i.trustToday,
-        trust5:i.trust5,
-        trust20:i.trust20,
-
-        dealerToday:i.dealerToday,
-        dealer5:i.dealer5,
-        dealer20:i.dealer20,
-
-        totalToday:i.totalToday,
-        total5:i.total5,
-        total20:i.total20
-
-    };
-
-    for(const [id,v] of Object.entries(fields)){
-
-        $(id).textContent =
-            i.available
-                ? (
-                    v===null
-                        ? "暫無資料"
-                        : fmtInt(v)
-                )
-                : "暫無資料";
-
-        $(id).classList.remove(
-            "good-text",
-            "bad-text"
-        );
-
-        if(
-            v!==null &&
-            v>0
-        ){
-            $(id).classList.add(
-                "good-text"
-            );
-        }
-
-        if(
-            v!==null &&
-            v<0
-        ){
-            $(id).classList.add(
-                "bad-text"
-            );
-        }
-
-    }
-
-    paintDirection(
-        "foreignDir",
-        i.foreignToday
-    );
-
-    paintDirection(
-        "trustDir",
-        i.trustToday
-    );
-
-    paintDirection(
-        "dealerDir",
-        i.dealerToday
-    );
-
-    paintDirection(
-        "totalDir",
-        i.totalToday
-    );
-
-    if(!i.available){
-
-        $("institutionSync").textContent=
-            "暫無資料";
-
-        $("institutionSyncNote").textContent=
-            "目前沒有取得可靠法人資料，不以0代替。";
-
-        $("institutionStreak").textContent=
-            "暫無資料";
-
-        $("institutionCost").textContent=
-            "暫無資料";
-
-        $("institutionState").textContent=
-            "等待資料";
-
-        $("institutionTags").innerHTML=
-            `<span class="tag warn">
-                ⚠️ 法人資料暫無
-            </span>`;
-
-        return;
-
-    }
-
-    const sync =
-        (i.foreignToday||0)>0 &&
-        (i.trustToday||0)>0 &&
-        (i.dealerToday||0)>0;
-
-    $("institutionSync").textContent =
-        sync
-            ? "🔥 是"
-            : "否";
-
-    $("institutionSyncNote").textContent =
-        sync
-            ? "三大法人今日同時買超。"
-            : "目前沒有三大法人同步買超。";
-
-    const streak =
-        i.totalStreak || {
-            direction:"none",
-            days:0
-        };
-
-    $("institutionStreak").textContent =
-        streak.days+
-        " 天";
-
-    $("institutionStreakNote").textContent =
-        streak.direction==="buy"
-            ? "三大法人合計連續買超"
-            : streak.direction==="sell"
-                ? "三大法人合計連續賣超"
-                : "方向不明顯";
-
-    const cost =
-        estimateInstitutionCost(
-            a
-        );
-
-    $("institutionCost").textContent =
-        cost===null
-            ? "暫無資料"
-            : fmt(cost);
-
-    $("institutionCostNote").textContent =
-        cost===null
-            ? "資料不足"
-            : "依近期價格與法人方向估算";
-
-    $("institutionState").textContent =
-        i.totalToday>0
-            ? "🟢 偏多"
-            : i.totalToday<0
-                ? "🔴 偏空"
-                : "🟡 中性";
-
-    $("institutionStateNote").textContent =
-        i.total5>0
-            ? "5日法人籌碼偏多"
-            : i.total5<0
-                ? "5日法人籌碼偏空"
-                : "5日方向中性";
-
-    const tags=[];
-
-    if(sync){
-
-        tags.push(
-            `<span class="tag good">
-                🔥 三大法人同步買進
-            </span>`
-        );
-
-    }
-
-    if(
-        i.total5!==null &&
-        i.total5>0
-    ){
-
-        tags.push(
-            `<span class="tag good">
-                🟢 5日法人買超
-            </span>`
-        );
-
-    }
-
-    if(
-        streak.direction==="buy" &&
-        streak.days>=3
-    ){
-
-        tags.push(
-            `<span class="tag info">
-                🏦 連買${streak.days}天
-            </span>`
-        );
-
-    }
-
-    $("institutionTags").innerHTML =
-        tags.join("");
-
-}
-
-function estimateInstitutionCost(a){
-
-    if(
-        !a.rows.length ||
-        !a.inst.available
-    ){
-        return null;
-    }
-
-    const last20 =
-        a.rows.slice(-20);
-
-    const prices =
-        last20
-            .map(x=>x.close)
-            .filter(v=>v!==null);
-
-    if(!prices.length){
-        return null;
-    }
-
-    const med =
-        median(prices);
-
-    if(
-        a.inst.total20>0
-    ){
-
-        return med*1.01;
-
-    }
-
-    if(
-        a.inst.total20<0
-    ){
-
-        return med*.99;
-
-    }
-
-    return med;
-
-}
-
-function renderVolume(a){
-
-    $("avgVol5").textContent =
-        fmtInt(a.avgVol5);
-
-    $("avgVol20").textContent =
-        fmtInt(a.avgVol20);
-
-    $("volumeRatio5").textContent =
-        a.volumeRatio5===null
-            ? "--"
-            : a.volumeRatio5.toFixed(2)+"倍";
-
-    $("volumeRatio20").textContent =
-        a.volumeRatio20===null
-            ? "--"
-            : a.volumeRatio20.toFixed(2)+"倍";
-
-    let state="正常";
-
-    if(
-        a.volumeRatio5!==null &&
-        a.volumeRatio5>=2
-    ){
-
-        state="🔥 強爆量";
-
-    }else if(
-        a.volumeRatio5!==null &&
-        a.volumeRatio5>=1.5
-    ){
-
-        state="🔥 放量";
-
-    }else if(
-        a.volumeRatio5!==null &&
-        a.volumeRatio5<=.7
-    ){
-
-        state="💤 量縮";
-
-    }
-
-    $("volumeState").textContent =
-        state;
-
-    $("volumeStateNote").textContent =
-        a.volumeRatio5===null
-            ? "資料不足"
-            :
-            "今日量／5日均量 "+
-            a.volumeRatio5.toFixed(2)+
-            "倍";
-
-    let vp="中性";
-    let note="等待價格與量能確認。";
-
-    if(
-        a.volumeRatio5!==null &&
-        a.change!==null
-    ){
-
-        if(
-            a.volumeRatio5>=1.5 &&
-            a.change>2
-        ){
-
-            vp="🟢 量價正向";
-            note="價漲量增，短線動能偏強。";
-
-        }else if(
-            a.volumeRatio5>=2 &&
-            a.change<1
-        ){
-
-            vp="🔴 爆量不漲";
-            note="量很大但價格沒有同步攻擊，注意賣壓。";
-
-        }else if(
-            a.volumeRatio5<.8 &&
-            a.change>0
-        ){
-
-            vp="🟡 量縮上漲";
-            note="上漲但量能沒有放大，需要後續確認。";
-
-        }
-
-    }
-
-    $("volumePriceState").textContent=vp;
-    $("volumePriceNote").textContent=note;
-
-}
-
-function renderTrend(a){
-
-    function state(price,ma){
-
-        if(price===null || ma===null){
-            return "--";
-        }
-
-        return price>ma
-            ? "🟢 站上"
-            : "🔴 跌破";
-
-    }
-
-    $("ma5State").textContent =
-        state(a.price,a.ma5);
-
-    $("ma20State").textContent =
-        state(a.price,a.ma20);
-
-    $("ma60State").textContent =
-        state(a.price,a.ma60);
-
-    let arrange="資料不足";
-
-    if(
-        a.ma5!==null &&
-        a.ma20!==null &&
-        a.ma60!==null
-    ){
-
-        if(
-            a.ma5>a.ma20 &&
-            a.ma20>a.ma60
-        ){
-
-            arrange="🚀 多頭排列";
-
-        }else if(
-            a.ma5<a.ma20 &&
-            a.ma20<a.ma60
-        ){
-
-            arrange="🔴 空頭排列";
-
-        }else{
-
-            arrange="🟡 混合";
-
-        }
-
-    }
-
-    $("maArrange").textContent =
-        arrange;
-
-    const tags=[];
-
-    if(
-        a.ma5!==null &&
-        a.ma20!==null &&
-        a.ma5>a.ma20
-    ){
-
-        tags.push(
-            `<span class="tag good">
-                MA5＞MA20
-            </span>`
-        );
-
-    }
-
-    if(
-        a.ma20!==null &&
-        a.ma60!==null &&
-        a.ma20>a.ma60
-    ){
-
-        tags.push(
-            `<span class="tag good">
-                MA20＞MA60
-            </span>`
-        );
-
-    }
-
-    if(
-        a.ma120!==null &&
-        a.ma60!==null &&
-        a.ma60>a.ma120
-    ){
-
-        tags.push(
-            `<span class="tag info">
-                中長期趨勢偏多
-            </span>`
-        );
-
-    }
-
-    $("trendTags").innerHTML =
-        tags.join("");
-
-}
-
-function renderPullback(a){
-
-    const p=a.pullback;
-
-    $("pullbackTitle").textContent =
-        p.title;
-
-    $("pullbackMain").textContent =
-        p.main;
-
-    $("pullbackDesc").textContent =
-        p.desc;
-
-    $("pullbackUpTag").textContent =
-        "長高："+
-        (
-            p.up
-                ? "是"
-                : "否"
-        );
-
-    $("pullbackRetraceTag").textContent =
-        "拉回："+
-        (
-            p.retrace
-                ? "是"
-                : "否"
-        );
-
-    $("pullbackInstTag").textContent =
-        "法人："+
-        (
-            p.institution
-                ? "承接"
-                : "未確認"
-        );
-
-    $("pullbackVolTag").textContent =
-        "量能："+
-        (
-            p.volume
-                ? "放大"
-                : "未放大"
-        );
-
-    if(p.score>=75){
-
-        $("pullbackTitle")
-            .className="signal-title up";
-
-    }else{
-
-        $("pullbackTitle")
-            .className="signal-title";
-
-    }
-
-}
-
-function renderBreakout(a){
-
-    const b=a.breakout;
-
-    $("resistance").textContent =
-        fmt(b.resistance);
-
-    $("support").textContent =
-        fmt(b.support);
-
-    const price=a.price;
-
-    $("distanceResistance").textContent =
-        price!==null &&
-        b.resistance!==null
-            ? pct(
-                (
-                    (b.resistance-price)/
-                    price
-                )*100
-            )
-            : "--";
-
-    $("distanceSupport").textContent =
-        price!==null &&
-        b.support!==null
-            ? pct(
-                (
-                    (price-b.support)/
-                    price
-                )*100
-            )
-            : "--";
-
-    $("breakoutState").textContent =
-        b.state;
-
-    $("breakoutNote").textContent =
-        b.breakout
-            ? (
-                b.volumeConfirm
-                    ? "突破同時有量能確認。"
-                    : "突破但成交量尚未確認。"
-            )
-            : "尚未突破近期壓力。";
-
-    $("falseBreakout").textContent =
-        b.falseRisk;
-
-    $("falseBreakoutNote").textContent =
-        b.falseRisk==="高"
-            ? "爆量但法人偏賣，避免追高。"
-            : b.falseRisk==="中"
-                ? "需要觀察突破後能否站穩。"
-                : "目前假突破風險相對較低。";
-
-}
-
-function renderTrade(a){
-
-    $("entry1").textContent =
-        fmt(a.entry1);
-
-    $("entry2").textContent =
-        fmt(a.entry2);
-
-    $("stopLoss").textContent =
-        fmt(a.stop);
-
-    $("tp1").textContent =
-        fmt(a.tp1);
-
-    $("tp2").textContent =
-        fmt(a.tp2);
-
-    $("riskReward").textContent =
-        a.rr===null
-            ? "--"
-            : "1 : "+
-              a.rr.toFixed(2);
-
-    let text="";
-
-    if(
-        a.signalTitle.includes("爆量警戒")
-    ){
-
-        text=
-            "🔴 暫不追高。爆量但法人偏賣，先等籌碼重新轉強。";
-
-    }else if(
-        a.signalTitle.includes("回檔再攻")
-    ){
-
-        text=
-            "🟢 優先觀察回踩進場區。不要追最高點，等待支撐確認後分批。";
-
-    }else if(
-        a.signalTitle.includes("強勢進場")
-    ){
-
-        text=
-            "🚀 可以列入進場觀察。若突破後回踩不破，訊號會更漂亮。";
-
-    }else if(
-        a.score>=65
-    ){
-
-        text=
-            "🟡 偏多，但等待更漂亮的價格位置。";
-
-    }else{
-
-        text=
-            "⚪ 目前沒有足夠條件，耐心等待。";
-
-    }
-
-    $("tradeAdvice").textContent =
-        text;
-
-}
-
-function renderScore(a){
-
-    $("scoreNum").textContent =
-        Math.round(a.score);
-
-    $("scoreFill").style.width =
-        a.score+"%";
-
-    $("scoreText").textContent =
-        a.grade+
-        "級｜"+
-        a.meat;
-
-}
-
-function renderSignal(a){
-
-    $("signalTitle").textContent =
-        a.signalTitle;
-
-    $("signalMain").textContent =
-        a.signalMain;
-
-    $("signalDesc").textContent =
-        a.signalDesc;
-
-    $("meatValue").textContent =
-        a.meat;
-
-    $("meatDesc").textContent =
-        a.meatDesc;
-
-    if(
-        a.grade==="A"
-    ){
-
-        $("meatValue").className=
-            "meat-value up";
-
-    }else if(
-        a.grade==="D"
-    ){
-
-        $("meatValue").className=
-            "meat-value down";
-
-    }else{
-
-        $("meatValue").className=
-            "meat-value";
-
-    }
-
-}
-
-function renderRules(a){
-
-    $("ruleList").innerHTML =
-        a.rules
-            .map(
-                r=>`
-
-                <div class="rule">
-
-                    <div class="rule-icon">
-                        ${r.icon}
-                    </div>
-
-                    <div class="rule-main">
-
-                        <div class="rule-title">
-                            ${r.title}
-                        </div>
-
-                        <div class="rule-desc">
-                            ${r.desc}
-                        </div>
-
-                    </div>
-
-                    <div
-                        class="rule-score ${
-                            r.points>0
-                                ? "good-text"
-                                : r.points<0
-                                    ? "bad-text"
-                                    : ""
-                        }"
-                    >
-                        ${
-                            r.points>0
-                                ? "+"+r.points
-                                : r.points
-                        }
-                    </div>
-
-                </div>
-
-                `
-            )
-            .join("");
-
-}
-
-function renderConclusion(a){
-
-    let title=
-        "🟡 觀察";
-
-    let desc=
-        "目前條件尚未形成強烈進場訊號。";
-
-    if(a.grade==="A"){
-
-        title=
-            "🚀🍖 值得重點觀察";
-
-        desc=
-            a.meatDesc+
-            " 進場仍建議等待價格位置確認。";
-
-    }else if(a.grade==="B"){
-
-        title=
-            "🟢 偏多觀察";
-
-        desc=
-            "條件偏多，但等待更好的進場位置。";
-
-    }else if(a.grade==="C"){
-
-        title=
-            "🟡 等待確認";
-
-        desc=
-            "部分條件成立，但還不到強勢訊號。";
-
-    }else if(a.grade==="D"){
-
-        title=
-            "🔴 不宜追高";
-
-        desc=
-            a.meatDesc;
-
-    }
-
-    $("finalConclusion").innerHTML=`
-
-        <div class="signal-title">
-            ${title}
-        </div>
-
-        <div class="signal-main">
-            ${a.signalMain}
-        </div>
-
-        <div class="signal-desc">
-            ${desc}
-        </div>
-
-    `;
-
-}
-
-/* =========================================================
-   載入股票
-   ========================================================= */
-
-async function loadStock(query){
-
-    const stock =
-        typeof query==="string"
-            ? resolveStock(query)
-            : query;
-
-    if(!stock){
-
-        statusEl.textContent =
-            "找不到這檔股票，請輸入代號或名稱。";
-
-        return;
-
-    }
-
-    currentStock=stock;
-
-    statusEl.textContent =
-        "⏳ 正在取得 "+
-        stock.code+
-        " 資料……";
-
-    window.scrollTo({
-        top:0,
-        behavior:"smooth"
-    });
+  }
+
+  if(
+    stock.market === "twse"
+  ){
 
     try{
 
-        const [
-            realtime,
-            history,
-            institution
-        ] =
-        await Promise.all([
+      const url =
+        `${MIS}?ex_ch=tse_` +
+        `${encodeURIComponent(stock.code)}` +
+        `.tw&json=1&delay=0`;
 
-            getRealtime(stock.code),
+      const data =
+        await fetchJson(
+          url,
+          7000
+        );
 
-            getHistory(stock.code),
+      if(
+        data?.msgArray?.length
+      ){
 
-            getInstitution(stock.code)
-
-        ]);
+        const out =
+          parseMisRow(
+            data.msgArray[0],
+            stock
+          );
 
         if(
-            !realtime &&
-            !history.length
+          out?.price !== null
         ){
 
-            statusEl.textContent =
-                "⚠️ 目前無法取得行情資料。";
+          cacheSet(
+            key,
+            out
+          );
 
-            return;
+          return out;
 
         }
 
-        const data =
-            buildAnalysis(
-                stock,
-                realtime,
-                history,
-                institution
-            );
+      }
 
-        currentData=data;
-
-        renderBasic(data);
-
-        renderInstitution(data);
-
-        renderVolume(data);
-
-        renderTrend(data);
-
-        renderPullback(data);
-
-        renderBreakout(data);
-
-        renderTrade(data);
-
-        renderScore(data);
-
-        renderSignal(data);
-
-        renderRules(data);
-
-        renderConclusion(data);
-
-        statusEl.textContent =
-            "✅ 分析完成｜"+
-            stock.code+
-            " "+
-            (
-                realtime?.name ||
-                stock.name
-            );
-
-    }catch(error){
-
-        console.error(error);
-
-        statusEl.textContent =
-            "⚠️ 資料取得過程發生問題，請稍後再試。";
+    }catch(e){
 
     }
+
+  }
+
+  /*
+    TPEx realtime endpoint may fail because
+    of CORS, market status, or official API changes.
+    V41 does not fabricate realtime prices.
+    It uses the latest historical close as fallback.
+  */
+
+  return null;
 
 }
 
-/* =========================================================
-   搜尋
-   ========================================================= */
-
-function doSearch(){
-
-    const q=
-        searchInput.value.trim();
-
-    if(!q){
-        return;
-    }
-
-    const results=
-        searchLocal(q);
-
-    if(results.length){
-
-        renderSearchResults(
-            results
-        );
-
-        if(results.length===1){
-
-            loadStock(
-                results[0]
-            );
-
-        }
-
-        return;
-
-    }
-
-    const stock=
-        resolveStock(q);
-
-    if(stock){
-
-        searchResults.innerHTML="";
-
-        loadStock(stock);
-
-        return;
-
-    }
-
-    statusEl.textContent =
-        "找不到股票，請輸入正確代號。";
-
-}
-
-searchBtn.addEventListener(
-    "click",
-    doSearch
-);
-
-searchInput.addEventListener(
-    "keydown",
-    e=>{
-
-        if(e.key==="Enter"){
-            doSearch();
-        }
-
-    }
-);
-
-searchInput.addEventListener(
-    "input",
-    ()=>{
-
-        const q=
-            searchInput.value.trim();
-
-        if(!q){
-
-            searchResults.innerHTML="";
-
-            return;
-
-        }
-
-        renderSearchResults(
-            searchLocal(q)
-        );
-
-    }
-);
 
 /* =========================================================
-   快速按鈕
+   HISTORICAL DATA
    ========================================================= */
 
-document
-    .querySelectorAll(".quick-btn")
-    .forEach(
-        btn=>
-            btn.addEventListener(
-                "click",
-                ()=>{
-                    loadStock(
-                        btn.dataset.code
-                    );
-                }
+async function getHistory(
+  stock,
+  force=false
+){
+
+  const key =
+    "hist:"+stock.code;
+
+  if(!force){
+
+    const cached =
+      cacheGet(
+        key,
+        TTL.history
+      );
+
+    if(cached){
+      return cached;
+    }
+
+  }
+
+  const url =
+    FINMIND +
+    `?dataset=TaiwanStockPrice` +
+    `&data_id=${encodeURIComponent(stock.code)}` +
+    `&start_date=${dateDaysAgo(180)}` +
+    `&end_date=${todayStr()}`;
+
+  try{
+
+    const data =
+      await fetchJson(
+        url,
+        12000
+      );
+
+    const rows =
+      (data?.data||[])
+        .map(
+          r => ({
+
+            date:r.date,
+
+            open:n(r.open),
+
+            high:n(
+              r.max ??
+              r.high
+            ),
+
+            low:n(
+              r.min ??
+              r.low
+            ),
+
+            close:n(r.close),
+
+            volume:n(
+              r.Trading_Volume ??
+              r.volume
             )
+
+          })
+        )
+        .filter(
+          r =>
+            r.date &&
+            r.close!==null
+        );
+
+    rows.sort(
+      (a,b) =>
+        a.date.localeCompare(
+          b.date
+        )
     );
 
-/* =========================================================
-   模式按鈕
-   ========================================================= */
+    cacheSet(
+      key,
+      rows
+    );
 
-function ensureCurrent(){
+    return rows;
 
-    if(!currentData){
+  }catch(e){
 
-        statusEl.textContent =
-            "請先搜尋一檔股票。";
+    return [];
 
-        return false;
-
-    }
-
-    return true;
+  }
 
 }
 
-$("modeBreakout")
-    .addEventListener(
-        "click",
-        ()=>{
-
-            if(!ensureCurrent()){
-                return;
-            }
-
-            document
-                .querySelector(
-                    "#breakoutState"
-                )
-                ?.scrollIntoView({
-                    behavior:"smooth",
-                    block:"center"
-                });
-
-        }
-    );
-
-$("modeInstitution")
-    .addEventListener(
-        "click",
-        ()=>{
-
-            if(!ensureCurrent()){
-                return;
-            }
-
-            document
-                .querySelector(
-                    "#institutionSync"
-                )
-                ?.scrollIntoView({
-                    behavior:"smooth",
-                    block:"center"
-                });
-
-        }
-    );
-
-$("modePullback")
-    .addEventListener(
-        "click",
-        ()=>{
-
-            if(!ensureCurrent()){
-                return;
-            }
-
-            document
-                .querySelector(
-                    "#pullbackTitle"
-                )
-                ?.scrollIntoView({
-                    behavior:"smooth",
-                    block:"center"
-                });
-
-        }
-    );
-
-$("modeMeat")
-    .addEventListener(
-        "click",
-        ()=>{
-
-            if(!ensureCurrent()){
-                return;
-            }
-
-            document
-                .querySelector(
-                    "#meatValue"
-                )
-                ?.scrollIntoView({
-                    behavior:"smooth",
-                    block:"center"
-                });
-
-        }
-    );
 
 /* =========================================================
-   掃描
+   INSTITUTIONAL DATA
    ========================================================= */
 
-$("scanBtn")
-    .addEventListener(
-        "click",
-        scanStocks
+function investorName(x){
+
+  const s =
+    String(x||"")
+      .toLowerCase();
+
+  if(
+    s.includes("foreign") ||
+    s.includes("外資")
+  ){
+    return "foreign";
+  }
+
+  if(
+    s.includes("investment") ||
+    s.includes("trust") ||
+    s.includes("投信")
+  ){
+    return "trust";
+  }
+
+  if(
+    s.includes("dealer") ||
+    s.includes("自營")
+  ){
+    return "dealer";
+  }
+
+  return "";
+
+}
+
+
+function netOfRow(r){
+
+  const direct = [
+
+    r.net,
+
+    r.Net,
+
+    r.buy_sell,
+
+    r.BuySell,
+
+    r.net_buy_sell,
+
+    r.NetBuySell
+
+  ];
+
+  for(
+    const v of direct
+  ){
+
+    if(
+      v!==undefined &&
+      v!==null &&
+      v!==""
+    ){
+      return n(v);
+    }
+
+  }
+
+  const buy =
+    n(
+      r.buy ??
+      r.Buy
     );
 
-async function scanStocks(){
+  const sell =
+    n(
+      r.sell ??
+      r.Sell
+    );
 
-    const btn=$("scanBtn");
+  if(
+    buy!==null &&
+    sell!==null
+  ){
+    return buy-sell;
+  }
 
-    btn.disabled=true;
+  return null;
 
-    const results=[];
+}
 
-    const total=
-        SCAN_CODES.length;
+
+async function getInstitution(
+  stock,
+  force=false
+){
+
+  const key =
+    "inst:"+stock.code;
+
+  if(!force){
+
+    const cached =
+      cacheGet(
+        key,
+        TTL.institution
+      );
+
+    if(cached){
+      return cached;
+    }
+
+  }
+
+  const url =
+    FINMIND +
+    `?dataset=TaiwanStockInstitutionalInvestorsBuySell` +
+    `&data_id=${encodeURIComponent(stock.code)}` +
+    `&start_date=${dateDaysAgo(120)}` +
+    `&end_date=${todayStr()}`;
+
+  try{
+
+    const data =
+      await fetchJson(
+        url,
+        14000
+      );
+
+    const map =
+      new Map();
 
     for(
-        let i=0;
-        i<SCAN_CODES.length;
-        i++
+      const r of
+      (data?.data||[])
     ){
 
-        const code=
-            SCAN_CODES[i];
+      const date =
+        r.date;
 
-        $("progressText").textContent =
-            "分析 "+code;
+      const type =
+        investorName(
+          r.name ??
+          r.InvestorType ??
+          r.investor_type
+        );
 
-        const percent=
-            Math.round(
-                (
-                    i/total
-                )*100
+      const net =
+        netOfRow(r);
+
+      if(
+        !date ||
+        !type ||
+        net===null
+      ){
+        continue;
+      }
+
+      if(!map.has(date)){
+
+        map.set(
+          date,
+          {
+            date,
+            foreign:0,
+            trust:0,
+            dealer:0
+          }
+        );
+
+      }
+
+      map.get(date)[type] += net;
+
+    }
+
+    const rows =
+      [...map.values()]
+        .map(
+          x => ({
+            ...x,
+            total:
+              x.foreign +
+              x.trust +
+              x.dealer
+          })
+        )
+        .sort(
+          (a,b) =>
+            a.date.localeCompare(
+              b.date
+            )
+        );
+
+    const out = {
+
+      available:
+        rows.length>0,
+
+      rows,
+
+      error:null
+
+    };
+
+    cacheSet(
+      key,
+      out
+    );
+
+    return out;
+
+  }catch(e){
+
+    const out = {
+
+      available:false,
+
+      rows:[],
+
+      error:
+        e?.message ||
+        "法人資料取得失敗"
+
+    };
+
+    cacheSet(
+      key,
+      out
+    );
+
+    return out;
+
+  }
+
+}
+
+
+/* =========================================================
+   MATH FUNCTIONS
+   ========================================================= */
+
+function avg(arr){
+
+  const a =
+    arr
+      .map(Number)
+      .filter(
+        Number.isFinite
+      );
+
+  return a.length
+    ? a.reduce(
+        (s,v)=>s+v,
+        0
+      ) / a.length
+    : null;
+
+}
+
+
+function sum(arr){
+
+  const a =
+    arr
+      .map(Number)
+      .filter(
+        Number.isFinite
+      );
+
+  return a.length
+    ? a.reduce(
+        (s,v)=>s+v,
+        0
+      )
+    : null;
+
+}
+
+
+function ma(
+  rows,
+  key,
+  len
+){
+
+  const a =
+    rows
+      .slice(-len)
+      .map(
+        x=>x[key]
+      )
+      .filter(
+        Number.isFinite
+      );
+
+  return a.length
+    ? a.reduce(
+        (s,v)=>s+v,
+        0
+      ) / a.length
+    : null;
+
+}
+
+
+function maxOf(
+  rows,
+  key
+){
+
+  const a =
+    rows
+      .map(
+        x=>x[key]
+      )
+      .filter(
+        Number.isFinite
+      );
+
+  return a.length
+    ? Math.max(...a)
+    : null;
+
+}
+
+
+function minOf(
+  rows,
+  key
+){
+
+  const a =
+    rows
+      .map(
+        x=>x[key]
+      )
+      .filter(
+        Number.isFinite
+      );
+
+  return a.length
+    ? Math.min(...a)
+    : null;
+
+}
+
+
+function percentChange(a,b){
+
+  if(
+    !Number.isFinite(a) ||
+    !Number.isFinite(b) ||
+    a===0
+  ){
+    return null;
+  }
+
+  return (
+    (b-a)/a
+  ) * 100;
+
+}
+
+
+/* =========================================================
+   INSTITUTION ANALYSIS
+   ========================================================= */
+
+function institutionAnalysis(rows){
+
+  if(!rows?.length){
+
+    return {
+
+      available:false,
+
+      rows:[],
+
+      latestDate:null,
+
+      foreignToday:null,
+
+      trustToday:null,
+
+      dealerToday:null,
+
+      totalToday:null,
+
+      foreign5:null,
+
+      trust5:null,
+
+      dealer5:null,
+
+      total5:null,
+
+      foreign20:null,
+
+      trust20:null,
+
+      dealer20:null,
+
+      total20:null,
+
+      foreignStreak:0,
+
+      trustStreak:0,
+
+      dealerStreak:0,
+
+      totalStreak:0
+
+    };
+
+  }
+
+  const r =
+    rows
+      .slice()
+      .sort(
+        (a,b) =>
+          a.date.localeCompare(
+            b.date
+          )
+      );
+
+  const latest =
+    r[r.length-1];
+
+  const last5 =
+    r.slice(-5);
+
+  const last20 =
+    r.slice(-20);
+
+  const streak =
+    key => {
+
+      let c=0;
+
+      for(
+        let i=r.length-1;
+        i>=0;
+        i--
+      ){
+
+        if(
+          (r[i][key]||0)>0
+        ){
+          c++;
+        }else{
+          break;
+        }
+
+      }
+
+      return c;
+
+    };
+
+  return {
+
+    available:true,
+
+    rows:r,
+
+    latestDate:
+      latest.date,
+
+    foreignToday:
+      latest.foreign,
+
+    trustToday:
+      latest.trust,
+
+    dealerToday:
+      latest.dealer,
+
+    totalToday:
+      latest.total,
+
+    foreign5:
+      sum(
+        last5.map(
+          x=>x.foreign
+        )
+      ),
+
+    trust5:
+      sum(
+        last5.map(
+          x=>x.trust
+        )
+      ),
+
+    dealer5:
+      sum(
+        last5.map(
+          x=>x.dealer
+        )
+      ),
+
+    total5:
+      sum(
+        last5.map(
+          x=>x.total
+        )
+      ),
+
+    foreign20:
+      sum(
+        last20.map(
+          x=>x.foreign
+        )
+      ),
+
+    trust20:
+      sum(
+        last20.map(
+          x=>x.trust
+        )
+      ),
+
+    dealer20:
+      sum(
+        last20.map(
+          x=>x.dealer
+        )
+      ),
+
+    total20:
+      sum(
+        last20.map(
+          x=>x.total
+        )
+      ),
+
+    foreignStreak:
+      streak("foreign"),
+
+    trustStreak:
+      streak("trust"),
+
+    dealerStreak:
+      streak("dealer"),
+
+    totalStreak:
+      streak("total")
+
+  };
+
+}
+
+
+/* =========================================================
+   MAIN ANALYSIS ENGINE
+   ========================================================= */
+
+function buildAnalysis(
+  stock,
+  realtime,
+  history,
+  institutionRows
+){
+
+  const rows =
+    (history||[])
+      .slice()
+      .sort(
+        (a,b) =>
+          a.date.localeCompare(
+            b.date
+          )
+      );
+
+  const last =
+    rows[rows.length-1] ||
+    {};
+
+  const price =
+    n(realtime?.price) ??
+    n(last.close);
+
+  const prev =
+    n(realtime?.prev) ??
+    (
+      rows.length>1
+        ? n(
+            rows[
+              rows.length-2
+            ].close
+          )
+        : null
+    );
+
+  const open =
+    n(realtime?.open) ??
+    n(last.open);
+
+  const high =
+    n(realtime?.high) ??
+    n(last.high);
+
+  const low =
+    n(realtime?.low) ??
+    n(last.low);
+
+  const latestVol =
+    n(realtime?.volume) ??
+    n(last.volume);
+
+  const ma5 =
+    ma(rows,"close",5);
+
+  const ma20 =
+    ma(rows,"close",20);
+
+  const ma60 =
+    ma(rows,"close",60);
+
+  const ma120 =
+    ma(rows,"close",120);
+
+  const vol5 =
+    avg(
+      rows
+        .slice(-5)
+        .map(
+          x=>x.volume
+        )
+    );
+
+  const vol20 =
+    avg(
+      rows
+        .slice(-20)
+        .map(
+          x=>x.volume
+        )
+    );
+
+  const volRatio5 =
+    latestVol!==null &&
+    vol5
+      ? latestVol/vol5
+      : null;
+
+  const volRatio20 =
+    latestVol!==null &&
+    vol20
+      ? latestVol/vol20
+      : null;
+
+  const inst =
+    institutionAnalysis(
+      institutionRows||[]
+    );
+
+  const prior20 =
+    rows.slice(-21,-1);
+
+  const resistance =
+    maxOf(
+      prior20,
+      "high"
+    );
+
+  const support =
+    minOf(
+      rows.slice(-20),
+      "low"
+    );
+
+  const breakout =
+    price!==null &&
+    resistance!==null &&
+    price>resistance;
+
+  const breakoutPct =
+    breakout
+      ? percentChange(
+          resistance,
+          price
+        )
+      : 0;
+
+  const strongVolume =
+    volRatio5!==null &&
+    volRatio5>=1.5;
+
+  const veryStrongVolume =
+    volRatio5!==null &&
+    volRatio5>=2;
+
+  const instBuyToday =
+    inst.available &&
+    (inst.totalToday||0)>0;
+
+  const instSellToday =
+    inst.available &&
+    (inst.totalToday||0)<0;
+
+  const instSync =
+    inst.available &&
+    (inst.foreignToday||0)>0 &&
+    (inst.trustToday||0)>0 &&
+    (inst.dealerToday||0)>0;
+
+  const recent20 =
+    rows.slice(-20);
+
+  const recentHigh =
+    maxOf(
+      recent20,
+      "high"
+    );
+
+  const oldStart =
+    recent20.length
+      ? recent20[0].close
+      : null;
+
+  const gain20 =
+    oldStart!==null &&
+    recentHigh!==null
+      ? percentChange(
+          oldStart,
+          recentHigh
+        )
+      : null;
+
+  const dropFromHigh =
+    price!==null &&
+    recentHigh!==null
+      ? percentChange(
+          recentHigh,
+          price
+        )
+      : null;
+
+  const pullback =
+    gain20!==null &&
+    gain20>=8 &&
+    dropFromHigh!==null &&
+    dropFromHigh<=-2 &&
+    dropFromHigh>=-18 &&
+    inst.available &&
+    (inst.totalToday||0)>0 &&
+    volRatio5!==null &&
+    volRatio5>=1.2;
+
+  const shortResistance =
+    maxOf(
+      rows.slice(-6,-1),
+      "high"
+    );
+
+  const secondBreakout =
+    pullback &&
+    shortResistance!==null &&
+    price!==null &&
+    price>shortResistance &&
+    strongVolume;
+
+  const belowSupport =
+    price!==null &&
+    support!==null &&
+    price<support;
+
+  const falseBreakout =
+    veryStrongVolume &&
+    inst.available &&
+    instSellToday;
+
+  const volumeWarning =
+    veryStrongVolume &&
+    price!==null &&
+    prev!==null &&
+    price<=prev;
+
+
+  let score=0;
+
+  const rules=[];
+
+
+  const add =
+    (
+      name,
+      ok,
+      points,
+      desc
+    ) => {
+
+      if(ok){
+        score += points;
+      }
+
+      rules.push({
+        name,
+        ok,
+        points,
+        desc
+      });
+
+    };
+
+
+  add(
+    "價格站上 MA20",
+    price!==null &&
+    ma20!==null &&
+    price>ma20,
+    10,
+    "中期趨勢偏多"
+  );
+
+
+  add(
+    "MA5 > MA20",
+    ma5!==null &&
+    ma20!==null &&
+    ma5>ma20,
+    8,
+    "短線動能優於月線"
+  );
+
+
+  add(
+    "MA5 > MA20 > MA60",
+    ma5!==null &&
+    ma20!==null &&
+    ma60!==null &&
+    ma5>ma20 &&
+    ma20>ma60,
+    10,
+    "多頭均線排列"
+  );
+
+
+  add(
+    "爆量",
+    strongVolume,
+    10,
+    "今日量達5日均量1.5倍"
+  );
+
+
+  add(
+    "法人今日買超",
+    instBuyToday,
+    12,
+    "法人當日合計買超"
+  );
+
+
+  add(
+    "法人5日買超",
+    inst.available &&
+    (inst.total5||0)>0,
+    10,
+    "法人近5日合計買超"
+  );
+
+
+  add(
+    "三大法人同步買進",
+    instSync,
+    15,
+    "外資、投信、自營商同日同步買超"
+  );
+
+
+  add(
+    "爆量突破",
+    breakout &&
+    strongVolume,
+    15,
+    "突破前20日壓力且量能確認"
+  );
+
+
+  add(
+    "回檔承接",
+    pullback,
+    8,
+    "上漲後回撤且法人重新承接"
+  );
+
+
+  add(
+    "拉回法人量能",
+    pullback &&
+    instBuyToday &&
+    strongVolume,
+    7,
+    "拉回後法人與量能重新轉強"
+  );
+
+
+  if(volumeWarning){
+
+    score -= 12;
+
+    rules.push({
+      name:"爆量但價格沒有上漲",
+      ok:false,
+      points:-12,
+      desc:"留意高檔換手或出貨"
+    });
+
+  }
+
+
+  if(falseBreakout){
+
+    score -= 15;
+
+    rules.push({
+      name:"爆量＋法人賣超",
+      ok:false,
+      points:-15,
+      desc:"高風險出貨警訊"
+    });
+
+  }
+
+
+  if(belowSupport){
+
+    score -= 18;
+
+    rules.push({
+      name:"跌破20日支撐",
+      ok:false,
+      points:-18,
+      desc:"結構轉弱"
+    });
+
+  }
+
+
+  score =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Math.round(score)
+      )
+    );
+
+
+  let grade =
+    score>=80
+      ? "A"
+      : score>=65
+        ? "B"
+        : score>=50
+          ? "C"
+          : "D";
+
+
+  if(
+    breakout &&
+    strongVolume &&
+    instBuyToday
+  ){
+    grade="A";
+  }
+
+
+  if(
+    pullback &&
+    instBuyToday &&
+    strongVolume
+  ){
+    grade="A";
+  }
+
+
+  if(falseBreakout){
+    grade="D";
+  }
+
+
+  let signal =
+    "🟡 等待確認";
+
+  let signalDetail =
+    "條件尚未全部成立，先觀察，不急著追價。";
+
+
+  if(
+    falseBreakout ||
+    belowSupport
+  ){
+
+    signal =
+      "🔴 假突破／出貨";
+
+    signalDetail =
+      "爆量但法人偏賣，或價格跌破重要支撐，先防守。";
+
+  }else if(secondBreakout){
+
+    signal =
+      "🔥 二次起漲";
+
+    signalDetail =
+      "拉回後重新突破短線壓力，搭配量能放大，屬較強再攻型態。";
+
+  }else if(
+    breakout &&
+    strongVolume &&
+    instBuyToday
+  ){
+
+    signal =
+      "🚀 爆量突破";
+
+    signalDetail =
+      "突破壓力＋量能確認＋法人買超，屬強勢進場訊號。";
+
+  }else if(pullback){
+
+    signal =
+      "🟢 回檔承接";
+
+    signalDetail =
+      "前段長高後拉回，法人重新買進且量能回升，有肉可觀察。";
+
+  }else if(
+    instSync &&
+    strongVolume
+  ){
+
+    signal =
+      "🟢 法人量價共振";
+
+    signalDetail =
+      "三大法人同步買進，且量能明顯放大。";
+
+  }else if(instSync){
+
+    signal =
+      "🟢 法人共振";
+
+    signalDetail =
+      "三大法人同步買進，但仍等待價格與量能進一步確認。";
+
+  }
+
+
+  const meatDesc = {
+
+    A:"肉多｜條件高度共振",
+
+    B:"有肉｜條件偏多",
+
+    C:"觀察｜尚未完全成形",
+
+    D:"不要碰｜風險偏高"
+
+  }[grade];
+
+
+  let entry1=null;
+
+  let entry2=null;
+
+  let stop=null;
+
+  let tp1=null;
+
+  let tp2=null;
+
+  let rr=null;
+
+
+  if(price!==null){
+
+    if(breakout){
+
+      entry1=price;
+
+      entry2 =
+        resistance!==null
+          ? resistance*1.005
+          : price*0.985;
+
+    }else{
+
+      entry1 =
+        ma5!==null
+          ? Math.min(
+              price,
+              ma5
+            )
+          : price;
+
+      entry2 =
+        ma20!==null
+          ? Math.min(
+              price*0.985,
+              ma20
+            )
+          : price*0.97;
+
+    }
+
+
+    stop =
+      support!==null
+        ? support
+        : price*0.94;
+
+
+    if(stop>=price){
+      stop=price*0.94;
+    }
+
+
+    const risk =
+      price-stop;
+
+
+    tp1 =
+      price +
+      risk*1.5;
+
+
+    tp2 =
+      price +
+      risk*2.5;
+
+
+    rr =
+      risk>0
+        ? 2.5
+        : null;
+
+  }
+
+
+  return {
+
+    stock,
+
+    realtime,
+
+    rows,
+
+    price,
+
+    prev,
+
+    open,
+
+    high,
+
+    low,
+
+    latestVol,
+
+    ma5,
+
+    ma20,
+
+    ma60,
+
+    ma120,
+
+    vol5,
+
+    vol20,
+
+    volRatio5,
+
+    volRatio20,
+
+    inst,
+
+    resistance,
+
+    support,
+
+    breakout,
+
+    breakoutPct,
+
+    strongVolume,
+
+    veryStrongVolume,
+
+    instBuyToday,
+
+    instSellToday,
+
+    instSync,
+
+    pullback,
+
+    gain20,
+
+    recentHigh,
+
+    dropFromHigh,
+
+    secondBreakout,
+
+    belowSupport,
+
+    falseBreakout,
+
+    volumeWarning,
+
+    score,
+
+    grade,
+
+    signal,
+
+    signalDetail,
+
+    meatDesc,
+
+    rules,
+
+    entry1,
+
+    entry2,
+
+    stop,
+
+    tp1,
+
+    tp2,
+
+    rr
+
+  };
+
+}
+
+
+/* =========================================================
+   UI RENDER
+   ========================================================= */
+
+function renderBasic(a){
+
+  const stock =
+    a.stock;
+
+
+  setText(
+    "stockName",
+    stock.name
+  );
+
+
+  setText(
+    "stockMeta",
+    `${stock.code}｜${marketText(stock.market)}｜${stock.sector||"待確認"}`
+  );
+
+
+  setText(
+    "stockPrice",
+    a.price!==null
+      ? fmt(a.price,2)
+      : "--"
+  );
+
+
+  const ch =
+    percentChange(
+      a.prev,
+      a.price
+    );
+
+
+  setText(
+    "changeText",
+    ch!==null
+      ? `${ch>=0?"+":""}${fmt(ch,2)}%　${a.realtime?.time?`更新 ${a.realtime.time}`:"歷史收盤/快取資料"}`
+      : "資料更新中",
+    directionClass(ch)
+  );
+
+
+  let badgeClass =
+    "info";
+
+
+  if(a.grade==="A"){
+    badgeClass="good";
+  }
+
+
+  if(a.grade==="D"){
+    badgeClass="bad";
+  }
+
+
+  if(a.grade==="C"){
+    badgeClass="warn";
+  }
+
+
+  setHTML(
+    "signalBadge",
+    `<span class="badge ${badgeClass}">
+      ${escapeHtml(a.signal)}
+    </span>`
+  );
+
+
+  setText(
+    "mOpen",
+    fmt(a.open)
+  );
+
+
+  setText(
+    "mHigh",
+    fmt(a.high)
+  );
+
+
+  setText(
+    "mLow",
+    fmt(a.low)
+  );
+
+
+  setText(
+    "mVolume",
+    fmtInt(a.latestVol)
+  );
+
+
+  setText(
+    "mMA5",
+    fmt(a.ma5)
+  );
+
+
+  setText(
+    "mMA20",
+    fmt(a.ma20)
+  );
+
+
+  setText(
+    "mMA60",
+    fmt(a.ma60)
+  );
+
+
+  setText(
+    "mVolRatio",
+    a.volRatio5!==null
+      ? fmt(
+          a.volRatio5,
+          2
+        )+"x"
+      : "--"
+  );
+
+
+  setText(
+    "score",
+    String(a.score)
+  );
+
+
+  $("scoreBar").style.width =
+    a.score+"%";
+
+
+  setText(
+    "scoreText",
+    `等級 ${a.grade}｜${
+      a.score>=80
+        ? "強勢"
+        : a.score>=65
+          ? "偏多"
+          : a.score>=50
+            ? "觀察"
+            : "弱勢"
+    }`
+  );
+
+
+  setText(
+    "meatGrade",
+    a.grade
+  );
+
+
+  setText(
+    "meatDesc",
+    a.meatDesc
+  );
+
+
+  setText(
+    "meatReason",
+    meatReason(a)
+  );
+
+
+  setHTML(
+    "signalBox",
+
+    `<div class="signal-main">
+      ${escapeHtml(a.signal)}
+    </div>
+
+    <div class="signal-sub">
+      ${escapeHtml(a.signalDetail)}
+    </div>`
+  );
+
+}
+
+
+function meatReason(a){
+
+  const parts=[];
+
+
+  if(a.instSync){
+    parts.push("三大法人同步");
+  }else if(a.instBuyToday){
+    parts.push("法人買超");
+  }
+
+
+  if(a.strongVolume){
+    parts.push("量能放大");
+  }
+
+
+  if(a.breakout){
+    parts.push("突破壓力");
+  }
+
+
+  if(a.pullback){
+    parts.push("拉回承接");
+  }
+
+
+  if(a.falseBreakout){
+    parts.push("法人賣超");
+  }
+
+
+  if(a.belowSupport){
+    parts.push("跌破支撐");
+  }
+
+
+  return parts.length
+    ? parts.join("＋")
+    : "等待關鍵條件";
+
+}
+
+
+function renderInstitution(a){
+
+  const inst =
+    a.inst;
+
+
+  if(!inst.available){
+
+    setHTML(
+      "institutionTable",
+
+      `<tr>
+        <td
+          colspan="5"
+          class="empty">
+          暫無法人資料｜不以 0 假裝
+        </td>
+      </tr>`
+    );
+
+
+    setText(
+      "institutionNote",
+      "法人資料目前無法取得，分數不會把缺失資料當成買超或賣超。"
+    );
+
+
+    setText(
+      "instSync",
+      "⚪ 無法確認三大法人同步狀態"
+    );
+
+
+    setText(
+      "instPower",
+      "⚪ 法人資料不足，請等待資料更新"
+    );
+
+
+    return;
+
+  }
+
+
+  const rows=[
+
+    [
+      "外資",
+      inst.foreignToday,
+      inst.foreign5,
+      inst.foreign20
+    ],
+
+    [
+      "投信",
+      inst.trustToday,
+      inst.trust5,
+      inst.trust20
+    ],
+
+    [
+      "自營商",
+      inst.dealerToday,
+      inst.dealer5,
+      inst.dealer20
+    ]
+
+  ];
+
+
+  setHTML(
+    "institutionTable",
+
+    rows
+      .map(
+        r => {
+
+          const cls =
+            directionClass(
+              r[1]
             );
 
-        $("progressPercent").textContent =
-            percent+"%";
+          const state =
+            r[1]>0
+              ? "買超"
+              : r[1]<0
+                ? "賣超"
+                : "中性";
 
-        $("progressFill").style.width =
-            percent+"%";
+
+          return `
+            <tr>
+
+              <td>
+                ${r[0]}
+              </td>
+
+              <td class="${cls}">
+                ${sign(r[1])}
+              </td>
+
+              <td class="${directionClass(r[2])}">
+                ${sign(r[2])}
+              </td>
+
+              <td class="${directionClass(r[3])}">
+                ${sign(r[3])}
+              </td>
+
+              <td class="${cls}">
+                ${state}
+              </td>
+
+            </tr>
+          `;
+
+        }
+      )
+      .join("")
+  );
+
+
+  setText(
+    "institutionNote",
+    `最新法人日期：${inst.latestDate||"--"}｜數字依公開資料彙整`
+  );
+
+
+  if(a.instSync){
+
+    setText(
+      "instSync",
+      "🟢 三大法人同步買進",
+      "green"
+    );
+
+  }else if(a.instBuyToday){
+
+    setText(
+      "instSync",
+      "🟡 法人合計買超，但未三方同步",
+      "yellow"
+    );
+
+  }else if(a.instSellToday){
+
+    setText(
+      "instSync",
+      "🔴 法人合計賣超",
+      "red"
+    );
+
+  }else{
+
+    setText(
+      "instSync",
+      "🟡 法人合計接近中性",
+      "yellow"
+    );
+
+  }
+
+
+  const power =
+    a.inst.total5;
+
+
+  setText(
+    "instPower",
+
+    power>0
+      ? `🟢 近5日合計 ${sign(power)}｜買方較強`
+      : power<0
+        ? `🔴 近5日合計 ${sign(power)}｜賣方較強`
+        : "🟡 近5日接近中性",
+
+    power>0
+      ? "green"
+      : power<0
+        ? "red"
+        : "yellow"
+  );
+
+}
+
+
+function renderVolume(a){
+
+  setText(
+    "vToday",
+    fmtInt(a.latestVol)
+  );
+
+
+  setText(
+    "vMA5",
+    fmtInt(a.vol5)
+  );
+
+
+  setText(
+    "vMA20",
+    fmtInt(a.vol20)
+  );
+
+
+  setText(
+    "vRatio5",
+    a.volRatio5!==null
+      ? fmt(
+          a.volRatio5,
+          2
+        )+"x"
+      : "--"
+  );
+
+
+  setText(
+    "vRatio20",
+    a.volRatio20!==null
+      ? fmt(
+          a.volRatio20,
+          2
+        )+"x"
+      : "--"
+  );
+
+
+  let text =
+    "量能正常";
+
+
+  if(a.falseBreakout){
+
+    text =
+      "🔴 爆量＋法人賣超，優先防出貨";
+
+  }else if(
+    a.veryStrongVolume &&
+    a.price>a.prev
+  ){
+
+    text =
+      "🔥 極強量能，若同時突破壓力才有意義";
+
+  }else if(
+    a.strongVolume &&
+    a.price>a.prev
+  ){
+
+    text =
+      "🟢 量價同步放大";
+
+  }else if(a.strongVolume){
+
+    text =
+      "🟡 爆量但價格沒有同步上攻，等待確認";
+
+  }else if(
+    a.volRatio5!==null &&
+    a.volRatio5<0.7
+  ){
+
+    text =
+      "🟡 量縮，適合等待方向";
+
+  }
+
+
+  setText(
+    "vText",
+    text
+  );
+
+}
+
+
+function renderTrend(a){
+
+  setText(
+    "tMA5",
+    fmt(a.ma5)
+  );
+
+
+  setText(
+    "tMA20",
+    fmt(a.ma20)
+  );
+
+
+  setText(
+    "tMA60",
+    fmt(a.ma60)
+  );
+
+
+  setText(
+    "tMA120",
+    fmt(a.ma120)
+  );
+
+
+  const arr=[];
+
+
+  if(
+    a.price!==null &&
+    a.ma20!==null
+  ){
+
+    arr.push(
+      a.price>a.ma20
+        ? "價格站上MA20"
+        : "價格跌破MA20"
+    );
+
+  }
+
+
+  if(
+    a.ma5!==null &&
+    a.ma20!==null
+  ){
+
+    arr.push(
+      a.ma5>a.ma20
+        ? "MA5在MA20之上"
+        : "MA5在MA20之下"
+    );
+
+  }
+
+
+  if(
+    a.ma20!==null &&
+    a.ma60!==null
+  ){
+
+    arr.push(
+      a.ma20>a.ma60
+        ? "MA20在MA60之上"
+        : "MA20在MA60之下"
+    );
+
+  }
+
+
+  setText(
+    "trendText",
+    arr.length
+      ? arr.join("｜")
+      : "均線資料不足"
+  );
+
+}
+
+
+function renderPullback(a){
+
+  setText(
+    "pHigh",
+    fmt(a.recentHigh)
+  );
+
+
+  setText(
+    "pDrop",
+    a.dropFromHigh!==null
+      ? pct(a.dropFromHigh)
+      : "--"
+  );
+
+
+  setText(
+    "pGain",
+    a.gain20!==null
+      ? pct(a.gain20)
+      : "--"
+  );
+
+
+  let text =
+    "尚未形成標準拉回承接";
+
+
+  if(a.pullback){
+
+    text =
+      "🟢 長高後拉回＋法人重新買進＋量能回升，有肉型態成立";
+
+  }else if(
+    a.gain20!==null &&
+    a.gain20>=8 &&
+    a.dropFromHigh!==null &&
+    a.dropFromHigh<0
+  ){
+
+    text =
+      "🟡 有上漲後拉回，但法人或量能尚未完全確認";
+
+  }
+
+
+  setText(
+    "pullbackText",
+    text
+  );
+
+}
+
+
+function renderBreakout(a){
+
+  setText(
+    "bResistance",
+    fmt(a.resistance)
+  );
+
+
+  setText(
+    "bPct",
+    a.breakoutPct!==null
+      ? pct(a.breakoutPct)
+      : "--"
+  );
+
+
+  setText(
+    "bVol",
+    a.volRatio5!==null
+      ? fmt(
+          a.volRatio5,
+          2
+        )+"x"
+      : "--"
+  );
+
+
+  let text =
+    "尚未突破前20日壓力";
+
+
+  if(a.falseBreakout){
+
+    text =
+      "🔴 爆量突破疑似出貨：法人同步賣超";
+
+  }else if(
+    a.breakout &&
+    a.strongVolume &&
+    a.instBuyToday
+  ){
+
+    text =
+      "🚀 有效突破：壓力突破＋爆量＋法人買超";
+
+  }else if(a.breakout){
+
+    text =
+      "🟡 價格已突破，但等待量能與法人確認";
+
+  }
+
+
+  setText(
+    "breakoutText",
+    text
+  );
+
+}
+
+
+function renderPlan(a){
+
+  setText(
+    "entry1",
+    fmt(a.entry1)
+  );
+
+  setText(
+    "entry2",
+    fmt(a.entry2)
+  );
+
+  setText(
+    "stop",
+    fmt(a.stop)
+  );
+
+  setText(
+    "tp1",
+    fmt(a.tp1)
+  );
+
+  setText(
+    "tp2",
+    fmt(a.tp2)
+  );
+
+  setText(
+    "rr",
+    a.rr!==null
+      ? fmt(a.rr,1)+"R"
+      : "--"
+  );
+
+}
+
+
+function renderRules(a){
+
+  setHTML(
+    "rules",
+
+    a.rules
+      .map(
+        r => {
+
+          const cls =
+            r.ok
+              ? "ok"
+              : r.points<0
+                ? "no"
+                : "warn";
+
+          const mark =
+            r.ok
+              ? "✓"
+              : r.points<0
+                ? "×"
+                : "•";
+
+
+          return `
+            <div class="rule">
+
+              <span
+                class="dot ${cls}">
+              </span>
+
+              <div>
+
+                <b>
+                  ${mark}
+                  ${escapeHtml(r.name)}
+                </b>
+
+                <br>
+
+                <span class="muted">
+                  ${escapeHtml(r.desc)}
+                  ｜${
+                    r.points>0
+                      ? "+"+r.points
+                      : r.points
+                  }分
+                </span>
+
+              </div>
+
+            </div>
+          `;
+
+        }
+      )
+      .join("")
+  );
+
+}
+
+
+function renderConclusion(a){
+
+  let c="";
+
+
+  if(
+    a.falseBreakout ||
+    a.belowSupport
+  ){
+
+    c =
+      `🔴 <b>目前以防守優先。</b>
+       ${a.falseBreakout
+         ? "出現爆量＋法人賣超。 "
+         : ""}
+       ${a.belowSupport
+         ? "價格跌破20日支撐。 "
+         : ""}
+       不建議因為看到爆量就直接追價。`;
+
+  }else if(a.secondBreakout){
+
+    c =
+      "🔥 <b>二次起漲型。</b> 前段拉高後完成拉回，現在重新突破短線壓力並伴隨量能，屬於目前模型最喜歡的「拉回再攻」結構。";
+
+  }else if(
+    a.breakout &&
+    a.strongVolume &&
+    a.instBuyToday
+  ){
+
+    c =
+      "🚀 <b>爆量突破型。</b> 價格突破前20日壓力，量能達確認門檻且法人買超。重點不是盲目追高，而是觀察突破後能否守住壓力轉支撐。";
+
+  }else if(a.pullback){
+
+    c =
+      "🟢 <b>回檔承接型。</b> 已經長高後拉回，法人重新買進且量能回升。這類型比單純追爆量更適合等待舒服價格。";
+
+  }else if(a.instSync){
+
+    c =
+      "🟢 <b>法人共振。</b> 三大法人同步買進是加分條件，但目前仍需搭配價格、量能與壓力突破確認。";
+
+  }else if(a.score>=65){
+
+    c =
+      "🟡 <b>偏多觀察。</b> 趨勢分數不差，但關鍵進場訊號尚未完全共振。";
+
+  }else{
+
+    c =
+      "🟡 <b>等待確認。</b> 目前條件不足，不追高，等待量價與法人方向更清楚。";
+
+  }
+
+
+  setHTML(
+    "conclusion",
+    c
+  );
+
+}
+
+
+function renderAll(a){
+
+  renderBasic(a);
+
+  renderInstitution(a);
+
+  renderVolume(a);
+
+  renderTrend(a);
+
+  renderPullback(a);
+
+  renderBreakout(a);
+
+  renderPlan(a);
+
+  renderRules(a);
+
+  renderConclusion(a);
+
+}
+
+
+/* =========================================================
+   LOAD STOCK
+   ========================================================= */
+
+async function loadStock(
+  stock,
+  force=false
+){
+
+  if(loading){
+    return;
+  }
+
+  loading=true;
+
+  currentStock=stock;
+
+  setText(
+    "systemStatus",
+    `載入 ${stock.code}...`
+  );
+
+  setText(
+    "stockName",
+    stock.name,
+    "loading"
+  );
+
+
+  try{
+
+    const [
+      realtime,
+      history,
+      inst
+    ] =
+      await Promise.all([
+
+        getRealtime(
+          stock,
+          force
+        ),
+
+        getHistory(
+          stock,
+          force
+        ),
+
+        getInstitution(
+          stock,
+          force
+        )
+
+      ]);
+
+
+    if(
+      !realtime &&
+      !history.length
+    ){
+
+      setText(
+        "systemStatus",
+        "查無行情"
+      );
+
+      setHTML(
+        "signalBox",
+
+        `<div class="signal-main">
+          ⚠️ 暫時查不到資料
+        </div>
+
+        <div class="signal-sub">
+          可能是代號、市場或公開 API 暫時無回應。稍後再試。
+        </div>`
+      );
+
+      return;
+
+    }
+
+
+    const data =
+      buildAnalysis(
+        stock,
+        realtime,
+        history,
+        inst.rows
+      );
+
+
+    data.institutionRows =
+      inst.rows || [];
+
+
+    data.instRaw =
+      inst;
+
+
+    currentData =
+      data;
+
+
+    lastFullRefresh =
+      Date.now();
+
+
+    renderAll(data);
+
+
+    setText(
+      "systemStatus",
+      realtime
+        ? "🟢 即時/快取"
+        : "🟡 歷史收盤"
+    );
+
+
+    startAutoRefresh();
+
+
+  }catch(e){
+
+    console.error(e);
+
+    setText(
+      "systemStatus",
+      "資料異常"
+    );
+
+  }finally{
+
+    loading=false;
+
+  }
+
+}
+
+
+async function loadStockByCode(code){
+
+  const stock =
+    resolveStock(code);
+
+  if(!stock){
+    return;
+  }
+
+  $("searchInput").value =
+    stock.code;
+
+  await loadStock(stock);
+
+}
+
+
+async function doSearch(){
+
+  const q =
+    $("searchInput")
+      .value
+      .trim();
+
+  if(!q){
+    return;
+  }
+
+
+  const local =
+    searchLocal(q);
+
+
+  if(local.length===1){
+
+    await loadStock(
+      local[0]
+    );
+
+    return;
+
+  }
+
+
+  const stock =
+    resolveStock(q);
+
+
+  if(stock){
+
+    await loadStock(stock);
+
+    return;
+
+  }
+
+
+  setText(
+    "systemStatus",
+    "找不到股票"
+  );
+
+
+  setHTML(
+    "suggestions",
+
+    `<div class="small">
+      目前內建搜尋名單沒有「${escapeHtml(q)}」。
+      可直接輸入完整股票代號嘗試。
+    </div>`
+  );
+
+}
+
+
+/* =========================================================
+   AUTO REFRESH
+   V41:
+   Institution rows are preserved
+   ========================================================= */
+
+function startAutoRefresh(){
+
+  clearInterval(
+    autoTimer
+  );
+
+
+  autoTimer =
+    setInterval(
+      async()=>{
+
+        if(
+          !currentStock ||
+          loading
+        ){
+          return;
+        }
+
 
         try{
 
-            const stock=
-                resolveStock(code);
+          const now =
+            Date.now();
+
+          const needFull =
+            now -
+            lastFullRefresh >=
+            180000;
+
+
+          if(needFull){
 
             const [
-                realtime,
-                history,
-                institution
+              realtime,
+              history,
+              inst
             ] =
-            await Promise.all([
+              await Promise.all([
 
-                getRealtime(code),
+                getRealtime(
+                  currentStock,
+                  true
+                ),
 
-                getHistory(code),
+                getHistory(
+                  currentStock,
+                  true
+                ),
 
-                getInstitution(code)
+                getInstitution(
+                  currentStock,
+                  true
+                )
 
-            ]);
+              ]);
+
 
             if(
-                !realtime &&
-                !history.length
+              realtime ||
+              history.length
             ){
-                continue;
-            }
 
-            const data=
+              currentData =
                 buildAnalysis(
-                    stock,
-                    realtime,
-                    history,
-                    institution
+                  currentStock,
+                  realtime,
+                  history,
+                  inst.rows
                 );
 
-            results.push(data);
+
+                currentData.institutionRows =
+                  inst.rows || [];
+
+
+                currentData.instRaw =
+                  inst;
+
+
+                lastFullRefresh =
+                  now;
+
+
+                renderAll(
+                  currentData
+                );
+
+            }
+
+          }else{
+
+            const realtime =
+              await getRealtime(
+                currentStock,
+                true
+              );
+
+
+            if(realtime){
+
+              const data =
+                buildAnalysis(
+
+                  currentStock,
+
+                  realtime,
+
+                  currentData.rows || [],
+
+                  currentData.institutionRows ||
+                  currentData.inst?.rows ||
+                  []
+
+                );
+
+
+              data.institutionRows =
+                currentData.institutionRows ||
+                [];
+
+
+              data.instRaw =
+                currentData.instRaw ||
+                currentData.inst;
+
+
+              currentData =
+                data;
+
+
+              renderAll(
+                currentData
+              );
+
+            }
+
+          }
+
+
+          setText(
+            "systemStatus",
+            realtimeAvailableText(
+              currentData
+            )
+          );
+
 
         }catch(e){
 
-            console.warn(
-                "scan",
-                code,
-                e
-            );
+          console.warn(
+            "auto refresh",
+            e
+          );
 
         }
 
-    }
-
-    results.sort(
-        (a,b)=>
-            b.score-a.score
+      },
+      15000
     );
-
-    $("progressText").textContent =
-        "掃描完成";
-
-    $("progressPercent").textContent =
-        "100%";
-
-    $("progressFill").style.width =
-        "100%";
-
-    renderScanResults(
-        results
-    );
-
-    btn.disabled=false;
 
 }
 
-function renderScanResults(results){
 
-    const top=
-        results
-            .filter(
-                x=>x.score>=45
-            )
-            .slice(0,15);
+function realtimeAvailableText(a){
 
-    if(!top.length){
+  if(!a){
+    return "準備中";
+  }
 
-        $("scanResults").innerHTML =
-            `
-            <div class="notice">
-                目前沒有符合條件的股票。
-                <br>
-                可以等待盤面出現法人、量價與突破共振。
-            </div>
+  return a.realtime
+    ? "🟢 自動更新中"
+    : "🟡 歷史資料";
+
+}
+
+
+async function refreshCurrent(){
+
+  if(!currentStock){
+
+    await doSearch();
+
+    return;
+
+  }
+
+
+  clearInterval(
+    autoTimer
+  );
+
+
+  lastFullRefresh=0;
+
+
+  await loadStock(
+    currentStock,
+    true
+  );
+
+}
+
+
+/* =========================================================
+   STRONG STOCK SCANNER
+   ========================================================= */
+
+async function scanStocks(){
+
+  if(loading){
+    return;
+  }
+
+
+  const btn =
+    $("scanBtn");
+
+
+  btn.disabled=true;
+
+
+  $("scanList").innerHTML =
+    "";
+
+
+  $("scanProgress")
+    .style.width =
+    "0%";
+
+
+  setText(
+    "scanStatus",
+    "掃描中..."
+  );
+
+
+  const results=[];
+
+
+  for(
+    let i=0;
+    i<SCAN_CODES.length;
+    i++
+  ){
+
+    const code =
+      SCAN_CODES[i];
+
+
+    const stock =
+      KNOWN[code];
+
+
+    try{
+
+      const [
+        rt,
+        hist,
+        inst
+      ] =
+        await Promise.all([
+
+          getRealtime(stock),
+
+          getHistory(stock),
+
+          getInstitution(stock)
+
+        ]);
+
+
+      if(
+        rt ||
+        hist.length
+      ){
+
+        const a =
+          buildAnalysis(
+            stock,
+            rt,
+            hist,
+            inst.rows
+          );
+
+        results.push(a);
+
+      }
+
+
+    }catch(e){
+
+    }
+
+
+    const p =
+      Math.round(
+        (i+1) /
+        SCAN_CODES.length *
+        100
+      );
+
+
+    $("scanProgress")
+      .style.width =
+      p+"%";
+
+
+    setText(
+      "scanStatus",
+      `掃描 ${i+1}/${SCAN_CODES.length}`
+    );
+
+  }
+
+
+  results.sort(
+    (a,b)=>
+      b.score-a.score
+  );
+
+
+  if(!results.length){
+
+    $("scanList").innerHTML =
+      `<div class="empty">
+        目前沒有取得足夠資料
+      </div>`;
+
+  }else{
+
+    $("scanList").innerHTML =
+      results
+        .map(
+          a => {
+
+            const cls =
+              a.grade==="A"
+                ? "green"
+                : a.grade==="D"
+                  ? "red"
+                  : "yellow";
+
+
+            return `
+              <button
+                class="scan-item"
+                data-scan="${a.stock.code}"
+                style="
+                  width:100%;
+                  background:transparent;
+                  border:0;
+                  border-bottom:1px solid #1b2940;
+                  color:#fff;
+                  text-align:left;
+                ">
+
+                <span>
+
+                  <b>
+                    ${a.stock.code}
+                  </b>
+
+                  <br>
+
+                  <span class="muted">
+                    ${escapeHtml(a.stock.name)}
+                  </span>
+
+                </span>
+
+
+                <span>
+
+                  <span class="${cls}">
+                    ${escapeHtml(a.signal)}
+                  </span>
+
+                  <br>
+
+                  <span class="muted">
+
+                    ${
+                      a.instSync
+                        ? "三法人同步"
+                        : a.instBuyToday
+                          ? "法人買超"
+                          : "法人未確認"
+                    }
+
+                    ｜
+
+                    ${
+                      a.volRatio5!==null
+                        ? fmt(
+                            a.volRatio5,
+                            1
+                          )+"x"
+                        : "量未知"
+                    }
+
+                  </span>
+
+                </span>
+
+
+                <strong>
+
+                  ${a.score}
+
+                  <br>
+
+                  <span class="muted">
+                    ${a.grade}
+                  </span>
+
+                </strong>
+
+              </button>
             `;
 
-        return;
-
-    }
-
-    $("scanResults").innerHTML =
-        top
-            .map(
-                a=>{
-
-                    const change =
-                        a.change===null
-                            ? "--"
-                            :
-                            (
-                                a.change>0
-                                    ? "+"
-                                    : ""
-                            )+
-                            a.change.toFixed(2)+
-                            "%";
-
-                    return `
-
-                    <div class="list-item">
-
-                        <div class="list-main">
-
-                            <div class="list-title">
-
-                                ${
-                                    a.grade==="A"
-                                        ? "🍖"
-                                        : ""
-                                }
-
-                                ${a.stock.code}
-                                ${a.stock.name}
-
-                            </div>
-
-                            <div class="list-sub">
-                                ${a.signalMain}
-                            </div>
-
-                        </div>
-
-                        <div class="list-right">
-
-                            <div class="list-price">
-                                ${fmt(a.price)}
-                            </div>
-
-                            <div class="list-change ${
-                                a.change>0
-                                    ? "good-text"
-                                    : a.change<0
-                                        ? "bad-text"
-                                        : ""
-                            }">
-                                ${change}
-                            </div>
-
-                            <div class="list-change">
-                                ${Math.round(a.score)}分
-                            </div>
-
-                        </div>
-
-                        <button
-                            class="small-btn"
-                            data-scan-code="${a.stock.code}"
-                        >
-                            查看
-                        </button>
-
-                    </div>
-
-                    `;
-
-                }
-            )
-            .join("");
-
-    $("scanResults")
-        .querySelectorAll(
-            "[data-scan-code]"
+          }
         )
-        .forEach(
-            btn=>
-                btn.addEventListener(
-                    "click",
-                    ()=>{
-                        loadStock(
-                            btn.dataset.scanCode
-                        );
-                    }
-                )
-        );
+        .join("");
+
+
+    document
+      .querySelectorAll(
+        "[data-scan]"
+      )
+      .forEach(
+        b =>
+          b.onclick =
+            () =>
+              loadStockByCode(
+                b.dataset.scan
+              )
+      );
+
+  }
+
+
+  setText(
+    "scanStatus",
+    `完成｜共 ${results.length} 檔`
+  );
+
+
+  btn.disabled=false;
 
 }
 
+
 /* =========================================================
-   底部導覽
+   ANALYSIS MODES
    ========================================================= */
 
-document
-    .querySelectorAll(".nav-btn")
-    .forEach(
-        btn=>
-            btn.addEventListener(
-                "click",
-                ()=>{
+function applyMode(mode){
 
-                    document
-                        .querySelectorAll(
-                            ".nav-btn"
-                        )
-                        .forEach(
-                            x=>
-                                x.classList.remove(
-                                    "active"
-                                )
-                        );
+  if(!currentData){
 
-                    btn.classList.add(
-                        "active"
-                    );
-
-                    const nav=
-                        btn.dataset.nav;
-
-                    if(nav==="top"){
-
-                        window.scrollTo({
-                            top:0,
-                            behavior:"smooth"
-                        });
-
-                    }
-
-                    if(nav==="analysis"){
-
-                        document
-                            .querySelector(
-                                "#signalTitle"
-                            )
-                            ?.scrollIntoView({
-                                behavior:"smooth",
-                                block:"center"
-                            });
-
-                    }
-
-                    if(nav==="signal"){
-
-                        document
-                            .querySelector(
-                                "#finalConclusion"
-                            )
-                            ?.scrollIntoView({
-                                behavior:"smooth",
-                                block:"center"
-                            });
-
-                    }
-
-                    if(nav==="search"){
-
-                        window.scrollTo({
-                            top:0,
-                            behavior:"smooth"
-                        });
-
-                        searchInput.focus();
-
-                    }
-
-                }
-            )
+    setText(
+      "systemStatus",
+      "請先搜尋股票"
     );
 
+    return;
+
+  }
+
+
+  let text="";
+
+
+  if(
+    mode==="breakout"
+  ){
+
+    text =
+      currentData.breakout &&
+      currentData.strongVolume &&
+      currentData.instBuyToday
+
+        ? "🚀 爆量突破成立：壓力、量能、法人三項確認。"
+
+        : "🟡 爆量突破尚未完整成立，先不要追。";
+
+  }
+
+
+  if(
+    mode==="institution"
+  ){
+
+    text =
+      currentData.instSync
+
+        ? "🟢 三大法人同步買進。"
+
+        : currentData.instBuyToday
+
+          ? "🟡 法人合計買超，但尚未三方同步。"
+
+          : "🔴 尚未出現法人同步買進。";
+
+  }
+
+
+  if(
+    mode==="pullback"
+  ){
+
+    text =
+      currentData.pullback
+
+        ? "🟢 長高後拉回＋法人承接＋量能回升成立。"
+
+        : "🟡 回檔承接條件尚未完整。";
+
+  }
+
+
+  if(
+    mode==="meat"
+  ){
+
+    text =
+      `🍖 ${currentData.grade}級｜${currentData.meatDesc}`;
+
+  }
+
+
+  setHTML(
+    "signalBox",
+
+    `<div class="signal-main">
+      ${escapeHtml(text)}
+    </div>
+
+    <div class="signal-sub">
+      ${escapeHtml(currentData.signalDetail)}
+    </div>`
+  );
+
+
+  $("signalBox")
+    .scrollIntoView({
+      behavior:"smooth",
+      block:"center"
+    });
+
+}
+
+
 /* =========================================================
-   自動刷新目前股票
+   EVENTS
    ========================================================= */
 
-setInterval(
-    async ()=>{
+$("searchBtn").onclick =
+  doSearch;
 
-        if(
-            currentStock &&
-            currentData
-        ){
 
-            try{
+$("refreshBtn").onclick =
+  refreshCurrent;
 
-                const realtime =
-                    await getRealtime(
-                        currentStock.code
-                    );
 
-                if(
-                    realtime &&
-                    currentData
-                ){
+$("searchInput")
+  .addEventListener(
+    "keydown",
+    e => {
 
-                    const data=
-                        buildAnalysis(
-                            currentStock,
-                            realtime,
-                            currentData.rows,
-                            currentData.inst.available
-                                ? (
-                                    currentData.inst.rows ||
-                                    []
-                                )
-                                : []
-                        );
+      if(e.key==="Enter"){
+        doSearch();
+      }
 
-                    /*
-                     * 這裡不直接覆蓋法人，
-                     * 避免沒有取得資料時把原資料清掉。
-                     */
+    }
+  );
 
-                    currentData.realtime=
-                        realtime;
 
-                    currentData.price=
-                        realtime.price;
+$("searchInput")
+  .addEventListener(
+    "input",
+    renderSuggestions
+  );
 
-                    currentData.prev=
-                        realtime.prev;
 
-                    currentData.change=
-                        percentChange(
-                            realtime.prev,
-                            realtime.price
-                        );
+$("scanBtn").onclick =
+  scanStocks;
 
-                    currentData.latestVol=
-                        realtime.volume;
 
-                    renderBasic(
-                        currentData
-                    );
+document
+  .querySelectorAll(
+    "[data-code]"
+  )
+  .forEach(
+    b => {
 
-                    renderVolume(
-                        currentData
-                    );
+      b.onclick =
+        () =>
+          loadStockByCode(
+            b.dataset.code
+          );
 
-                }
+    }
+  );
 
-            }catch(e){}
 
-        }
+document
+  .querySelectorAll(
+    "[data-mode]"
+  )
+  .forEach(
+    b => {
 
-    },
-    15000
-);
+      b.onclick =
+        () =>
+          applyMode(
+            b.dataset.mode
+          );
+
+    }
+  );
+
+
+function scrollToId(id){
+
+  const el =
+    $(id);
+
+  if(el){
+
+    el.scrollIntoView({
+      behavior:"smooth",
+      block:"start"
+    });
+
+  }
+
+}
+
+
+window.refreshCurrent =
+  refreshCurrent;
+
+
+window.scrollToId =
+  scrollToId;
+
 
 /* =========================================================
-   初始提示
+   INITIALIZATION
    ========================================================= */
 
-statusEl.textContent =
-    "輸入股票代號，例如 2330、1326、3685";
+(function init(){
 
-/* =========================================================
-   開發者提示
-   ========================================================= */
+  setText(
+    "systemStatus",
+    "🟢 V41 就緒"
+  );
 
-console.log(
-    "台股股票搜尋器 V40 已啟動"
-);
 
-console.log(
-    "核心：法人共振＋爆量＋突破＋長高拉回＋肉度"
-);
+  renderSuggestions();
+
+
+  const saved =
+    localStorage.getItem(
+      "v41_last_stock"
+    );
+
+
+  if(
+    saved &&
+    KNOWN[saved]
+  ){
+
+    $("searchInput").value =
+      saved;
+
+    loadStockByCode(
+      saved
+    );
+
+  }
+
+})();
+
+
+const originalLoadStockByCode =
+  loadStockByCode;
+
+
+loadStockByCode =
+  async function(code){
+
+    localStorage.setItem(
+      "v41_last_stock",
+      code
+    );
+
+    return originalLoadStockByCode(
+      code
+    );
+
+  };
+
 
 </script>
 
