@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
+
+<title>🐰 Crypto AI 虛擬貨幣智慧儀表板</title>
+
+<style>
+:root{
+    --bg:#050607;
+    --panel:#0d0f11;
+    --panel2:#111416;
+    --line:#292d30;
+    --gold:#e9c66a;
+    --gold2:#fff0a5;
+    --green:#21d46b;
+    --green2:#0b6b38;
+    --red:#ff4e5e;
+    --yellow:#f4c84d;
+    --text:#f4f4f4;
+    --muted:#858b90;
+}
+
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+body{
+    margin:0;
+    background:
+        radial-gradient(circle at 50% -10%,#211d0d 0,#080909 35%,#030404 100%);
+    color:var(--text);
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Noto Sans TC",
+        "PingFang TC",
+        Arial,
+        sans-serif;
+}
+
+button,
+input,
+select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.app{
+    width:100%;
+    max-width:680px;
+    margin:auto;
+    padding-bottom:90px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(5,6,7,.94);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid #29230e;
+    padding:15px;
+}
+
+.brand{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.logo{
+    font-size:21px;
+    font-weight:900;
+    color:var(--gold);
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    color:var(--muted);
+}
+
+.dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 12px var(--green);
+}
+
+/* =========================
+   SEARCH
+========================= */
+
+.searchBox{
+    display:flex;
+    gap:8px;
+    margin-top:13px;
+}
+
+.searchBox input{
+    flex:1;
+    min-width:0;
+    background:#101214;
+    color:white;
+    border:1px solid #35302a;
+    border-radius:13px;
+    padding:13px 14px;
+    outline:none;
+}
+
+.searchBox input:focus{
+    border-color:var(--gold);
+    box-shadow:0 0 15px rgba(233,198,106,.15);
+}
+
+.goldBtn{
+    border:1px solid #826c2e;
+    background:linear-gradient(180deg,#6c5720,#30250d);
+    color:var(--gold2);
+    border-radius:13px;
+    padding:0 16px;
+    font-weight:800;
+}
+
+/* =========================
+   PRESETS
+========================= */
+
+.presets{
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    padding:11px 0 2px;
+}
+
+.presets::-webkit-scrollbar{
+    display:none;
+}
+
+.coinBtn{
+    flex:0 0 auto;
+    padding:8px 12px;
+    border-radius:20px;
+    border:1px solid #34383a;
+    background:#111416;
+    color:#c8c8c8;
+}
+
+.coinBtn.active{
+    border-color:var(--gold);
+    color:var(--gold2);
+    box-shadow:0 0 12px rgba(233,198,106,.18);
+}
+
+/* =========================
+   TIMEFRAME
+========================= */
+
+.tabs{
+    display:flex;
+    gap:7px;
+    margin-top:12px;
+}
+
+.tab{
+    flex:1;
+    padding:10px 4px;
+    background:#111416;
+    border:1px solid #292d30;
+    color:#969da1;
+    border-radius:10px;
+}
+
+.tab.active{
+    color:#17130a;
+    background:linear-gradient(180deg,#ffe58a,#b88e28);
+    border-color:var(--gold);
+    font-weight:900;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.card{
+    margin:13px 12px;
+    background:
+        linear-gradient(180deg,
+        rgba(21,23,25,.97),
+        rgba(10,12,13,.98));
+    border:1px solid #292d30;
+    border-radius:18px;
+    padding:16px;
+    box-shadow:
+        0 12px 35px rgba(0,0,0,.25),
+        inset 0 0 25px rgba(255,255,255,.015);
+}
+
+.goldCard{
+    border-color:#5c4b20;
+    box-shadow:
+        0 0 30px rgba(233,198,106,.08),
+        inset 0 0 25px rgba(233,198,106,.025);
+}
+
+.sectionTitle{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:13px;
+}
+
+.sectionTitle strong{
+    font-size:17px;
+}
+
+.sectionTitle span{
+    color:var(--muted);
+    font-size:12px;
+}
+
+/* =========================
+   PRICE
+========================= */
+
+.coinHeader{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+}
+
+.coinName{
+    font-size:25px;
+    font-weight:900;
+}
+
+.coinType{
+    color:var(--muted);
+    font-size:12px;
+    margin-top:3px;
+}
+
+.price{
+    font-size:37px;
+    font-weight:900;
+    letter-spacing:-1px;
+    margin:15px 0 3px;
+}
+
+.change{
+    font-size:15px;
+    font-weight:900;
+}
+
+.up{
+    color:var(--green);
+}
+
+.down{
+    color:var(--red);
+}
+
+.neutral{
+    color:var(--yellow);
+}
+
+/* =========================
+   CHART
+========================= */
+
+.chartWrap{
+    margin-top:15px;
+    height:260px;
+    position:relative;
+    border-radius:14px;
+    overflow:hidden;
+    background:#090b0c;
+    border:1px solid #202427;
+}
+
+canvas{
+    width:100%;
+    height:100%;
+    display:block;
+}
+
+.chartInfo{
+    position:absolute;
+    left:12px;
+    top:10px;
+    font-size:12px;
+    color:#9ca2a6;
+    pointer-events:none;
+}
+
+/* =========================
+   AI SCORE
+========================= */
+
+.aiHero{
+    text-align:center;
+    padding:5px 0 14px;
+}
+
+.aiLabel{
+    color:var(--gold);
+    font-size:13px;
+    letter-spacing:2px;
+}
+
+.aiScore{
+    font-size:68px;
+    font-weight:1000;
+    line-height:1;
+    margin:8px 0;
+}
+
+.aiStatus{
+    display:inline-block;
+    border-radius:30px;
+    padding:8px 22px;
+    font-size:18px;
+    font-weight:900;
+}
+
+.aiStatus.bull{
+    color:#071b0e;
+    background:var(--green);
+}
+
+.aiStatus.bear{
+    color:#240609;
+    background:var(--red);
+}
+
+.aiStatus.wait{
+    color:#271f04;
+    background:var(--yellow);
+}
+
+.aiReason{
+    color:#aeb4b8;
+    line-height:1.7;
+    margin-top:12px;
+    font-size:14px;
+}
+
+/* =========================
+   RADAR
+========================= */
+
+.radarGrid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:9px;
+}
+
+.radar{
+    text-align:center;
+    padding:13px 5px;
+    border:1px solid #252a2d;
+    background:#0b0e0f;
+    border-radius:13px;
+}
+
+.radarName{
+    color:#8e969b;
+    font-size:12px;
+}
+
+.radarScore{
+    font-size:22px;
+    font-weight:900;
+    margin-top:5px;
+}
+
+/* =========================
+   DATA GRID
+========================= */
+
+.dataGrid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:9px;
+}
+
+.dataItem{
+    background:#0b0e0f;
+    border:1px solid #24282a;
+    border-radius:12px;
+    padding:11px;
+}
+
+.dataLabel{
+    font-size:11px;
+    color:#858d92;
+}
+
+.dataValue{
+    margin-top:5px;
+    font-size:17px;
+    font-weight:900;
+}
+
+/* =========================
+   LEVELS
+========================= */
+
+.level{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:13px 0;
+    border-bottom:1px solid #222629;
+}
+
+.level:last-child{
+    border-bottom:none;
+}
+
+.levelName{
+    color:#a4aaae;
+}
+
+.levelPrice{
+    font-size:18px;
+    font-weight:900;
+}
+
+.support{
+    color:var(--green);
+}
+
+.resistance{
+    color:var(--red);
+}
+
+.entry{
+    color:var(--gold);
+}
+
+/* =========================
+   SIGNAL
+========================= */
+
+.signal{
+    padding:14px;
+    border-radius:14px;
+    margin-bottom:9px;
+    border:1px solid #282d30;
+    background:#0a0d0e;
+}
+
+.signal:last-child{
+    margin-bottom:0;
+}
+
+.signalTop{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.signalTitle{
+    font-weight:900;
+}
+
+.signalDesc{
+    color:#969da1;
+    font-size:13px;
+    line-height:1.6;
+    margin-top:5px;
+}
+
+.signal.green{
+    border-left:4px solid var(--green);
+}
+
+.signal.red{
+    border-left:4px solid var(--red);
+}
+
+.signal.yellow{
+    border-left:4px solid var(--yellow);
+}
+
+/* =========================
+   SCRIPT
+========================= */
+
+.scenario{
+    padding:15px;
+    border-radius:15px;
+    margin-bottom:10px;
+    background:#0a0d0e;
+    border:1px solid #262b2d;
+}
+
+.scenario h3{
+    margin:0 0 7px;
+    font-size:16px;
+}
+
+.scenario p{
+    margin:0;
+    color:#a4aaae;
+    font-size:13px;
+    line-height:1.7;
+}
+
+.scenario.upScenario{
+    border-left:4px solid var(--green);
+}
+
+.scenario.flatScenario{
+    border-left:4px solid var(--yellow);
+}
+
+.scenario.downScenario{
+    border-left:4px solid var(--red);
+}
+
+/* =========================
+   CAPITAL CALCULATOR
+========================= */
+
+.inputRow{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.inputGroup label{
+    display:block;
+    color:#858d91;
+    font-size:12px;
+    margin-bottom:5px;
+}
+
+.inputGroup input{
+    width:100%;
+    background:#0b0e0f;
+    border:1px solid #2a2f32;
+    color:white;
+    border-radius:10px;
+    padding:11px;
+    outline:none;
+}
+
+.calcResult{
+    margin-top:12px;
+    padding:15px;
+    background:#0a0d0e;
+    border:1px solid #40351c;
+    border-radius:13px;
+    line-height:1.8;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer{
+    text-align:center;
+    color:#666d71;
+    font-size:11px;
+    line-height:1.7;
+    padding:20px;
+}
+
+.bottomNav{
+    position:fixed;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(680px,100%);
+    z-index:60;
+    background:rgba(8,9,10,.96);
+    backdrop-filter:blur(15px);
+    border-top:1px solid #292d30;
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    padding:8px 5px calc(8px + env(safe-area-inset-bottom));
+}
+
+.navItem{
+    text-align:center;
+    color:#747b7f;
+    font-size:11px;
+    padding:5px;
+}
+
+.navItem.active{
+    color:var(--gold);
+}
+
+.navIcon{
+    font-size:19px;
+    margin-bottom:2px;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+    text-align:center;
+    padding:35px;
+    color:#858d91;
+}
+
+.error{
+    color:var(--red);
+    text-align:center;
+    padding:15px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:420px){
+
+    .price{
+        font-size:31px;
+    }
+
+    .aiScore{
+        font-size:58px;
+    }
+
+    .radarGrid{
+        gap:6px;
+    }
+
+    .radar{
+        padding:10px 3px;
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- HEADER -->
+<header class="header">
+
+    <div class="brand">
+        <div class="logo">🐰 AI CRYPTO</div>
+
+        <div class="status">
+            <span class="dot"></span>
+            <span id="statusText">即時資料</span>
+        </div>
+    </div>
+
+    <div class="searchBox">
+
+        <input
+            id="symbolInput"
+            value="BTCUSDT"
+            placeholder="輸入 BTCUSDT / ETHUSDT / TRUMPUSDT">
+
+        <button
+            class="goldBtn"
+            onclick="searchCoin()">
+            搜尋
+        </button>
+
+    </div>
+
+    <div class="presets">
+
+        <button class="coinBtn active"
+                onclick="quickCoin('BTCUSDT',this)">
+            BTC
+        </button>
+
+        <button class="coinBtn"
+                onclick="quickCoin('ETHUSDT',this)">
+            ETH
+        </button>
+
+        <button class="coinBtn"
+                onclick="quickCoin('SOLUSDT',this)">
+            SOL
+        </button>
+
+        <button class="coinBtn"
+                onclick="quickCoin('BNBUSDT',this)">
+            BNB
+        </button>
+
+        <button class="coinBtn"
+                onclick="quickCoin('XRPUSDT',this)">
+            XRP
+        </button>
+
+        <button class="coinBtn"
+                onclick="quickCoin('DOGEUSDT',this)">
+            DOGE
+        </button>
+
+        <button class="coinBtn"
+                onclick="quickCoin('TRUMPUSDT',this)">
+            TRUMP
+        </button>
+
+    </div>
+
+    <div class="tabs">
+
+        <button class="tab"
+                onclick="changeInterval('5m',this)">
+            5M
+        </button>
+
+        <button class="tab active"
+                onclick="changeInterval('15m',this)">
+            15M
+        </button>
+
+        <button class="tab"
+                onclick="changeInterval('1h',this)">
+            1H
+        </button>
+
+        <button class="tab"
+                onclick="changeInterval('4h',this)">
+            4H
+        </button>
+
+        <button class="tab"
+                onclick="changeInterval('1d',this)">
+            1D
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- MAIN -->
+<main id="main">
+
+<div class="loading">
+    正在載入虛擬貨幣資料...
+</div>
+
+</main>
+
+
+<footer class="footer">
+
+    🐰 Crypto AI 智慧儀表板<br>
+
+    資料來源：Binance 公開市場行情 API<br>
+
+    AI 分析為技術指標規則模型，不代表保證獲利。<br>
+
+    虛擬貨幣具有高度波動與損失風險。
+
+</footer>
+
+</div>
+
+
+<!-- BOTTOM NAV -->
+
+<nav class="bottomNav">
+
+    <div class="navItem active">
+        <div class="navIcon">🏠</div>
+        儀表板
+    </div>
+
+    <div class="navItem">
+        <div class="navIcon">🤖</div>
+        AI偵測
+    </div>
+
+    <div class="navItem">
+        <div class="navIcon">📊</div>
+        行情
+    </div>
+
+    <div class="navItem">
+        <div class="navIcon">🔔</div>
+        警報
+    </div>
+
+    <div class="navItem">
+        <div class="navIcon">⚙️</div>
+        設定
+    </div>
+
+</nav>
+
+
+<script>
+
+/* ==========================================================
+   CONFIG
+========================================================== */
+
+const API = "https://api.binance.com";
+
+let symbol = "BTCUSDT";
+let interval = "15m";
+
+let klines = [];
+let ticker = null;
+
+
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+function fmt(num, digits=2){
+
+    if(num === null || num === undefined || isNaN(num)){
+        return "--";
+    }
+
+    return Number(num).toLocaleString(
+        "en-US",
+        {
+            minimumFractionDigits:digits,
+            maximumFractionDigits:digits
+        }
+    );
+}
+
+
+function pct(num){
+
+    if(num === null || num === undefined || isNaN(num)){
+        return "--";
+    }
+
+    return (num >= 0 ? "+" : "") +
+           Number(num).toFixed(2) +
+           "%";
+}
+
+
+function clamp(v,min,max){
+
+    return Math.max(min,Math.min(max,v));
+
+}
+
+
+/* ==========================================================
+   FETCH TICKER
+========================================================== */
+
+async function fetchTicker(){
+
+    const url =
+        API +
+        "/api/v3/ticker/24hr?symbol=" +
+        symbol;
+
+    const res = await fetch(url);
+
+    if(!res.ok){
+        throw new Error("行情取得失敗");
+    }
+
+    return await res.json();
+
+}
+
+
+/* ==========================================================
+   FETCH KLINES
+========================================================== */
+
+async function fetchKlines(){
+
+    const url =
+        API +
+        "/api/v3/klines?symbol=" +
+        symbol +
+        "&interval=" +
+        interval +
+        "&limit=180";
+
+    const res = await fetch(url);
+
+    if(!res.ok){
+        throw new Error("K線資料取得失敗");
+    }
+
+    return await res.json();
+
+}
+
+
+/* ==========================================================
+   CALCULATIONS
+========================================================== */
+
+function closes(){
+
+    return klines.map(x => Number(x[4]));
+
+}
+
+
+function volumes(){
+
+    return klines.map(x => Number(x[5]));
+
+}
+
+
+/* SMA */
+
+function SMA(arr,period){
+
+    if(arr.length < period){
+        return null;
+    }
+
+    let slice =
+        arr.slice(arr.length-period);
+
+    return slice.reduce((a,b)=>a+b,0)/period;
+
+}
+
+
+/* RSI */
+
+function RSI(arr,period=14){
+
+    if(arr.length < period+1){
+        return 50;
+    }
+
+    let gains = 0;
+    let losses = 0;
+
+    for(
+        let i=arr.length-period;
+        i<arr.length;
+        i++
+    ){
+
+        let diff =
+            arr[i]-arr[i-1];
+
+        if(diff>=0){
+            gains += diff;
+        }else{
+            losses += Math.abs(diff);
+        }
+
+    }
+
+    if(losses === 0){
+        return 100;
+    }
+
+    const rs =
+        (gains/period) /
+        (losses/period);
+
+    return 100-(100/(1+rs));
+
+}
+
+
+/* EMA */
+
+function EMA(arr,period){
+
+    if(arr.length < period){
+        return null;
+    }
+
+    const multiplier =
+        2/(period+1);
+
+    let ema =
+        arr.slice(0,period)
+            .reduce((a,b)=>a+b,0)/period;
+
+    for(let i=period;i<arr.length;i++){
+
+        ema =
+            (arr[i]-ema)*multiplier+ema;
+
+    }
+
+    return ema;
+
+}
+
+
+/* MACD */
+
+function MACD(arr){
+
+    const ema12 = EMA(arr,12);
+    const ema26 = EMA(arr,26);
+
+    if(!ema12 || !ema26){
+        return 0;
+    }
+
+    return ema12-ema26;
+
+}
+
+
+/* ATR */
+
+function ATR(data,period=14){
+
+    if(data.length < period+1){
+        return 0;
+    }
+
+    let trs=[];
+
+    for(let i=1;i<data.length;i++){
+
+        const high=Number(data[i][2]);
+        const low=Number(data[i][3]);
+        const prevClose=Number(data[i-1][4]);
+
+        const tr=Math.max(
+            high-low,
+            Math.abs(high-prevClose),
+            Math.abs(low-prevClose)
+        );
+
+        trs.push(tr);
+
+    }
+
+    return SMA(trs,period) || 0;
+
+}
+
+
+/* volume ratio */
+
+function volumeRatio(data){
+
+    if(data.length < 21){
+        return 1;
+    }
+
+    const current =
+        Number(data[data.length-1][5]);
+
+    const previous =
+        data
+        .slice(data.length-21,data.length-1)
+        .map(x=>Number(x[5]));
+
+    const avg =
+        previous.reduce((a,b)=>a+b,0) /
+        previous.length;
+
+    if(avg===0){
+        return 1;
+    }
+
+    return current/avg;
+
+}
+
+
+/* ==========================================================
+   SUPPORT / RESISTANCE
+========================================================== */
+
+function levels(data){
+
+    const recent =
+        data.slice(-60);
+
+    const highs =
+        recent.map(x=>Number(x[2]));
+
+    const lows =
+        recent.map(x=>Number(x[3]));
+
+    const high =
+        Math.max(...highs);
+
+    const low =
+        Math.min(...lows);
+
+    const current =
+        Number(data[data.length-1][4]);
+
+    const range =
+        high-low;
+
+    let support =
+        low + range*0.25;
+
+    let resistance =
+        low + range*0.75;
+
+    if(current > resistance){
+        resistance = high;
+    }
+
+    if(current < support){
+        support = low;
+    }
+
+    return {
+        high,
+        low,
+        support,
+        resistance
+    };
+
+}
+
+
+/* ==========================================================
+   AI SCORE
+========================================================== */
+
+function analyze(){
+
+    const arr=closes();
+
+    const current =
+        arr[arr.length-1];
+
+    const ma5=SMA(arr,5);
+    const ma20=SMA(arr,20);
+    const ma60=SMA(arr,60);
+
+    const rsi=RSI(arr,14);
+
+    const macd=MACD(arr);
+
+    const atr=ATR(klines,14);
+
+    const volRatio=volumeRatio(klines);
+
+    const lv=levels(klines);
+
+    let score=50;
+
+    /* trend */
+
+    let trend=50;
+
+    if(current>ma5) trend+=12;
+    else trend-=12;
+
+    if(current>ma20) trend+=13;
+    else trend-=13;
+
+    if(current>ma60) trend+=10;
+    else trend-=10;
+
+    trend=clamp(trend,0,100);
+
+
+    /* momentum */
+
+    let momentum=50;
+
+    if(rsi>=55 && rsi<70){
+        momentum+=22;
+    }
+
+    if(rsi>=70){
+        momentum-=10;
+    }
+
+    if(rsi<45){
+        momentum-=20;
+    }
+
+    if(macd>0){
+        momentum+=15;
+    }else{
+        momentum-=15;
+    }
+
+    momentum=clamp(momentum,0,100);
+
+
+    /* volume */
+
+    let volume=50;
+
+    if(volRatio>=1.5){
+        volume+=25;
+    }else if(volRatio>=1.15){
+        volume+=12;
+    }else if(volRatio<0.7){
+        volume-=12;
+    }
+
+    volume=clamp(volume,0,100);
+
+
+    /* position */
+
+    const range=lv.high-lv.low;
+
+    let position=50;
+
+    if(range>0){
+
+        const pos =
+            (current-lv.low)/range;
+
+        if(pos<0.35){
+            position+=25;
+        }else if(pos>0.82){
+            position-=20;
+        }
+
+    }
+
+    position=clamp(position,0,100);
+
+
+    /* risk */
+
+    let risk=65;
+
+    if(rsi>75){
+        risk-=25;
+    }
+
+    if(rsi<25){
+        risk-=10;
+    }
+
+    if(volRatio>2.5){
+        risk-=10;
+    }
+
+    risk=clamp(risk,0,100);
+
+
+    /* overall */
+
+    score =
+        trend*0.30 +
+        momentum*0.25 +
+        volume*0.15 +
+        position*0.20 +
+        risk*0.10;
+
+    score=Math.round(score);
+
+    let state="wait";
+
+    if(score>=70){
+        state="bull";
+    }else if(score<=38){
+        state="bear";
+    }
+
+    /* Don't chase */
+
+    let chase=false;
+
+    if(
+        current>lv.resistance*0.985 ||
+        rsi>=72
+    ){
+        chase=true;
+    }
+
+    /* Entry */
+
+    let entry1 =
+        Math.min(
+            current*0.985,
+            lv.support+(lv.resistance-lv.support)*0.35
+        );
+
+    let entry2 =
+        lv.support+(lv.resistance-lv.support)*0.15;
+
+    let stop =
+        lv.support-atr*0.5;
+
+    if(stop<=0){
+        stop=current*0.92;
+    }
+
+    return {
+        current,
+        ma5,
+        ma20,
+        ma60,
+        rsi,
+        macd,
+        atr,
+        volRatio,
+        levels:lv,
+        trend,
+        momentum,
+        volume,
+        position,
+        risk,
+        score,
+        state,
+        chase,
+        entry1,
+        entry2,
+        stop
+    };
+
+}
+
+
+/* ==========================================================
+   DRAW CHART
+========================================================== */
+
+function drawChart(){
+
+    const canvas=
+        document.getElementById("chart");
+
+    if(!canvas){
+        return;
+    }
+
+    const ctx=
+        canvas.getContext("2d");
+
+    const rect=
+        canvas.getBoundingClientRect();
+
+    const dpr=
+        window.devicePixelRatio || 1;
+
+    canvas.width=
+        rect.width*dpr;
+
+    canvas.height=
+        rect.height*dpr;
+
+    ctx.scale(dpr,dpr);
+
+    const W=rect.width;
+    const H=rect.height;
+
+    ctx.clearRect(0,0,W,H);
+
+    const arr=
+        closes().slice(-80);
+
+    if(arr.length<2){
+        return;
+    }
+
+    const min=
+        Math.min(...arr);
+
+    const max=
+        Math.max(...arr);
+
+    const range=
+        max-min || 1;
+
+    /* grid */
+
+    ctx.strokeStyle="#202
