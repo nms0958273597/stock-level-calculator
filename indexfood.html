@@ -2,32 +2,35 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-
-<meta name="viewport"
-      content="width=device-width,
-      initial-scale=1.0,
-      maximum-scale=1.0,
-      user-scalable=no,
-      viewport-fit=cover">
-
-<meta name="theme-color" content="#090909">
-
-<title>泉州街三寶｜美食廣告</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d10">
+<title>AI 商品廣告製作器</title>
 
 <style>
-
 *{
     box-sizing:border-box;
     margin:0;
     padding:0;
 }
 
+:root{
+    --bg:#080a0d;
+    --panel:#12161b;
+    --panel2:#181d23;
+    --line:#2b323b;
+    --text:#ffffff;
+    --muted:#aeb6c1;
+    --accent:#ffd34e;
+    --accent2:#ff9f1c;
+    --danger:#ff6262;
+    --success:#55d98b;
+}
+
 html,
 body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#000;
+    min-height:100%;
+    background:var(--bg);
+    color:var(--text);
     font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -37,1051 +40,2654 @@ body{
 }
 
 body{
+    overflow-x:hidden;
+}
+
+button,
+input,
+textarea,
+select{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.app{
+    width:100%;
+    max-width:1200px;
+    margin:0 auto;
+    padding:18px;
+}
+
+.header{
+    padding:10px 0 20px;
+}
+
+.header h1{
+    font-size:clamp(28px,6vw,48px);
+    line-height:1.1;
+    font-weight:900;
+}
+
+.header p{
+    margin-top:8px;
+    color:var(--muted);
+    line-height:1.6;
+}
+
+.layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(360px,1fr);
+    gap:16px;
+}
+
+.card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:17px;
+    margin-bottom:16px;
+    box-shadow:0 10px 35px rgba(0,0,0,.18);
+}
+
+.card h2{
+    font-size:20px;
+    margin-bottom:14px;
+}
+
+.card-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+label{
+    display:block;
+    margin:11px 0 7px;
+    font-size:14px;
+    font-weight:800;
+}
+
+input,
+textarea,
+select{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:#0d1014;
+    color:#fff;
+    padding:12px;
+    outline:none;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+    border-color:var(--accent);
+}
+
+textarea{
+    min-height:150px;
+    resize:vertical;
+    line-height:1.55;
+}
+
+.grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+}
+
+.grid3{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+}
+
+.btn{
+    border:0;
+    border-radius:11px;
+    padding:11px 15px;
+    background:#272e37;
+    color:#fff;
+    font-weight:900;
+}
+
+.btn.primary{
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#17120a;
+}
+
+.btn.success{
+    background:#1f6842;
+}
+
+.btn.danger{
+    background:#482323;
+    color:#ffd0d0;
+}
+
+.btn:active{
+    transform:scale(.98);
+}
+
+.help{
+    margin-top:8px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.6;
+}
+
+.file-input{
+    padding:12px;
+    background:#0d1014;
+}
+
+.media-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-top:12px;
+}
+
+.media-item{
+    position:relative;
+    aspect-ratio:1;
+    overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:#050607;
+}
+
+.media-item img,
+.media-item video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.media-number{
+    position:absolute;
+    left:6px;
+    top:6px;
+    padding:3px 7px;
+    border-radius:7px;
+    background:#000b;
+    font-size:11px;
+    font-weight:900;
+}
+
+.media-remove{
+    position:absolute;
+    right:5px;
+    top:5px;
+    width:27px;
+    height:27px;
+    border:0;
+    border-radius:50%;
+    background:#000c;
+    color:#fff;
+    font-weight:900;
+}
+
+.scene-list{
+    display:grid;
+    gap:8px;
+    margin-top:12px;
+}
+
+.scene-item{
+    display:grid;
+    grid-template-columns:70px minmax(0,1fr) auto;
+    gap:10px;
+    align-items:center;
+    background:#0d1014;
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:9px;
+}
+
+.scene-thumb{
+    width:70px;
+    height:52px;
+    border-radius:7px;
+    object-fit:cover;
+    background:#050607;
+}
+
+.scene-text{
+    min-width:0;
+}
+
+.scene-text strong{
+    display:block;
+    font-size:14px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.scene-text span{
+    display:block;
+    margin-top:3px;
+    color:var(--muted);
+    font-size:12px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.preview-area{
     display:flex;
     justify-content:center;
     align-items:center;
+    min-height:500px;
+    padding:15px;
+    background:#050607;
+    border-radius:16px;
 }
 
-/* =========================
-   影片主畫面
-========================= */
-
-.video{
+.preview{
     position:relative;
-
-    width:100vw;
-    height:100vh;
-
-    max-width:720px;
-
+    width:min(100%,360px);
+    aspect-ratio:9/16;
     overflow:hidden;
-
     background:#000;
-
-    color:#fff;
+    border-radius:15px;
+    box-shadow:0 15px 55px #000c;
 }
 
-/* =========================
-   每一幕
-========================= */
+.preview.square{
+    aspect-ratio:1/1;
+}
 
-.slide{
+.preview.landscape{
+    width:min(100%,620px);
+    aspect-ratio:16/9;
+}
 
+.preview-scene{
     position:absolute;
-
     inset:0;
-
     opacity:0;
-
-    transform:scale(1.12);
-
+    transform:scale(1.08);
     transition:
-        opacity 1.2s ease,
-        transform 6s ease;
-
-    pointer-events:none;
+        opacity .8s ease,
+        transform 5s ease;
 }
 
-.slide.active{
-
+.preview-scene.active{
     opacity:1;
-
     transform:scale(1);
-
 }
 
-/* =========================
-   圖片
-========================= */
-
-.slide img{
-
+.preview-scene img,
+.preview-scene video{
     width:100%;
-
     height:100%;
-
     object-fit:cover;
-
-    display:block;
-
 }
 
-/* =========================
-   黑色漸層
-========================= */
+.scene-background{
+    width:100%;
+    height:100%;
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            #6b461e,
+            #16120d 45%,
+            #050505
+        );
+}
 
 .overlay{
-
     position:absolute;
-
     inset:0;
-
     background:
-
         linear-gradient(
             to bottom,
-            rgba(0,0,0,.60) 0%,
-            rgba(0,0,0,.05) 32%,
-            rgba(0,0,0,.05) 50%,
-            rgba(0,0,0,.78) 100%
+            rgba(0,0,0,.65),
+            rgba(0,0,0,.05) 40%,
+            rgba(0,0,0,.8)
         );
-
 }
 
-/* =========================
-   頂部
-========================= */
-
-.top-title{
-
+.preview-brand{
     position:absolute;
-
     top:5%;
-
     left:6%;
-
-    z-index:5;
-
-    font-size:15px;
-
-    letter-spacing:4px;
-
-    font-weight:800;
-
-    text-shadow:
-        0 2px 8px rgba(0,0,0,.9);
-
-}
-
-.location{
-
-    display:inline-block;
-
-    padding:8px 15px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.75);
-
-    border-radius:30px;
-
-    background:
-        rgba(0,0,0,.35);
-
-    backdrop-filter:
-        blur(5px);
-
-}
-
-/* =========================
-   右上圓點
-========================= */
-
-.dots{
-
-    position:absolute;
-
-    top:5.5%;
-
     right:6%;
-
-    z-index:5;
-
-    display:flex;
-
-    gap:6px;
-
-}
-
-.dot{
-
-    width:7px;
-
-    height:7px;
-
-    border-radius:50%;
-
-    background:
-        rgba(255,255,255,.45);
-
-    transition:
-        .3s ease;
-
-}
-
-.dot.active{
-
-    width:22px;
-
-    border-radius:10px;
-
-    background:#fff;
-
-}
-
-/* =========================
-   文字
-========================= */
-
-.caption{
-
-    position:absolute;
-
-    left:7%;
-
-    right:7%;
-
-    bottom:17%;
-
-    z-index:5;
-
-    text-align:left;
-
-    text-shadow:
-        0 3px 12px
-        rgba(0,0,0,.95);
-
-}
-
-.caption h1{
-
-    font-size:
-        clamp(38px,10vw,72px);
-
-    line-height:1.08;
-
-    font-weight:900;
-
-    letter-spacing:3px;
-
-    margin-bottom:14px;
-
-}
-
-.caption p{
-
-    font-size:
-        clamp(18px,5vw,31px);
-
-    line-height:1.45;
-
-    font-weight:700;
-
-    letter-spacing:1px;
-
-}
-
-/* =========================
-   第一幕特別標題
-========================= */
-
-.main-title{
-
-    font-size:
-        clamp(48px,13vw,90px)
-        !important;
-
-    color:#ffd86b;
-
-    text-shadow:
-
-        0 3px 0 #5b2600,
-
-        0 6px 15px
-        rgba(0,0,0,.9);
-
-}
-
-/* =========================
-   紅色強調
-========================= */
-
-.red-line{
-
-    display:inline-block;
-
-    margin-top:12px;
-
-    padding:8px 18px;
-
-    background:#d71920;
-
-    border-radius:5px;
-
-    font-size:
-        clamp(18px,5vw,30px);
-
-    font-weight:900;
-
-    transform:
-        rotate(-1deg);
-
-}
-
-/* =========================
-   CTA
-========================= */
-
-.cta{
-
-    position:absolute;
-
-    left:50%;
-
-    bottom:5%;
-
-    transform:
-        translateX(-50%);
-
     z-index:10;
-
-    white-space:nowrap;
-
-    padding:
-        13px 25px;
-
-    border-radius:40px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #ffd34e,
-            #ff9d00
-        );
-
-    color:#1b1000;
-
-    font-size:
-        clamp(16px,4.5vw,24px);
-
-    font-weight:900;
-
-    box-shadow:
-
-        0 5px 25px
-        rgba(0,0,0,.6),
-
-        0 0 15px
-        rgba(255,190,50,.45);
-
 }
 
-/* =========================
-   進度條
-========================= */
+.brand-badge{
+    display:inline-block;
+    padding:7px 12px;
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:30px;
+    background:#0007;
+    backdrop-filter:blur(6px);
+    font-size:13px;
+    font-weight:800;
+}
 
-.progress-container{
-
+.preview-caption{
     position:absolute;
+    left:6%;
+    right:6%;
+    bottom:14%;
+    z-index:10;
+    text-shadow:0 4px 14px #000;
+}
 
-    left:0;
+.preview-caption h3{
+    margin:0 0 10px;
+    font-size:clamp(30px,8vw,55px);
+    line-height:1.08;
+    font-weight:900;
+    letter-spacing:2px;
+}
 
-    right:0;
+.preview-caption p{
+    margin:0;
+    font-size:clamp(16px,4.5vw,25px);
+    line-height:1.45;
+    font-weight:800;
+}
 
-    bottom:0;
+.preview-caption.big h3{
+    font-size:clamp(38px,10vw,70px);
+}
 
+.preview-caption.huge h3{
+    font-size:clamp(44px,12vw,80px);
+}
+
+.price-badge{
+    display:inline-block;
+    margin-top:10px;
+    padding:7px 13px;
+    border-radius:7px;
+    background:#d71920;
+    color:#fff;
+    font-size:18px;
+    font-weight:900;
+}
+
+.preview-cta{
+    position:absolute;
+    left:50%;
+    bottom:3.5%;
+    z-index:15;
+    transform:translateX(-50%);
+    white-space:nowrap;
+    padding:10px 16px;
+    border-radius:30px;
+    background:linear-gradient(135deg,#ffe36a,#ff9e00);
+    color:#17100a;
+    font-size:14px;
+    font-weight:900;
+    box-shadow:0 5px 20px #0008;
+}
+
+.progress-wrap{
     height:4px;
-
-    z-index:20;
-
-    background:
-        rgba(255,255,255,.15);
-
+    background:#ffffff22;
 }
 
 .progress{
-
+    width:0;
     height:100%;
-
-    width:0%;
-
     background:#fff;
-
-    transform-origin:left center;
-
+    transition:width .1s linear;
 }
 
-/* =========================
-   開始播放
-========================= */
+.status{
+    margin-top:10px;
+    padding:10px;
+    border-radius:10px;
+    background:#0d1014;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.5;
+}
 
-.start-screen{
+.status.ok{
+    color:#8af0b1;
+}
 
-    position:absolute;
+.status.error{
+    color:#ff9b9b;
+}
 
-    inset:0;
-
-    z-index:100;
-
+.checkbox{
     display:flex;
-
-    justify-content:center;
-
     align-items:center;
+    gap:8px;
+    margin-top:12px;
+}
 
+.checkbox input{
+    width:auto;
+}
+
+.template-buttons{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:6px;
+}
+
+.template-btn{
+    border:1px solid var(--line);
+    background:#0d1014;
+    color:#fff;
+    border-radius:10px;
+    padding:10px 5px;
+    font-size:12px;
+    font-weight:800;
+}
+
+.template-btn.active{
+    border-color:var(--accent);
+    background:#302a18;
+}
+
+.end-message{
+    position:absolute;
+    inset:0;
+    z-index:30;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:25px;
+    opacity:0;
+    pointer-events:none;
     background:
-
         radial-gradient(
             circle,
-            rgba(255,180,40,.15),
+            rgba(255,191,50,.25),
             rgba(0,0,0,.95)
         );
-
+    transition:opacity .8s ease;
 }
 
-.start-screen.hidden{
-
-    display:none;
-
-}
-
-.start-button{
-
-    border:0;
-
-    padding:
-        17px 30px;
-
-    border-radius:50px;
-
-    background:#fff;
-
-    color:#111;
-
-    font-size:20px;
-
-    font-weight:900;
-
-    box-shadow:
-        0 10px 35px
-        rgba(0,0,0,.6);
-
-    cursor:pointer;
-
-}
-
-.start-button:active{
-
-    transform:scale(.94);
-
-}
-
-/* =========================
-   最後一幕
-========================= */
-
-.end-card{
-
-    position:absolute;
-
-    inset:0;
-
-    z-index:50;
-
-    display:flex;
-
-    flex-direction:column;
-
-    justify-content:center;
-
-    align-items:center;
-
-    text-align:center;
-
-    padding:30px;
-
-    opacity:0;
-
-    pointer-events:none;
-
-    background:
-
-        radial-gradient(
-            circle at center,
-            rgba(255,185,45,.25),
-            rgba(0,0,0,.95)
-        );
-
-    transition:
-        opacity 1s ease;
-
-}
-
-.end-card.show{
-
+.end-message.show{
     opacity:1;
-
 }
 
-.end-card h2{
-
-    font-size:
-        clamp(38px,10vw,68px);
-
-    color:#ffd25a;
-
-    margin-bottom:15px;
-
-    text-shadow:
-        0 4px 15px #000;
-
+.end-message h2{
+    font-size:clamp(36px,10vw,70px);
+    color:#ffd45b;
+    text-shadow:0 4px 15px #000;
 }
 
-.end-card p{
-
-    font-size:
-        clamp(19px,5vw,30px);
-
+.end-message p{
+    margin-top:12px;
+    font-size:clamp(17px,5vw,28px);
     line-height:1.7;
-
     font-weight:800;
-
 }
 
-.end-button{
-
-    margin-top:30px;
-
-    padding:
-        13px 28px;
-
-    border:
-        2px solid #fff;
-
-    border-radius:40px;
-
-    font-size:18px;
-
-    font-weight:900;
-
+.timeline{
+    display:flex;
+    gap:4px;
+    margin-top:12px;
 }
 
-/* =========================
-   桌機顯示
-========================= */
+.timeline-item{
+    flex:1;
+    min-width:0;
+    padding:8px 4px;
+    border-radius:7px;
+    background:#20262d;
+    color:#aaa;
+    text-align:center;
+    font-size:11px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
 
-@media (min-width:721px){
+.timeline-item.active{
+    background:#8c6b1c;
+    color:#fff;
+}
 
-    .video{
+@media(max-width:850px){
+    .layout{
+        grid-template-columns:1fr;
+    }
+}
 
-        height:100vh;
-
-        box-shadow:
-            0 0 60px
-            rgba(0,0,0,.8);
-
+@media(max-width:600px){
+    .app{
+        padding:10px;
     }
 
-}
+    .grid2,
+    .grid3{
+        grid-template-columns:1fr;
+    }
 
+    .media-grid{
+        grid-template-columns:repeat(3,1fr);
+    }
+
+    .template-buttons{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .preview-area{
+        min-height:420px;
+    }
+}
 </style>
 </head>
 
 <body>
 
-<div class="video" id="video">
+<div class="app">
 
-    <!-- =====================
-         開始畫面
-    ====================== -->
+<header class="header">
+    <h1>🎬 AI 商品廣告製作器</h1>
+    <p>
+        上傳商品照片／影片＋貼上廣告編碼，
+        自動建立短影音廣告預覽。
+    </p>
+</header>
 
-    <div
-        class="start-screen"
-        id="startScreen">
+<div class="layout">
 
-        <button
-            class="start-button"
-            id="startButton">
+<!-- =====================================================
+     LEFT PANEL
+===================================================== -->
 
-            ▶ 開始播放廣告
+<section>
 
-        </button>
+<div class="card">
 
-    </div>
+<div class="card-title">
+    <h2>📦 ① 商品資料</h2>
+</div>
+
+<label for="productName">
+    商品／活動名稱
+</label>
+
+<input
+    id="productName"
+    type="text"
+    placeholder="例如：泉州街三寶"
+>
+
+<div class="grid2">
+
+<div>
+<label for="brandName">
+    品牌／店家
+</label>
+
+<input
+    id="brandName"
+    type="text"
+    placeholder="例如：阿桑大腸麵線"
+>
+</div>
+
+<div>
+<label for="productPrice">
+    價格
+</label>
+
+<input
+    id="productPrice"
+    type="text"
+    placeholder="例如：55元"
+>
+</div>
+
+</div>
+
+<label for="productFeatures">
+    商品特色
+</label>
+
+<textarea
+    id="productFeatures"
+    placeholder="例如：料多實在、香濃順口、台北在地美食"
+></textarea>
+
+<div class="grid2">
+
+<div>
+<label for="address">
+    地址
+</label>
+
+<input
+    id="address"
+    type="text"
+    placeholder="例如：台北市泉州街"
+>
+</div>
+
+<div>
+<label for="phone">
+    電話
+</label>
+
+<input
+    id="phone"
+    type="text"
+    placeholder="例如：02-1234-5678"
+>
+</div>
+
+</div>
+
+<label for="ctaText">
+    最後 CTA
+</label>
+
+<input
+    id="ctaText"
+    type="text"
+    value="今天，就來吃泉州街三寶 ❤️"
+>
+
+</div>
 
 
-    <!-- =====================
-         頂部
-    ====================== -->
+<!-- =====================================================
+     MEDIA
+===================================================== -->
 
-    <div class="top-title">
+<div class="card">
 
-        <span class="location">
-            台北・泉州街
-        </span>
+<h2>📸 ② 上傳圖片／影片</h2>
 
-    </div>
+<input
+    id="mediaInput"
+    class="file-input"
+    type="file"
+    accept="image/*,video/*"
+    multiple
+>
 
+<div class="help">
+    可以一次選擇多張圖片或影片。
+    素材只會暫存在目前瀏覽器，不會自動上傳到伺服器。
+</div>
 
-    <!-- =====================
-         圓點
-    ====================== -->
+<div
+    id="mediaGrid"
+    class="media-grid">
+</div>
 
-    <div
-        class="dots"
-        id="dots">
-    </div>
+<div class="actions">
 
+<button
+    class="btn"
+    id="clearMediaBtn">
+    清除全部素材
+</button>
 
-    <!-- =====================
-         幻燈片
-    ====================== -->
+</div>
 
-    <div id="slides"></div>
-
-
-    <!-- =====================
-         CTA
-    ====================== -->
-
-    <div class="cta">
-
-        今天，就來吃泉州街三寶 ❤️
-
-    </div>
+</div>
 
 
-    <!-- =====================
-         進度條
-    ====================== -->
+<!-- =====================================================
+     SCRIPT
+===================================================== -->
 
-    <div class="progress-container">
+<div class="card">
 
-        <div
-            class="progress"
-            id="progress">
-        </div>
+<h2>📝 ③ 廣告編碼</h2>
 
-    </div>
+<textarea
+    id="scriptInput"
+    placeholder="[SCENE 1]
+泉州街三寶
+台北老饕必吃
+
+[SCENE 2]
+阿桑大腸麵線
+料多實在・香濃順口
+
+[SCENE 3]
+炭烤香腸
+炭火香氣・外酥內嫩
+
+[SCENE 4]
+金桔檸檬
+酸甜解膩・清爽好喝
+
+[END]
+今天，就來吃泉州街三寶 ❤️"
+></textarea>
+
+<div class="actions">
+
+<button
+    class="btn primary"
+    id="parseBtn">
+    ✨ 解析廣告編碼
+</button>
+
+<button
+    class="btn"
+    id="sampleBtn">
+    載入範例
+</button>
+
+<button
+    class="btn danger"
+    id="clearScriptBtn">
+    清除
+</button>
+
+</div>
+
+<div class="help">
+    每一幕使用 [SCENE 1]、[SCENE 2]……
+    第一行是標題，後面文字是副標。
+    最後可以使用 [END]。
+</div>
+
+<div
+    id="sceneList"
+    class="scene-list">
+</div>
+
+</div>
 
 
-    <!-- =====================
-         結尾
-    ====================== -->
+<!-- =====================================================
+     BASIC AUTO COPY
+===================================================== -->
 
-    <div
-        class="end-card"
-        id="endCard">
+<div class="card">
 
-        <h2>
-            泉州街三寶
-        </h2>
+<h2>🤖 ④ 廣告文案工具</h2>
 
-        <p>
-            🍜 阿桑大腸麵線<br>
-            🌭 炭烤香腸<br>
-            🍋 金桔檸檬
-        </p>
+<div class="grid2">
 
-        <div class="end-button">
-            立即品嚐 ❤️
-        </div>
+<button
+    class="btn primary"
+    id="autoCopyBtn">
+    📋 複製廣告編碼
+</button>
 
-    </div>
+<button
+    class="btn"
+    id="saveBtn">
+    💾 儲存設定
+</button>
+
+</div>
+
+<div class="help">
+    「複製廣告編碼」可以把目前腳本直接複製，
+    方便交給 ChatGPT 再修改。
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     RIGHT PANEL
+===================================================== -->
+
+<section>
+
+<div class="card">
+
+<h2>🎨 ⑤ 廣告設定</h2>
+
+<label>
+    廣告模板
+</label>
+
+<div
+    id="templateButtons"
+    class="template-buttons">
+
+<button
+    class="template-btn active"
+    data-template="food">
+    🔥 美食熱賣
+</button>
+
+<button
+    class="template-btn"
+    data-template="premium">
+    ✨ 高級商品
+</button>
+
+<button
+    class="template-btn"
+    data-template="sale">
+    🛍️ 電商促銷
+</button>
+
+<button
+    class="template-btn"
+    data-template="local">
+    🏪 在地店家
+</button>
+
+<button
+    class="template-btn"
+    data-template="short">
+    ⚡ 短影音
+</button>
+
+</div>
+
+<div class="grid2">
+
+<div>
+
+<label for="ratioSelect">
+    影片比例
+</label>
+
+<select id="ratioSelect">
+
+<option value="portrait">
+    9:16｜Reels / Shorts
+</option>
+
+<option value="square">
+    1:1｜社群貼文
+</option>
+
+<option value="landscape">
+    16:9｜YouTube
+</option>
+
+</select>
+
+</div>
+
+<div>
+
+<label for="durationInput">
+    每幕秒數
+</label>
+
+<input
+    id="durationInput"
+    type="number"
+    min="2"
+    max="15"
+    value="5"
+>
+
+</div>
+
+</div>
+
+<label for="fontSelect">
+    字幕大小
+</label>
+
+<select id="fontSelect">
+
+<option value="normal">
+    標準
+</option>
+
+<option value="big">
+    大字
+</option>
+
+<option value="huge">
+    超大字
+</option>
+
+</select>
+
+<label class="checkbox">
+
+<input
+    id="voiceCheck"
+    type="checkbox"
+>
+
+<span>
+    🔊 使用瀏覽器中文語音朗讀
+</span>
+
+</label>
+
+<div class="actions">
+
+<button
+    class="btn primary"
+    id="generateBtn">
+    🚀 產生廣告
+</button>
+
+<button
+    class="btn"
+    id="playBtn">
+    ▶ 播放
+</button>
+
+<button
+    class="btn"
+    id="pauseBtn">
+    ⏸ 暫停
+</button>
+
+<button
+    class="btn"
+    id="restartBtn">
+    ↻ 重播
+</button>
+
+<button
+    class="btn success"
+    id="recordBtn">
+    🎥 錄製影片
+</button>
+
+</div>
+
+<div
+    id="status"
+    class="status">
+    尚未產生廣告
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     PREVIEW
+===================================================== -->
+
+<div class="card">
+
+<h2>🎞️ ⑥ 廣告預覽</h2>
+
+<div class="preview-area">
+
+<div
+    id="preview"
+    class="preview">
+
+<div class="preview-brand">
+    <span
+        id="brandBadge"
+        class="brand-badge">
+        商品廣告
+    </span>
+</div>
+
+<div id="previewScenes"></div>
+
+<div
+    id="previewCTA"
+    class="preview-cta">
+    今天，就來吃泉州街三寶 ❤️
+</div>
+
+<div
+    id="endMessage"
+    class="end-message">
+
+<h2 id="endTitle">
+    廣告完成
+</h2>
+
+<p id="endText">
+    謝謝觀看 ❤️
+</p>
+
+</div>
+
+<div class="progress-wrap">
+
+<div
+    id="progress"
+    class="progress">
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div
+    id="timeline"
+    class="timeline">
+</div>
+
+<div class="help">
+    預覽完成後，可以使用「🎥 錄製影片」。
+    瀏覽器通常會輸出 WebM 格式。
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     CONTACT / STORE CARD
+===================================================== -->
+
+<div class="card">
+
+<h2>📍 ⑦ 店家資訊</h2>
+
+<div
+    id="storeInfo"
+    class="status">
+
+尚未輸入店家資料
+</div>
+
+</div>
+
+</section>
+
+</div>
 
 </div>
 
 
 <script>
 
-/* ==================================================
-   商品照片
+/* =========================================================
+   AI PRODUCT AD MAKER
+   Pure HTML / CSS / JavaScript
+   No external framework required
+========================================================= */
 
-   如果你要換圖片，
-   只需要修改下面 src 的圖片網址。
-================================================== */
 
-const slides = [
+/* =========================================================
+   ELEMENT HELPERS
+========================================================= */
 
-    {
-        src:
-        "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=90",
+const $ = id => document.getElementById(id);
 
-        title:
-        "泉州街三寶",
 
-        text:
-        "一口家鄉味・一吃就上癮！",
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
 
-        type:
-        "main"
-    },
+let mediaFiles = [];
 
-    {
-        src:
-        "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=1200&q=90",
+let scenes = [];
 
-        title:
-        "阿桑大腸麵線",
+let currentScene = 0;
 
-        text:
-        "料多實在・香濃順口"
-    },
+let isPlaying = false;
 
-    {
-        src:
-        "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=90",
+let playTimer = null;
 
-        title:
-        "炭烤香腸",
+let progressTimer = null;
 
-        text:
-        "炭火香氣・外酥內嫩"
-    },
+let currentTemplate = "food";
 
-    {
-        src:
-        "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=1200&q=90",
+let recording = false;
 
-        title:
-        "金桔檸檬",
 
-        text:
-        "酸甜解膩・清爽無負擔"
+/* =========================================================
+   SAMPLE AD SCRIPT
+========================================================= */
+
+const SAMPLE_SCRIPT = `[SCENE 1]
+泉州街三寶
+台北老饕必吃
+
+[SCENE 2]
+阿桑大腸麵線
+料多實在・香濃順口
+
+[SCENE 3]
+炭烤香腸
+炭火香氣・外酥內嫩
+
+[SCENE 4]
+金桔檸檬
+酸甜解膩・清爽好喝
+
+[END]
+今天，就來吃泉州街三寶 ❤️`;
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHTML(value){
+
+    return String(value || "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   UPDATE STATUS
+========================================================= */
+
+function setStatus(message,type=""){
+
+    const el = $("status");
+
+    el.textContent = message;
+
+    el.className = "status";
+
+    if(type){
+
+        el.classList.add(type);
+
     }
 
-];
+}
 
 
-/* ==================================================
-   設定
-================================================== */
+/* =========================================================
+   MEDIA UPLOAD
+========================================================= */
 
-const SLIDE_TIME = 5000;
+$("mediaInput").addEventListener(
+    "change",
+    function(event){
 
-let current = 0;
+        const files =
+            Array.from(event.target.files || []);
 
-let playing = false;
+        files.forEach(file => {
 
-let animationFrame;
+            const url =
+                URL.createObjectURL(file);
 
-let slideStart = 0;
+            mediaFiles.push({
+
+                file:file,
+
+                url:url,
+
+                type:
+                    file.type.startsWith("video/")
+                    ? "video"
+                    : "image",
+
+                name:file.name
+
+            });
+
+        });
+
+        renderMedia();
+
+        generateAd();
+
+    }
+);
 
 
-/* ==================================================
-   建立畫面
-================================================== */
+/* =========================================================
+   RENDER MEDIA
+========================================================= */
 
-const slideContainer =
-    document.getElementById("slides");
+function renderMedia(){
 
-const dots =
-    document.getElementById("dots");
+    const container =
+        $("mediaGrid");
+
+    container.innerHTML = "";
+
+    mediaFiles.forEach(
+        (item,index) => {
+
+            const box =
+                document.createElement("div");
+
+            box.className =
+                "media-item";
+
+            const media =
+                item.type === "video"
+
+                ?
+
+                `<video
+                    src="${item.url}"
+                    muted
+                    playsinline>
+                </video>`
+
+                :
+
+                `<img
+                    src="${item.url}"
+                    alt="${escapeHTML(item.name)}">`;
+
+            box.innerHTML = `
+
+                ${media}
+
+                <span class="media-number">
+                    ${index + 1}
+                </span>
+
+                <button
+                    class="media-remove"
+                    data-index="${index}">
+                    ×
+                </button>
+
+            `;
+
+            container.appendChild(box);
+
+        }
+    );
 
 
-slides.forEach(
-    (item,index)=>{
+    container
+        .querySelectorAll(".media-remove")
+        .forEach(button => {
 
-        const slide =
-            document.createElement("div");
+            button.addEventListener(
+                "click",
+                function(){
 
-        slide.className =
-            "slide";
+                    const index =
+                        Number(
+                            this.dataset.index
+                        );
+
+                    if(mediaFiles[index]){
+
+                        URL.revokeObjectURL(
+                            mediaFiles[index].url
+                        );
+
+                    }
+
+                    mediaFiles.splice(
+                        index,
+                        1
+                    );
+
+                    renderMedia();
+
+                    generateAd();
+
+                }
+            );
+
+        });
+
+}
 
 
-        let titleClass = "";
+/* =========================================================
+   CLEAR MEDIA
+========================================================= */
 
-        if(item.type === "main"){
+$("clearMediaBtn").addEventListener(
+    "click",
+    function(){
 
-            titleClass =
-                "main-title";
+        mediaFiles.forEach(item => {
+
+            URL.revokeObjectURL(
+                item.url
+            );
+
+        });
+
+        mediaFiles = [];
+
+        $("mediaInput").value = "";
+
+        renderMedia();
+
+        generateAd();
+
+    }
+);
+
+
+/* =========================================================
+   SCRIPT PARSER
+========================================================= */
+
+function parseScript(){
+
+    const raw =
+        $("scriptInput")
+        .value
+        .trim();
+
+    if(!raw){
+
+        scenes = [];
+
+        renderSceneList();
+
+        generateAd();
+
+        return;
+
+    }
+
+
+    const endMatch =
+        raw.match(
+            /\[END\]([\s\S]*)$/i
+        );
+
+
+    let mainText =
+        raw;
+
+
+    if(endMatch){
+
+        mainText =
+            raw.substring(
+                0,
+                endMatch.index
+            );
+
+    }
+
+
+    const blocks =
+        mainText
+            .split(
+                /(?=\[SCENE\s*\d+\])/i
+            )
+            .map(
+                block =>
+                    block.trim()
+            )
+            .filter(Boolean);
+
+
+    scenes =
+        blocks.map(
+            (block,index) => {
+
+                const cleaned =
+                    block.replace(
+                        /^\[SCENE\s*\d+\]\s*/i,
+                        ""
+                    );
+
+                const lines =
+                    cleaned
+                        .split(/\n/)
+                        .map(
+                            line =>
+                                line.trim()
+                        )
+                        .filter(Boolean);
+
+
+                return {
+
+                    id:index + 1,
+
+                    title:
+                        lines[0]
+                        ||
+                        `場景 ${index + 1}`,
+
+                    subtitle:
+                        lines
+                            .slice(1)
+                            .join(" "),
+
+                    end:false
+
+                };
+
+            }
+        );
+
+
+    if(endMatch){
+
+        const endLines =
+            endMatch[1]
+                .trim()
+                .split(/\n/)
+                .map(
+                    line =>
+                        line.trim()
+                )
+                .filter(Boolean);
+
+
+        if(endLines.length){
+
+            scenes.push({
+
+                id:
+                    scenes.length + 1,
+
+                title:
+                    endLines[0],
+
+                subtitle:
+                    endLines
+                        .slice(1)
+                        .join(" "),
+
+                end:true
+
+            });
 
         }
 
+    }
 
-        slide.innerHTML = `
 
-            <img
-                src="${item.src}"
-                alt="${item.title}">
+    renderSceneList();
 
-            <div class="overlay"></div>
+    generateAd();
 
-            <div class="caption">
+}
 
-                <h1 class="${titleClass}">
-                    ${item.title}
-                </h1>
 
-                <p>
-                    ${item.text}
-                </p>
+/* =========================================================
+   PARSE BUTTON
+========================================================= */
 
-                ${
-                    index === 0
-                    ?
-                    `<div class="red-line">
-                        台北老饕必吃
-                    </div>`
-                    :
-                    ""
+$("parseBtn").addEventListener(
+    "click",
+    parseScript
+);
+
+
+/* =========================================================
+   SAMPLE BUTTON
+========================================================= */
+
+$("sampleBtn").addEventListener(
+    "click",
+    function(){
+
+        $("scriptInput").value =
+            SAMPLE_SCRIPT;
+
+        parseScript();
+
+    }
+);
+
+
+/* =========================================================
+   CLEAR SCRIPT
+========================================================= */
+
+$("clearScriptBtn").addEventListener(
+    "click",
+    function(){
+
+        $("scriptInput").value = "";
+
+        scenes = [];
+
+        renderSceneList();
+
+        generateAd();
+
+    }
+);
+
+
+/* =========================================================
+   RENDER SCENE LIST
+========================================================= */
+
+function renderSceneList(){
+
+    const container =
+        $("sceneList");
+
+    container.innerHTML = "";
+
+
+    scenes.forEach(
+        (scene,index) => {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "scene-item";
+
+
+            const media =
+                mediaFiles.length
+                ?
+                mediaFiles[
+                    index % mediaFiles.length
+                ]
+                :
+                null;
+
+
+            let thumb = "";
+
+            if(media){
+
+                if(media.type === "video"){
+
+                    thumb =
+                        `<video
+                            class="scene-thumb"
+                            src="${media.url}"
+                            muted>
+                        </video>`;
+
+                }
+                else{
+
+                    thumb =
+                        `<img
+                            class="scene-thumb"
+                            src="${media.url}"
+                            alt="">`;
+
                 }
 
-            </div>
+            }
+            else{
 
-        `;
+                thumb =
+                    `<div
+                        class="scene-thumb">
+                    </div>`;
 
-        slideContainer.appendChild(slide);
-
-
-        const dot =
-            document.createElement("span");
-
-        dot.className =
-            "dot";
-
-        dots.appendChild(dot);
-
-    }
-);
+            }
 
 
-/* ==================================================
-   取得元素
-================================================== */
+            item.innerHTML = `
 
-const slideElements =
-    [...document.querySelectorAll(".slide")];
+                ${thumb}
 
-const dotElements =
-    [...document.querySelectorAll(".dot")];
+                <div class="scene-text">
 
-const progress =
-    document.getElementById("progress");
+                    <strong>
+                        ${escapeHTML(scene.title)}
+                    </strong>
 
-const startScreen =
-    document.getElementById("startScreen");
+                    <span>
+                        ${escapeHTML(
+                            scene.subtitle
+                        )}
+                    </span>
 
-const startButton =
-    document.getElementById("startButton");
+                </div>
 
-const endCard =
-    document.getElementById("endCard");
+                <button
+                    class="btn danger"
+                    data-scene="${index}">
+                    ×
+                </button>
+
+            `;
 
 
-/* ==================================================
-   顯示指定畫面
-================================================== */
+            container.appendChild(item);
 
-function showSlide(index){
+        }
+    );
 
-    slideElements.forEach(
-        (slide,i)=>{
 
-            slide.classList.toggle(
-                "active",
-                i === index
+    container
+        .querySelectorAll(
+            "[data-scene]"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                function(){
+
+                    const index =
+                        Number(
+                            this.dataset.scene
+                        );
+
+                    scenes.splice(
+                        index,
+                        1
+                    );
+
+                    renderSceneList();
+
+                    generateAd();
+
+                }
             );
 
-        }
-    );
-
-
-    dotElements.forEach(
-        (dot,i)=>{
-
-            dot.classList.toggle(
-                "active",
-                i === index
-            );
-
-        }
-    );
-
-
-    current = index;
-
-    slideStart =
-        performance.now();
+        });
 
 }
 
 
-/* ==================================================
-   播放動畫
-================================================== */
+/* =========================================================
+   GENERATE PREVIEW
+========================================================= */
 
-function animate(time){
+function generateAd(){
 
-    if(!playing){
+    stopPlayback();
 
-        return;
-
-    }
-
-
-    const elapsed =
-        time - slideStart;
+    const preview =
+        $("preview");
 
 
-    const percent =
-        Math.min(
-            elapsed / SLIDE_TIME,
-            1
-        );
+    preview.className =
+        "preview";
 
 
-    progress.style.width =
-        (percent * 100) + "%";
+    const ratio =
+        $("ratioSelect").value;
 
 
-    if(percent >= 1){
+    if(ratio === "square"){
 
-        nextSlide();
-
-        requestAnimationFrame(
-            animate
-        );
-
-        return;
-
-    }
-
-
-    requestAnimationFrame(
-        animate
-    );
-
-}
-
-
-/* ==================================================
-   下一幕
-================================================== */
-
-function nextSlide(){
-
-    if(current <
-       slideElements.length - 1){
-
-        showSlide(
-            current + 1
+        preview.classList.add(
+            "square"
         );
 
     }
-    else{
 
-        /* 播放完最後一幕 */
 
-        playing = false;
+    if(ratio === "landscape"){
 
-        endCard.classList.add(
-            "show"
+        preview.classList.add(
+            "landscape"
         );
 
-        progress.style.width =
-            "100%";
-
-        return;
-
-    }
-
-}
-
-
-/* ==================================================
-   開始播放
-================================================== */
-
-function start(){
-
-    if(playing){
-
-        return;
-
     }
 
 
-    endCard.classList.remove(
-        "show"
-    );
+    $("brandBadge").textContent =
+        $("brandName").value
+        ||
+        $("productName").value
+        ||
+        "商品廣告";
 
 
-    startScreen.classList.add(
-        "hidden"
-    );
+    $("previewCTA").textContent =
+        $("ctaText").value
+        ||
+        "立即品嚐 ❤️";
 
 
-    playing = true;
+    const list =
+        scenes.length
+        ?
+        scenes
+        :
+        [
 
-    showSlide(0);
+            {
 
-    progress.style.width =
-        "0%";
+                id:1,
 
+                title:
+                    $("productName").value
+                    ||
+                    "你的商品",
 
-    requestAnimationFrame(
-        animate
-    );
+                subtitle:
+                    $("productFeatures").value
+                    ||
+                    "精彩商品介紹",
 
-}
+                end:false
 
+            }
 
-/* ==================================================
-   點擊開始
-================================================== */
-
-startButton.addEventListener(
-    "click",
-    start
-);
-
-
-/* ==================================================
-   點擊畫面：
-
-   左邊 → 上一幕
-   右邊 → 下一幕
-================================================== */
-
-document
-.getElementById("video")
-.addEventListener(
-    "click",
-    function(e){
-
-        if(
-            e.target === startButton
-        ){
-
-            return;
-
-        }
+        ];
 
 
-        if(!playing){
-
-            return;
-
-        }
+    const container =
+        $("previewScenes");
 
 
-        const rect =
-            this.getBoundingClientRect();
+    container.innerHTML = "";
 
 
-        const x =
-            e.clientX -
-            rect.left;
+    list.forEach(
+        (scene,index) => {
+
+            const element =
+                document.createElement(
+                    "div"
+                );
 
 
-        if(
-            x <
-            rect.width / 2
-        ){
+            element.className =
+                "preview-scene";
 
-            if(current > 0){
 
-                showSlide(
-                    current - 1
+            if(index === 0){
+
+                element.classList.add(
+                    "active"
                 );
 
             }
 
-        }
-        else{
 
-            nextSlide();
+            const media =
+                mediaFiles.length
+                ?
+                mediaFiles[
+                    index % mediaFiles.length
+                ]
+                :
+                null;
+
+
+            let mediaHTML = "";
+
+
+            if(media){
+
+                if(media.type === "video"){
+
+                    mediaHTML = `
+
+                        <video
+                            src="${media.url}"
+                            muted
+                            playsinline
+                            preload="metadata">
+                        </video>
+
+                    `;
+
+                }
+                else{
+
+                    mediaHTML = `
+
+                        <img
+                            src="${media.url}"
+                            alt="">
+
+                    `;
+
+                }
+
+            }
+            else{
+
+                mediaHTML = `
+
+                    <div
+                        class="scene-background">
+                    </div>
+
+                `;
+
+            }
+
+
+            const fontClass =
+                $("fontSelect").value === "big"
+                ?
+                "big"
+                :
+                $("fontSelect").value === "huge"
+                ?
+                "huge"
+                :
+                "";
+
+
+            element.innerHTML = `
+
+                ${mediaHTML}
+
+                <div
+                    class="overlay">
+                </div>
+
+                <div
+                    class="preview-caption ${fontClass}">
+
+                    <h3>
+                        ${escapeHTML(
+                            scene.title
+                        )}
+                    </h3>
+
+                    <p>
+                        ${escapeHTML(
+                            scene.subtitle
+                        )}
+                    </p>
+
+                    ${
+                        $("productPrice").value
+                        ?
+                        `
+                        <span
+                            class="price-badge">
+                            ${escapeHTML(
+                                $("productPrice").value
+                            )}
+                        </span>
+                        `
+                        :
+                        ""
+                    }
+
+                </div>
+
+            `;
+
+
+            container.appendChild(
+                element
+            );
+
+        }
+    );
+
+
+    renderTimeline(list);
+
+
+    $("endMessage")
+        .classList.remove(
+            "show"
+        );
+
+
+    updateStoreInfo();
+
+
+    if(list.length){
+
+        currentScene = 0;
+
+    }
+
+
+    setStatus(
+        `已產生 ${list.length} 幕廣告｜每幕 ${$("durationInput").value} 秒`,
+        "ok"
+    );
+
+}
+
+
+/* =========================================================
+   TIMELINE
+========================================================= */
+
+function renderTimeline(list){
+
+    const timeline =
+        $("timeline");
+
+    timeline.innerHTML = "";
+
+
+    list.forEach(
+        (scene,index) => {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+            item.className =
+                "timeline-item";
+
+
+            if(index === 0){
+
+                item.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            item.textContent =
+                `${index + 1}. ${scene.title}`;
+
+
+            timeline.appendChild(
+                item
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SHOW SCENE
+========================================================= */
+
+function showScene(index){
+
+    const elements =
+        [
+            ...document.querySelectorAll(
+                ".preview-scene"
+            )
+        ];
+
+
+    if(!elements.length){
+
+        return;
+
+    }
+
+
+    if(index < 0){
+
+        index = 0;
+
+    }
+
+
+    if(index >= elements.length){
+
+        index =
+            elements.length - 1;
+
+    }
+
+
+    elements.forEach(
+        (element,i) => {
+
+            element.classList.toggle(
+                "active",
+                i === index
+            );
+
+        }
+    );
+
+
+    const timelineItems =
+        [
+            ...document.querySelectorAll(
+                ".timeline-item"
+            )
+        ];
+
+
+    timelineItems.forEach(
+        (item,i) => {
+
+            item.classList.toggle(
+                "active",
+                i === index
+            );
+
+        }
+    );
+
+
+    currentScene =
+        index;
+
+
+    if(
+        $("voiceCheck").checked
+        &&
+        "speechSynthesis" in window
+    ){
+
+        speechSynthesis.cancel();
+
+
+        const scene =
+            scenes[index];
+
+
+        if(scene){
+
+            const utterance =
+                new SpeechSynthesisUtterance(
+                    `${scene.title}。${scene.subtitle}`
+                );
+
+
+            utterance.lang =
+                "zh-TW";
+
+
+            utterance.rate =
+                .95;
+
+
+            utterance.pitch =
+                1;
+
+
+            speechSynthesis.speak(
+                utterance
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   PLAYBACK
+========================================================= */
+
+function startPlayback(){
+
+    if(isPlaying){
+
+        return;
+
+    }
+
+
+    const count =
+        document.querySelectorAll(
+            ".preview-scene"
+        ).length;
+
+
+    if(!count){
+
+        generateAd();
+
+    }
+
+
+    const total =
+        document.querySelectorAll(
+            ".preview-scene"
+        ).length;
+
+
+    if(!total){
+
+        return;
+
+    }
+
+
+    isPlaying = true;
+
+    currentScene = 0;
+
+    showScene(0);
+
+
+    const duration =
+        Math.max(
+            2,
+            Math.min(
+                15,
+                Number(
+                    $("durationInput").value
+                ) || 5
+            )
+        ) * 1000;
+
+
+    $("progress").style.width =
+        "0%";
+
+
+    const startTime =
+        performance.now();
+
+
+    function updateProgress(){
+
+        if(!isPlaying){
+
+            return;
+
+        }
+
+
+        const elapsed =
+            performance.now() -
+            startTime;
+
+
+        const percent =
+            Math.min(
+                elapsed / duration,
+                1
+            );
+
+
+        $("progress").style.width =
+            `${percent * 100}%`;
+
+
+        if(percent >= 1){
+
+            nextScene();
+
+            return;
+
+        }
+
+
+        progressTimer =
+            requestAnimationFrame(
+                updateProgress
+            );
+
+    }
+
+
+    progressTimer =
+        requestAnimationFrame(
+            updateProgress
+        );
+
+
+    playTimer =
+        setTimeout(
+            () => {
+
+                if(!isPlaying){
+
+                    return;
+
+                }
+
+                nextScene();
+
+            },
+            duration
+        );
+
+}
+
+
+/* =========================================================
+   NEXT SCENE
+========================================================= */
+
+function nextScene(){
+
+    clearTimeout(
+        playTimer
+    );
+
+
+    cancelAnimationFrame(
+        progressTimer
+    );
+
+
+    const count =
+        document.querySelectorAll(
+            ".preview-scene"
+        ).length;
+
+
+    if(currentScene >= count - 1){
+
+        isPlaying = false;
+
+        $("progress").style.width =
+            "100%";
+
+
+        $("endMessage")
+            .classList.add(
+                "show"
+            );
+
+
+        if(
+            "speechSynthesis" in window
+        ){
+
+            speechSynthesis.cancel();
+
+        }
+
+
+        return;
+
+    }
+
+
+    currentScene++;
+
+    showScene(
+        currentScene
+    );
+
+
+    const duration =
+        Math.max(
+            2,
+            Math.min(
+                15,
+                Number(
+                    $("durationInput").value
+                ) || 5
+            )
+        ) * 1000;
+
+
+    const startTime =
+        performance.now();
+
+
+    function tick(){
+
+        if(!isPlaying){
+
+            return;
+
+        }
+
+
+        const elapsed =
+            performance.now() -
+            startTime;
+
+
+        const percent =
+            Math.min(
+                elapsed / duration,
+                1
+            );
+
+
+        $("progress").style.width =
+            `${percent * 100}%`;
+
+
+        if(percent >= 1){
+
+            nextScene();
+
+            return;
+
+        }
+
+
+        progressTimer =
+            requestAnimationFrame(
+                tick
+            );
+
+    }
+
+
+    progressTimer =
+        requestAnimationFrame(
+            tick
+        );
+
+
+    playTimer =
+        setTimeout(
+            () => {
+
+                if(isPlaying){
+
+                    nextScene();
+
+                }
+
+            },
+            duration
+        );
+
+}
+
+
+/* =========================================================
+   STOP
+========================================================= */
+
+function stopPlayback(){
+
+    isPlaying = false;
+
+    clearTimeout(
+        playTimer
+    );
+
+    cancelAnimationFrame(
+        progressTimer
+    );
+
+
+    playTimer = null;
+
+    progressTimer = null;
+
+
+    if(
+        "speechSynthesis" in window
+    ){
+
+        speechSynthesis.cancel();
+
+    }
+
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+$("generateBtn").addEventListener(
+    "click",
+    generateAd
+);
+
+
+$("playBtn").addEventListener(
+    "click",
+    startPlayback
+);
+
+
+$("pauseBtn").addEventListener(
+    "click",
+    function(){
+
+        stopPlayback();
+
+        setStatus(
+            "廣告已暫停"
+        );
+
+    }
+);
+
+
+$("restartBtn").addEventListener(
+    "click",
+    function(){
+
+        stopPlayback();
+
+        $("endMessage")
+            .classList.remove(
+                "show"
+            );
+
+        showScene(0);
+
+        startPlayback();
+
+    }
+);
+
+
+/* =========================================================
+   TEMPLATE
+========================================================= */
+
+document
+    .querySelectorAll(
+        ".template-btn"
+    )
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            function(){
+
+                document
+                    .querySelectorAll(
+                        ".template-btn"
+                    )
+                    .forEach(
+                        btn =>
+                            btn.classList.remove(
+                                "active"
+                            )
+                    );
+
+
+                this.classList.add(
+                    "active"
+                );
+
+
+                currentTemplate =
+                    this.dataset.template;
+
+
+                applyTemplate();
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
+   TEMPLATE STYLE
+========================================================= */
+
+function applyTemplate(){
+
+    const preview =
+        $("preview");
+
+
+    preview.dataset.template =
+        currentTemplate;
+
+
+    generateAd();
+
+
+    const messages = {
+
+        food:
+            "🔥 已套用「美食熱賣」模板",
+
+        premium:
+            "✨ 已套用「高級商品」模板",
+
+        sale:
+            "🛍️ 已套用「電商促銷」模板",
+
+        local:
+            "🏪 已套用「在地店家」模板",
+
+        short:
+            "⚡ 已套用「短影音爆款」模板"
+
+    };
+
+
+    setStatus(
+        messages[currentTemplate]
+        ||
+        "模板已套用",
+        "ok"
+    );
+
+}
+
+
+/* =========================================================
+   SETTINGS EVENTS
+========================================================= */
+
+$("ratioSelect").addEventListener(
+    "change",
+    generateAd
+);
+
+
+$("fontSelect").addEventListener(
+    "change",
+    generateAd
+);
+
+
+$("durationInput").addEventListener(
+    "change",
+    generateAd
+);
+
+
+/* =========================================================
+   PRODUCT LIVE UPDATE
+========================================================= */
+
+[
+    "productName",
+    "brandName",
+    "productPrice",
+    "productFeatures",
+    "address",
+    "phone",
+    "ctaText"
+]
+.forEach(
+    id => {
+
+        $(id).addEventListener(
+            "input",
+            function(){
+
+                generateAd();
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   STORE INFO
+========================================================= */
+
+function updateStoreInfo(){
+
+    const brand =
+        $("brandName").value
+        ||
+        $("productName").value
+        ||
+        "未設定";
+
+
+    const address =
+        $("address").value
+        ||
+        "尚未設定";
+
+
+    const phone =
+        $("phone").value
+        ||
+        "尚未設定";
+
+
+    $("storeInfo").innerHTML = `
+
+        <strong>
+            ${escapeHTML(brand)}
+        </strong>
+
+        <br><br>
+
+        📍
+        ${escapeHTML(address)}
+
+        <br>
+
+        ☎️
+        ${escapeHTML(phone)}
+
+    `;
+
+}
+
+
+/* =========================================================
+   COPY SCRIPT
+========================================================= */
+
+$("autoCopyBtn").addEventListener(
+    "click",
+    async function(){
+
+        const text =
+            $("scriptInput").value;
+
+
+        try{
+
+            await navigator.clipboard.writeText(
+                text
+            );
+
+
+            setStatus(
+                "廣告編碼已複製到剪貼簿",
+                "ok"
+            );
+
+        }
+        catch(error){
+
+            setStatus(
+                "瀏覽器禁止自動複製，請手動複製文字。",
+                "error"
+            );
 
         }
 
@@ -1089,11 +2695,512 @@ document
 );
 
 
-/* ==================================================
-   初始第一幕
-================================================== */
+/* =========================================================
+   LOCAL STORAGE SAVE
+========================================================= */
 
-showSlide(0);
+$("saveBtn").addEventListener(
+    "click",
+    function(){
+
+        const data = {
+
+            productName:
+                $("productName").value,
+
+            brandName:
+                $("brandName").value,
+
+            productPrice:
+                $("productPrice").value,
+
+            productFeatures:
+                $("productFeatures").value,
+
+            address:
+                $("address").value,
+
+            phone:
+                $("phone").value,
+
+            ctaText:
+                $("ctaText").value,
+
+            script:
+                $("scriptInput").value,
+
+            ratio:
+                $("ratioSelect").value,
+
+            duration:
+                $("durationInput").value,
+
+            font:
+                $("fontSelect").value,
+
+            template:
+                currentTemplate
+
+        };
+
+
+        localStorage.setItem(
+            "aiProductAdMaker",
+            JSON.stringify(data)
+        );
+
+
+        setStatus(
+            "設定已儲存在本機瀏覽器",
+            "ok"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   LOAD LOCAL STORAGE
+========================================================= */
+
+function loadSavedData(){
+
+    try{
+
+        const raw =
+            localStorage.getItem(
+                "aiProductAdMaker"
+            );
+
+
+        if(!raw){
+
+            return;
+
+        }
+
+
+        const data =
+            JSON.parse(raw);
+
+
+        if(data.productName)
+            $("productName").value =
+                data.productName;
+
+
+        if(data.brandName)
+            $("brandName").value =
+                data.brandName;
+
+
+        if(data.productPrice)
+            $("productPrice").value =
+                data.productPrice;
+
+
+        if(data.productFeatures)
+            $("productFeatures").value =
+                data.productFeatures;
+
+
+        if(data.address)
+            $("address").value =
+                data.address;
+
+
+        if(data.phone)
+            $("phone").value =
+                data.phone;
+
+
+        if(data.ctaText)
+            $("ctaText").value =
+                data.ctaText;
+
+
+        if(data.script)
+            $("scriptInput").value =
+                data.script;
+
+
+        if(data.ratio)
+            $("ratioSelect").value =
+                data.ratio;
+
+
+        if(data.duration)
+            $("durationInput").value =
+                data.duration;
+
+
+        if(data.font)
+            $("fontSelect").value =
+                data.font;
+
+
+        if(data.template){
+
+            currentTemplate =
+                data.template;
+
+
+            document
+                .querySelectorAll(
+                    ".template-btn"
+                )
+                .forEach(button => {
+
+                    button.classList.toggle(
+                        "active",
+                        button.dataset.template
+                        ===
+                        currentTemplate
+                    );
+
+                });
+
+        }
+
+
+    }
+    catch(error){
+
+        console.warn(
+            "Unable to load saved data",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   WEBM RECORDING
+========================================================= */
+
+async function recordAdvertisement(){
+
+    if(recording){
+
+        return;
+
+    }
+
+
+    generateAd();
+
+
+    const preview =
+        $("preview");
+
+
+    if(
+        typeof preview.captureStream !==
+        "function"
+    ){
+
+        setStatus(
+            "此瀏覽器不支援網頁畫面錄製，請使用手機／瀏覽器的螢幕錄影功能。",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    recording = true;
+
+
+    setStatus(
+        "🎥 正在錄製廣告，請稍候……"
+    );
+
+
+    $("endMessage")
+        .classList.remove(
+            "show"
+        );
+
+
+    const stream =
+        preview.captureStream(30);
+
+
+    let recorder;
+
+
+    try{
+
+        recorder =
+            new MediaRecorder(
+                stream,
+                {
+                    mimeType:
+                        "video/webm;codecs=vp9"
+                }
+            );
+
+    }
+    catch(error){
+
+        recorder =
+            new MediaRecorder(
+                stream
+            );
+
+    }
+
+
+    const chunks = [];
+
+
+    recorder.ondataavailable =
+        event => {
+
+            if(
+                event.data &&
+                event.data.size
+            ){
+
+                chunks.push(
+                    event.data
+                );
+
+            }
+
+        };
+
+
+    recorder.onerror =
+        () => {
+
+            recording = false;
+
+            setStatus(
+                "錄製影片時發生錯誤。",
+                "error"
+            );
+
+        };
+
+
+    recorder.onstop =
+        () => {
+
+            recording = false;
+
+
+            const blob =
+                new Blob(
+                    chunks,
+                    {
+                        type:
+                            "video/webm"
+                    }
+                );
+
+
+            const url =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            const link =
+                document.createElement(
+                    "a"
+                );
+
+
+            link.href =
+                url;
+
+
+            link.download =
+                "product-advertisement.webm";
+
+
+            document.body.appendChild(
+                link
+            );
+
+
+            link.click();
+
+
+            link.remove();
+
+
+            setTimeout(
+                () => {
+
+                    URL.revokeObjectURL(
+                        url
+                    );
+
+                },
+                5000
+            );
+
+
+            setStatus(
+                "🎉 廣告影片錄製完成，已產生 WebM 檔案。",
+                "ok"
+            );
+
+        };
+
+
+    recorder.start();
+
+
+    const count =
+        document.querySelectorAll(
+            ".preview-scene"
+        ).length;
+
+
+    const duration =
+        Math.max(
+            2,
+            Math.min(
+                15,
+                Number(
+                    $("durationInput").value
+                )
+                ||
+                5
+            )
+        ) * 1000;
+
+
+    let index = 0;
+
+
+    showScene(0);
+
+
+    const interval =
+        setInterval(
+            () => {
+
+                index++;
+
+
+                if(index < count){
+
+                    showScene(index);
+
+                }
+                else{
+
+                    clearInterval(
+                        interval
+                    );
+
+
+                    setTimeout(
+                        () => {
+
+                            recorder.stop();
+
+                        },
+                        900
+                    );
+
+                }
+
+            },
+            duration
+        );
+
+}
+
+
+/* =========================================================
+   RECORD BUTTON
+========================================================= */
+
+$("recordBtn").addEventListener(
+    "click",
+    recordAdvertisement
+);
+
+
+/* =========================================================
+   KEYBOARD SHORTCUTS
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        if(
+            event.code === "Space"
+            &&
+            document.activeElement.tagName
+            !==
+            "TEXTAREA"
+            &&
+            document.activeElement.tagName
+            !==
+            "INPUT"
+        ){
+
+            event.preventDefault();
+
+
+            if(isPlaying){
+
+                stopPlayback();
+
+            }
+            else{
+
+                startPlayback();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+loadSavedData();
+
+
+if(
+    !$("scriptInput").value.trim()
+){
+
+    $("scriptInput").value =
+        SAMPLE_SCRIPT;
+
+}
+
+
+parseScript();
+
+
+updateStoreInfo();
+
+
+/* =========================================================
+   FINAL READY MESSAGE
+========================================================= */
+
+setStatus(
+    "🎬 廣告製作器已準備完成。可以上傳照片並貼上廣告編碼。",
+    "ok"
+);
 
 </script>
 
