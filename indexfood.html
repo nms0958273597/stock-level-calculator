@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no,
+      viewport-fit=cover">
+
+<meta name="theme-color" content="#090909">
+
+<title>泉州街三寶｜美食廣告</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Noto Sans TC",
+        "Microsoft JhengHei",
+        sans-serif;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* =========================
+   影片主畫面
+========================= */
+
+.video{
+    position:relative;
+
+    width:100vw;
+    height:100vh;
+
+    max-width:720px;
+
+    overflow:hidden;
+
+    background:#000;
+
+    color:#fff;
+}
+
+/* =========================
+   每一幕
+========================= */
+
+.slide{
+
+    position:absolute;
+
+    inset:0;
+
+    opacity:0;
+
+    transform:scale(1.12);
+
+    transition:
+        opacity 1.2s ease,
+        transform 6s ease;
+
+    pointer-events:none;
+}
+
+.slide.active{
+
+    opacity:1;
+
+    transform:scale(1);
+
+}
+
+/* =========================
+   圖片
+========================= */
+
+.slide img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+    display:block;
+
+}
+
+/* =========================
+   黑色漸層
+========================= */
+
+.overlay{
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+
+        linear-gradient(
+            to bottom,
+            rgba(0,0,0,.60) 0%,
+            rgba(0,0,0,.05) 32%,
+            rgba(0,0,0,.05) 50%,
+            rgba(0,0,0,.78) 100%
+        );
+
+}
+
+/* =========================
+   頂部
+========================= */
+
+.top-title{
+
+    position:absolute;
+
+    top:5%;
+
+    left:6%;
+
+    z-index:5;
+
+    font-size:15px;
+
+    letter-spacing:4px;
+
+    font-weight:800;
+
+    text-shadow:
+        0 2px 8px rgba(0,0,0,.9);
+
+}
+
+.location{
+
+    display:inline-block;
+
+    padding:8px 15px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.75);
+
+    border-radius:30px;
+
+    background:
+        rgba(0,0,0,.35);
+
+    backdrop-filter:
+        blur(5px);
+
+}
+
+/* =========================
+   右上圓點
+========================= */
+
+.dots{
+
+    position:absolute;
+
+    top:5.5%;
+
+    right:6%;
+
+    z-index:5;
+
+    display:flex;
+
+    gap:6px;
+
+}
+
+.dot{
+
+    width:7px;
+
+    height:7px;
+
+    border-radius:50%;
+
+    background:
+        rgba(255,255,255,.45);
+
+    transition:
+        .3s ease;
+
+}
+
+.dot.active{
+
+    width:22px;
+
+    border-radius:10px;
+
+    background:#fff;
+
+}
+
+/* =========================
+   文字
+========================= */
+
+.caption{
+
+    position:absolute;
+
+    left:7%;
+
+    right:7%;
+
+    bottom:17%;
+
+    z-index:5;
+
+    text-align:left;
+
+    text-shadow:
+        0 3px 12px
+        rgba(0,0,0,.95);
+
+}
+
+.caption h1{
+
+    font-size:
+        clamp(38px,10vw,72px);
+
+    line-height:1.08;
+
+    font-weight:900;
+
+    letter-spacing:3px;
+
+    margin-bottom:14px;
+
+}
+
+.caption p{
+
+    font-size:
+        clamp(18px,5vw,31px);
+
+    line-height:1.45;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+}
+
+/* =========================
+   第一幕特別標題
+========================= */
+
+.main-title{
+
+    font-size:
+        clamp(48px,13vw,90px)
+        !important;
+
+    color:#ffd86b;
+
+    text-shadow:
+
+        0 3px 0 #5b2600,
+
+        0 6px 15px
+        rgba(0,0,0,.9);
+
+}
+
+/* =========================
+   紅色強調
+========================= */
+
+.red-line{
+
+    display:inline-block;
+
+    margin-top:12px;
+
+    padding:8px 18px;
+
+    background:#d71920;
+
+    border-radius:5px;
+
+    font-size:
+        clamp(18px,5vw,30px);
+
+    font-weight:900;
+
+    transform:
+        rotate(-1deg);
+
+}
+
+/* =========================
+   CTA
+========================= */
+
+.cta{
+
+    position:absolute;
+
+    left:50%;
+
+    bottom:5%;
+
+    transform:
+        translateX(-50%);
+
+    z-index:10;
+
+    white-space:nowrap;
+
+    padding:
+        13px 25px;
+
+    border-radius:40px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffd34e,
+            #ff9d00
+        );
+
+    color:#1b1000;
+
+    font-size:
+        clamp(16px,4.5vw,24px);
+
+    font-weight:900;
+
+    box-shadow:
+
+        0 5px 25px
+        rgba(0,0,0,.6),
+
+        0 0 15px
+        rgba(255,190,50,.45);
+
+}
+
+/* =========================
+   進度條
+========================= */
+
+.progress-container{
+
+    position:absolute;
+
+    left:0;
+
+    right:0;
+
+    bottom:0;
+
+    height:4px;
+
+    z-index:20;
+
+    background:
+        rgba(255,255,255,.15);
+
+}
+
+.progress{
+
+    height:100%;
+
+    width:0%;
+
+    background:#fff;
+
+    transform-origin:left center;
+
+}
+
+/* =========================
+   開始播放
+========================= */
+
+.start-screen{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:100;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:
+
+        radial-gradient(
+            circle,
+            rgba(255,180,40,.15),
+            rgba(0,0,0,.95)
+        );
+
+}
+
+.start-screen.hidden{
+
+    display:none;
+
+}
+
+.start-button{
+
+    border:0;
+
+    padding:
+        17px 30px;
+
+    border-radius:50px;
+
+    background:#fff;
+
+    color:#111;
+
+    font-size:20px;
+
+    font-weight:900;
+
+    box-shadow:
+        0 10px 35px
+        rgba(0,0,0,.6);
+
+    cursor:pointer;
+
+}
+
+.start-button:active{
+
+    transform:scale(.94);
+
+}
+
+/* =========================
+   最後一幕
+========================= */
+
+.end-card{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:50;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    padding:30px;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    background:
+
+        radial-gradient(
+            circle at center,
+            rgba(255,185,45,.25),
+            rgba(0,0,0,.95)
+        );
+
+    transition:
+        opacity 1s ease;
+
+}
+
+.end-card.show{
+
+    opacity:1;
+
+}
+
+.end-card h2{
+
+    font-size:
+        clamp(38px,10vw,68px);
+
+    color:#ffd25a;
+
+    margin-bottom:15px;
+
+    text-shadow:
+        0 4px 15px #000;
+
+}
+
+.end-card p{
+
+    font-size:
+        clamp(19px,5vw,30px);
+
+    line-height:1.7;
+
+    font-weight:800;
+
+}
+
+.end-button{
+
+    margin-top:30px;
+
+    padding:
+        13px 28px;
+
+    border:
+        2px solid #fff;
+
+    border-radius:40px;
+
+    font-size:18px;
+
+    font-weight:900;
+
+}
+
+/* =========================
+   桌機顯示
+========================= */
+
+@media (min-width:721px){
+
+    .video{
+
+        height:100vh;
+
+        box-shadow:
+            0 0 60px
+            rgba(0,0,0,.8);
+
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="video" id="video">
+
+    <!-- =====================
+         開始畫面
+    ====================== -->
+
+    <div
+        class="start-screen"
+        id="startScreen">
+
+        <button
+            class="start-button"
+            id="startButton">
+
+            ▶ 開始播放廣告
+
+        </button>
+
+    </div>
+
+
+    <!-- =====================
+         頂部
+    ====================== -->
+
+    <div class="top-title">
+
+        <span class="location">
+            台北・泉州街
+        </span>
+
+    </div>
+
+
+    <!-- =====================
+         圓點
+    ====================== -->
+
+    <div
+        class="dots"
+        id="dots">
+    </div>
+
+
+    <!-- =====================
+         幻燈片
+    ====================== -->
+
+    <div id="slides"></div>
+
+
+    <!-- =====================
+         CTA
+    ====================== -->
+
+    <div class="cta">
+
+        今天，就來吃泉州街三寶 ❤️
+
+    </div>
+
+
+    <!-- =====================
+         進度條
+    ====================== -->
+
+    <div class="progress-container">
+
+        <div
+            class="progress"
+            id="progress">
+        </div>
+
+    </div>
+
+
+    <!-- =====================
+         結尾
+    ====================== -->
+
+    <div
+        class="end-card"
+        id="endCard">
+
+        <h2>
+            泉州街三寶
+        </h2>
+
+        <p>
+            🍜 阿桑大腸麵線<br>
+            🌭 炭烤香腸<br>
+            🍋 金桔檸檬
+        </p>
+
+        <div class="end-button">
+            立即品嚐 ❤️
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==================================================
+   商品照片
+
+   如果你要換圖片，
+   只需要修改下面 src 的圖片網址。
+================================================== */
+
+const slides = [
+
+    {
+        src:
+        "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=90",
+
+        title:
+        "泉州街三寶",
+
+        text:
+        "一口家鄉味・一吃就上癮！",
+
+        type:
+        "main"
+    },
+
+    {
+        src:
+        "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?auto=format&fit=crop&w=1200&q=90",
+
+        title:
+        "阿桑大腸麵線",
+
+        text:
+        "料多實在・香濃順口"
+    },
+
+    {
+        src:
+        "https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=1200&q=90",
+
+        title:
+        "炭烤香腸",
+
+        text:
+        "炭火香氣・外酥內嫩"
+    },
+
+    {
+        src:
+        "https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=1200&q=90",
+
+        title:
+        "金桔檸檬",
+
+        text:
+        "酸甜解膩・清爽無負擔"
+    }
+
+];
+
+
+/* ==================================================
+   設定
+================================================== */
+
+const SLIDE_TIME = 5000;
+
+let current = 0;
+
+let playing = false;
+
+let animationFrame;
+
+let slideStart = 0;
+
+
+/* ==================================================
+   建立畫面
+================================================== */
+
+const slideContainer =
+    document.getElementById("slides");
+
+const dots =
+    document.getElementById("dots");
+
+
+slides.forEach(
+    (item,index)=>{
+
+        const slide =
+            document.createElement("div");
+
+        slide.className =
+            "slide";
+
+
+        let titleClass = "";
+
+        if(item.type === "main"){
+
+            titleClass =
+                "main-title";
+
+        }
+
+
+        slide.innerHTML = `
+
+            <img
+                src="${item.src}"
+                alt="${item.title}">
+
+            <div class="overlay"></div>
+
+            <div class="caption">
+
+                <h1 class="${titleClass}">
+                    ${item.title}
+                </h1>
+
+                <p>
+                    ${item.text}
+                </p>
+
+                ${
+                    index === 0
+                    ?
+                    `<div class="red-line">
+                        台北老饕必吃
+                    </div>`
+                    :
+                    ""
+                }
+
+            </div>
+
+        `;
+
+        slideContainer.appendChild(slide);
+
+
+        const dot =
+            document.createElement("span");
+
+        dot.className =
+            "dot";
+
+        dots.appendChild(dot);
+
+    }
+);
+
+
+/* ==================================================
+   取得元素
+================================================== */
+
+const slideElements =
+    [...document.querySelectorAll(".slide")];
+
+const dotElements =
+    [...document.querySelectorAll(".dot")];
+
+const progress =
+    document.getElementById("progress");
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const startButton =
+    document.getElementById("startButton");
+
+const endCard =
+    document.getElementById("endCard");
+
+
+/* ==================================================
+   顯示指定畫面
+================================================== */
+
+function showSlide(index){
+
+    slideElements.forEach(
+        (slide,i)=>{
+
+            slide.classList.toggle(
+                "active",
+                i === index
+            );
+
+        }
+    );
+
+
+    dotElements.forEach(
+        (dot,i)=>{
+
+            dot.classList.toggle(
+                "active",
+                i === index
+            );
+
+        }
+    );
+
+
+    current = index;
+
+    slideStart =
+        performance.now();
+
+}
+
+
+/* ==================================================
+   播放動畫
+================================================== */
+
+function animate(time){
+
+    if(!playing){
+
+        return;
+
+    }
+
+
+    const elapsed =
+        time - slideStart;
+
+
+    const percent =
+        Math.min(
+            elapsed / SLIDE_TIME,
+            1
+        );
+
+
+    progress.style.width =
+        (percent * 100) + "%";
+
+
+    if(percent >= 1){
+
+        nextSlide();
+
+        requestAnimationFrame(
+            animate
+        );
+
+        return;
+
+    }
+
+
+    requestAnimationFrame(
+        animate
+    );
+
+}
+
+
+/* ==================================================
+   下一幕
+================================================== */
+
+function nextSlide(){
+
+    if(current <
+       slideElements.length - 1){
+
+        showSlide(
+            current + 1
+        );
+
+    }
+    else{
+
+        /* 播放完最後一幕 */
+
+        playing = false;
+
+        endCard.classList.add(
+            "show"
+        );
+
+        progress.style.width =
+            "100%";
+
+        return;
+
+    }
+
+}
+
+
+/* ==================================================
+   開始播放
+================================================== */
+
+function start(){
+
+    if(playing){
+
+        return;
+
+    }
+
+
+    endCard.classList.remove(
+        "show"
+    );
+
+
+    startScreen.classList.add(
+        "hidden"
+    );
+
+
+    playing = true;
+
+    showSlide(0);
+
+    progress.style.width =
+        "0%";
+
+
+    requestAnimationFrame(
+        animate
+    );
+
+}
+
+
+/* ==================================================
+   點擊開始
+================================================== */
+
+startButton.addEventListener(
+    "click",
+    start
+);
+
+
+/* ==================================================
+   點擊畫面：
+
+   左邊 → 上一幕
+   右邊 → 下一幕
+================================================== */
+
+document
+.getElementById("video")
+.addEventListener(
+    "click",
+    function(e){
+
+        if(
+            e.target === startButton
+        ){
+
+            return;
+
+        }
+
+
+        if(!playing){
+
+            return;
+
+        }
+
+
+        const rect =
+            this.getBoundingClientRect();
+
+
+        const x =
+            e.clientX -
+            rect.left;
+
+
+        if(
+            x <
+            rect.width / 2
+        ){
+
+            if(current > 0){
+
+                showSlide(
+                    current - 1
+                );
+
+            }
+
+        }
+        else{
+
+            nextSlide();
+
+        }
+
+    }
+);
+
+
+/* ==================================================
+   初始第一幕
+================================================== */
+
+showSlide(0);
+
+</script>
+
+</body>
+</html>
